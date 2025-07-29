@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YourToolQuizz - Elige tu SaaS ideal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+    /* Barra superior */
+    header {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+    nav a {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+    /* Contenido principal */
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    main h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    main h2 {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    /* Preguntas y respuestas */
+    .question {
+      margin-bottom: 25px;
+    }
+    .question h3 {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    ul.answers {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.answers li {
+      background: #f9f9f9;
+      margin-bottom: 8px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      border: 1px solid transparent;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    ul.answers li:hover {
+      background: #e2e8f0;
+    }
+    ul.answers li.selected {
+      background: #d0e8ff;
+      border-color: #4a90e2;
+    }
+    ul.answers li input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+    }
+    /* Botón enviar */
+    button#submitBtn {
+      margin-top: 25px;
+      display: block;
+      width: 100%;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button#submitBtn:hover {
+      background-color: #357abd;
+    }
+    /* Mensaje error */
+    #errorMsg {
+      color: red;
+      font-weight: bold;
+      margin-top: 15px;
+      display: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+</div>
+  <nav>
+    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+    <a href="{{ url_for('legal') }}">Aviso Legal</a>
+    <a href="{{ url_for('contact') }}">Contáctanos</a>
+    <a href="{{ url_for('Resultadosposibles') }}">Resultados posibles</a>
+  </nav>
+</header>
+
+<main>
+  <h1>YourToolQuizz</h1>
+  <h2>Empecemos con el quizz</h2>
+
+  <form method="POST" action="/result">
+
+
+    <!-- Pregunta 1 -->
+    <div class="question" data-question="1">
+      <h3>1. ¿Cuál es el tamaño de tu empresa?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q1" value="todoist_1" /> Microempresa (1-10 empleados)</label></li>
+        <li><label><input type="radio" name="q1" value="systemio_2" /> Pequeña empresa (11-50 empleados)</label></li>
+        <li><label><input type="radio" name="q1" value="semsearch_3" /> Mediana empresa (51-200 empleados)</label></li>
+        <li><label><input type="radio" name="q1" value="trello_4" /> Grande (200+ empleados)</label></li>
+        <li><label><input type="radio" name="q1" value="asana_5" /> Autónomo o freelance</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 2 -->
+    <div class="question" data-question="2">
+      <h3>2. ¿Qué función es la más importante para ti?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q2" value="todoist_2" /> Gestión de tareas</label></li>
+        <li><label><input type="radio" name="q2" value="systemio_3" /> Marketing y ventas</label></li>
+        <li><label><input type="radio" name="q2" value="semsearch_4" /> SEO y analítica</label></li>
+        <li><label><input type="radio" name="q2" value="trello_1" /> Organización visual de proyectos</label></li>
+        <li><label><input type="radio" name="q2" value="asana_5" /> Colaboración en equipo</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 3 -->
+    <div class="question" data-question="3">
+      <h3>3. ¿Qué nivel de integración buscas?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q3" value="todoist_3" /> Integración básica</label></li>
+        <li><label><input type="radio" name="q3" value="systemio_4" /> Integración con email marketing</label></li>
+        <li><label><input type="radio" name="q3" value="semsearch_5" /> Integración con SEO tools</label></li>
+        <li><label><input type="radio" name="q3" value="trello_2" /> Integración con apps de productividad</label></li>
+        <li><label><input type="radio" name="q3" value="asana_1" /> Integración avanzada</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 4 -->
+    <div class="question" data-question="4">
+      <h3>4. ¿Cuál es tu presupuesto mensual?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q4" value="todoist_5" /> Menos de 10€</label></li>
+        <li><label><input type="radio" name="q4" value="systemio_3" /> Entre 10€ y 30€</label></li>
+        <li><label><input type="radio" name="q4" value="semsearch_2" /> Entre 30€ y 50€</label></li>
+        <li><label><input type="radio" name="q4" value="trello_1" /> Más de 50€</label></li>
+        <li><label><input type="radio" name="q4" value="asana_4" /> No quiero pagar</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 5 -->
+    <div class="question" data-question="5">
+      <h3>5. ¿Qué tan importante es la facilidad de uso?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q5" value="todoist_5" /> Muy importante</label></li>
+        <li><label><input type="radio" name="q5" value="systemio_4" /> Importante</label></li>
+        <li><label><input type="radio" name="q5" value="semsearch_3" /> Algo importante</label></li>
+        <li><label><input type="radio" name="q5" value="trello_2" /> Poco importante</label></li>
+        <li><label><input type="radio" name="q5" value="asana_1" /> No es importante</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 6 -->
+    <div class="question" data-question="6">
+      <h3>6. ¿Qué tipo de soporte necesitas?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q6" value="todoist_3" /> Soporte básico</label></li>
+        <li><label><input type="radio" name="q6" value="systemio_5" /> Soporte dedicado</label></li>
+        <li><label><input type="radio" name="q6" value="semsearch_2" /> Soporte en línea</label></li>
+        <li><label><input type="radio" name="q6" value="trello_1" /> Soporte comunitario</label></li>
+        <li><label><input type="radio" name="q6" value="asana_4" /> Sin soporte</label></li>
+      </ul>
+    </div>
+
+    <button type="submit" id="submitBtn">Ver Resultado</button>
+    <div id="errorMsg">Por favor, responde todas las preguntas.</div>
+  </form>
+</main>
+
+</body>
+</html>

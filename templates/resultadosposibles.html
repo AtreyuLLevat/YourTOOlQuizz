@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultadosposibles - YourToolQuizz</title>
+  <style>
+    body { font-family: Bahnschrift, sans-serif; margin: 0; padding: 0; background: #fff; color: #000; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #fff; }
+    nav a { margin-right: 20px; text-decoration: none; color: black; font-weight: bold; }
+    .logo { font-weight: bold; font-size: 1.2rem; }
+    main { max-width: 700px; margin: 60px auto; padding: 20px; }
+    h1 { text-align: center; font-size: 2rem; font-weight: bold; }
+    p { font-size: 1rem; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>
+     <div class="logo">
+    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+</div>
+  <nav>
+    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+    <a href="{{ url_for('legal') }}">Aviso Legal</a>
+    <a href="{{ url_for('contact') }}">Contáctanos</a>
+    <a href="{{ url_for('Resultadosposibles') }}">Resultados posibles</a>
+  </nav>
+  </header>
+  <main>
+    <h1>RESULTADOS POSIBLES</h1>
+    <p>
+      En <strong>YourToolQuizz</strong> te damos los siguientes 5 posibles resultados:
+    </p>
+    <p>
+      -System.io
+    </p>
+    <p>
+      -Semrush
+    </p>
+    <p>
+      -TodoIst
+    </p>
+    <p>
+      -Trello
+     </p>
+    <p>
+      -Asana
+    </p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultado del Quiz - YourToolQuizz</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    header {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+    nav a {
+      color: #000;
+      text-decoration: none;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .cta-button {
+      background-color: #4a90e2;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+
+    ul.features {
+      list-style: disc;
+      text-align: left;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    ul.features li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+</div>
+  <nav>
+    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+    <a href="{{ url_for('legal') }}">Aviso Legal</a>
+    <a href="{{ url_for('contact') }}">Contáctanos</a>
+    <a href="{{ url_for('Resultadosposibles') }}">Resultados posibles</a>
+  </nav>
+</header>
+
+  <main>
+    <h1 id="toolName">Tu herramienta ideal es...</h1>
+    <a id="ctaBtn" href="#" class="cta-button" target="_blank">Ir a la herramienta</a>
+    <ul id="featuresList" class="features"></ul>
+  </main>
+
+  <script>
+    const result = localStorage.getItem('quizResult');
+
+    const tools = {
+      todoist: {
+        name: "Todoist",
+        url: "https://todoist.com",
+        features: [
+          "Gestión de tareas simple y efectiva",
+          "Diseño limpio y minimalista",
+          "Integraciones con Gmail, Slack y más",
+          "Listas y recordatorios personalizados",
+          "Funciona en todas las plataformas",
+          "Ideal para autónomos y pequeños equipos",
+          "Sistema de prioridades eficaz",
+          "Modo oscuro disponible",
+          "Ofrece estadísticas de productividad",
+          "Planes gratuitos disponibles"
+        ]
+      },
+      systemio: {
+        name: "System.io",
+        url: "https://systeme.io",
+        features: [
+          "Todo en uno: marketing, funnels y emails",
+          "Automatizaciones sencillas",
+          "Gestión de cursos y productos digitales",
+          "CRM integrado",
+          "Apto para negocios online",
+          "Buen soporte en español",
+          "Planes competitivos",
+          "Ideal para emprendedores digitales",
+          "Permite crear webs y blogs",
+          "Fácil de usar sin saber programar"
+        ]
+      },
+      semsearch: {
+        name: "SEMrush",
+        url: "https://semrush.com",
+        features: [
+          "Análisis SEO profesional",
+          "Monitoreo de palabras clave",
+          "Auditoría web detallada",
+          "Investigación de competidores",
+          "Soporte para agencias",
+          "Gráficos e informes exportables",
+          "Herramientas para contenido SEO",
+          "Integración con Google Search Console",
+          "Alertas de rendimiento",
+          "Panel intuitivo y claro"
+        ]
+      },
+      trello: {
+        name: "Trello",
+        url: "https://trello.com",
+        features: [
+          "Tableros visuales con tarjetas",
+          "Ideal para gestión de proyectos",
+          "Colaboración en tiempo real",
+          "Integraciones con múltiples herramientas",
+          "Fácil de usar para principiantes",
+          "Uso gratuito potente",
+          "Automatización con Butler",
+          "Disponible en móvil y PC",
+          "Plantillas listas para usar",
+          "Vista de calendario y cronograma"
+        ]
+      },
+      asana: {
+        name: "Asana",
+        url: "https://asana.com",
+        features: [
+          "Gestión de tareas en equipo",
+          "Líneas de tiempo y dependencias",
+          "Vista tipo kanban, lista o calendario",
+          "Automatizaciones fáciles",
+          "Seguimiento de objetivos",
+          "Ideal para equipos medianos y grandes",
+          "Paneles personalizables",
+          "Integración con más de 100 apps",
+          "Notificaciones inteligentes",
+          "Planes escalables según equipo"
+        ]
+      }
+    };
+
+    const tool = tools[result] || tools.todoist; // Fallback
+
+    document.getElementById('toolName').textContent = tool.name;
+    document.getElementById('ctaBtn').href = tool.url;
+
+    const list = document.getElementById('featuresList');
+    tool.features.forEach(feature => {
+      const li = document.createElement('li');
+      li.textContent = feature;
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>
