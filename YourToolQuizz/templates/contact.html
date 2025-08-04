@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contáctanos - YourToolQuizz</title>
+  <style>
+    body { font-family: Bahnschrift, sans-serif; margin: 0; padding: 0; background: #fff; color: #000; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); background: #fff; }
+    nav a { margin-right: 20px; text-decoration: none; color: black; font-weight: bold; }
+    .logo { font-weight: bold; font-size: 1.2rem; }
+    main { max-width: 700px; margin: 60px auto; padding: 20px; }
+    form { display: flex; flex-direction: column; gap: 15px; }
+    input, textarea { padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 12px; background: #4a90e2; color: #fff; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+    .flash { background: #d4edda; padding: 10px; margin-bottom: 20px; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724; }
+  </style>
+</head>
+<body>
+  <header>
+      <div class="logo">
+    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+</div>
+  <nav>
+    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+    <a href="{{ url_for('legal') }}">Aviso Legal</a>
+    <a href="{{ url_for('contact') }}">Contáctanos</a>
+  </nav>
+  </header>
+  <main>
+    <h1>Contáctanos</h1>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('contact') }}">
+      <input type="text" name="nombre" placeholder="Tu nombre" required />
+      <input type="email" name="correo" placeholder="Tu correo electrónico" required />
+      <textarea name="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+      <button type="submit">Enviar mensaje</button>
+    </form>
+  </main>
+</body>
+</html>

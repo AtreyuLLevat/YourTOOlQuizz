@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultado del Quiz - YourToolQuizz</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    header {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+    nav a {
+      color: #000;
+      text-decoration: none;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .cta-button {
+      background-color: #4a90e2;
+      color: white;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+
+    ul.features {
+      list-style: disc;
+      text-align: left;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    ul.features li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+    <nav>
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Tu herramienta ideal es: <strong>{{ tool.name }}</strong></h1>
+
+    <a class="cta-button" href="{{ tool.url }}" target="_blank">Ir a la herramienta</a>
+    
+  <h2>Características destacadas:</h2>
+  <ul class="features">
+    {% for feature in tool.features %}
+      <li>{{ feature }}</li>
+    {% endfor %}
+  </ul>
