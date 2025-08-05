@@ -43,19 +43,57 @@
   }
 }
 
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* Responsive: solo en móviles */
+@media (max-width: 600px) {
+  header {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  nav a {
+    margin: 10px 0;
+  }
+
+  nav.show {
+    display: flex;
+  }
+}
+
   </style>
 </head>
 <body>
   <header>
-  <div class="logo">
-    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
-</div>
-  <nav>
-    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
-    <a href="{{ url_for('legal') }}">Aviso Legal</a>
-    <a href="{{ url_for('contact') }}">Contáctanos</a>
-  </nav>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <nav id="mobileMenu">
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
   </header>
+
   <main>
     <h1>Sobre Nosotros</h1>
     <p>
@@ -71,5 +109,11 @@
       ¡Gracias por confiar en nosotros!
     </p>
   </main>
+    <script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('show');
+  }
+</script>
 </body>
 </html>

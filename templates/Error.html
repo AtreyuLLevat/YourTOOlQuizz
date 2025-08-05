@@ -13,7 +13,7 @@
     input, textarea { padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; }
     button { padding: 12px; background: #4a90e2; color: #fff; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
     .flash { background: #d4edda; padding: 10px; margin-bottom: 20px; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724; }
-    
+
     @media (max-width: 600px) {
   body {
     padding: 20px;
@@ -30,6 +30,41 @@
   }
 }
 
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* Responsive: solo en móviles */
+@media (max-width: 600px) {
+  header {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  nav a {
+    margin: 10px 0;
+  }
+
+  nav.show {
+    display: flex;
+  }
+}
+
+
   </style>
 </head>
 <body>
@@ -37,17 +72,27 @@
     <div class="logo">
       <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
     </div>
-    <nav>
+
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <nav id="mobileMenu">
       <a href="{{ url_for('about') }}">Sobre Nosotros</a>
       <a href="{{ url_for('legal') }}">Aviso Legal</a>
       <a href="{{ url_for('contact') }}">Contáctanos</a>
     </nav>
   </header>
 
+
   <main>
     <h1>Lo sentimos, el mensaje no se pudo enviar</h1>
     <p>Pruebe en unos minutos y si el error persiste ponte en contacto directamente con: yourtoolfindersuport@gmail.com</p>
     <a href="{{ url_for('YourToolQuizz') }}">Volver a la página principal</a>
   </main>
+    <script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('show');
+  }
+</script>
 </body>
 </html>
