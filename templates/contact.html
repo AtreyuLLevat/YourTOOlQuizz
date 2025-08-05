@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contáctanos - YourToolQuizz</title>
   <style>
- @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
 
     body {
       margin: 0;
@@ -12,36 +13,45 @@
       background: #f0f0f0;
       color: #000;
     }
-    /* Barra superior */
+
     header {
+      position: relative;
       background: #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
-      position: sticky;
-      top: 0;
       z-index: 100;
     }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
     nav {
       display: flex;
       gap: 20px;
       font-weight: bold;
     }
+
     nav a {
       color: #000;
       text-decoration: none;
-      cursor: pointer;
     }
+
     nav a:hover {
       text-decoration: underline;
     }
-    .logo {
-      font-weight: bold;
-      font-size: 1.3rem;
-    }
-    /* Contenido principal */
+
     main {
       max-width: 700px;
       margin: 40px auto;
@@ -50,62 +60,35 @@
       border-radius: 8px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
+
     main h1 {
       text-align: center;
       font-size: 2.2rem;
       font-weight: bold;
-      margin-bottom: 10px;
-    }
-    main h2 {
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.3rem;
       margin-bottom: 30px;
-      color: #333;
     }
-    /* Preguntas y respuestas */
-    .question {
-      margin-bottom: 25px;
-    }
-    .question h3 {
-      font-weight: bold;
-      margin-bottom: 12px;
-      font-size: 1.1rem;
-    }
-    ul.answers {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    ul.answers li {
-      background: #f9f9f9;
-      margin-bottom: 8px;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.95rem;
+
+    form {
       display: flex;
-      align-items: center;
-      user-select: none;
-      border: 1px solid transparent;
-      transition: background-color 0.2s, border-color 0.2s;
+      flex-direction: column;
+      gap: 15px;
     }
-    ul.answers li:hover {
-      background: #e2e8f0;
-    }
-    ul.answers li.selected {
-      background: #d0e8ff;
-      border-color: #4a90e2;
-    }
-    ul.answers li input[type="radio"] {
-      margin-right: 12px;
-      cursor: pointer;
-    }
-    /* Botón enviar */
-    button#submitBtn {
-      margin-top: 25px;
-      display: block;
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
       width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    button[type="submit"] {
       background-color: #4a90e2;
       color: white;
       font-weight: bold;
@@ -116,114 +99,70 @@
       cursor: pointer;
       transition: background-color 0.3s;
     }
-    button#submitBtn:hover {
+
+    button[type="submit"]:hover {
       background-color: #357abd;
     }
-    /* Mensaje error */
-    #errorMsg {
-      color: red;
-      font-weight: bold;
-      margin-top: 15px;
-      display: none;
+
+    .flash {
       text-align: center;
+      color: green;
+      margin-bottom: 20px;
+      font-weight: bold;
     }
 
+    /* Responsive: móviles */
     @media (max-width: 600px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-  }
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+      }
 
-  nav {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    margin-top: 10px;
-  }
+      .menu-toggle {
+        display: block;
+      }
 
-  main {
-    margin: 20px 10px;
-    padding: 20px;
-  }
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 20px;
+        background: white;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        border-radius: 6px;
+        flex-direction: column;
+        padding: 10px 15px;
+        z-index: 1000;
+      }
 
-  main h1 {
-    font-size: 1.6rem;
-  }
+      nav.show {
+        display: flex;
+      }
 
-  main h2 {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-  }
+      nav a {
+        margin: 8px 0;
+        white-space: nowrap;
+      }
 
-  .question h3 {
-    font-size: 1rem;
-  }
+      main {
+        margin: 20px 15px;
+        padding: 25px;
+      }
 
-  ul.answers li {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
+      main h1 {
+        font-size: 1.7rem;
+      }
 
-  button#submitBtn {
-    font-size: 1rem;
-    padding: 10px;
-  }
-}
-.menu-toggle {
-  display: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
+      input, textarea {
+        font-size: 1rem;
+      }
 
-/* Responsive: solo en móviles */
-@media (max-width: 600px) {
-  header {
-    position: relative; /* Para posicionar elementos relativos dentro */
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-  }
-
-  .menu-toggle {
-    display: block;
-    font-size: 1.8rem;
-    cursor: pointer;
-    z-index: 1001; /* Por encima del menú */
-  }
-
-  nav {
-    display: none;
-    position: absolute;       /* Para que el menú quede "flotando" */
-    top: 100%;                /* Justo debajo del header (bajo la hamburguesa) */
-    right: 20px;              /* Alineado a la derecha (donde está la hamburguesa) */
-    background: white;
-    width: max-content;       /* Ancho según el contenido */
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    border-radius: 6px;
-    flex-direction: column;
-    padding: 10px 15px;
-    z-index: 1000;            /* Debajo de la hamburguesa */
-  }
-
-  nav.show {
-    display: flex;
-  }
-
-  nav a {
-    margin: 8px 0;
-    white-space: nowrap;      /* Evita que las opciones hagan salto de línea */
-    color: #000;
-    text-decoration: none;
-  }
-
-  nav a:hover {
-    text-decoration: underline;
-  }
-}
+      button[type="submit"] {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -257,11 +196,12 @@
       <button type="submit">Enviar mensaje</button>
     </form>
   </main>
-    <script>
-  function toggleMenu() {
-    const menu = document.getElementById('mobileMenu');
-    menu.classList.toggle('show');
-  }
-</script>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('show');
+    }
+  </script>
 </body>
 </html>
