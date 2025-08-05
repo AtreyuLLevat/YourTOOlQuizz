@@ -36,41 +36,54 @@
 }
 
 /* Responsive: solo en móviles */
-.menu-toggle {
-  display: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
 @media (max-width: 600px) {
   header {
+    position: relative; /* Para posicionar elementos relativos dentro */
     display: flex;
-    flex-wrap: nowrap;          /* Evita que se rompa en varias filas */
-    flex-direction: row;        /* Logo y hamburguesa en línea */
-    justify-content: space-between; /* Separar a los extremos */
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
   }
 
   .menu-toggle {
-    display: block;             /* Muestra hamburguesa en móvil */
+    display: block;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 1001; /* Por encima del menú */
   }
 
   nav {
-    display: none;              /* Oculto por defecto */
+    display: none;
+    position: absolute;       /* Para que el menú quede "flotando" */
+    top: 100%;                /* Justo debajo del header (bajo la hamburguesa) */
+    right: 20px;              /* Alineado a la derecha (donde está la hamburguesa) */
+    background: white;
+    width: max-content;       /* Ancho según el contenido */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    border-radius: 6px;
     flex-direction: column;
-    width: 100%;
-    margin-top: 10px;
+    padding: 10px 15px;
+    z-index: 1000;            /* Debajo de la hamburguesa */
   }
 
   nav.show {
-    display: flex;              /* Mostrar menú al desplegar */
+    display: flex;
   }
 
   nav a {
-    margin: 10px 0;
+    margin: 8px 0;
+    white-space: nowrap;      /* Evita que las opciones hagan salto de línea */
+    color: #000;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
   }
 }
+
 
 
   </style>
