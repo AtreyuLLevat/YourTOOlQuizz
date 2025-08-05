@@ -11,6 +11,38 @@
     main { max-width: 700px; margin: 60px auto; padding: 20px; }
     h1 { text-align: center; font-size: 2rem; font-weight: bold; }
     p { font-size: 1rem; line-height: 1.6; margin-bottom: 1em; }
+
+    @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  nav {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  nav a {
+    margin: 10px 0;
+  }
+
+  main {
+    margin: 30px 15px;
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 0.95rem;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -29,7 +61,7 @@
     <p>El presente aviso legal regula el uso del sitio web <strong>YourToolQuizz</strong>.</p>
 
     <p><strong>Afiliación y monetización:</strong><br>
-    Este sitio participa en programas de afiliación con plataformas como x, y, z, entre otras. Esto significa que cuando haces clic en uno de nuestros enlaces y realizas una compra o registro, podemos recibir una comisión sin que esto suponga un coste adicional para ti.</p>
+    Este sitio participa en programas de afiliación con plataformas como x, y, z. Esto significa que cuando haces clic en uno de nuestros enlaces y realizas una compra o registro, podemos recibir una comisión sin que esto suponga un coste adicional para ti.</p>
 
     <p>La participación en estos programas de afiliados no influye en la objetividad de las recomendaciones, las cuales se basan en la utilidad y adecuación de las herramientas a las necesidades del usuario, determinadas mediante nuestro sistema de test.</p>
 

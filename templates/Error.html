@@ -2,17 +2,48 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Gracias por tu mensaje</title>
+  <title>el mensaje no se pudo enviar</title>
   <style>
     body { font-family: Bahnschrift, sans-serif; text-align: center; padding: 50px; background: #f9f9f9; color: #333; }
     h1 { font-size: 2rem; margin-bottom: 20px; }
     p { font-size: 1.1rem; }
     a { text-decoration: none; color: #4a90e2; font-weight: bold; display: inline-block; margin-top: 20px; }
+    nav a { margin: 0 10px; }
+     
+    @media (max-width: 600px) {
+  body {
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 1rem;
+  }
+  nav a {
+    display: block;
+    margin: 10px 0;
+  }
+}
+
   </style>
 </head>
 <body>
-  <h1>Lo sentimos, el mensaje no se pudo enviar</h1>
-  <p>Pruebe en unos minutos y si el error persiste ponte en contacto directamente con: yourtoolfindersuport@gmail.com</p>
-  <a href="{{ url_for('YourToolQuizz') }}">Volver a la página principal</a>
+  <header>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+    <nav>
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Lo sentimos, el mensaje no se pudo enviar</h1>
+    <p>Pruebe en unos minutos y si el error persiste ponte en contacto directamente con: yourtoolfindersuport@gmail.com</p>
+    <a href="{{ url_for('YourToolQuizz') }}">Volver a la página principal</a>
+  </main>
 </body>
 </html>

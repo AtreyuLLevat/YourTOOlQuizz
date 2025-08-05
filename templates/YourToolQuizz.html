@@ -128,6 +128,50 @@
       display: none;
       text-align: center;
     }
+
+    @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  main {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+
+  main h1 {
+    font-size: 1.6rem;
+  }
+
+  main h2 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .question h3 {
+    font-size: 1rem;
+  }
+
+  ul.answers li {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  button#submitBtn {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
+
   </style>
 </head>
 <body>

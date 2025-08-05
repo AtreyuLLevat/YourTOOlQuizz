@@ -8,11 +8,40 @@
     h1 { font-size: 2rem; margin-bottom: 20px; }
     p { font-size: 1.1rem; }
     a { text-decoration: none; color: #4a90e2; font-weight: bold; display: inline-block; margin-top: 20px; }
+
+    @media (max-width: 600px) {
+  body {
+    padding: 20px;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 1rem;
+  }
+  nav a {
+    display: block;
+    margin: 10px 0;
+  }
+}
+
   </style>
 </head>
 <body>
-  <h1>¡Gracias por tu mensaje!</h1>
-  <p>Tu mensaje ha sido enviado correctamente. Nos pondremos en contacto contigo lo antes posible.</p>
+  <header>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+    <nav>
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
+  <main>
+   <h1>¡Gracias por tu mensaje!</h1>
+    <p>Tu mensaje ha sido enviado correctamente. Nos pondremos en contacto contigo lo antes posible.</p>
   <a href="{{ url_for('YourToolQuizz') }}">Volver a la página principal</a>
+  </main>
 </body>
 </html>
