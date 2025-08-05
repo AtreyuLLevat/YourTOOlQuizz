@@ -13,7 +13,7 @@
       background: #f0f0f0;
       color: #000;
     }
-
+    /* Barra superior */
     header {
       background: #fff;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -21,6 +21,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     nav {
       display: flex;
@@ -30,12 +33,16 @@
     nav a {
       color: #000;
       text-decoration: none;
+      cursor: pointer;
+    }
+    nav a:hover {
+      text-decoration: underline;
     }
     .logo {
       font-weight: bold;
       font-size: 1.3rem;
     }
-
+    /* Contenido principal */
     main {
       max-width: 700px;
       margin: 40px auto;
@@ -43,51 +50,97 @@
       padding: 30px 40px;
       border-radius: 8px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    main h1 {
       text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+      font-size: 2.2rem;
       font-weight: bold;
+      margin-bottom: 10px;
     }
-
-    .cta-button {
+    main h2 {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    /* Preguntas y respuestas */
+    .question {
+      margin-bottom: 25px;
+    }
+    .question h3 {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    ul.answers {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.answers li {
+      background: #f9f9f9;
+      margin-bottom: 8px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      border: 1px solid transparent;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    ul.answers li:hover {
+      background: #e2e8f0;
+    }
+    ul.answers li.selected {
+      background: #d0e8ff;
+      border-color: #4a90e2;
+    }
+    ul.answers li input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+    }
+    /* Botón enviar */
+    button#submitBtn {
+      margin-top: 25px;
+      display: block;
+      width: 100%;
       background-color: #4a90e2;
       color: white;
-      padding: 12px 24px;
-      font-size: 1rem;
       font-weight: bold;
+      padding: 12px;
+      font-size: 1.1rem;
       border: none;
       border-radius: 6px;
-      text-decoration: none;
-      display: inline-block;
-      margin-bottom: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
-
-    ul.features {
-      list-style: disc;
-      text-align: left;
-      margin: 0 auto;
-      padding: 0 20px;
+    button#submitBtn:hover {
+      background-color: #357abd;
     }
-
-    ul.features li {
-      margin-bottom: 10px;
+    /* Mensaje error */
+    #errorMsg {
+      color: red;
+      font-weight: bold;
+      margin-top: 15px;
+      display: none;
+      text-align: center;
     }
 
     @media (max-width: 600px) {
   header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    padding: 15px;
+    padding: 10px;
   }
 
   nav {
     flex-direction: column;
     gap: 10px;
     width: 100%;
+    margin-top: 10px;
   }
 
   main {
@@ -95,24 +148,29 @@
     padding: 20px;
   }
 
-  h1 {
-    font-size: 1.8rem;
+  main h1 {
+    font-size: 1.6rem;
   }
 
-  .cta-button {
-    width: 100%;
-    text-align: center;
+  main h2 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
   }
 
-  ul.features {
-    padding: 0;
+  .question h3 {
+    font-size: 1rem;
   }
 
-  ul.features li {
-    font-size: 0.95rem;
+  ul.answers li {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  button#submitBtn {
+    font-size: 1rem;
+    padding: 10px;
   }
 }
-
 .menu-toggle {
   display: none;
   font-size: 1.8rem;
@@ -167,8 +225,6 @@
     text-decoration: underline;
   }
 }
-
-
 
   </style>
 </head>
