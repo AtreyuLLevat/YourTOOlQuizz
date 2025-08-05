@@ -80,119 +80,23 @@
 <body>
   <header>
     <div class="logo">
-    <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
-</div>
-  <nav>
-    <a href="{{ url_for('about') }}">Sobre Nosotros</a>
-    <a href="{{ url_for('legal') }}">Aviso Legal</a>
-    <a href="{{ url_for('contact') }}">Contáctanos</a>
-    <a href="{{ url_for('Resultadosposibles') }}">Resultados posibles</a>
-  </nav>
-</header>
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+    <nav>
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
 
   <main>
-    <h1 id="toolName">Tu herramienta ideal es...</h1>
-    <a id="ctaBtn" href="#" class="cta-button" target="_blank">Ir a la herramienta</a>
-    <ul id="featuresList" class="features"></ul>
-  </main>
+    <h1>Tu herramienta ideal es: <strong>{{ tool.name }}</strong></h1>
 
-  <script>
-    const result = localStorage.getItem('quizResult');
-
-    const tools = {
-      todoist: {
-        name: "Todoist",
-        url: "https://todoist.com",
-        features: [
-          "Gestión de tareas simple y efectiva",
-          "Diseño limpio y minimalista",
-          "Integraciones con Gmail, Slack y más",
-          "Listas y recordatorios personalizados",
-          "Funciona en todas las plataformas",
-          "Ideal para autónomos y pequeños equipos",
-          "Sistema de prioridades eficaz",
-          "Modo oscuro disponible",
-          "Ofrece estadísticas de productividad",
-          "Planes gratuitos disponibles"
-        ]
-      },
-      systemio: {
-        name: "System.io",
-        url: "https://systeme.io",
-        features: [
-          "Todo en uno: marketing, funnels y emails",
-          "Automatizaciones sencillas",
-          "Gestión de cursos y productos digitales",
-          "CRM integrado",
-          "Apto para negocios online",
-          "Buen soporte en español",
-          "Planes competitivos",
-          "Ideal para emprendedores digitales",
-          "Permite crear webs y blogs",
-          "Fácil de usar sin saber programar"
-        ]
-      },
-      semsearch: {
-        name: "SEMrush",
-        url: "https://semrush.com",
-        features: [
-          "Análisis SEO profesional",
-          "Monitoreo de palabras clave",
-          "Auditoría web detallada",
-          "Investigación de competidores",
-          "Soporte para agencias",
-          "Gráficos e informes exportables",
-          "Herramientas para contenido SEO",
-          "Integración con Google Search Console",
-          "Alertas de rendimiento",
-          "Panel intuitivo y claro"
-        ]
-      },
-      trello: {
-        name: "Trello",
-        url: "https://trello.com",
-        features: [
-          "Tableros visuales con tarjetas",
-          "Ideal para gestión de proyectos",
-          "Colaboración en tiempo real",
-          "Integraciones con múltiples herramientas",
-          "Fácil de usar para principiantes",
-          "Uso gratuito potente",
-          "Automatización con Butler",
-          "Disponible en móvil y PC",
-          "Plantillas listas para usar",
-          "Vista de calendario y cronograma"
-        ]
-      },
-      asana: {
-        name: "Asana",
-        url: "https://asana.com",
-        features: [
-          "Gestión de tareas en equipo",
-          "Líneas de tiempo y dependencias",
-          "Vista tipo kanban, lista o calendario",
-          "Automatizaciones fáciles",
-          "Seguimiento de objetivos",
-          "Ideal para equipos medianos y grandes",
-          "Paneles personalizables",
-          "Integración con más de 100 apps",
-          "Notificaciones inteligentes",
-          "Planes escalables según equipo"
-        ]
-      }
-    };
-
-    const tool = tools[result] || tools.todoist; // Fallback
-
-    document.getElementById('toolName').textContent = tool.name;
-    document.getElementById('ctaBtn').href = tool.url;
-
-    const list = document.getElementById('featuresList');
-    tool.features.forEach(feature => {
-      const li = document.createElement('li');
-      li.textContent = feature;
-      list.appendChild(li);
-    });
-  </script>
-</body>
-</html>
+    <a class="cta-button" href="{{ tool.url }}" target="_blank">Ir a la herramienta</a>
+    
+  <h2>Características destacadas:</h2>
+  <ul class="features">
+    {% for feature in tool.features %}
+      <li>{{ feature }}</li>
+    {% endfor %}
+  </ul>
