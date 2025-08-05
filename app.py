@@ -135,4 +135,5 @@ def thank_you():
     return render_template('Error.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))  # Puerto proporcionado por DigitalOcean
+    app.run(host='0.0.0.0', port=port, debug=True)  # Acepta conexiones externas
