@@ -120,32 +120,42 @@
 }
 
 /* Responsive: solo en móviles */
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
 @media (max-width: 600px) {
   header {
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-wrap: nowrap;          /* Evita que se rompa en varias filas */
+    flex-direction: row;        /* Logo y hamburguesa en línea */
+    justify-content: space-between; /* Separar a los extremos */
+    align-items: center;
+    padding: 10px 20px;
   }
 
   .menu-toggle {
-    display: block;
+    display: block;             /* Muestra hamburguesa en móvil */
   }
 
   nav {
-    display: none;
+    display: none;              /* Oculto por defecto */
     flex-direction: column;
     width: 100%;
     margin-top: 10px;
   }
 
+  nav.show {
+    display: flex;              /* Mostrar menú al desplegar */
+  }
+
   nav a {
     margin: 10px 0;
   }
-
-  nav.show {
-    display: flex;
-  }
 }
+
 
 
   </style>
