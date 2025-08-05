@@ -140,7 +140,6 @@
     <a href="{{ url_for('about') }}">Sobre Nosotros</a>
     <a href="{{ url_for('legal') }}">Aviso Legal</a>
     <a href="{{ url_for('contact') }}">Contáctanos</a>
-    <a href="{{ url_for('Resultadosposibles') }}">Resultados posibles</a>
   </nav>
 </header>
 
@@ -153,77 +152,59 @@
 
     <!-- Pregunta 1 -->
     <div class="question" data-question="1">
-      <h3>1. ¿Cuál es el tamaño de tu empresa?</h3>
+      <h3>1. ¿Qué nivel de protección buscas contra amenazas online?</h3>
       <ul class="answers">
-        <li><label><input type="radio" name="q1" value="todoist_1" /> Microempresa (1-10 empleados)</label></li>
-        <li><label><input type="radio" name="q1" value="systemio_2" /> Pequeña empresa (11-50 empleados)</label></li>
-        <li><label><input type="radio" name="q1" value="semsearch_3" /> Mediana empresa (51-200 empleados)</label></li>
-        <li><label><input type="radio" name="q1" value="trello_4" /> Grande (200+ empleados)</label></li>
-        <li><label><input type="radio" name="q1" value="asana_5" /> Autónomo o freelance</label></li>
+        <li><label><input type="radio" name="q1" value="Panda" /> Protección básica contra virus y malware</label></li>
+        <li><label><input type="radio" name="q1" value="Panda" /> Detección inteligente de amenazas en segundo plano</label></li>
+        <li><label><input type="radio" name="q1" value="Bitdefender" /> Protección contra ransomware y exploits avanzados</label></li>
+        <li><label><input type="radio" name="q1" value="Bitdefender" /> Módulos separados para banca, navegación y correos maliciosos</label></li>
+        <li><label><input type="radio" name="q1" value="Norton_360" /> Protección completa con firewall, VPN y backup en la nube</label></li>
+        <li><label><input type="radio" name="q1" value="Norton_360" /> Defensa contra suplantación de identidad y seguimiento online</label></li>
       </ul>
     </div>
 
     <!-- Pregunta 2 -->
     <div class="question" data-question="2">
-      <h3>2. ¿Qué función es la más importante para ti?</h3>
+      <h3>2. ¿Qué tanto te importa el efecto del antivirus al rendimiento de tu equipo?</h3>
       <ul class="answers">
-        <li><label><input type="radio" name="q2" value="todoist_2" /> Gestión de tareas</label></li>
-        <li><label><input type="radio" name="q2" value="systemio_3" /> Marketing y ventas</label></li>
-        <li><label><input type="radio" name="q2" value="semsearch_4" /> SEO y analítica</label></li>
-        <li><label><input type="radio" name="q2" value="trello_1" /> Organización visual de proyectos</label></li>
-        <li><label><input type="radio" name="q2" value="asana_5" /> Colaboración en equipo</label></li>
+        <li><label><input type="radio" name="q2" value="Panda" /> Necesito que consuma lo mínimo posible</label></li>
+        <li><label><input type="radio" name="q2" value="Bitdefender" /> Busco el equilibrio entre protección y velocidad</label></li>
+        <li><label><input type="radio" name="q2" value="Norton_360" /> Uso un equipo potente, así que no me importa si consume más Colaboración en equipo</label></li>
       </ul>
     </div>
 
     <!-- Pregunta 3 -->
     <div class="question" data-question="3">
-      <h3>3. ¿Qué nivel de integración buscas?</h3>
+      <h3>3. ¿Te gustaría tener funciones extra integradas?</h3>
       <ul class="answers">
-        <li><label><input type="radio" name="q3" value="todoist_3" /> Integración básica</label></li>
-        <li><label><input type="radio" name="q3" value="systemio_4" /> Integración con email marketing</label></li>
-        <li><label><input type="radio" name="q3" value="semsearch_5" /> Integración con SEO tools</label></li>
-        <li><label><input type="radio" name="q3" value="trello_2" /> Integración con apps de productividad</label></li>
-        <li><label><input type="radio" name="q3" value="asana_1" /> Integración avanzada</label></li>
+        <li><label><input type="radio" name="q3" value="Panda" /> Solo quiero antivirus, lo más simple posible</label></li>
+        <li><label><input type="radio" name="q3" value="Bitdefender" /> Quiero protección contra ransomware y gestión de contraseñas</label></li>
+        <li><label><input type="radio" name="q3" value="Norton_360" /> Quiero una VPN ilimitada, control parental y respaldo en la nube</label></li>
+        <li><label><input type="radio" name="q3" value="Norton_360" /> Me interesa protección contra robo de identidad y monitoreo de la Dark Web </label></li>  
       </ul>
     </div>
 
     <!-- Pregunta 4 -->
     <div class="question" data-question="4">
-      <h3>4. ¿Cuál es tu presupuesto mensual?</h3>
+      <h3>4.  ¿Qué tan preocupado estás por el secuestro o pérdida de datos (ransomware, borrado, etc.)?</h3>
       <ul class="answers">
-        <li><label><input type="radio" name="q4" value="todoist_5" /> Menos de 10€</label></li>
-        <li><label><input type="radio" name="q4" value="systemio_3" /> Entre 10€ y 30€</label></li>
-        <li><label><input type="radio" name="q4" value="semsearch_2" /> Entre 30€ y 50€</label></li>
-        <li><label><input type="radio" name="q4" value="trello_1" /> Más de 50€</label></li>
-        <li><label><input type="radio" name="q4" value="asana_4" /> No quiero pagar</label></li>
+        <li><label><input type="radio" name="q4" value="Panda" /> No manejo información importante, así que confío en que el antivirus básico me protegerá de esas amenazas.</label></li>
+        <li><label><input type="radio" name="q4" value="Bitdefender" /> Me preocupa el ransomware y quiero una protección específica contra él.</label></li>
+        <li><label><input type="radio" name="q4" value="Norton_360" /> Quiero protección avanzada contra pérdida de datos en múltiples dispositivos, con respaldo en la nube y recuperar archivos si algo sale mal.</label></li>
       </ul>
     </div>
 
     <!-- Pregunta 5 -->
     <div class="question" data-question="5">
-      <h3>5. ¿Qué tan importante es la facilidad de uso?</h3>
+      <h3>5. ¿Qué valoras más al elegir un antivirus?</h3>
       <ul class="answers">
-        <li><label><input type="radio" name="q5" value="todoist_5" /> Muy importante</label></li>
-        <li><label><input type="radio" name="q5" value="systemio_4" /> Importante</label></li>
-        <li><label><input type="radio" name="q5" value="semsearch_3" /> Algo importante</label></li>
-        <li><label><input type="radio" name="q5" value="trello_2" /> Poco importante</label></li>
-        <li><label><input type="radio" name="q5" value="asana_1" /> No es importante</label></li>
+        <li><label><input type="radio" name="q5" value="Panda" /> Que lo pueda instalar y olvidar</label></li>
+        <li><label><input type="radio" name="q5" value="Bitdefender" /> Que me ofrezca defensa proactiva contra amenazas nuevas con un control detallado de cada módulo</label></li>
+        <li><label><input type="radio" name="q5" value="Norton_360" /> Que me proteja incluso fuera del antivirus, como identidad y privacidad</label></li>
       </ul>
     </div>
 
-    <!-- Pregunta 6 -->
-    <div class="question" data-question="6">
-      <h3>6. ¿Qué tipo de soporte necesitas?</h3>
-      <ul class="answers">
-        <li><label><input type="radio" name="q6" value="todoist_3" /> Soporte básico</label></li>
-        <li><label><input type="radio" name="q6" value="systemio_5" /> Soporte dedicado</label></li>
-        <li><label><input type="radio" name="q6" value="semsearch_2" /> Soporte en línea</label></li>
-        <li><label><input type="radio" name="q6" value="trello_1" /> Soporte comunitario</label></li>
-        <li><label><input type="radio" name="q6" value="asana_4" /> Sin soporte</label></li>
-      </ul>
-    </div>
-
-    <button type="submit" id="submitBtn">Ver Resultado</button>
+    <button type="submit">Ver resultado</button>
     <div id="errorMsg">Por favor, responde todas las preguntas.</div>
   </form>
 </main>

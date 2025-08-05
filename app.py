@@ -1,8 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for
+# -*- coding: utf-8 -*-
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_mail import Mail, Message
+from email.header import Header
 
 app = Flask(__name__)
+app.secret_key = 'clave_secreta_segura'
 
-# Página principal: el quiz
+# Configuración de Flask-Mail (ejemplo con Gmail)
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'tuemail@gmail.com'       # Sustituye por tu email
+app.config['MAIL_PASSWORD'] = 'tu_contraseña_app'       # Sustituye por tu contraseña de aplicación
+
+mail = Mail(app)
+
 @app.route('/')
 def YourToolQuizz():
     return render_template('YourToolQuizz.html')
@@ -15,15 +27,12 @@ def result():
         request.form.get('q3'),
         request.form.get('q4'),
         request.form.get('q5'),
-        request.form.get('q6'),
     ]
 
     scores = {
-        'todoist': 0,
-        'systeme': 0,
-        'semrush': 0,
-        'notion': 0,
-        'canva': 0
+        'Panda': 0,
+        'Bitdefender': 0,
+        'Norton_360': 0,
     }
 
     for answer in answers:
@@ -33,121 +42,97 @@ def result():
     best_tool = max(scores, key=scores.get)
 
     tool_data = {
-        'todoist': {
-            'name': 'Todoist',
-            'url': 'https://affiliate.todoist.com',
+        'Panda': {
+            'name': 'Panda',
+            'url': 'https://www.pandasecurity.com/es/homeusers/#plans',
             'features': [
-                'Gestión de tareas sencilla',
-                'Integración con apps de calendario',
-                'App para móvil y escritorio',
-                'Ideal para uso personal y trabajo',
-                'Colaboración en equipo',
-                'Interfaz limpia',
-                'Soporte por etiquetas y prioridades',
-                'Recordatorios inteligentes',
-                'Automatización básica',
-                'Sincronización en la nube'
+                'Antivirus muy ligero y automatizado. Impacto bajo en el rendimiento',
+                'Interfaz simple e intuitiva para principiantes',
+                'Pocas opciones de configuración, personalización sencilla',
+                'Modo de emergencia USB',
+                'Protección a tiempo real',
+                'Protección Wi-Fi',
+                'VPN integrada (a partir del plan Advanced)',
+                'Antiphishing y protección web',
+                'Modo Gaming/Multimedia',
+                'Dark Web Monitor (Plan Premium)',
             ]
         },
-        'systeme': {
-            'name': 'Systeme.io',
-            'url': 'https://systeme.io/?ref=tu-link',
+        'Bitdefender': {
+            'name': 'Bitdefender',
+            'url': 'https://www.bitdefender.com/...',
             'features': [
-                'Plataforma todo en uno',
-                'Automatizaciones de marketing',
-                'Email marketing integrado',
-                'Landing pages fáciles',
-                'Gestión de cursos online',
-                'CRM incluido',
-                'Funnel builder',
-                'Afiliación integrada',
-                'Planes gratuitos disponibles',
-                'Soporte técnico eficiente'
+                'Altísima tasa de detección de malware y ransomware',
+                'Protección en tiempo real avanzada con IA',
+                'Impacto bajo en el rendimiento',
+                'Múltiples capas de defensa contra ransomware',
+                'Módulo de banca segura incluso en el navegador',
+                'Gestor de contraseñas integrado',
+                'Navegador protegido',
+                'Firewall avanzado y control de red',
+                'VPN integrada',
+                'Protección de identidad',
+                'Ad Blocker y anti-tracker en todo el sistema',
             ]
         },
-        'semrush': {
-            'name': 'Semrush',
-            'url': 'https://es.semrush.com/?ref=afiliado',
+        'Norton_360': {
+            'name': 'Norton 360',
+            'url': 'https://es.norton.com/...',
             'features': [
-                'Investigación de palabras clave',
-                'Auditoría SEO completa',
-                'Análisis de competencia',
-                'Seguimiento de rankings',
-                'Marketing de contenidos',
-                'Publicidad de pago (PPC)',
-                'Backlink analysis',
-                'Informes automáticos',
-                'Herramientas de redes sociales',
-                'Datos en tiempo real'
+                'Protección total todo en uno',
+                'Dark web monitoring (a partir del plan Deluxe)',
+                'Gestor de contraseñas',
+                'Conexión VPN privada (desde plan Estándar)',
+                'Copia de seguridad en la nube (10 GB)',
+                'Asistencia para restauración de identidad (Plan Advanced)',
+                'Asistencia por robo de billetera (Plan Advanced)',
+                'Monitoreo de redes sociales (Plan Advanced)',
             ]
         },
-        'notion': {
-            'name': 'Notion',
-            'url': 'https://www.notion.so/product?ref=afiliado',
-            'features': [
-                'Organización de información',
-                'Plantillas de productividad',
-                'Gestión de proyectos',
-                'Soporte para bases de datos',
-                'Toma de notas integrada',
-                'Colaboración en tiempo real',
-                'Aplicaciones móviles',
-                'Interfaz visual moderna',
-                'Integraciones con terceros',
-                'Versión gratuita completa'
-            ]
-        },
-        'canva': {
-            'name': 'Canva',
-            'url': 'https://partner.canva.com/tu-link',
-            'features': [
-                'Diseño gráfico fácil',
-                'Miles de plantillas',
-                'Editor arrastrar y soltar',
-                'Integración con redes sociales',
-                'Creación de logos, posters, etc.',
-                'Banco de imágenes gratuito',
-                'Colaboración en equipo',
-                'Exportación rápida',
-                'Compatible con móviles',
-                'Ideal para emprendedores'
-            ]
-        }
     }
 
     return render_template('result.html', tool=tool_data[best_tool])
 
-# Sobre Nosotros
 @app.route('/about')
 def about():
     return render_template('about.html')
 
-# Aviso Legal
 @app.route('/legal')
 def legal():
     return render_template('legal.html')
 
-# Resultados posibles
-@app.route('/Resultadosposibles')
-def Resultadosposibles():
-    return render_template('Resultadosposibles.html')
-
-# Contáctanos - GET para mostrar formulario, POST para procesarlo
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
         nombre = request.form.get('nombre')
         correo = request.form.get('correo')
         mensaje = request.form.get('mensaje')
-        print(f"Mensaje de {nombre} ({correo}): {mensaje}")
-        return redirect(url_for('thank_you'))
+
+        from email.header import Header
+        subject = Header(f"Nuevo mensaje de {nombre}", 'utf-8').encode()
+
+
+
+        msg = Message(
+            subject=subject,
+            sender=app.config['MAIL_USERNAME'],
+            recipients=['atreyulaguilera@gmail.com']
+        )
+        msg.body = f"De: {nombre} <{correo}>\n\nMensaje:\n{mensaje}"
+
+        try:
+            mail.send(msg)
+            flash('¡Mensaje enviado correctamente!', 'success')
+            return redirect(url_for('thank_you'))
+        except Exception as e:
+            flash(f'Error al enviar el mensaje: {str(e)}', 'error')
+            return redirect(url_for('thank_you'))
+
     return render_template('contact.html')
 
-# Página de agradecimiento después de enviar el formulario
-@app.route('/thank-you')
+@app.route('/thank_you')
 def thank_you():
-    return "<h1>¡Gracias por contactarnos! Te responderemos pronto.</h1>"
+    return render_template('Error.html')
 
-# Ejecutar la aplicación
 if __name__ == '__main__':
     app.run(debug=True)
