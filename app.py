@@ -30,9 +30,9 @@ def result():
     ]
 
     scores = {
-        'Panda': 0,
-        'Bitdefender': 0,
-        'Norton_360': 0,
+        'y': 0,
+        'x': 0,
+        'z': 0,
     }
 
     for answer in answers:
@@ -42,9 +42,9 @@ def result():
     best_tool = max(scores, key=scores.get)
 
     tool_data = {
-        'Panda': {
-            'name': 'Panda',
-            'url': 'https://www.pandasecurity.com/es/homeusers/#plans',
+        'y': {
+            'name': 'y',
+            'url': 'https://yourtoolquizz-5u2ht.ondigitalocean.app/',
             'features': [
                 'Antivirus muy ligero y automatizado. Impacto bajo en el rendimiento',
                 'Interfaz simple e intuitiva para principiantes',
@@ -58,9 +58,9 @@ def result():
                 'Dark Web Monitor (Plan Premium)',
             ]
         },
-        'Bitdefender': {
-            'name': 'Bitdefender',
-            'url': 'https://www.bitdefender.com/...',
+        'x': {
+            'name': 'x',
+            'url': 'https://yourtoolquizz-5u2ht.ondigitalocean.app/',
             'features': [
                 'Altísima tasa de detección de malware y ransomware',
                 'Protección en tiempo real avanzada con IA',
@@ -75,9 +75,9 @@ def result():
                 'Ad Blocker y anti-tracker en todo el sistema',
             ]
         },
-        'Norton_360': {
-            'name': 'Norton 360',
-            'url': 'https://es.norton.com/...',
+        'z': {
+            'name': 'z',
+            'url': 'https://yourtoolquizz-5u2ht.ondigitalocean.app/',
             'features': [
                 'Protección total todo en uno',
                 'Dark web monitoring (a partir del plan Deluxe)',
@@ -96,6 +96,10 @@ def result():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/Inicio')
+def Inicio():
+    return render_template('Inicio.html')
 
 @app.route('/legal')
 def legal():
