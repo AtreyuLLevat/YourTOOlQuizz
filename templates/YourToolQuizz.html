@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name='impact-site-verification' value='42601080-d38d-487e-b72d-c47f41e53eee'>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YourToolQuizz - Elige tu SaaS ideal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+    /* Barra superior */
+    header {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+    nav a {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+    /* Contenido principal */
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    main h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    main h2 {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    /* Preguntas y respuestas */
+    .question {
+      margin-bottom: 25px;
+    }
+    .question h3 {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+    ul.answers {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.answers li {
+      background: #f9f9f9;
+      margin-bottom: 8px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      user-select: none;
+      border: 1px solid transparent;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    ul.answers li:hover {
+      background: #e2e8f0;
+    }
+    ul.answers li.selected {
+      background: #d0e8ff;
+      border-color: #4a90e2;
+    }
+    ul.answers li input[type="radio"] {
+      margin-right: 12px;
+      cursor: pointer;
+    }
+    /* Botón enviar */
+    button#submitBtn {
+      margin-top: 25px;
+      display: block;
+      width: 100%;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
+      padding: 12px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button#submitBtn:hover {
+      background-color: #357abd;
+    }
+    /* Mensaje error */
+    #errorMsg {
+      color: red;
+      font-weight: bold;
+      margin-top: 15px;
+      display: none;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  main {
+    margin: 20px 10px;
+    padding: 20px;
+  }
+
+  main h1 {
+    font-size: 1.6rem;
+  }
+
+  main h2 {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .question h3 {
+    font-size: 1rem;
+  }
+
+  ul.answers li {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  button#submitBtn {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* Responsive: solo en móviles */
+@media (max-width: 600px) {
+  header {
+    position: relative; /* Para posicionar elementos relativos dentro */
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+  }
+
+  .menu-toggle {
+    display: block;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 1001; /* Por encima del menú */
+  }
+
+  nav {
+    display: none;
+    position: absolute;       /* Para que el menú quede "flotando" */
+    top: 100%;                /* Justo debajo del header (bajo la hamburguesa) */
+    right: 20px;              /* Alineado a la derecha (donde está la hamburguesa) */
+    background: white;
+    width: max-content;       /* Ancho según el contenido */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    border-radius: 6px;
+    flex-direction: column;
+    padding: 10px 15px;
+    z-index: 1000;            /* Debajo de la hamburguesa */
+  }
+
+  nav.show {
+    display: flex;
+  }
+
+  nav a {
+    margin: 8px 0;
+    white-space: nowrap;      /* Evita que las opciones hagan salto de línea */
+    color: #000;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <nav id="mobileMenu">
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
+
+<main>
+  <h1>YourToolQuizz</h1>
+  <h2>Empecemos con el quizz</h2>
+
+  <form method="POST" action="/result">
+
+
+    <!-- Pregunta 1 -->
+    <div class="question" data-question="1">
+      <h3>1. ¿Qué nivel de protección buscas contra amenazas online?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q1" value="y" /> Protección básica contra virus y malware</label></li>
+        <li><label><input type="radio" name="q1" value="y" /> Detección inteligente de amenazas en segundo plano</label></li>
+        <li><label><input type="radio" name="q1" value="x" /> Protección contra ransomware y exploits avanzados</label></li>
+        <li><label><input type="radio" name="q1" value="x" /> Módulos separados para banca, navegación y correos maliciosos</label></li>
+        <li><label><input type="radio" name="q1" value="z" /> Protección completa con firewall, VPN y backup en la nube</label></li>
+        <li><label><input type="radio" name="q1" value="z" /> Defensa contra suplantación de identidad y seguimiento online</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 2 -->
+    <div class="question" data-question="2">
+      <h3>2. ¿Qué tanto te importa el efecto del antivirus al rendimiento de tu equipo?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q2" value="y" /> Necesito que consuma lo mínimo posible</label></li>
+        <li><label><input type="radio" name="q2" value="x" /> Busco el equilibrio entre protección y velocidad</label></li>
+        <li><label><input type="radio" name="q2" value="z" /> Uso un equipo potente, así que no me importa si consume más Colaboración en equipo</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 3 -->
+    <div class="question" data-question="3">
+      <h3>3. ¿Te gustaría tener funciones extra integradas?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q3" value="y" /> Solo quiero antivirus, lo más simple posible</label></li>
+        <li><label><input type="radio" name="q3" value="x" /> Quiero protección contra ransomware y gestión de contraseñas</label></li>
+        <li><label><input type="radio" name="q3" value="z" /> Quiero una VPN ilimitada, control parental y respaldo en la nube</label></li>
+        <li><label><input type="radio" name="q3" value="z" /> Me interesa protección contra robo de identidad y monitoreo de la Dark Web </label></li>  
+      </ul>
+    </div>
+
+    <!-- Pregunta 4 -->
+    <div class="question" data-question="4">
+      <h3>4.  ¿Qué tan preocupado estás por el secuestro o pérdida de datos (ransomware, borrado, etc.)?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q4" value="y" /> No manejo información importante, así que confío en que el antivirus básico me protegerá de esas amenazas.</label></li>
+        <li><label><input type="radio" name="q4" value="x" /> Me preocupa el ransomware y quiero una protección específica contra él.</label></li>
+        <li><label><input type="radio" name="q4" value="z" /> Quiero protección avanzada contra pérdida de datos en múltiples dispositivos, con respaldo en la nube y recuperar archivos si algo sale mal.</label></li>
+      </ul>
+    </div>
+
+    <!-- Pregunta 5 -->
+    <div class="question" data-question="5">
+      <h3>5. ¿Qué valoras más al elegir un antivirus?</h3>
+      <ul class="answers">
+        <li><label><input type="radio" name="q5" value="y" /> Que lo pueda instalar y olvidar</label></li>
+        <li><label><input type="radio" name="q5" value="x" /> Que me ofrezca defensa proactiva contra amenazas nuevas con un control detallado de cada módulo</label></li>
+        <li><label><input type="radio" name="q5" value="z" /> Que me proteja incluso fuera del antivirus, como identidad y privacidad</label></li>
+      </ul>
+    </div>
+
+    <button type="submit">Ver resultado</button>
+    <div id="errorMsg">Por favor, responde todas las preguntas.</div>
+  </form>
+</main>
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('mobileMenu');
+    menu.classList.toggle('show');
+  }
+</script>
+
+</body>
+</html>

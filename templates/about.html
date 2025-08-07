@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sobre Nosotros - YourToolQuizz</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    /* Barra superior */
+    header {
+      position: relative;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      z-index: 100;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Contenido principal */
+    main {
+      max-width: 700px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    main h1 {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    main p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    main p strong {
+      color: #4a90e2;
+    }
+
+    /* Responsive: móviles */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 20px;
+        background: white;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        border-radius: 6px;
+        flex-direction: column;
+        padding: 10px 15px;
+        z-index: 1000;
+      }
+
+      nav.show {
+        display: flex;
+      }
+
+      nav a {
+        margin: 8px 0;
+        white-space: nowrap;
+      }
+
+      main {
+        margin: 20px 15px;
+        padding: 25px;
+      }
+
+      main h1 {
+        font-size: 1.7rem;
+      }
+
+      main p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+
+    <nav id="mobileMenu">
+      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
+      <a href="{{ url_for('legal') }}">Aviso Legal</a>
+      <a href="{{ url_for('contact') }}">Contáctanos</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Sobre Nosotros</h1>
+    <p>
+      En <strong>YourToolQuizz</strong> creemos que la tecnología puede simplificar la vida de todos, especialmente de los emprendedores y profesionales digitales.
+    </p>
+    <p>
+      Creamos esta plataforma con un objetivo claro: ayudarte a encontrar la herramienta SaaS perfecta según tus necesidades, sin perder tiempo comparando cientos de opciones y ganando comisiones con tus compras a través de nuestros enlaces, ya que somos afiliados de estas webs. Nos basamos en la experiencia, utilidad y simplicidad de uso para ofrecerte una recomendación precisa.
+    </p>
+    <p>
+      ¡Gracias por confiar en nosotros!
+    </p>
+  </main>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('show');
+    }
+  </script>
+</body>
+</html>
