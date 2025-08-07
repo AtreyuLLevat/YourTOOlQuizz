@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YourToolQuizz - Inicio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Bahnschrift', sans-serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    header {
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: #000;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    /* HERO con fondo de imagen y título */
+    .hero {
+      position: relative;
+      background-image: url('ruta/a/tu/imagen.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin: 0;
+      z-index: 2;
+    }
+
+    .hero nav {
+      position: absolute;
+      bottom: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .hero nav a {
+      color: #000;
+      margin: 0 10px;
+      text-decoration: none;
+    }
+
+    .hero nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Lista de quizzes */
+    .quiz-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .quiz-item {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 300px;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .quiz-item:hover {
+      transform: scale(1.02);
+    }
+
+    .quiz-item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .quiz-title {
+      padding: 15px;
+      font-size: 1.1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* RESPONSIVE - móviles */
+    @media (max-width: 600px) {
+      header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+      }
+
+      .menu-toggle {
+        display: block;
+        z-index: 1001;
+      }
+
+      nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 20px;
+        background: white;
+        flex-direction: column;
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        z-index: 1000;
+      }
+
+      nav.show {
+        display: flex;
+      }
+
+      nav a {
+        margin: 8px 0;
+      }
+
+      .quiz-list {
+        flex-direction: column;
+        padding: 20px 10px;
+      }
+
+      .quiz-item {
+        width: 100%;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+        text-align: center;
+      }
+
+      .hero nav {
+        position: static;
+        margin-top: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Encabezado -->
+  <header>
+    <div class="logo">
+      <a href="/" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <nav id="mobileMenu">
+      <a href="#inicio">Inicio</a>
+      <a href="#quizzes">Quizzes</a>
+      <a href="#sobre">Sobre Nosotros</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>YourToolQuizz</h1>
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="#quizzes">Quizzes</a>
+      <a href="#sobre">Sobre Nosotros</a>
+    </nav>
+  </section>
+
+  <!-- Lista de Quizzes -->
+  <section class="quiz-list" id="quizzes">
+    <div class="quiz-item">
+      <img src="ruta/portada1.jpg" alt="Quiz 1">
+      <div class="quiz-title">Quiz 1: Marketing Digital</div>
+    </div>
+
+    <div class="quiz-item">
+      <img src="ruta/portada2.jpg" alt="Quiz 2">
+      <div class="quiz-title">Quiz 2: Gestión de Equipos</div>
+    </div>
+
+    <div class="quiz-item">
+      <img src="ruta/portada3.jpg" alt="Quiz 3">
+      <div class="quiz-title">Quiz 3: Finanzas Básicas</div>
+    </div>
+
+    <!-- Puedes añadir más quizzes aquí -->
+  </section>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('show');
+    }
+  </script>
+</body>
+</html>
