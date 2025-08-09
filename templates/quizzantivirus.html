@@ -322,15 +322,158 @@
         justify-content: flex-start;
       }
     }
+    /* Contenedor buscador móvil */
+.mobile-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Formulario búsqueda: oculto por defecto en móvil */
+#mobileSearchForm {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 6px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  width: 200px;
+  z-index: 110;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Input búsqueda */
+#mobileSearchInput {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 1rem;
+}
+
+/* Botón cerrar búsqueda */
+#searchCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #ff6f61;
+}
+
+/* Botón lupa para mostrar el formulario */
+#searchToggleBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: white;
+  padding: 0 8px;
+}
+
+/* Botón hamburguesa */
+#hamburgerBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: white;
+  padding: 0 8px;
+  margin-left: 10px;
+}
+
+/* Menú móvil oculto */
+.hidden {
+  display: none;
+}
+
+/* Menú móvil visible */
+#mobileNavMenu {
+  background: #ff6f61;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 100;
+}
+
+#mobileNavMenu ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#mobileNavMenu ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.3s;
+}
+
+#mobileNavMenu ul li a:hover {
+  color: #e65a4e;
+}
+
+/* Solo mostrar iconos y hamburguesa en móvil (menos de 600px) */
+@media(min-width: 601px) {
+  /* Ocultar buscador móvil y hamburguesa en desktop */
+  .mobile-search-container,
+  #hamburgerBtn,
+  #mobileNavMenu {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 <body>
   <header>
     <div class="logo">
+      <div class="mobile-search-container">
+  <button id="searchToggleBtn" aria-label="Abrir búsqueda">
+    <i class="fas fa-search"></i>
+  </button>
+  <form id="mobileSearchForm" action="/search" method="GET">
+    <input
+      type="search"
+      name="q"
+      id="mobileSearchInput"
+      placeholder="Buscar..."
+      aria-label="Buscar"
+      autocomplete="off"
+    />
+    <button type="button" id="searchCloseBtn" aria-label="Cerrar búsqueda">
+      <i class="fas fa-times"></i>
+    </button>
+  </form>
+</div>
+
+<button id="hamburgerBtn" aria-label="Abrir menú">
+  <i class="fas fa-bars"></i>
+</button>
+<nav id="mobileNavMenu" class="hidden">
+  <ul>
+    <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+    <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+    <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+    <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+    <!-- Agrega más enlaces si quieres -->
+  </ul>
+</nav>
      <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
     </div>
   </header>
-  <main>
+
     
  <main>
     <form
@@ -567,6 +710,56 @@
       // Inicializa la vista en la pregunta 0
       showQuestion(0);
     });
+    document.addEventListener("DOMContentLoaded", () => {
+  const searchToggleBtn = document.getElementById("searchToggleBtn");
+  const searchCloseBtn = document.getElementById("searchCloseBtn");
+  const mobileSearchForm = document.getElementById("mobileSearchForm");
+
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mobileNavMenu = document.getElementById("mobileNavMenu");
+
+  // Mostrar formulario búsqueda al pulsar lupa
+  searchToggleBtn.addEventListener("click", () => {
+    mobileSearchForm.style.display = "flex";
+    searchToggleBtn.style.display = "none";
+    mobileSearchForm.querySelector("input").focus();
+    // Ocultar menú móvil si abierto
+    mobileNavMenu.classList.add("hidden");
+  });
+
+  // Cerrar formulario búsqueda al pulsar X
+  searchCloseBtn.addEventListener("click", () => {
+    mobileSearchForm.style.display = "none";
+    searchToggleBtn.style.display = "inline-block";
+  });
+
+  // Toggle menú hamburguesa
+  hamburgerBtn.addEventListener("click", () => {
+    mobileNavMenu.classList.toggle("hidden");
+    // Al abrir menú, ocultar buscador
+    if (!mobileNavMenu.classList.contains("hidden")) {
+      mobileSearchForm.style.display = "none";
+      searchToggleBtn.style.display = "inline-block";
+    }
+  });
+
+  // Opcional: cerrar menú o buscador si clic fuera
+  document.addEventListener("click", (e) => {
+    const insideSearch = mobileSearchForm.contains(e.target);
+    const insideSearchBtn = searchToggleBtn.contains(e.target);
+    const insideMenu = mobileNavMenu.contains(e.target);
+    const insideHamburger = hamburgerBtn.contains(e.target);
+
+    if (!insideSearch && !insideSearchBtn) {
+      mobileSearchForm.style.display = "none";
+      searchToggleBtn.style.display = "inline-block";
+    }
+    if (!insideMenu && !insideHamburger) {
+      mobileNavMenu.classList.add("hidden");
+    }
+  });
+});
+
 
   </script>
   <form method="POST">
