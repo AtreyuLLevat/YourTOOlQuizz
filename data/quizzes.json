@@ -12,20 +12,25 @@
     }
   ],
   "herramientas": {
-    "y": {
-      "name": "Herramienta Básica",
-      "url": "https://ejemplo.com/basica",
-      "features": ["Protección básica", "Interfaz simple"]
+    "panda": {
+      "name": "Panda Antivirus",
+      "url": "https://www.pandasecurity.com/es/homeusers/#plans",
+      "features": ["Antivirus, antimalware y antispyware", 
+        "Firewall y protección Wi-Fi","VPN incluida150mb/día",
+        "Antiphishing y navegación segura", "Antiransomware(plan Advanced)", 
+        "Cifrado y eliminación segura de archivos(plan Complete)", "..."]
     },
     "x": {
-      "name": "Herramienta Intermedia",
-      "url": "https://ejemplo.com/intermedia",
-      "features": ["Protección avanzada", "VPN incluida"]
+      "name": "Bitdefender Antivirus",
+      "url": "https://www.bitdefender.com/pages/consumer/es/new/cl-offer-premium-fam?locale=es-ES&vcampaign=BDLP25V2&cid=ppc|c|google|60off&gad_source=1&gad_campaignid=22844623130&gbraid=0AAAAAD4Ft7LLZTkRMfJYJ0XJVV3hsSjJf&gclid=CjwKCAjw49vEBhAVEiwADnMbbMWh7oH7joFfCojmPhb-KL5Yy68WGrKEn3JKbgAvPrQgoaD4vooNyxoCcigQAvD_BwE",
+      "features": ["Protección galardonada contra ransomware, antivirus y antimalware", 
+      "VPN incluida 200mb/día", "Detección y prevención de estafas","Detección de violaciones de la seguridad", "Cryptomining Protection(plan Total Security)", "Scam Copilot(plan Premium Security)"]
     },
     "z": {
-      "name": "Herramienta Premium",
-      "url": "https://ejemplo.com/premium",
-      "features": ["Protección total", "Dark Web Monitoring"]
+      "name": "Norton 360 Antivirus",
+      "url": "https://es.norton.com/ps/4up_norton360_nav_ns_nd_np_Reading_tw_nb.html?nortoncountry=es&om_sem_cid=hho_sem_sy:~es-es_nor_n36_sch_brn_exc_nfr_adw_nad_low:top~c_kw0000000559&gad_source=1&gad_campaignid=19153623585&gbraid=0AAAAAD4v9n2icrT6yMq23oKxaX5owd5_R&gclid=CjwKCAjwkbzEBhAVEiwA4V-yqjAemZ2L8V8NnrxUDOa2Y2nT8W3nJG8JNVQ1CD4UJWSlKH4EDegalhoClucQAvD_BwE&gclsrc=aw.ds#chart",
+      "features": ["Antivirus, software malicioso, ransomware y protección contra hackers", "Promesa de Protección frente a Virus 100%", 
+        "VPN privada(plan Estandard)", "Administrador de contraseñas", "Copia de seguridad en la nube", "Dark Web Monitoring(plan Deluxe)", "Asistencia por robo de billetera(plan Deluxe)", "Asistencia para la restauración de la identidad(plan Deluxe)"]
     }
   }
 }

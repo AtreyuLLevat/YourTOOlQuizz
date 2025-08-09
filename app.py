@@ -87,7 +87,7 @@ def quizzantivirus():
     if form.validate_on_submit():
         # Procesar respuestas y redirigir a resultado
         answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
-        scores = {'y': 0, 'x': 0, 'z': 0}
+        scores = {'panda': 0, 'x': 0, 'z': 0}
         for answer in answers:
             if answer in scores:
                 scores[answer] += 1
@@ -132,7 +132,7 @@ def Inteligenciasartificiales():
 def result():
     try:
         answers = [request.form.get(f'q{i}') for i in range(1, 6)]
-        scores = {'y': 0, 'x': 0, 'z': 0}
+        scores = {'panda': 0, 'x': 0, 'z': 0}
         for answer in answers:
             if answer in scores:
                 scores[answer] += 1
