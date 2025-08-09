@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+from tu_modulo_de_formularios import Quizantivirus
 
 # Cargar variables de entorno
 load_dotenv()
@@ -76,14 +77,24 @@ class LoginForm(FlaskForm):
 # --------------------------
 
 @app.route('/')
-def home():
+def homepage():
     """Página de inicio (homepage)"""
     return render_template('homepage.html')
 
-@app.route('/quizzantivirus')
-def quiz():
-    """Página principal del quiz"""
-    return render_template('YourToolQuizz.html')
+@app.route('/quizzantivirus', methods=['GET', 'POST'])
+def quizzantivirus():
+    form = Quizantivirus()
+    if form.validate_on_submit():
+        # Procesar respuestas y redirigir a resultado
+        answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
+        scores = {'y': 0, 'x': 0, 'z': 0}
+        for answer in answers:
+            if answer in scores:
+                scores[answer] += 1
+        best_tool = max(scores, key=scores.get)
+        tool_data = quizzes_data['herramientas'][best_tool]
+        return render_template('result.html', tool=tool_data)
+    return render_template('quizzantivirus.html', form=form)
 
 # --------------------------
 # RUTAS DE CATEGORÍAS
@@ -92,6 +103,10 @@ def quiz():
 @app.route('/diseño')
 def diseño():
     return render_template('Diseño.html')
+
+@app.route('/Blogs')
+def blog():
+    return render_template('Blogs.html')
 
 @app.route('/productividad')
 def productividad():
@@ -106,8 +121,8 @@ def Redes():
     return render_template('Redes.html')
 
 @app.route('/Inteligenciasartificales')
-def Inteligenciasartificales():
-    return render_template('Inteligenciasartificales.html')
+def Inteligenciasartificiales():
+    return render_template('Inteligenciasartificiales.html')
 
 # --------------------------
 # FUNCIONALIDADES CORE
@@ -131,17 +146,32 @@ def result():
 
 @app.route('/buscar')
 def buscar():
-    query = request.args.get('q', '').lower()
+    query = request.args.get('q', '').strip().lower()
     resultados = []
+
     if query:
-        for quiz in quizzes_data['quizzes']:
-            if query in quiz['titulo'].lower() or query in quiz['categoria'].lower():
+        for quiz in quizzes_data.get('quizzes', []):
+            # Buscar en título, categoría y descripción (si existe)
+            titulo = quiz.get('titulo', '').lower()
+            categoria = quiz.get('categoria', '').lower()
+            descripcion = quiz.get('descripcion', '').lower() if 'descripcion' in quiz else ''
+
+            if query in titulo or query in categoria or query in descripcion:
                 resultados.append(quiz)
+
     return render_template("buscar.html", resultados=resultados, query=query)
+
 
 # --------------------------
 # FORMULARIOS Y CONTACTO
 # --------------------------
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/legal')
+def legal():
+    return render_template('legal.html')
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

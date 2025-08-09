@@ -490,7 +490,7 @@
     </div>
     
     <div class="logo">
-      <a href="{{ url_for('YourToolQuizz') }}">YourToolQuizz</a>
+      <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
     </div>
     
    <div class="right-nav">
@@ -519,23 +519,23 @@
   <main>
     <!-- Categories Section -->
     <div class="categories-subheading">
-      <a href="Seguridad.html" class="category-tag">
+      <a href="{{ url_for('quizzantivirus') }}" class="category-tag">
         <span class="category-icon">🛡️</span>
         <span class="category-name">Seguridad</span>
       </a>
-      <a href="productividad.html" class="category-tag">
+      <a href="{{ url_for('productividad') }}" class="category-tag">
         <span class="category-icon">⏱️</span>
         <span class="category-name">Productividad</span>
       </a>
-      <a href="Diseño.html" class="category-tag">
+      <a href="{{ url_for('diseño') }}" class="category-tag">
         <span class="category-icon">🎨</span>
         <span class="category-name">Diseño</span>
       </a>
-      <a href="Redes.html" class="category-tag">
+      <a href="{{ url_for('Redes') }}" class="category-tag">
         <span class="category-icon">📡</span>
         <span class="category-name">Redes</span>
       </a>
-      <a href="Inteligenciasartificiales.html" class="category-tag">
+      <a href="{{ url_for('Inteligenciasartificiales') }}" class="category-tag">
         <span class="category-icon">🤖</span>
         <span class="category-name">IA</span>
       </a>
@@ -545,47 +545,15 @@
     <section class="section">
       <h2 class="section-title">Quiz más nuevo</h2>
       <div class="featured-quiz">
-        <div class="quiz-image" style="background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');"></div>
+        <div class="quiz-image" style="background-image: url('https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg');"></div>
         <div class="quiz-content">
           <h3 class="quiz-title">¿Qué antivirus es el mejor para ti?</h3>
           <p class="quiz-description">Descubre cuál es el antivirus que mejor se adapta a tus necesidades de seguridad y protección online con este test personalizado.</p>
-          <a href="quiz-antivirus.html" class="quiz-button">Realizar quiz ahora</a>
+          <a href="{{ url_for('quizzantivirus') }}" class="quiz-button">Realizar quiz ahora</a>
         </div>
       </div>
     </section>
     
-    <!-- Popular Quizzes Section -->
-    <section class="section">
-      <h2 class="section-title">Quizzes populares</h2>
-      <div class="items-grid">
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">¿Qué editor de código deberías usar?</h4>
-            <div class="item-meta">Programación • 10 preguntas</div>
-            <a href="quiz-editores.html" class="item-link">Realizar quiz →</a>
-          </div>
-        </div>
-        
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">Encuentra tu herramienta de diseño ideal</h4>
-            <div class="item-meta">Diseño • 8 preguntas</div>
-            <a href="quiz-diseno.html" class="item-link">Realizar quiz →</a>
-          </div>
-        </div>
-        
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">¿Qué gestor de proyectos necesitas?</h4>
-            <div class="item-meta">Productividad • 7 preguntas</div>
-            <a href="quiz-proyectos.html" class="item-link">Realizar quiz →</a>
-          </div>
-        </div>
-      </div>
-    </section>
     
     <!-- Recent Blog Section -->
     <section class="section">
@@ -595,43 +563,12 @@
         <div class="quiz-content">
           <h3 class="quiz-title">Cómo proteger tus datos en 2023</h3>
           <p class="quiz-description">Descubre las mejores prácticas y herramientas para mantener tu información segura en el nuevo año con nuestra guía completa de seguridad digital.</p>
-          <a href="blog-seguridad.html" class="quiz-button">Leer artículo</a>
+          <a href="{{ url_for('blog') }}" class="quiz-button">Leer artículo</a>
         </div>
       </div>
     </section>
     
-    <!-- More Blog Articles Section -->
-    <section class="section">
-      <h2 class="section-title">Más artículos del blog</h2>
-      <div class="items-grid">
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">Las 10 mejores herramientas para diseñadores en 2023</h4>
-            <div class="item-meta">Diseño • 8 min lectura</div>
-            <a href="blog-herramientas-diseno.html" class="item-link">Leer artículo →</a>
-          </div>
-        </div>
-        
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">Comparativa: VS Code vs Sublime Text vs Atom</h4>
-            <div class="item-meta">Programación • 12 min lectura</div>
-            <a href="blog-editores-codigo.html" class="item-link">Leer artículo →</a>
-          </div>
-        </div>
-        
-        <div class="item-card">
-          <div class="item-image" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60');"></div>
-          <div class="item-info">
-            <h4 class="item-title">Cómo aumentar tu productividad con estas apps</h4>
-            <div class="item-meta">Productividad • 6 min lectura</div>
-            <a href="blog-productividad.html" class="item-link">Leer artículo →</a>
-          </div>
-        </div>
-      </div>
-    </section>
+   
   </main>
   
   <footer>
@@ -639,28 +576,29 @@
       <div class="footer-section">
         <h3>Navegación</h3>
         <ul>
-          <li><a href="index.html">Inicio</a></li>
-          <li><a href="quizzes.html">Quizzes</a></li>
-          <li><a href="blog.html">Blog</a></li>
-          <li><a href="categorias.html">Categorías</a></li>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
         </ul>
       </div>
       
       <div class="footer-section">
-        <h3>Legal</h3>
+        <h3>Quizzes</h3>
         <ul>
-          <li><a href="terminos.html">Términos y condiciones</a></li>
-          <li><a href="privacidad.html">Política de privacidad</a></li>
-          <li><a href="cookies.html">Cookies</a></li>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
         </ul>
       </div>
       
       <div class="footer-section">
         <h3>Contacto</h3>
         <ul>
-          <li><a href="mailto:info@yourtoolquizz.com">info@yourtoolquizz.com</a></li>
-          <li><a href="soporte.html">Soporte</a></li>
-          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
         </ul>
       </div>
       
@@ -668,17 +606,18 @@
         <h3>Síguenos</h3>
         <div class="social-links">
           <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
           <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
         </div>
       </div>
     </div>
     
     <div class="footer-bottom">
-      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
     </div>
   </footer>
+  
 
   <script>
     // Mostrar / ocultar buscador móvil

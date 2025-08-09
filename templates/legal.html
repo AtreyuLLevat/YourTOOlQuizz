@@ -271,7 +271,7 @@
 <body>
   <header>
     <div class="logo">
-      <a href="{{ url_for('YourToolQuizz') }}">YourToolQuizz</a>
+      <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
     </div>
     
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
@@ -308,28 +308,29 @@
       <div class="footer-section">
         <h3>Navegación</h3>
         <ul>
-          <li><a href="{{ url_for('YourToolQuizz') }}">Inicio</a></li>
-          <li><a href="#">Test</a></li>
-          <li><a href="#">Resultados</a></li>
-          <li><a href="#">Blog</a></li>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
         </ul>
       </div>
       
       <div class="footer-section">
-        <h3>Legal</h3>
+        <h3>Quizzes</h3>
         <ul>
-          <li><a href="{{ url_for('legal') }}">Términos y condiciones</a></li>
-          <li><a href="{{ url_for('legal') }}">Política de privacidad</a></li>
-          <li><a href="{{ url_for('legal') }}">Cookies</a></li>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
         </ul>
       </div>
       
       <div class="footer-section">
         <h3>Contacto</h3>
         <ul>
-          <li><a href="mailto:info@yourtoolquizz.com">info@yourtoolquizz.com</a></li>
-          <li><a href="{{ url_for('contact') }}">Soporte</a></li>
-          <li><a href="#">FAQ</a></li>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
         </ul>
       </div>
       
@@ -337,17 +338,18 @@
         <h3>Síguenos</h3>
         <div class="social-links">
           <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
           <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
         </div>
       </div>
     </div>
     
     <div class="footer-bottom">
-      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
     </div>
   </footer>
+  
   
   <script>
     function toggleMenu() {
