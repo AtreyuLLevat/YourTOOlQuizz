@@ -274,13 +274,20 @@
       <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
     </div>
     
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    
-    <nav id="mobileMenu">
-      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
-      <a href="{{ url_for('legal') }}">Aviso Legal</a>
-      <a href="{{ url_for('contact') }}">Contáctanos</a>
-    </nav>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
+<div class="mobile-menu" id="mobileMenu">
+  <ul>
+    <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+    <li><a href="{{ url_for('legal') }}">Aviso Legal</a></li>
+    <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+    {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+    {% else %}
+      <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
+    {% endif %}
+  </ul>
+</div>
   </header>
   
   <main>
@@ -351,11 +358,32 @@
   </footer>
   
   
-  <script>
-    function toggleMenu() {
-      const menu = document.getElementById('mobileMenu');
-      menu.classList.toggle('show');
-    }
-  </script>
+<script>
+    // Mostrar/ocultar menú móvil - Versión simplificada solo para hamburguesa
+    document.getElementById('menuToggle').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('active');
+      
+      // Opcional: Cerrar otros elementos si están abiertos (como buscador)
+      // document.getElementById('mobileSearchContainer').classList.remove('active');
+    });
+
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener('click', function(event) {
+      const menuToggle = document.getElementById('menuToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      
+      if (!menuToggle.contains(event.target) && 
+          !mobileMenu.contains(event.target)) {
+        mobileMenu.classList.remove('active');
+      }
+    });
+
+    // Evitar que el clic dentro del menú lo cierre
+    document.getElementById('mobileMenu').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+</script>
 </body>
 </html>
