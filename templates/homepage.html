@@ -577,12 +577,16 @@
     <button class="menu-toggle" id="menuToggle">☰</button>
     
     <!-- Mobile Search Container -->
-    <div class="mobile-search-container" id="mobileSearchContainer">
+      <div class="mobile-search-container" id="mobileSearchContainer">
       <form method="GET" action="/buscar">
-        <input type="text" name="q" class="mobile-search-input" placeholder="Buscar...">
+        <input type="text" 
+              name="q" 
+              class="mobile-search-input" 
+              placeholder="Buscar..."
+              aria-label="Buscar en el sitio">
       </form>
     </div>
-    
+        
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
       <ul>
@@ -699,10 +703,17 @@
   </footer>
   
 
-  <script>
+<script>
     // Mostrar / ocultar buscador móvil
     document.getElementById('mobileSearchBtn').addEventListener('click', function() {
-      document.getElementById('mobileSearchContainer').classList.toggle('active');
+      const searchContainer = document.getElementById('mobileSearchContainer');
+      searchContainer.classList.toggle('active');
+      
+      // Enfocar el campo de búsqueda cuando se muestra
+      if (searchContainer.classList.contains('active')) {
+        document.querySelector('.mobile-search-input').focus();
+      }
+      
       // Cerrar el menú si está abierto
       document.getElementById('mobileMenu').classList.remove('active');
     });
@@ -714,6 +725,7 @@
       document.getElementById('mobileSearchContainer').classList.remove('active');
     });
     
+    // Cerrar menús al hacer clic fuera de ellos
     document.addEventListener('click', function(event) {
       const mobileSearchBtn = document.getElementById('mobileSearchBtn');
       const mobileSearchContainer = document.getElementById('mobileSearchContainer');
@@ -728,6 +740,6 @@
         mobileMenu.classList.remove('active');
       }
     });
-  </script>
+</script>
 </body>
 </html>
