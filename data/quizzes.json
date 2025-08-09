@@ -1,0 +1,31 @@
+{
+  "quizzes": [
+    {
+      "titulo": "¿Qué editor de código deberías usar?",
+      "url": "/quiz-editores",
+      "categoria": "productividad"
+    },
+    {
+      "titulo": "Encuentra tu herramienta de diseño ideal",
+      "url": "/quiz-diseno",
+      "categoria": "diseño"
+    }
+  ],
+  "herramientas": {
+    "y": {
+      "name": "Herramienta Básica",
+      "url": "https://ejemplo.com/basica",
+      "features": ["Protección básica", "Interfaz simple"]
+    },
+    "x": {
+      "name": "Herramienta Intermedia",
+      "url": "https://ejemplo.com/intermedia",
+      "features": ["Protección avanzada", "VPN incluida"]
+    },
+    "z": {
+      "name": "Herramienta Premium",
+      "url": "https://ejemplo.com/premium",
+      "features": ["Protección total", "Dark Web Monitoring"]
+    }
+  }
+}
