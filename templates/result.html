@@ -19,30 +19,29 @@
     
     header {
       background: #ff6f61;
-      padding: 15px 20px;
       color: white;
+      padding: 15px 20px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      position: relative;
       z-index: 100;
     }
-    
     .logo {
       font-family: "Fascinate Inline", system-ui;
       font-weight: 400;
       font-style: normal;
       font-size: 2.5rem;
       letter-spacing: -0.5px;
-      text-transform: none;
       margin: 0;
+      text-align: center;
+      flex-grow: 1;
     }
-    
     .logo a {
       text-decoration: none;
       color: inherit;
     }
-    
     .menu-toggle {
       display: none;
       font-size: 1.8rem;
@@ -306,19 +305,12 @@
   </style>
 </head>
 <body>
-  <header>
+<header>
     <div class="logo">
-      <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
+     <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
     </div>
-    
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    
-    <nav id="mobileMenu">
-      <a href="{{ url_for('about') }}">Sobre Nosotros</a>
-      <a href="{{ url_for('legal') }}">Aviso Legal</a>
-      <a href="{{ url_for('contact') }}">Contáctanos</a>
-    </nav>
   </header>
+  
   
   <main>
     <h1>Tu herramienta ideal es: <strong>{{ tool.name }}</strong></h1>

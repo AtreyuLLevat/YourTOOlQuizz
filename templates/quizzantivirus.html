@@ -18,23 +18,28 @@
     }
     header {
       background: #ff6f61;
-      padding: 15px 20px;
-      text-align: center;
       color: white;
+      padding: 15px 20px;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      justify-content: space-between;
+      display: flex;
       align-items: center;
-      padding: 10px 20px;
+      justify-content: space-between;
+      position: relative;
       z-index: 100;
     }
     .logo {
       font-family: "Fascinate Inline", system-ui;
       font-weight: 400;
       font-style: normal;
-      font-size: 3rem;
+      font-size: 2.5rem;
       letter-spacing: -0.5px;
-      text-transform: none;
       margin: 0;
+      text-align: center;
+      flex-grow: 1;
+    }
+    .logo a {
+      text-decoration: none;
+      color: inherit;
     }
     main {
       max-width: 800px;
@@ -437,39 +442,8 @@
   </style>
 </head>
 <body>
-  <header>
+<header>
     <div class="logo">
-      <div class="mobile-search-container">
-  <button id="searchToggleBtn" aria-label="Abrir búsqueda">
-    <i class="fas fa-search"></i>
-  </button>
-  <form id="mobileSearchForm" action="/search" method="GET">
-    <input
-      type="search"
-      name="q"
-      id="mobileSearchInput"
-      placeholder="Buscar..."
-      aria-label="Buscar"
-      autocomplete="off"
-    />
-    <button type="button" id="searchCloseBtn" aria-label="Cerrar búsqueda">
-      <i class="fas fa-times"></i>
-    </button>
-  </form>
-</div>
-
-<button id="hamburgerBtn" aria-label="Abrir menú">
-  <i class="fas fa-bars"></i>
-</button>
-<nav id="mobileNavMenu" class="hidden">
-  <ul>
-    <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-    <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-    <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-    <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-    <!-- Agrega más enlaces si quieres -->
-  </ul>
-</nav>
      <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
     </div>
   </header>
