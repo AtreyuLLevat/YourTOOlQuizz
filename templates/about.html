@@ -1,133 +1,326 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sobre Nosotros - YourToolQuizz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Bahnschrift&display=swap');
-
     body {
       margin: 0;
-      font-family: 'Bahnschrift', sans-serif;
-      background: #f0f0f0;
-      color: #000;
+      font-family: 'Roboto', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
     }
-
-    /* Barra superior */
+    
     header {
-      position: relative;
-      background: #fff;
+      background: #ff6f61;
+      padding: 15px 20px;
+      color: white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
       z-index: 100;
     }
-
+    
     .logo {
-      font-weight: bold;
-      font-size: 1.3rem;
+      font-family: "Fascinate Inline", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 2.5rem;
+      letter-spacing: -0.5px;
+      text-transform: none;
+      margin: 0;
     }
-
+    
+    .logo a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
     .menu-toggle {
       display: none;
       font-size: 1.8rem;
       cursor: pointer;
       z-index: 1001;
     }
-
+    
     nav {
       display: flex;
       gap: 20px;
-      font-weight: bold;
     }
-
+    
     nav a {
-      color: #000;
+      color: white;
       text-decoration: none;
-      cursor: pointer;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
     }
-
+    
     nav a:hover {
-      text-decoration: underline;
+      background-color: rgba(255,255,255,0.2);
     }
-
-    /* Contenido principal */
+    
     main {
-      max-width: 700px;
+      max-width: 800px;
       margin: 40px auto;
-      background: #fff;
-      padding: 30px 40px;
-      border-radius: 8px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1;
     }
-
-    main h1 {
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: bold;
+    
+    h1 {
+      color: #ff6f61;
+      font-size: 2.5rem;
       margin-bottom: 30px;
+      text-align: center;
+      position: relative;
+      padding-bottom: 15px;
     }
-
-    main p {
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: #ff6f61;
+    }
+    
+    p {
       font-size: 1.1rem;
-      line-height: 1.6;
       margin-bottom: 20px;
-      color: #333;
+      color: #555;
     }
-
-    main p strong {
-      color: #4a90e2;
+    
+    strong {
+      color: #2c3e50;
+      font-weight: 600;
     }
-
-    /* Responsive: móviles */
-    @media (max-width: 600px) {
-      header {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
+    
+    .highlight {
+      background: #fff3f2;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #ff6f61;
+      margin: 30px 0;
+    }
+    
+    .team-section {
+      margin-top: 40px;
+    }
+    
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+    }
+    
+    .team-member {
+      text-align: center;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .team-member:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .team-member img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid #ff6f61;
+    }
+    
+    .team-member h3 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    
+    .team-member p {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+    
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .social-links a {
+      color: #ff6f61;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+    
+    .social-links a:hover {
+      color: #e65a4e;
+    }
+    
+    /* Footer styles */
+    footer {
+      background: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      text-align: left;
+    }
+    
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-section h3::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 50px;
+      height: 2px;
+      background: #ff6f61;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-section ul li a {
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-section ul li a:hover {
+      color: #ff6f61;
+    }
+    
+    .footer-social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .footer-social-links a {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+    
+    .footer-social-links a:hover {
+      color: #ff6f61;
+    }
+    
+    .footer-bottom {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #34495e;
+      font-size: 0.9rem;
+      color: #bdc3c7;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .logo {
+        font-size: 2rem;
       }
-
+      
       .menu-toggle {
         display: block;
       }
-
+      
       nav {
         display: none;
         position: absolute;
         top: 100%;
-        right: 20px;
-        background: white;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        border-radius: 6px;
+        left: 0;
+        right: 0;
+        background: #ff6f61;
         flex-direction: column;
-        padding: 10px 15px;
-        z-index: 1000;
+        padding: 15px 20px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       }
-
+      
       nav.show {
         display: flex;
       }
-
+      
       nav a {
-        margin: 8px 0;
-        white-space: nowrap;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
       }
-
+      
       main {
-        margin: 20px 15px;
         padding: 25px;
+        margin: 20px 15px;
       }
-
-      main h1 {
-        font-size: 1.7rem;
+      
+      h1 {
+        font-size: 2rem;
       }
-
-      main p {
-        font-size: 1rem;
+      
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      
+      .footer-section h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      .footer-social-links {
+        justify-content: center;
+      }
+    }
+    
+    @media (min-width: 769px) and (max-width: 1024px) {
+      main {
+        width: 85%;
+      }
+      
+      .logo {
+        font-size: 2.2rem;
       }
     }
   </style>
@@ -135,31 +328,80 @@
 <body>
   <header>
     <div class="logo">
-      <a href="{{ url_for('YourToolQuizz') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+      <a href="{{ url_for('YourToolQuizz') }}">YourToolQuizz</a>
     </div>
-
+    
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-
+    
     <nav id="mobileMenu">
       <a href="{{ url_for('about') }}">Sobre Nosotros</a>
       <a href="{{ url_for('legal') }}">Aviso Legal</a>
       <a href="{{ url_for('contact') }}">Contáctanos</a>
     </nav>
   </header>
-
+  
   <main>
     <h1>Sobre Nosotros</h1>
-    <p>
-      En <strong>YourToolQuizz</strong> creemos que la tecnología puede simplificar la vida de todos, especialmente de los emprendedores y profesionales digitales.
-    </p>
-    <p>
-      Creamos esta plataforma con un objetivo claro: ayudarte a encontrar la herramienta SaaS perfecta según tus necesidades, sin perder tiempo comparando cientos de opciones y ganando comisiones con tus compras a través de nuestros enlaces, ya que somos afiliados de estas webs. Nos basamos en la experiencia, utilidad y simplicidad de uso para ofrecerte una recomendación precisa.
-    </p>
-    <p>
-      ¡Gracias por confiar en nosotros!
-    </p>
-  </main>
+    
+    <p>En <strong>YourToolQuizz</strong> creemos que la tecnología puede simplificar la vida de todos, especialmente de los emprendedores y profesionales digitales.</p>
+    
+    <div class="highlight">
+      <p>Creamos esta plataforma con un objetivo claro: ayudarte a encontrar la herramienta SaaS perfecta según tus necesidades, sin perder tiempo comparando cientos de opciones.</p>
+      <p>Nos basamos en la experiencia, utilidad y simplicidad de uso para ofrecerte una recomendación precisa.</p>
+    </div>
+    
+    <p>Somos afiliados de las herramientas que recomendamos, lo que significa que ganamos una pequeña comisión si decides adquirirlas a través de nuestros enlaces, sin que esto represente ningún costo adicional para ti.</p>
 
+    
+    <p>¡Gracias por confiar en nosotros para encontrar las mejores herramientas para impulsar tu negocio!</p>
+  </main>
+  
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="{{ url_for('YourToolQuizz') }}">Inicio</a></li>
+          <li><a href="#">Test</a></li>
+          <li><a href="#">Resultados</a></li>
+          <li><a href="#">Blog</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Legal</h3>
+        <ul>
+          <li><a href="{{ url_for('legal') }}">Términos y condiciones</a></li>
+          <li><a href="{{ url_for('legal') }}">Política de privacidad</a></li>
+          <li><a href="{{ url_for('legal') }}">Cookies</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:info@yourtoolquizz.com">info@yourtoolquizz.com</a></li>
+          <li><a href="{{ url_for('contact') }}">Soporte</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="footer-social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+    </div>
+  </footer>
+  
   <script>
     function toggleMenu() {
       const menu = document.getElementById('mobileMenu');
