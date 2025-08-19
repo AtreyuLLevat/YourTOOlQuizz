@@ -1,16 +1,4 @@
 {
-  "quizzes": [
-    {
-      "titulo": "¿Qué editor de código deberías usar?",
-      "url": "/quiz-editores",
-      "categoria": "productividad"
-    },
-    {
-      "titulo": "Encuentra tu herramienta de diseño ideal",
-      "url": "/quiz-diseno",
-      "categoria": "diseño"
-    }
-  ],
   "herramientas": {
     "panda": {
       "name": "Panda Antivirus",
@@ -34,3 +22,4 @@
     }
   }
 }
+

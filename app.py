@@ -11,6 +11,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from tu_modulo_de_formularios import Quizantivirus
+from tu_modulo_de_formularios import Quizzproductividad
+
 
 # Cargar variables de entorno
 load_dotenv()
@@ -36,9 +38,19 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirige a login si no está autenticado
 
-# Cargar datos de quizzes desde JSON
+# Cargar antivirus
 with open('data/quizzes.json', 'r', encoding='utf-8') as f:
-    quizzes_data = json.load(f)
+    antivirus_data = json.load(f)
+
+# Cargar productividad
+with open('data/productividad.json', 'r', encoding='utf-8') as f:
+    productividad_data = json.load(f)
+
+# Combinar en un solo diccionario
+quizzes_data = {
+    "antivirus": antivirus_data.get("antivirus", {}),
+    "herramientasproductivas": productividad_data.get("herramientasproductivas", {})
+}
 
 # Modelos de BD
 class User(UserMixin, db.Model):
@@ -96,6 +108,20 @@ def quizzantivirus():
         return render_template('result.html', tool=tool_data)
     return render_template('quizzantivirus.html', form=form)
 
+@app.route('/quizzproductividad', methods=['GET', 'POST'])
+def quizzproductividad():
+    form = Quizzproductividad()
+    if form.validate_on_submit():
+        # Procesar respuestas y redirigir a resultado
+        answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
+        scores = {'notion': 0, 'clickup': 0, 'todoist': 0}
+        for answer in answers:
+            if answer in scores:
+                scores[answer] += 1
+        best_tool = max(scores, key=scores.get)
+        tool_data = quizzes_data['herramientasproductivas'][best_tool]
+        return render_template('result.html', tool=tool_data)
+    return render_template('quizzproductividad.html', form=form)
 # --------------------------
 # RUTAS DE CATEGORÍAS
 # --------------------------
