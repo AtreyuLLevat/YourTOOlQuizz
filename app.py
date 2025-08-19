@@ -133,6 +133,9 @@ def diseño():
 @app.route('/Blogs')
 def blog():
     return render_template('Blogs.html')
+@app.route('/Blog1antivirus')
+def Blog1antivirus():
+    return render_template('Blogs1antivirus.html')
 
 @app.route('/productividad')
 def productividad():
