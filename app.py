@@ -131,7 +131,7 @@ def diseño():
     return render_template('Diseño.html')
 
 @app.route('/Blogs')
-def blog():
+def Blogs():
     return render_template('Blogs.html')
 @app.route('/Blog1antivirus')
 def Blog1antivirus():
