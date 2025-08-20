@@ -136,6 +136,9 @@ def Blog():
 @app.route('/Blogs1antivirus')
 def Blog1antivirus():
     return render_template('Blogs1antivirus.html')
+@app.route('/Blogproductividad')
+def Blogproductividad():
+    return render_template('Blogproductividad.html')
 
 @app.route('/productividad')
 def productividad():
