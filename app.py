@@ -12,12 +12,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from tu_modulo_de_formularios import Quizantivirus
 from tu_modulo_de_formularios import Quizzproductividad
+from models import db, User
 
+app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yourtoolquizz.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+with app.app_context():
+    db.create_all() 
 
 # Cargar variables de entorno
 load_dotenv()
-
-app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY') or 'dev-key-segura'  # Usar variable de entorno
 
 # Configuración Flask-Mail
@@ -29,7 +35,7 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Desde .env
 app.config['WTF_CSRF_ENABLED'] = True  # Protección CSRF activada
 
 # Configuración base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'  # Base datos local
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 mail = Mail(app)
@@ -37,6 +43,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirige a login si no está autenticado
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 # Cargar antivirus
 with open('data/quizzes.json', 'r', encoding='utf-8') as f:
@@ -48,19 +59,10 @@ with open('data/productividad.json', 'r', encoding='utf-8') as f:
 
 # Combinar en un solo diccionario
 quizzes_data = {
-    "antivirus": antivirus_data.get("antivirus", {}),
+    "herramientas": antivirus_data.get("herramientas", {}),
     "herramientasproductivas": productividad_data.get("herramientasproductivas", {})
 }
 
-# Modelos de BD
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), unique=True)
-    password = db.Column(db.String(150))
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
 
 # Formularios
 class ContactForm(FlaskForm):
@@ -136,6 +138,7 @@ def Blog():
 @app.route('/Blogs1antivirus')
 def Blog1antivirus():
     return render_template('Blogs1antivirus.html')
+    
 @app.route('/Blogproductividad')
 def Blogproductividad():
     return render_template('Blogproductividad.html')
@@ -236,43 +239,42 @@ def contact_error():
 # RUTAS DE USUARIOS (SISTEMA DE LOGIN)
 # --------------------------
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        hashed_pw = generate_password_hash(form.password.data, method='sha256')
+        hashed_pw = generate_password_hash(form.password.data)
         new_user = User(email=form.email.data, password=hashed_pw)
         db.session.add(new_user)
         db.session.commit()
-        flash('Cuenta creada con éxito. Ya puedes iniciar sesión.', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+        flash("Registro exitoso. Ahora puedes iniciar sesión.", "success")
+        return redirect(url_for("login"))
+    return render_template("register.html", form=form)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash('Has iniciado sesión correctamente', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard'))
+            flash("Inicio de sesión exitoso", "success")
+            return redirect(url_for("dashboard"))
         else:
-            flash('Correo o contraseña incorrectos', 'error')
-    return render_template('login.html', form=form)
+            flash("Correo o contraseña incorrectos", "danger")
+    return render_template("login.html", form=form)
 
-@app.route('/dashboard')
+@app.route("/dashboard")
 @login_required
 def dashboard():
-    return render_template('dashboard.html', email=current_user.email)
+    return render_template("dashboard.html", email=current_user.email)
 
-@app.route('/logout')
+@app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    flash('Has cerrado sesión', 'info')
-    return redirect(url_for('login'))
+    flash("Sesión cerrada correctamente", "info")
+    return redirect(url_for("login"))
 
 # --------------------------
 # MANEJO DE ERRORES
