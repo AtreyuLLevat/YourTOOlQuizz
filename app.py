@@ -181,13 +181,16 @@ def create_app():
     @app.route('/buscar')
     def buscar():
         query = request.args.get('q', '')
+        resultados_quiz = []
+        resultados_blog = []
         if query:
-            resultados = Quiz.query.filter(
+            resultados_quiz = Quiz.query.filter(
                 (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
             ).all()
-        else:
-            resultados = []
-        return render_template('buscar.html', resultados=resultados, q=query)
+            resultados_blog = Blog.query.filter(
+                (Blog.titulo.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))
+            ).all()
+        return render_template('buscar.html', resultados_quiz=resultados_quiz, resultados_blog=resultados_blog, q=query)
 
     # --------------------------
     # FORMULARIOS Y CONTACTO
