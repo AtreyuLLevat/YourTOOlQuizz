@@ -36,7 +36,7 @@ app.config['WTF_CSRF_ENABLED'] = True  # Protección CSRF activada
 
 # Configuración base de datos
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 mail = Mail(app)
 db = SQLAlchemy(app)
@@ -297,3 +297,4 @@ if __name__ == '__main__':
         db.create_all()  # Crear tablas si no existen
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+
