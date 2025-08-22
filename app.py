@@ -50,66 +50,105 @@ def create_app():
     # RUTAS
     # -----------------------------
 
-    @app.route('/')
-    def homepage():
-        return render_template('homepage.html')
+   @app.route('/')
+def homepage():
+    return render_template('homepage.html')
 
-    @app.route('/quizzantivirus', methods=['GET', 'POST'])
-    def quizzantivirus():
-        form = Quizantivirus()
 
-        # Cargar JSON solo cuando se llama la ruta
-        with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
-            antivirus_data = json.load(f)
-        quizzes_data = antivirus_data.get("herramientas", {})
+@app.route('/quizzantivirus', methods=['GET', 'POST'])
+def quizzantivirus():
+    form = Quizantivirus()
 
-        if form.validate_on_submit():
-            answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
-            scores = {'panda': 0, 'x': 0, 'z': 0}
-            for answer in answers:
-                if answer in scores:
-                    scores[answer] += 1
-            best_tool = max(scores, key=scores.get)
-            tool_data = quizzes_data[best_tool]
-            return render_template('result.html', tool=tool_data)
-        return render_template('quizzantivirus.html', form=form)
+    # Búsqueda de quizzes por keywords
+    keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
+    resultados = Quiz.query.filter(
+        db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
+    ).all()
 
-    @app.route('/quizzproductividad', methods=['GET', 'POST'])
-    def quizzproductividad():
-        form = Quizzproductividad()
+    # Cargar JSON solo cuando se llama la ruta
+    with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
+        antivirus_data = json.load(f)
+    quizzes_data = antivirus_data.get("herramientas", {})
 
-        with open(os.path.join(app.root_path, 'data/productividad.json'), 'r', encoding='utf-8') as f:
-            productividad_data = json.load(f)
-        quizzes_data = productividad_data.get("herramientasproductivas", {})
+    if form.validate_on_submit():
+        answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
+        scores = {'panda': 0, 'x': 0, 'z': 0}
+        for answer in answers:
+            if answer in scores:
+                scores[answer] += 1
+        best_tool = max(scores, key=scores.get)
+        tool_data = quizzes_data[best_tool]
+        return render_template('result.html', tool=tool_data)
 
-        if form.validate_on_submit():
-            answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
-            scores = {'notion': 0, 'clickup': 0, 'todoist': 0}
-            for answer in answers:
-                if answer in scores:
-                    scores[answer] += 1
-            best_tool = max(scores, key=scores.get)
-            tool_data = quizzes_data[best_tool]
-            return render_template('result.html', tool=tool_data)
-        return render_template('quizzproductividad.html', form=form)
-      # --------------------------
-# RUTAS DE CATEGORÍAS
+    return render_template('quizzantivirus.html', form=form, relacionados=resultados)
+
+
+@app.route('/quizzproductividad', methods=['GET', 'POST'])
+def quizzproductividad():
+    form = Quizzproductividad()
+
+    # Búsqueda de quizzes por keywords
+    keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión"]
+    resultados = Quiz.query.filter(
+        db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
+    ).all()
+
+    with open(os.path.join(app.root_path, 'data/productividad.json'), 'r', encoding='utf-8') as f:
+        productividad_data = json.load(f)
+    quizzes_data = productividad_data.get("herramientasproductivas", {})
+
+    if form.validate_on_submit():
+        answers = [form.q1.data, form.q2.data, form.q3.data, form.q4.data, form.q5.data]
+        scores = {'notion': 0, 'clickup': 0, 'todoist': 0}
+        for answer in answers:
+            if answer in scores:
+                scores[answer] += 1
+        best_tool = max(scores, key=scores.get)
+        tool_data = quizzes_data[best_tool]
+        return render_template('result.html', tool=tool_data)
+
+    return render_template('quizzproductividad.html', form=form, relacionados=resultados)
+
+
+# --------------------------
+# RUTAS DE CATEGORÍAS / BLOGS
 # --------------------------
 
-    @app.route('/diseño')
-    def diseño():
-        return render_template('Diseño.html')
+@app.route('/diseño')
+def diseño():
+    return render_template('Diseño.html')
 
-    @app.route('/Blogs')
-    def Blog():
-        return render_template('Blogs.html')
-    @app.route('/Blogs1antivirus')
-    def Blog1antivirus():
-        return render_template('Blogs1antivirus.html')
-        
-    @app.route('/Blogproductividad')
-    def Blogproductividad():
-        return render_template('Blogproductividad.html')
+
+@app.route('/Blogs')
+def Blog():
+    return render_template('Blogs.html')
+
+
+@app.route('/Blogs1antivirus')
+def Blog1antivirus():
+    # Keywords manuales para seguridad/antivirus
+    keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
+
+    # Buscar blogs relacionados según las keywords
+    relacionados = Blog.query.filter(
+        db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
+    ).all()
+
+    return render_template('Blogs1antivirus.html', relacionados=relacionados)
+
+
+@app.route('/Blogproductividad')
+def Blogproductividad():
+    # Keywords manuales para productividad
+    keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación"]
+
+    # Buscar blogs relacionados según las keywords
+    relacionados = Blog.query.filter(
+        db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
+    ).all()
+
+    return render_template('Blogproductividad.html', relacionados=relacionados)
+
 
     @app.route('/productividad')
     def productividad():
@@ -148,19 +187,16 @@ def create_app():
             return redirect(url_for('quiz'))
 
     @app.route('/buscar')
-    def buscar():
-        query = request.args.get('q', '').strip()
+def buscar():
+    query = request.args.get('q', '')
+    if query:
+        # Buscar coincidencias en el título o descripción
+        resultados = Quiz.query.filter(
+            (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
+        ).all()
+    else:
         resultados = []
-
-        if query:
-            # Buscar en títulos y descripciones usando SQLAlchemy
-            resultados = Quiz.query.filter(
-                (Quiz.title.ilike(f"%{query}%")) |
-                (Quiz.description.ilike(f"%{query}%"))
-            ).all()
-
-        return render_template("buscar.html", resultados=resultados, query=query)
-
+    return render_template('buscar.html', resultados=resultados, q=query)
     # --------------------------
     # FORMULARIOS Y CONTACTO
     # --------------------------
