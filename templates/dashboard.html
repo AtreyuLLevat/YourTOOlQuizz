@@ -232,28 +232,59 @@
   <main>
     <section class="dashboard">
       <h2>Bienvenido, {{ email }} 🎉</h2>
-      <p>Este es tu panel de usuario. Desde aquí podrás acceder a tus quizzes, revisar resultados y gestionar tu cuenta.</p>
+      <p>Has iniciado sesión de forma exitosa.</p>
 
-      <div class="cards">
-        <div class="card">
-          <i class="fas fa-shield-alt fa-2x"></i>
-          <h3>Seguridad informática</h3>
-          <p>Pon a prueba tus conocimientos en ciberseguridad.</p>
-          <a href="/seguridad_informatica" class="btn">Hacer quiz</a>
-        </div>
 
-        <div class="card">
-          <i class="fas fa-brain fa-2x"></i>
-          <h3>Inteligencias artificiales</h3>
-          <p>Descubre qué tanto sabes sobre IA y sus aplicaciones.</p>
-          <a href="/Inteligenciasartificales" class="btn">Hacer quiz</a>
-        </div>
-      </div>
     </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 YourToolQuizz. Todos los derechos reservados.</p>
+      <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
+          <li><a href="{{ url_for('Blog') }}">Blogs relacionados con los quizz</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
+    </div>
   </footer>
 </body>
 </html>

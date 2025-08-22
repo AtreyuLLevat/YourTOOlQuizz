@@ -226,7 +226,7 @@ def create_app():
             if user and check_password_hash(user.password, form.password.data):
                 login_user(user)
                 flash("Inicio de sesión exitoso", "success")
-                return redirect(url_for("dashboard"))
+                return redirect(url_for("homepage"))
             else:
                 flash("Correo o contraseña incorrectos", "danger")
         return render_template("login.html", form=form)
@@ -262,5 +262,4 @@ if __name__ == '__main__':
     app = create_app()
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
 

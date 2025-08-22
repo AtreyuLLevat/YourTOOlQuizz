@@ -251,25 +251,22 @@
   <main>
     <h1>Resultados para "{{ query }}"</h1>
     
-    <div class="results-container">
-     {% if resultados %}
-      <ul>
-          {% for item in resultados %}
-            <li>
-              <strong>{{ item.titulo }}</strong><br>
-              {{ item.categoria }}<br>
-              {% if item.descripcion %}
-                {{ item.descripcion }}
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No se encontraron resultados para "{{ query }}"</p>
-      {% endif %}
-
-    </div>
-    
+  <div class="results-container">
+  {% if resultados %}
+    <ul>
+      {% for item in resultados %}
+        <li>
+          <strong>{{ item.title }}</strong><br>
+          {% if item.description %}
+            {{ item.description }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No se encontraron resultados para "{{ query }}"</p>
+  {% endif %}
+</div>
     <a href="/" class="back-link">
       <i class="fas fa-arrow-left"></i> Volver al inicio
     </a>
