@@ -3,43 +3,40 @@ import os
 import json
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mail import Mail, Message
-from email.header import Header
-from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, PasswordField, SubmitField, validators
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from tu_modulo_de_formularios import Quizantivirus
-from tu_modulo_de_formularios import Quizzproductividad
+
 from models import db, User
+from forms import RegisterForm, LoginForm, ContactForm
+from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 
+# ---------------------------------
+# App & config
+# ---------------------------------
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yourtoolquizz.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-db.init_app(app)
-with app.app_context():
-    db.create_all() 
 
 # Cargar variables de entorno
 load_dotenv()
-app.secret_key = os.getenv('SECRET_KEY') or 'dev-key-segura'  # Usar variable de entorno
+app.secret_key = os.getenv('SECRET_KEY') or 'dev-key-segura'
 
-# Configuración Flask-Mail
+# Base de datos
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yourtoolquizz.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
+
+# Mail
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # Desde .env
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # Desde .env
-app.config['WTF_CSRF_ENABLED'] = True  # Protección CSRF activada
-
-# Configuración base de datos
-
-
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
+app.config['WTF_CSRF_ENABLED'] = True
 
 mail = Mail(app)
-db = SQLAlchemy(app)
+
+# Login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Redirige a login si no está autenticado
@@ -63,28 +60,6 @@ quizzes_data = {
     "herramientasproductivas": productividad_data.get("herramientasproductivas", {})
 }
 
-
-# Formularios
-class ContactForm(FlaskForm):
-    nombre = StringField('Nombre', [validators.InputRequired()])
-    correo = StringField('Email', [validators.Email(), validators.InputRequired()])
-    mensaje = TextAreaField('Mensaje', [validators.InputRequired(), validators.Length(min=10)])
-
-class RegisterForm(FlaskForm):
-    email = StringField('Email', validators=[validators.InputRequired(), validators.Email(), validators.Length(max=150)])
-    password = PasswordField('Contraseña', validators=[validators.InputRequired(), validators.Length(min=6, max=150)])
-    confirm_password = PasswordField('Confirmar contraseña', validators=[validators.InputRequired(), validators.EqualTo('password', message='Las contraseñas deben coincidir')])
-    submit = SubmitField('Registrarse')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user:
-            raise validators.ValidationError('Email ya registrado')
-
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[validators.InputRequired(), validators.Email(), validators.Length(max=150)])
-    password = PasswordField('Contraseña', validators=[validators.InputRequired()])
-    submit = SubmitField('Iniciar sesión')
 
 # --------------------------
 # RUTAS PRINCIPALES
@@ -297,4 +272,3 @@ if __name__ == '__main__':
         db.create_all()  # Crear tablas si no existen
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
