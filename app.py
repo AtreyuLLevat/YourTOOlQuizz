@@ -51,7 +51,7 @@ def create_app():
     # -----------------------------
 
     @app.route('/')
-        def homepage():
+    def homepage():
         return render_template('homepage.html')
 
 
