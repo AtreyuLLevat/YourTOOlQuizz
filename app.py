@@ -1,17 +1,14 @@
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import db, User
+from models import db, User, Quiz, Question, Blog
 from forms import RegisterForm, LoginForm, ContactForm
 from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 from flask_migrate import Migrate
-from models import Quiz, Question
-from models import Blog
-
 
 mail = Mail()
 login_manager = LoginManager()
@@ -55,18 +52,15 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
 
-
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
     def quizzantivirus():
         form = Quizantivirus()
 
-        # Búsqueda de quizzes por keywords
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
         resultados = Quiz.query.filter(
             db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
         ).all()
 
-        # Cargar JSON solo cuando se llama la ruta
         with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
             antivirus_data = json.load(f)
         quizzes_data = antivirus_data.get("herramientas", {})
@@ -83,12 +77,10 @@ def create_app():
 
         return render_template('quizzantivirus.html', form=form, relacionados=resultados)
 
-
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
     def quizzproductividad():
         form = Quizzproductividad()
 
-        # Búsqueda de quizzes por keywords
         keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión"]
         resultados = Quiz.query.filter(
             db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
@@ -110,7 +102,6 @@ def create_app():
 
         return render_template('quizzproductividad.html', form=form, relacionados=resultados)
 
-
     # --------------------------
     # RUTAS DE CATEGORÍAS / BLOGS
     # --------------------------
@@ -119,37 +110,25 @@ def create_app():
     def diseño():
         return render_template('Diseño.html')
 
-
     @app.route('/Blogs')
     def Blog():
         return render_template('Blogs.html')
 
-
     @app.route('/Blogs1antivirus')
     def Blog1antivirus():
-        # Keywords manuales para seguridad/antivirus
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
-
-        # Buscar blogs relacionados según las keywords
         relacionados = Blog.query.filter(
             db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
         ).all()
-
         return render_template('Blogs1antivirus.html', relacionados=relacionados)
-
 
     @app.route('/Blogproductividad')
     def Blogproductividad():
-        # Keywords manuales para productividad
         keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación"]
-
-        # Buscar blogs relacionados según las keywords
         relacionados = Blog.query.filter(
             db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
         ).all()
-
         return render_template('Blogproductividad.html', relacionados=relacionados)
-
 
     @app.route('/productividad')
     def productividad():
@@ -189,9 +168,7 @@ def create_app():
             data = json.load(f)
 
         quizzes_data = data[key]
-
         answers = [request.form.get(f'q{i}') for i in range(1,6)]
-        # ejemplo de puntuación
         scores = {tool: 0 for tool in quizzes_data.keys()}
         for answer in answers:
             if answer in scores:
@@ -201,21 +178,21 @@ def create_app():
 
         return render_template('result.html', tool=tool_data)
 
-        return render_template('result.html', tool=tool_data)
     @app.route('/buscar')
     def buscar():
-            query = request.args.get('q', '')
+        query = request.args.get('q', '')
         if query:
-            # Buscar coincidencias en el título o descripción
             resultados = Quiz.query.filter(
                 (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
             ).all()
         else:
             resultados = []
         return render_template('buscar.html', resultados=resultados, q=query)
+
     # --------------------------
     # FORMULARIOS Y CONTACTO
     # --------------------------
+
     @app.route('/about')
     def about():
         return render_template('about.html')
@@ -255,9 +232,6 @@ def create_app():
     # RUTAS DE USUARIOS (SISTEMA DE LOGIN)
     # --------------------------
 
-    # -----------------------------
-    # LOGIN / USUARIOS
-    # -----------------------------
     @app.route("/register", methods=["GET", "POST"])
     def register():
         form = RegisterForm()
@@ -294,7 +268,6 @@ def create_app():
         logout_user()
         flash("Sesión cerrada correctamente", "info")
         return redirect(url_for("login"))
-    
 
     # -----------------------------
     # Manejo de errores
@@ -307,11 +280,9 @@ def create_app():
     def internal_error(e):
         return render_template('500.html'), 500
 
-
     return app
 
 if __name__ == '__main__':
     app = create_app()
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
