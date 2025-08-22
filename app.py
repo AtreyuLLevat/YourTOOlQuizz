@@ -187,7 +187,7 @@ def create_app():
             return redirect(url_for('quiz'))
 
     @app.route('/buscar')
-def buscar():
+    def buscar():
     query = request.args.get('q', '')
     if query:
         # Buscar coincidencias en el título o descripción
