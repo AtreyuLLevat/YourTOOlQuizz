@@ -50,9 +50,9 @@ def create_app():
     # RUTAS
     # -----------------------------
 
-   @app.route('/')
-    def homepage():
-    return render_template('homepage.html')
+    @app.route('/')
+        def homepage():
+        return render_template('homepage.html')
 
 
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
