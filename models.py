@@ -1,25 +1,12 @@
 # models.py
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-
-db = SQLAlchemy()
-
-class User(UserMixin, db.Model):
-    __tablename__ = "users"
-
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-
-    def __repr__(self):
-        return f"<User {self.email}>"
-
-        # models.py
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin
 from datetime import datetime
 
 db = SQLAlchemy()
+
+
+
 
 # -------------------------
 # MODELO DE USUARIOS
@@ -35,7 +22,6 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f"<User {self.email}>"
-
 
 # -------------------------
 # MODELO DE QUIZZES
@@ -54,8 +40,6 @@ class Quiz(db.Model):
 
     def __repr__(self):
         return f"<Quiz {self.title}>"
-
-
 # -------------------------
 # MODELO DE PREGUNTAS
 # -------------------------
@@ -64,13 +48,12 @@ class Question(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(500), nullable=False)
-    answer = db.Column(db.String(200), nullable=False)  # respuesta correcta
+    answer = db.Column(db.String(200), nullable=False)
 
     quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
 
     def __repr__(self):
         return f"<Question {self.text[:20]}...>"
-
 
 # -------------------------
 # MODELO DE RESULTADOS
@@ -87,4 +70,3 @@ class Result(db.Model):
 
     def __repr__(self):
         return f"<Result User={self.user_id} Quiz={self.quiz_id} Score={self.score}>"
-
