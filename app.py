@@ -173,46 +173,46 @@ def create_app():
 
     @app.route('/result', methods=['POST'])
     def result():
-    quiz_type = request.form.get('quiz_type')
+        quiz_type = request.form.get('quiz_type')
 
-    if quiz_type == 'antivirus':
-        path = os.path.join(current_app.root_path, 'data/quizzes.json')
-        key = 'herramientas'
-    elif quiz_type == 'productividad':
-        path = os.path.join(current_app.root_path, 'data/productividad.json')
-        key = 'herramientasproductivas'
-    else:
-        flash("Tipo de quiz desconocido", "error")
-        return redirect(url_for('homepage'))
+        if quiz_type == 'antivirus':
+            path = os.path.join(current_app.root_path, 'data/quizzes.json')
+            key = 'herramientas'
+        elif quiz_type == 'productividad':
+            path = os.path.join(current_app.root_path, 'data/productividad.json')
+            key = 'herramientasproductivas'
+        else:
+            flash("Tipo de quiz desconocido", "error")
+            return redirect(url_for('homepage'))
 
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
 
-    quizzes_data = data[key]
+        quizzes_data = data[key]
 
-    answers = [request.form.get(f'q{i}') for i in range(1,6)]
-    # ejemplo de puntuación
-    scores = {tool: 0 for tool in quizzes_data.keys()}
-    for answer in answers:
-        if answer in scores:
-            scores[answer] += 1
-    best_tool = max(scores, key=scores.get)
-    tool_data = quizzes_data[best_tool]
+        answers = [request.form.get(f'q{i}') for i in range(1,6)]
+        # ejemplo de puntuación
+        scores = {tool: 0 for tool in quizzes_data.keys()}
+        for answer in answers:
+            if answer in scores:
+                scores[answer] += 1
+        best_tool = max(scores, key=scores.get)
+        tool_data = quizzes_data[best_tool]
 
-    return render_template('result.html', tool=tool_data)
+        return render_template('result.html', tool=tool_data)
 
-    return render_template('result.html', tool=tool_data)
+        return render_template('result.html', tool=tool_data)
     @app.route('/buscar')
     def buscar():
-        query = request.args.get('q', '')
-    if query:
-        # Buscar coincidencias en el título o descripción
-        resultados = Quiz.query.filter(
-            (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
-        ).all()
-    else:
-        resultados = []
-    return render_template('buscar.html', resultados=resultados, q=query)
+            query = request.args.get('q', '')
+        if query:
+            # Buscar coincidencias en el título o descripción
+            resultados = Quiz.query.filter(
+                (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
+            ).all()
+        else:
+            resultados = []
+        return render_template('buscar.html', resultados=resultados, q=query)
     # --------------------------
     # FORMULARIOS Y CONTACTO
     # --------------------------
