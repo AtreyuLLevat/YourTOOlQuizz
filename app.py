@@ -147,7 +147,7 @@ def create_app():
             flash('Error al procesar el quiz', 'error')
             return redirect(url_for('quiz'))
 
-   @app.route('/buscar')
+    @app.route('/buscar')
     def buscar():
         query = request.args.get('q', '').strip()
         resultados = []
@@ -262,4 +262,5 @@ if __name__ == '__main__':
     app = create_app()
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+
 
