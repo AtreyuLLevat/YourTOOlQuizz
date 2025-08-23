@@ -16,15 +16,26 @@ login_manager = LoginManager()
 def create_app():
     """Factory para crear la app Flask"""
     app = Flask(__name__)
-
     # -----------------------------
     # CONFIGURACIÓN
     # -----------------------------
     load_dotenv()
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///yourtoolquizz.db"
+
+    # Usar variable de entorno DATABASE_URL para SQLAlchemy
+    USER = os.getenv("DB_USER")
+    PASSWORD = os.getenv("DB_PASSWORD")
+    HOST = os.getenv("DB_HOST")
+    PORT = os.getenv("DB_PORT")
+    DBNAME = os.getenv("DB_NAME")
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://postgres.klwbxeyozltqgluxkiqi:A_T_R_E_Y_U@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=require"
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    # Clave secreta
     app.secret_key = os.getenv('SECRET_KEY') or 'dev-key-segura'
 
+    # Configuración de correo
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
@@ -284,8 +295,15 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
-
+    
 if __name__ == '__main__':
     app = create_app()
+    try:
+        with db.engine.connect() as conn:
+            print("Conexión a la base de datos (Transaction Pooler) exitosa!")
+    except Exception as e:
+        print(f"Error de conexión: {e}")
+
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
+

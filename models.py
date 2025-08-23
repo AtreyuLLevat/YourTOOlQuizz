@@ -72,13 +72,14 @@ class Result(db.Model):
         return f"<Result User={self.user_id} Quiz={self.quiz_id} Score={self.score}>"
 
 class Blog(db.Model):
+
     __tablename__ = 'blogs'
     
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(200), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
     keywords = db.Column(db.String(300), nullable=True)  # Coma-separadas
-    autor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    autor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # <-- corregido
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     autor = db.relationship('User', backref=db.backref('blogs', lazy=True))
