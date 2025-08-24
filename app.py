@@ -66,7 +66,7 @@ def create_app():
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad", "quiz"]
         resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
-        with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
+        with open(os.path.join(app.root_path, 'data/antivirus.json'), 'r', encoding='utf-8') as f:
             antivirus_data = json.load(f)
         quizzes_data = antivirus_data.get("herramientas", {})
 
