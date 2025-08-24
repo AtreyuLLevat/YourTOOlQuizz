@@ -85,4 +85,4 @@ class Blog(db.Model):
     autor = db.relationship('User', backref=db.backref('blogs', lazy=True))
     
     def __repr__(self):
-        return f"<Blog {self.titulo}>"
+        return f"<Blog {self.title}>"
