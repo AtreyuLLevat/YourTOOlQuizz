@@ -2,9 +2,9 @@
 {% block title %}Inicio - YourToolQuizz{% endblock %}
 
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/quizz.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}">
+{% block title %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  {% block extra_css %}{% endblock %}
 {% block content %}
 <!-- Categorías -->
 
@@ -53,61 +53,60 @@
       </ul>
     </div>
 
-<div class="categories-subheading">
-  <a href="{{ url_for('seguridad') }}" class="category-tag">
-    <span class="category-icon">🛡️</span>
-    <span class="category-name">Seguridad</span>
-  </a>
-  <a href="{{ url_for('productividad') }}" class="category-tag">
-    <span class="category-icon">⏱️</span>
-    <span class="category-name">Productividad</span>
-  </a>
-  <a href="{{ url_for('diseño') }}" class="category-tag">
-    <span class="category-icon">🎨</span>
-    <span class="category-name">Diseño</span>
-  </a>
-  <a href="{{ url_for('Redes') }}" class="category-tag">
-    <span class="category-icon">📡</span>
-    <span class="category-name">Redes</span>
-  </a>
-  <a href="{{ url_for('Inteligenciasartificiales') }}" class="category-tag">
-    <span class="category-icon">🤖</span>
-    <span class="category-name">IA</span>
-  </a>
-  <a href="{{ url_for('blog') }}" class="category-tag">
-    <span class="category-icon">📚</span>
-    <span class="category-name">Blogs</span>
-  </a>
-</div>
-
-<!-- Último Quiz -->
-<section class="section">
-  <h2 class="section-title">Quiz más nuevo</h2>
-  <div class="featured-quiz">
-    <div class="quiz-image" style="background-image: url('https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg');"></div>
-    <div class="quiz-content">
-      <h3 class="quiz-title">¿Qué antivirus es el mejor para ti?</h3>
-      <p class="quiz-description">Descubre cuál es el antivirus que mejor se adapta a tus necesidades de seguridad y protección online con este test personalizado.</p>
-      <a href="{{ url_for('quizzantivirus') }}" class="quiz-button">Realizar quiz ahora</a>
-    </div>
+  <div class="categories-subheading">
+    <a href="{{ url_for('seguridad') }}" class="category-tag">
+      <span class="category-icon">🛡️</span>
+      <span class="category-name">Seguridad</span>
+    </a>
+    <a href="{{ url_for('productividad') }}" class="category-tag">
+      <span class="category-icon">⏱️</span>
+      <span class="category-name">Productividad</span>
+    </a>
+    <a href="{{ url_for('diseño') }}" class="category-tag">
+      <span class="category-icon">🎨</span>
+      <span class="category-name">Diseño</span>
+    </a>
+    <a href="{{ url_for('Redes') }}" class="category-tag">
+      <span class="category-icon">📡</span>
+      <span class="category-name">Redes</span>
+    </a>
+    <a href="{{ url_for('Inteligenciasartificiales') }}" class="category-tag">
+      <span class="category-icon">🤖</span>
+      <span class="category-name">IA</span>
+    </a>
+    <a href="{{ url_for('blog') }}" class="category-tag">
+      <span class="category-icon">📚</span>
+      <span class="category-name">Blogs</span>
+    </a>
   </div>
-</section>
 
-<!-- Blogs recientes -->
-<section class="section">
-  <h2 class="section-title">Blogs</h2>
-  <div class="featured-quiz">
-    <div class="quiz-image" style="background-image: url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');"></div>
-    <div class="quiz-content">
-      <h3 class="quiz-title">Blogs relacionados con todos nuestros quizzes</h3>
-      <p class="quiz-description">Infórmate al completo sobre todos los temas relacionados con nuestros quizzes, desde las herramientas que usamos hasta novedades del mercado.</p>
-      <a href="{{ url_for('blog') }}" class="quiz-button">Leer artículo</a>
+  <!-- Último Quiz -->
+  <section class="section">
+    <h2 class="section-title">Quiz más nuevo</h2>
+    <div class="featured-quiz">
+      <div class="quiz-image" style="background-image: url('https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg');"></div>
+      <div class="quiz-content">
+        <h3 class="quiz-title">¿Qué antivirus es el mejor para ti?</h3>
+        <p class="quiz-description">Descubre cuál es el antivirus que mejor se adapta a tus necesidades de seguridad y protección online con este test personalizado.</p>
+        <a href="{{ url_for('quizzantivirus') }}" class="quiz-button">Realizar quiz ahora</a>
+      </div>
     </div>
-  </div>
-</section>
-{% endblock %}
-  <!-- Scripts generales -->
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+  </section>
 
-
+  <!-- Blogs recientes -->
+  <section class="section">
+    <h2 class="section-title">Blogs</h2>
+    <div class="featured-quiz">
+      <div class="quiz-image" style="background-image: url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');"></div>
+      <div class="quiz-content">
+        <h3 class="quiz-title">Blogs relacionados con todos nuestros quizzes</h3>
+        <p class="quiz-description">Infórmate al completo sobre todos los temas relacionados con nuestros quizzes, desde las herramientas que usamos hasta novedades del mercado.</p>
+        <a href="{{ url_for('blog') }}" class="quiz-button">Leer artículo</a>
+      </div>
+    </div>
+  </section>
+  {% endblock %}
+  {% block extra_js %}
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+  {% endblock %}
