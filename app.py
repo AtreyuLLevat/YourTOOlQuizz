@@ -63,7 +63,7 @@ def create_app():
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
     def quizzantivirus():
         form = Quizantivirus()
-        keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
+        keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad", "quiz"]
         resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
         with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
@@ -85,7 +85,7 @@ def create_app():
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
     def quizzproductividad():
         form = Quizzproductividad()
-        keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión"]
+        keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión", "quiz"]
         resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
         with open(os.path.join(app.root_path, 'data/productividad.json'), 'r', encoding='utf-8') as f:
@@ -117,13 +117,13 @@ def create_app():
 
     @app.route('/Blogs1antivirus')
     def Blog1antivirus():
-        keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
+        keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogs1antivirus.html', relacionados=relacionados)
 
     @app.route('/Blogproductividad')
     def Blogproductividad():
-        keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación"]
+        keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogproductividad.html', relacionados=relacionados)
 
@@ -180,10 +180,10 @@ def create_app():
         resultados_blog = []
         if query:
             resultados_quiz = Quiz.query.filter(
-                (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
+                (Quiz.title.ilike(f'%{query}%')) | (Quiz.descripcion.ilike(f'%{query}%'))
             ).all()
             resultados_blog = Blog.query.filter(
-                (Blog.titulo.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))
+                (Blog.title.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))
             ).all()
         return render_template('buscar.html', resultados_quiz=resultados_quiz, resultados_blog=resultados_blog, q=query)
 
