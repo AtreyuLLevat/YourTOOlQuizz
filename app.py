@@ -180,7 +180,7 @@ def create_app():
         resultados_blog = []
         if query:
             resultados_quiz = Quiz.query.filter(
-                (Quiz.title.ilike(f'%{query}%')) | (Quiz.description.ilike(f'%{query}%'))
+                (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.contenido.ilike(f'%{query}%'))
             ).all()
             resultados_blog = Blog.query.filter(
                 (Blog.titulo.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))

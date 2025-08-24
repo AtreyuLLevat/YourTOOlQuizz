@@ -30,8 +30,8 @@ class Quiz(db.Model):
     __tablename__ = "quizzes"
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.String(300))
+    titulo = db.Column(db.String(150), nullable=False)
+    contenido = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
@@ -39,7 +39,7 @@ class Quiz(db.Model):
     results = db.relationship("Result", backref="quiz", lazy=True)
 
     def __repr__(self):
-        return f"<Quiz {self.title}>"
+        return f"<Quiz {self.titulo}>"
 # -------------------------
 # MODELO DE PREGUNTAS
 # -------------------------
