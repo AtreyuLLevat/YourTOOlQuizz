@@ -33,6 +33,7 @@ class Quiz(db.Model):
     titulo = db.Column(db.String(150), nullable=False)
     contenido = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    keywords = db.Column(db.String(300), nullable=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     questions = db.relationship("Question", backref="quiz", lazy=True)

@@ -172,20 +172,34 @@ def create_app():
         tool_data = quizzes_data[best_tool]
 
         return render_template('result.html', tool=tool_data)
-
+        
     @app.route('/buscar')
     def buscar():
         query = request.args.get('q', '')
         resultados_quiz = []
         resultados_blog = []
+
         if query:
+            # Buscar en Quizzes: titulo, descripcion y keywords
             resultados_quiz = Quiz.query.filter(
-                (Quiz.titulo.ilike(f'%{query}%')) | (Quiz.contenido.ilike(f'%{query}%'))
+                (Quiz.titulo.ilike(f'%{query}%')) |
+                (Quiz.descripcion.ilike(f'%{query}%')) |
+                (Quiz.keywords.ilike(f'%{query}%'))
             ).all()
+
+            # Buscar en Blogs: titulo, contenido y keywords
             resultados_blog = Blog.query.filter(
-                (Blog.titulo.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))
+                (Blog.titulo.ilike(f'%{query}%')) |
+                (Blog.contenido.ilike(f'%{query}%')) |
+                (Blog.keywords.ilike(f'%{query}%'))
             ).all()
-        return render_template('buscar.html', resultados_quiz=resultados_quiz, resultados_blog=resultados_blog, q=query)
+
+        return render_template(
+            'buscar.html',
+            resultados_quiz=resultados_quiz,
+            resultados_blog=resultados_blog,
+            q=query
+        )
 
     # -----------------------------
     # FORMULARIOS Y CONTACTO
