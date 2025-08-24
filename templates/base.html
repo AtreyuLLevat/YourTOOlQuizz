@@ -1,10 +1,9 @@
 
 {% block title %}Inicio - YourToolQuizz{% endblock %}
-
-
-{% block title %}{% endblock %}
+ 
+ {% block extra_css %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-  {% block extra_css %}{% endblock %}
+ {% endblock %}
 {% block content %}
 <!-- Categorías -->
 
