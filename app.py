@@ -183,7 +183,7 @@ def create_app():
                 (Quiz.title.ilike(f'%{query}%')) | (Quiz.description.ilike(f'%{query}%'))
             ).all()
             resultados_blog = Blog.query.filter(
-                (Blog.titulo.ilike(f'%{query}%')) | (Blog.descripcion.ilike(f'%{query}%'))
+                (Blog.title.ilike(f'%{query}%')) | (Blog.contenido.ilike(f'%{query}%'))
             ).all()
         return render_template('buscar.html', resultados_quiz=resultados_quiz, resultados_blog=resultados_blog, q=query)
 
