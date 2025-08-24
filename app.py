@@ -112,7 +112,7 @@ def create_app():
         return render_template('Diseño.html')
 
     @app.route('/blogs')
-    def Blogs():
+    def Blog():
         return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
