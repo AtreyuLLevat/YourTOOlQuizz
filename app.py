@@ -9,31 +9,21 @@ from models import db, User, Quiz, Question, Blog
 from forms import RegisterForm, LoginForm, ContactForm
 from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 from flask_migrate import Migrate
+from sqlalchemy.pool import NullPool
 
-mail = Mail()
-login_manager = LoginManager()
+load_dotenv()
 
+# -----------------------------
+# FACTORY DE LA APP
+# -----------------------------
 def create_app():
-    """Factory para crear la app Flask"""
     app = Flask(__name__)
-    # -----------------------------
-    # CONFIGURACIÓN
-    # -----------------------------
-    load_dotenv()
 
-    # Usar variable de entorno DATABASE_URL para SQLAlchemy
-    USER = os.getenv("DB_USER")
-    PASSWORD = os.getenv("DB_PASSWORD")
-    HOST = os.getenv("DB_HOST")
-    PORT = os.getenv("DB_PORT")
-    DBNAME = os.getenv("DB_NAME")
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql+psycopg2://postgres.klwbxeyozltqgluxkiqi:A_T_R_E_Y_U@aws-1-eu-north-1.pooler.supabase.com:6543/postgres?sslmode=require"
-
+    # Configuración básica
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-
-    # Clave secreta
-    app.secret_key = os.getenv('SECRET_KEY') or 'dev-key-segura'
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"poolclass": NullPool}
+    app.secret_key = os.getenv("SECRET_KEY", "dev-key-segura")
 
     # Configuración de correo
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -42,23 +32,30 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
-    app.config['WTF_CSRF_ENABLED'] = True
 
     # Inicializar extensiones
     db.init_app(app)
+    mail = Mail(app)
     Migrate(app, db)
-    mail.init_app(app)
-    login_manager.init_app(app)
+    login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
+    # -----------------------------
+    # USER LOADER
+    # -----------------------------
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
     # -----------------------------
+    # CONTEXTO DE LA APP
+    # -----------------------------
+    with app.app_context():
+        db.create_all()  # Crea tablas si no existen
+
+    # -----------------------------
     # RUTAS
     # -----------------------------
-
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
@@ -66,11 +63,8 @@ def create_app():
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
     def quizzantivirus():
         form = Quizantivirus()
-
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
-        resultados = Quiz.query.filter(
-            db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
-        ).all()
+        resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
         with open(os.path.join(app.root_path, 'data/quizzes.json'), 'r', encoding='utf-8') as f:
             antivirus_data = json.load(f)
@@ -91,11 +85,8 @@ def create_app():
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
     def quizzproductividad():
         form = Quizzproductividad()
-
         keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión"]
-        resultados = Quiz.query.filter(
-            db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])
-        ).all()
+        resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
         with open(os.path.join(app.root_path, 'data/productividad.json'), 'r', encoding='utf-8') as f:
             productividad_data = json.load(f)
@@ -113,32 +104,27 @@ def create_app():
 
         return render_template('quizzproductividad.html', form=form, relacionados=resultados)
 
-    # --------------------------
-    # RUTAS DE CATEGORÍAS / BLOGS
-    # --------------------------
-
+    # -----------------------------
+    # RUTAS DE BLOG Y CATEGORÍAS
+    # -----------------------------
     @app.route('/diseño')
     def diseño():
         return render_template('Diseño.html')
 
-    @app.route('/Blogs')
-    def Blog():
+    @app.route('/blogs')
+    def Blogs():
         return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
     def Blog1antivirus():
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad"]
-        relacionados = Blog.query.filter(
-            db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
-        ).all()
+        relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogs1antivirus.html', relacionados=relacionados)
 
     @app.route('/Blogproductividad')
     def Blogproductividad():
         keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación"]
-        relacionados = Blog.query.filter(
-            db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])
-        ).all()
+        relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogproductividad.html', relacionados=relacionados)
 
     @app.route('/productividad')
@@ -153,18 +139,16 @@ def create_app():
     def Redes():
         return render_template('Redes.html')
 
-    @app.route('/Inteligenciasartificales')
+    @app.route('/Inteligenciasartificiales')
     def Inteligenciasartificiales():
         return render_template('Inteligenciasartificiales.html')
 
-    # --------------------------
+    # -----------------------------
     # FUNCIONALIDADES CORE
-    # --------------------------
-
+    # -----------------------------
     @app.route('/result', methods=['POST'])
     def result():
         quiz_type = request.form.get('quiz_type')
-
         if quiz_type == 'antivirus':
             path = os.path.join(current_app.root_path, 'data/quizzes.json')
             key = 'herramientas'
@@ -203,10 +187,9 @@ def create_app():
             ).all()
         return render_template('buscar.html', resultados_quiz=resultados_quiz, resultados_blog=resultados_blog, q=query)
 
-    # --------------------------
+    # -----------------------------
     # FORMULARIOS Y CONTACTO
-    # --------------------------
-
+    # -----------------------------
     @app.route('/about')
     def about():
         return render_template('about.html')
@@ -242,10 +225,9 @@ def create_app():
     def contact_error():
         return render_template('Error.html')
 
-    # --------------------------
-    # RUTAS DE USUARIOS (SISTEMA DE LOGIN)
-    # --------------------------
-
+    # -----------------------------
+    # RUTAS DE USUARIOS (LOGIN)
+    # -----------------------------
     @app.route("/register", methods=["GET", "POST"])
     def register():
         form = RegisterForm()
@@ -295,15 +277,18 @@ def create_app():
         return render_template('500.html'), 500
 
     return app
-    
-if __name__ == '__main__':
+
+
+# -----------------------------
+# EJECUCIÓN PRINCIPAL
+# -----------------------------
+if __name__ == "__main__":
     app = create_app()
     try:
         with db.engine.connect() as conn:
-            print("Conexión a la base de datos (Transaction Pooler) exitosa!")
+            print("Conexión a la base de datos exitosa!")
     except Exception as e:
         print(f"Error de conexión: {e}")
 
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)
-
