@@ -112,17 +112,17 @@ def create_app():
         return render_template('Diseño.html')
 
     @app.route('/blogs')
-    def Blog():
+    def blog():
         return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
-    def Blog1antivirus():
+    def blog1antivirus():
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogs1antivirus.html', relacionados=relacionados)
 
     @app.route('/Blogproductividad')
-    def Blogproductividad():
+    def blogproductividad():
         keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogproductividad.html', relacionados=relacionados)

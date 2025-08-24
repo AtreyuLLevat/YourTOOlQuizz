@@ -441,6 +441,7 @@
 
   </style>
 </head>
+
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
@@ -545,6 +546,7 @@
           Siguiente
         </button>
       </div>
+      <input type="hidden" name="quiz_type" value="productividad">
       <button type="submit" id="submitBtn" class="nav-btn" style="display: none;">
         Enviar
       </button>
@@ -575,7 +577,7 @@
           <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
           <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
           <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
-          <li><a href="{{ url_for('Blog') }}">Blogs relacionados con los quizz</a></li>
+          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
         </ul>
       </div>
       
