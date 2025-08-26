@@ -1,8 +1,226 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Tu ordenador está protegido? Haz nuestro quiz de seguridad informática</title>
+  <meta name="description" content="Descubre si tu ordenador está realmente protegido contra virus, malware y ataques informáticos. Haz nuestro quiz gratuito de seguridad informática y recibe consejos personalizados.">
+  <meta name="keywords" content="seguridad informática, protección del ordenador, antivirus actualizado, malware, virus, quiz de seguridad digital, seguridad PC, protección online">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Fascinate+Inline&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for social icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  
+  <style>
+    html, body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+      /* Header Styles */
+    header {
+      background: #ff6f61;
+      color: white;
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-family: "Fascinate Inline", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 2.5rem;
+      letter-spacing: -0.5px;
+      text-transform: none;
+      margin: 0;
+      text-align: center;
+      flex-grow: 1;
+    }
+    
+    .logo a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
 
-{% block title %}¿Tu ordenador está protegido? Haz nuestro quiz de seguridad informática{% endblock %}
+    main {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1;
+    }
 
-{% block content %}
+    h1 {
+      color: #ff6f61;
+      font-size: 3rem;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #2c3e50;
+      font-size: 1.8rem;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ff6f61;
+      padding-bottom: 8px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    ul {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    strong {
+      color: #2c3e50;
+    }
+
+    a {
+      color: #ff6f61;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #e65a4e;
+      text-decoration: underline;
+    }
+
+    blockquote {
+      background: #fef3f3;
+      border-left: 5px solid #ff6f61;
+      padding: 15px 20px;
+      margin: 20px 0;
+      font-style: italic;
+      color: #555;
+      border-radius: 6px;
+    }
+
+    /* Footer */
+    footer {
+      background: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      text-align: left;
+    }
+
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .footer-section h3::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 50px;
+      height: 2px;
+      background: #ff6f61;
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-section ul li a {
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-section ul li a:hover {
+      color: #ff6f61;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: #ff6f61;
+    }
+
+    .footer-bottom {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #34495e;
+      font-size: 0.9rem;
+      color: #bdc3c7;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      main {
+        padding: 25px;
+        margin: 20px 15px;
+      }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.5rem; }
+      p { font-size: 1rem; }
+      .footer-content { grid-template-columns: 1fr; text-align: center; }
+      .footer-section h3::after { left: 50%; transform: translateX(-50%); }
+      .social-links { justify-content: center; }
+    }
+  </style>
+</head>
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<header>
+    <div class="logo">
+     <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+  </header>
+<body>
 <main>
   <h1>Encuentra la herramienta de seguridad adecuada con nuestro quiz</h1>
 
@@ -68,4 +286,53 @@
   <h2>Conclusión: elige la herramienta adecuada y protege tu tranquilidad</h2>
   <p>No subestimes la <strong>seguridad digital</strong>. Nuestro <strong>quiz de seguridad informática</strong> te ayuda a <strong>identificar la herramienta que mejor se adapta a ti</strong>, para proteger tu ordenador y tus datos sin complicaciones. 💡 <strong>Haz el quiz ahora</strong> y encuentra la opción más adecuada antes de exponerte a riesgos innecesarios.</p>
 </main>
-{% endblock %}
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
+          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
+    </div>
+  </footer>
+</body>
+</html>
