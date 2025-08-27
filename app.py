@@ -112,7 +112,7 @@ def create_app():
         return render_template('Diseño.html')
 
     @app.route('/blogs')
-    def blogs():
+    def blog():
         return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
@@ -307,3 +307,4 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8080))
 
     app.run(host='0.0.0.0', port=port, debug=True)
+
