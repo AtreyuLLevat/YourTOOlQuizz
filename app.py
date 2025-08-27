@@ -112,7 +112,7 @@ def create_app():
         return render_template('Diseño.html')
 
     @app.route('/blogs')
-    def blog():
+    def blogs():
         return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
@@ -305,4 +305,5 @@ if __name__ == "__main__":
         print(f"Error de conexión: {e}")
 
     port = int(os.environ.get('PORT', 8080))
+
     app.run(host='0.0.0.0', port=port, debug=True)
