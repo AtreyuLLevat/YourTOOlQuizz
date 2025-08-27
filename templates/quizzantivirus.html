@@ -1,7 +1,46 @@
-{%extends "base.html"%}
-{% block title %}Quiz de Antivirus - YourToolQuizz{% endblock %}
-{%block extra_css%}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YourToolQuizz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Monoton&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: #ff6f61;
+      color: white;
+      padding: 15px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 100;
+    }
+    .logo {
+      font-family: "Fascinate Inline", system-ui;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 2.5rem;
+      letter-spacing: -0.5px;
+      margin: 0;
+      text-align: center;
+      flex-grow: 1;
+    }
+    .logo a {
+      text-decoration: none;
+      color: inherit;
+    }
     main {
       max-width: 800px;
       margin: 30px auto;
@@ -118,19 +157,309 @@
     button#submitBtn:hover {
       background: #e65a4e;
     }
-    .progress-bar-inner {
-      height: 100%;
-      width: 0%;
-      background-color: #ff6f61;
-      border-radius: 8px;
-      transition: width 0.3s ease-in-out;
+    
+    /* Footer styles */
+     footer {
+      width: 100%;
+      background: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
     }
+    
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      text-align: left;
+    }
+    
+    .footer-section h3 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-section h3::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 50px;
+      height: 2px;
+      background: #ff6f61;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-section ul li a {
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    
+    .footer-section ul li a:hover {
+      color: #ff6f61;
+    }
+    
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .social-links a {
+      color: white;
+      font-size: 1.5rem;
+      transition: color 0.3s;
+    }
+    
+    .social-links a:hover {
+      color: #ff6f61;
+    }
+    
+    .footer-bottom {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #34495e;
+      font-size: 0.9rem;
+      color: #bdc3c7;
+    }
+    
+    @media (max-width: 600px) {
+      .logo {
+        font-size: 2rem;
+      }
+      .Introducción {
+        font-size: 1.4rem;
+      }
+      .Subtitulointroducción {
+        font-size: 1rem;
+      }
+      .question h3 { 
+        font-size: 1.2rem; 
+      }
+      .nav-btn, button#submitBtn { 
+        font-size: 1rem;
+        padding: 12px 20px;
+      }
+      .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .footer-section h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .social-links {
+        justify-content: center;
+      }
+    }
+     /* Tablet-specific adjustments */
+    @media (min-width: 600px) and (max-width: 1024px) {
+      main {
+        width: 85%;
+        padding: 25px;
+      }
+      
+      .logo {
+        font-size: 2.5rem;
+      }
+      
+      .Introducción {
+        font-size: 1.5rem;
+      }
+      
+      .Subtitulointroducción {
+        font-size: 1.1rem;
+      }
+      
+      .question h3 {
+        font-size: 1.3rem;
+      }
+      
+      ul.answers li {
+        padding: 16px 18px;
+        font-size: 1.05rem;
+      }
+      
+      .footer-content {
+        text-align: left;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      
+      .footer-section h3::after {
+        left: 0;
+        transform: none;
+      }
+      
+      .social-links {
+        justify-content: flex-start;
+      }
+    }
+    
+    /* Desktop adjustments */
+    @media (min-width: 1025px) {
+      main {
+        padding: 30px;
+      }
+      
+      .footer-content {
+        text-align: left;
+      }
+      
+      .footer-section h3::after {
+        left: 0;
+        transform: none;
+      }
+      
+      .social-links {
+        justify-content: flex-start;
+      }
+    }
+    /* Contenedor buscador móvil */
+.mobile-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Formulario búsqueda: oculto por defecto en móvil */
+#mobileSearchForm {
+  display: none;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 6px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  width: 200px;
+  z-index: 110;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Input búsqueda */
+#mobileSearchInput {
+  flex-grow: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 1rem;
+}
+
+/* Botón cerrar búsqueda */
+#searchCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #ff6f61;
+}
+
+/* Botón lupa para mostrar el formulario */
+#searchToggleBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: white;
+  padding: 0 8px;
+}
+
+/* Botón hamburguesa */
+#hamburgerBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: white;
+  padding: 0 8px;
+  margin-left: 10px;
+}
+
+/* Menú móvil oculto */
+.hidden {
+  display: none;
+}
+
+/* Menú móvil visible */
+#mobileNavMenu {
+  background: #ff6f61;
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 100;
+}
+
+#mobileNavMenu ul {
+  list-style: none;
+  margin: 0;
+  padding: 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#mobileNavMenu ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.3s;
+}
+
+#mobileNavMenu ul li a:hover {
+  color: #e65a4e;
+}
+
+/* Solo mostrar iconos y hamburguesa en móvil (menos de 600px) */
+@media(min-width: 601px) {
+  /* Ocultar buscador móvil y hamburguesa en desktop */
+  .mobile-search-container,
+  #hamburgerBtn,
+  #mobileNavMenu {
+    display: none !important;
+  }
+}
+
+  </style>
+</head>
+
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R9HVBYS6QM');
+</script>
+<body>
+<header>
+    <div class="logo">
+     <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+    </div>
+  </header>
 
     
-  </style>
-{%endblock%}
-
-{%block content%}
  <main>
     <form
       id="quizForm"
@@ -225,101 +554,207 @@
       
     </form>
   </main>
-{%endblock%}
+
   
   
-{% block extra_js %}  
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const questions = document.querySelectorAll(".question");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const submitBtn = document.getElementById("submitBtn");
-  const globalProgress = document.getElementById("globalProgress"); // barra global
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
+          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
+    </div>
+  </footer>
+  
+  
+ <script>
+        document.addEventListener("DOMContentLoaded", function () {
+      const questions = document.querySelectorAll(".question");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const submitBtn = document.getElementById("submitBtn");
+      const progressBarInner = document.querySelector(".progress-bar-inner");
 
-  let currentQuestion = 0;
-  const totalQuestions = questions.length;
+      let currentQuestion = 0;
+      const totalQuestions = questions.length;
 
-  // Mostrar la pregunta según índice
-  function showQuestion(index) {
-    questions[currentQuestion].classList.remove("active");
-    currentQuestion = index;
-    questions[currentQuestion].classList.add("active");
-    updateButtons();
-    updateProgressBar();
-    updateNextBtnState();
-  }
-
-  // Actualizar botones Prev y Next / Submit
-  function updateButtons() {
-    prevBtn.disabled = currentQuestion === 0;
-
-    if (currentQuestion === totalQuestions - 1) {
-      nextBtn.style.display = "none";
-      submitBtn.style.display = "inline-block";
-    } else {
-      nextBtn.style.display = "inline-block";
-      submitBtn.style.display = "none";
-    }
-  }
-
-  // Validar que pregunta actual tenga respuesta seleccionada
-  function validateCurrentQuestion() {
-    const currentQ = questions[currentQuestion];
-    return currentQ.querySelector('input[type="radio"]:checked') !== null;
-  }
-
-  // Habilitar/deshabilitar botón siguiente
-  function updateNextBtnState() {
-    nextBtn.disabled = !validateCurrentQuestion();
-  }
-
-  // Actualizar barra de progreso GLOBAL
-  function updateProgressBar() {
-    const progressPercent = ((currentQuestion + 1) / totalQuestions) * 100;
-    globalProgress.style.width = progressPercent + "%";
-  }
-
-  // Evento para selección de respuesta en cada opción
-  document.querySelectorAll("ul.answers li").forEach((li) => {
-    li.addEventListener("click", () => {
-      const radio = li.querySelector('input[type="radio"]');
-      if (radio) {
-        radio.checked = true;
-        radio.dispatchEvent(new Event("change"));
+      // Mostrar la pregunta según índice
+      function showQuestion(index) {
+        questions[currentQuestion].classList.remove("active");
+        currentQuestion = index;
+        questions[currentQuestion].classList.add("active");
+        updateButtons();
+        updateProgressBar();
+        updateNextBtnState();
       }
 
-      // Visual feedback - marca opción seleccionada
-      li.parentNode.querySelectorAll("li").forEach((item) => {
-        item.classList.remove("selected");
+      // Actualizar botones Prev y Next / Submit
+      function updateButtons() {
+        prevBtn.disabled = currentQuestion === 0;
+
+        if (currentQuestion === totalQuestions - 1) {
+          nextBtn.style.display = "none";
+          submitBtn.style.display = "inline-block";
+        } else {
+          nextBtn.style.display = "inline-block";
+          submitBtn.style.display = "none";
+        }
+      }
+
+      // Validar que pregunta actual tenga respuesta seleccionada
+      function validateCurrentQuestion() {
+        const currentQ = questions[currentQuestion];
+        return currentQ.querySelector('input[type="radio"]:checked') !== null;
+      }
+
+      // Habilitar/deshabilitar botón siguiente
+      function updateNextBtnState() {
+        nextBtn.disabled = !validateCurrentQuestion();
+      }
+
+      // Actualizar barra de progreso (ancho en %)
+      function updateProgressBar() {
+        if (!progressBarInner) return; // Seguridad si no existe
+
+        const progressPercent = ((currentQuestion + 1) / totalQuestions) * 100;
+        progressBarInner.style.width = progressPercent + "%";
+      }
+
+      // Evento para selección de respuesta en cada opción
+      document.querySelectorAll("ul.answers li").forEach((li) => {
+        li.addEventListener("click", () => {
+          const radio = li.querySelector('input[type="radio"]');
+          if (radio) {
+            radio.checked = true;
+          }
+
+          // Visual feedback - marca opción seleccionada
+          li.parentNode.querySelectorAll("li").forEach((item) => {
+            item.classList.remove("selected");
+          });
+          li.classList.add("selected");
+
+          updateNextBtnState();
+        });
       });
-      li.classList.add("selected");
 
-      updateNextBtnState();
+      // Botón anterior
+      prevBtn.addEventListener("click", () => {
+        if (currentQuestion > 0) {
+          showQuestion(currentQuestion - 1);
+        }
+      });
+
+      // Botón siguiente
+      nextBtn.addEventListener("click", () => {
+        if (validateCurrentQuestion()) {
+          if (currentQuestion < totalQuestions - 1) {
+            showQuestion(currentQuestion + 1);
+          }
+        } else {
+          alert("Por favor selecciona una respuesta");
+        }
+      });
+
+      // Inicializa la vista en la pregunta 0
+      showQuestion(0);
     });
+    document.addEventListener("DOMContentLoaded", () => {
+  const searchToggleBtn = document.getElementById("searchToggleBtn");
+  const searchCloseBtn = document.getElementById("searchCloseBtn");
+  const mobileSearchForm = document.getElementById("mobileSearchForm");
+
+  const hamburgerBtn = document.getElementById("hamburgerBtn");
+  const mobileNavMenu = document.getElementById("mobileNavMenu");
+
+  // Mostrar formulario búsqueda al pulsar lupa
+  searchToggleBtn.addEventListener("click", () => {
+    mobileSearchForm.style.display = "flex";
+    searchToggleBtn.style.display = "none";
+    mobileSearchForm.querySelector("input").focus();
+    // Ocultar menú móvil si abierto
+    mobileNavMenu.classList.add("hidden");
   });
 
-  // Botón anterior
-  prevBtn.addEventListener("click", () => {
-    if (currentQuestion > 0) {
-      showQuestion(currentQuestion - 1);
+  // Cerrar formulario búsqueda al pulsar X
+  searchCloseBtn.addEventListener("click", () => {
+    mobileSearchForm.style.display = "none";
+    searchToggleBtn.style.display = "inline-block";
+  });
+
+  // Toggle menú hamburguesa
+  hamburgerBtn.addEventListener("click", () => {
+    mobileNavMenu.classList.toggle("hidden");
+    // Al abrir menú, ocultar buscador
+    if (!mobileNavMenu.classList.contains("hidden")) {
+      mobileSearchForm.style.display = "none";
+      searchToggleBtn.style.display = "inline-block";
     }
   });
 
-  // Botón siguiente
-  nextBtn.addEventListener("click", () => {
-    if (validateCurrentQuestion()) {
-      if (currentQuestion < totalQuestions - 1) {
-        showQuestion(currentQuestion + 1);
-      }
-    } else {
-      alert("Por favor selecciona una respuesta");
+  // Opcional: cerrar menú o buscador si clic fuera
+  document.addEventListener("click", (e) => {
+    const insideSearch = mobileSearchForm.contains(e.target);
+    const insideSearchBtn = searchToggleBtn.contains(e.target);
+    const insideMenu = mobileNavMenu.contains(e.target);
+    const insideHamburger = hamburgerBtn.contains(e.target);
+
+    if (!insideSearch && !insideSearchBtn) {
+      mobileSearchForm.style.display = "none";
+      searchToggleBtn.style.display = "inline-block";
+    }
+    if (!insideMenu && !insideHamburger) {
+      mobileNavMenu.classList.add("hidden");
     }
   });
-
-  // Inicializa la vista en la primera pregunta
-  showQuestion(0);
-  updateNextBtnState(); // 🔑 asegura que el botón "Siguiente" arranque bien
 });
-</script>
-{% endblock %}
+
+
+  </script>
+  <form method="POST">
+    {{ form.hidden_tag() }}  <!-- Token CSRF -->
+    <!-- Campos del formulario -->
+</form>
+</body>
+
+</head>
+</html>
