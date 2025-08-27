@@ -133,12 +133,10 @@
     >
       {{ form.hidden_tag() }}
 
-          <div class="progress-container">
-      <div class="progress-bar-inner"></div>
-    </div>
-
           <div class="question active">
         <h3>{{ form.q1.label }}</h3>
+        <div class="progress-bar">
+          <div class="progress-bar-inner"></div>
         </div>
         <ul class="answers">
           {% for subfield in form.q1 %}
@@ -151,6 +149,8 @@
 
       <div class="question">
         <h3>{{ form.q2.label }}</h3>
+        <div class="progress-bar">
+          <div class="progress-bar-inner"></div>
         </div>
         <ul class="answers">
           {% for subfield in form.q2 %}
@@ -163,6 +163,8 @@
 
       <div class="question">
         <h3>{{ form.q3.label }}</h3>
+        <div class="progress-bar">
+          <div class="progress-bar-inner"></div>
         </div>
         <ul class="answers">
           {% for subfield in form.q3 %}
@@ -175,6 +177,8 @@
 
       <div class="question">
         <h3>{{ form.q4.label }}</h3>
+        <div class="progress-bar">
+          <div class="progress-bar-inner"></div>
         </div>
         <ul class="answers">
           {% for subfield in form.q4 %}
@@ -187,6 +191,8 @@
 
       <div class="question">
         <h3>{{ form.q5.label }}</h3>
+        <div class="progress-bar">
+          <div class="progress-bar-inner"></div>
         </div>
         <ul class="answers">
           {% for subfield in form.q5 %}
