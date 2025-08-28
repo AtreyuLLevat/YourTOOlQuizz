@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - YourToolQuizz{% endblock %}
+{% block extra_css %}
+<style>
+    main {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1;
+      text-align: center;
+    }
+    
+    .empty-title {
+      font-size: 2.5rem;
+      color: #ff6f61;
+      margin-bottom: 20px;
+    }
+    
+    .empty-subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 40px;
+    }
+    
+    .empty-icon {
+      font-size: 5rem;
+      color: #ddd;
+      margin: 40px 0;
+    }
+    
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 12px 25px;
+      background: #ff6f61;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+    
+    .action-btn:hover {
+      background: #e65a4e;
+      transform: translateY(-2px);
+    }
+    
+    .action-btn i {
+      margin-right: 10px;
+    }
+    
+   
+  </style>
+{% endblock %}
+{% block content %}
+
+  <main>
+    <section class="dashboard">
+      <h2>Bienvenido, {{ email }} 🎉</h2>
+      <p>Has iniciado sesión de forma exitosa.</p>
+
+
+    </section>
+  </main>
+{% endblock %}
