@@ -1,0 +1,74 @@
+{%extends "base.html"%}
+{%block title%}Aviso Legal - YourToolQuizz{%endblock%}
+{%block extra_css%}
+  <style>
+    
+    main {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+    
+    h1 {
+      color: #ff6f61;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    h2 {
+      color: #2c3e50;
+      font-size: 1.8rem;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #ff6f61;
+      padding-bottom: 8px;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #555;
+    }
+    
+    strong {
+      color: #2c3e50;
+    }
+    
+    a {
+      color: #ff6f61;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    a:hover {
+      color: #e65a4e;
+      text-decoration: underline;
+    }
+    
+    /* Footer styles */
+
+  </style>
+{%endblock%}
+{%block content%}
+  
+  <main>
+    <h1>Aviso Legal</h1>
+    
+    <p>El presente aviso legal regula el uso del sitio web <strong>YourToolQuizz</strong>.</p>
+    
+    <h2>Responsabilidad</h2>
+    <p>No garantizamos resultados ni nos responsabilizamos por el uso que cada usuario haga de las herramientas recomendadas. Las decisiones finales de contratación y uso dependen exclusivamente del visitante.</p>
+    
+    <h2>Propiedad intelectual</h2>
+    <p>Todos los contenidos, textos y elementos gráficos de esta web son propiedad de YourToolQuizz o de terceros con licencia, y están protegidos por los derechos de autor.</p>
+    
+    <h2>Contacto</h2>
+    <p>Para cualquier duda o solicitud relacionada con este aviso legal, puedes escribirnos desde la sección <a href="{{ url_for('contact') }}">Contáctanos</a>.</p>
+  </main>
+ {%endblock%} 
