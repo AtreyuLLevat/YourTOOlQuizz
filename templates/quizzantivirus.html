@@ -460,13 +460,14 @@
   </header>
 
     
- <main>
+  <main>
     <form
       id="quizForm"
       method="POST"
       action="{{ url_for('quizzantivirus') }}"
     >
       {{ form.hidden_tag() }}
+
 
           <div class="question active">
         <h3>{{ form.q1.label }}</h3>
@@ -482,6 +483,7 @@
         </ul>
       </div>
 
+
       <div class="question">
         <h3>{{ form.q2.label }}</h3>
         <div class="progress-bar">
@@ -495,6 +497,7 @@
           {% endfor %}
         </ul>
       </div>
+
 
       <div class="question">
         <h3>{{ form.q3.label }}</h3>
@@ -510,6 +513,7 @@
         </ul>
       </div>
 
+
       <div class="question">
         <h3>{{ form.q4.label }}</h3>
         <div class="progress-bar">
@@ -523,6 +527,7 @@
           {% endfor %}
         </ul>
       </div>
+
 
       <div class="question">
         <h3>{{ form.q5.label }}</h3>
@@ -538,6 +543,7 @@
         </ul>
       </div>
 
+
       <div class="navigation-buttons">
         <button type="button" id="prevBtn" class="nav-btn" disabled>
           Anterior
@@ -551,7 +557,8 @@
         Enviar
       </button>
 
-      
+
+     
     </form>
   </main>
 
@@ -757,4 +764,5 @@
 </body>
 
 </head>
+
 </html>
