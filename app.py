@@ -112,7 +112,7 @@ def create_app():
     @app.route('/Servicio_1')
     def servicio1():
         return render_template('Servicio_1.html')
-    @app.route('/Categorias/Diseño/')
+    @app.route('/Categorias/Dise%C3%B1o')
     def diseño():
         return render_template('Diseño.html')
 
