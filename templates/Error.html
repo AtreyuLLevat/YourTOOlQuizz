@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aviso Legal - YourToolQuizz</title>
+  <title>Error en el envío - YourToolQuizz</title>
   <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -15,10 +15,9 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      line-height: 1.6;
     }
     
-     header {
+   header {
       background: #ff6f61;
       color: white;
       padding: 15px 20px;
@@ -77,44 +76,60 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       flex: 1;
+      text-align: center;
     }
     
     h1 {
       color: #ff6f61;
       font-size: 2.5rem;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    
-    h2 {
-      color: #2c3e50;
-      font-size: 1.8rem;
-      margin-top: 40px;
       margin-bottom: 20px;
-      border-bottom: 2px solid #ff6f61;
-      padding-bottom: 8px;
     }
     
     p {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 30px;
       color: #555;
     }
     
     strong {
       color: #2c3e50;
+      font-weight: 600;
     }
     
-    a {
-      color: #ff6f61;
+    .error-email {
+      display: inline-block;
+      background: #fff3f2;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border-left: 4px solid #ff6f61;
+      margin: 15px 0;
+      font-family: monospace;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: #ff6f61;
+      color: white;
       text-decoration: none;
+      border-radius: 6px;
       font-weight: 500;
-      transition: color 0.3s;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      margin-top: 20px;
     }
     
-    a:hover {
-      color: #e65a4e;
-      text-decoration: underline;
+    .btn:hover {
+      background: #e65a4e;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .error-icon {
+      font-size: 4rem;
+      color: #ff6f61;
+      margin-bottom: 20px;
     }
     
     /* Footer styles */
@@ -234,12 +249,12 @@
         font-size: 2rem;
       }
       
-      h2 {
-        font-size: 1.5rem;
+      p {
+        font-size: 1.1rem;
       }
       
-      p {
-        font-size: 1rem;
+      .error-icon {
+        font-size: 3rem;
       }
       
       .footer-content {
@@ -277,19 +292,16 @@
   </header>
   
   <main>
-    <h1>Aviso Legal</h1>
-    
-    <p>El presente aviso legal regula el uso del sitio web <strong>YourToolQuizz</strong>.</p>
-    
-    <h2>Responsabilidad</h2>
-    <p>No garantizamos resultados ni nos responsabilizamos por el uso que cada usuario haga de las herramientas recomendadas. Las decisiones finales de contratación y uso dependen exclusivamente del visitante.</p>
-    
-    <h2>Propiedad intelectual</h2>
-    <p>Todos los contenidos, textos y elementos gráficos de esta web son propiedad de YourToolQuizz o de terceros con licencia, y están protegidos por los derechos de autor.</p>
-    
-    <h2>Contacto</h2>
-    <p>Para cualquier duda o solicitud relacionada con este aviso legal, puedes escribirnos desde la sección <a href="{{ url_for('contact') }}">Contáctanos</a>.</p>
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1>Lo sentimos, el mensaje no se pudo enviar</h1>
+    <p>Hubo un problema al procesar tu mensaje. Por favor, inténtalo de nuevo en unos minutos.</p>
+    <p>Si el error persiste, puedes contactarnos directamente a:</p>
+    <div class="error-email">yourtoolfindersuport@gmail.com</div>
+    <a href="{{ url_for('YourToolQuizz') }}" class="btn">Volver a la página principal</a>
   </main>
+  
   
   <footer>
     <div class="footer-content">
@@ -340,32 +352,11 @@
   </footer>
   
   
-<script>
-    // Mostrar/ocultar menú móvil - Versión simplificada solo para hamburguesa
-    document.getElementById('menuToggle').addEventListener('click', function(e) {
-      e.stopPropagation();
-      const mobileMenu = document.getElementById('mobileMenu');
-      mobileMenu.classList.toggle('active');
-      
-      // Opcional: Cerrar otros elementos si están abiertos (como buscador)
-      // document.getElementById('mobileSearchContainer').classList.remove('active');
-    });
-
-    // Cerrar menú al hacer clic fuera
-    document.addEventListener('click', function(event) {
-      const menuToggle = document.getElementById('menuToggle');
-      const mobileMenu = document.getElementById('mobileMenu');
-      
-      if (!menuToggle.contains(event.target) && 
-          !mobileMenu.contains(event.target)) {
-        mobileMenu.classList.remove('active');
-      }
-    });
-
-    // Evitar que el clic dentro del menú lo cierre
-    document.getElementById('mobileMenu').addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-</script>
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('show');
+    }
+  </script>
 </body>
 </html>

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aviso Legal - YourToolQuizz</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Iniciar Sesión | YourToolQuizz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     body {
       margin: 0;
@@ -15,10 +15,8 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      line-height: 1.6;
     }
-    
-     header {
+    header {
       background: #ff6f61;
       color: white;
       padding: 15px 20px;
@@ -43,88 +41,71 @@
       text-decoration: none;
       color: inherit;
     }
-    
-    .menu-toggle {
-      display: none;
-      font-size: 1.8rem;
-      cursor: pointer;
-      z-index: 1001;
-    }
-    
-    nav {
-      display: flex;
-      gap: 20px;
-    }
-    
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 5px 10px;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    
-    nav a:hover {
-      background-color: rgba(255,255,255,0.2);
-    }
-    
     main {
-      max-width: 800px;
+      max-width: 400px;
       margin: 40px auto;
+      padding: 30px 40px;
       background: white;
-      padding: 40px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       flex: 1;
     }
-    
-    h1 {
-      color: #ff6f61;
-      font-size: 2.5rem;
-      margin-bottom: 30px;
-      text-align: center;
+    form {
+      display: flex;
+      flex-direction: column;
     }
-    
-    h2 {
-      color: #2c3e50;
-      font-size: 1.8rem;
-      margin-top: 40px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #ff6f61;
-      padding-bottom: 8px;
-    }
-    
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 20px;
-      color: #555;
-    }
-    
-    strong {
-      color: #2c3e50;
-    }
-    
-    a {
-      color: #ff6f61;
-      text-decoration: none;
+    label {
+      margin: 15px 0 5px;
       font-weight: 500;
-      transition: color 0.3s;
     }
-    
-    a:hover {
-      color: #e65a4e;
-      text-decoration: underline;
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
     }
-    
-    /* Footer styles */
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: #ff6f61;
+      outline: none;
+    }
+    button[type="submit"] {
+      margin-top: 25px;
+      background: #ff6f61;
+      border: none;
+      color: white;
+      padding: 12px;
+      font-size: 1.1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button[type="submit"]:hover {
+      background: #e65a4e;
+    }
+    .flash-message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+    }
+    .flash-message.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .flash-message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
     footer {
       background: #2c3e50;
       color: white;
       padding: 30px 20px;
       text-align: center;
     }
-    
     .footer-content {
       max-width: 1200px;
       margin: 0 auto;
@@ -133,14 +114,12 @@
       gap: 30px;
       text-align: left;
     }
-    
     .footer-section h3 {
       font-size: 1.2rem;
       margin-bottom: 15px;
       position: relative;
       padding-bottom: 10px;
     }
-    
     .footer-section h3::after {
       content: '';
       position: absolute;
@@ -150,42 +129,34 @@
       height: 2px;
       background: #ff6f61;
     }
-    
     .footer-section ul {
       list-style: none;
       padding: 0;
     }
-    
     .footer-section ul li {
       margin-bottom: 10px;
     }
-    
     .footer-section ul li a {
       color: #ecf0f1;
       text-decoration: none;
       transition: color 0.3s;
     }
-    
     .footer-section ul li a:hover {
       color: #ff6f61;
     }
-    
     .social-links {
       display: flex;
       gap: 15px;
       margin-top: 15px;
     }
-    
     .social-links a {
       color: white;
       font-size: 1.5rem;
       transition: color 0.3s;
     }
-    
     .social-links a:hover {
       color: #ff6f61;
     }
-    
     .footer-bottom {
       margin-top: 30px;
       padding-top: 20px;
@@ -193,77 +164,24 @@
       font-size: 0.9rem;
       color: #bdc3c7;
     }
-    
-    /* Responsive styles */
     @media (max-width: 768px) {
       .logo {
         font-size: 2rem;
       }
-      
-      .menu-toggle {
-        display: block;
-      }
-      
-      nav {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #ff6f61;
-        flex-direction: column;
-        padding: 15px 20px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      }
-      
-      nav.show {
-        display: flex;
-      }
-      
-      nav a {
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-      }
-      
       main {
-        padding: 25px;
-        margin: 20px 15px;
+        padding: 30px 20px;
+        margin: 20px;
       }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
-      h2 {
-        font-size: 1.5rem;
-      }
-      
-      p {
-        font-size: 1rem;
-      }
-      
       .footer-content {
         grid-template-columns: 1fr;
         text-align: center;
       }
-      
       .footer-section h3::after {
         left: 50%;
         transform: translateX(-50%);
       }
-      
       .social-links {
         justify-content: center;
-      }
-    }
-    
-    @media (min-width: 769px) and (max-width: 1024px) {
-      main {
-        width: 85%;
-      }
-      
-      .logo {
-        font-size: 2.2rem;
       }
     }
   </style>
@@ -276,20 +194,47 @@
     </div>
   </header>
   
-  <main>
-    <h1>Aviso Legal</h1>
-    
-    <p>El presente aviso legal regula el uso del sitio web <strong>YourToolQuizz</strong>.</p>
-    
-    <h2>Responsabilidad</h2>
-    <p>No garantizamos resultados ni nos responsabilizamos por el uso que cada usuario haga de las herramientas recomendadas. Las decisiones finales de contratación y uso dependen exclusivamente del visitante.</p>
-    
-    <h2>Propiedad intelectual</h2>
-    <p>Todos los contenidos, textos y elementos gráficos de esta web son propiedad de YourToolQuizz o de terceros con licencia, y están protegidos por los derechos de autor.</p>
-    
-    <h2>Contacto</h2>
-    <p>Para cualquier duda o solicitud relacionada con este aviso legal, puedes escribirnos desde la sección <a href="{{ url_for('contact') }}">Contáctanos</a>.</p>
-  </main>
+<main class="login-container">
+  <h2>Iniciar Sesión</h2>
+
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.email.label }}
+      {{ form.email(class="form-input", placeholder="Introduce tu correo") }}
+      {% for error in form.email.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.password.label }}
+      {{ form.password(class="form-input", placeholder="Introduce tu contraseña") }}
+      {% for error in form.password.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-actions">
+      {{ form.submit(class="btn") }}
+    </div>
+  </form>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <p class="register-link">
+    ¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate aquí</a>
+  </p>
+</main>
+
+  
   
   <footer>
     <div class="footer-content">
@@ -339,33 +284,15 @@
     </div>
   </footer>
   
-  
-<script>
-    // Mostrar/ocultar menú móvil - Versión simplificada solo para hamburguesa
-    document.getElementById('menuToggle').addEventListener('click', function(e) {
-      e.stopPropagation();
-      const mobileMenu = document.getElementById('mobileMenu');
-      mobileMenu.classList.toggle('active');
-      
-      // Opcional: Cerrar otros elementos si están abiertos (como buscador)
-      // document.getElementById('mobileSearchContainer').classList.remove('active');
-    });
-
-    // Cerrar menú al hacer clic fuera
-    document.addEventListener('click', function(event) {
-      const menuToggle = document.getElementById('menuToggle');
-      const mobileMenu = document.getElementById('mobileMenu');
-      
-      if (!menuToggle.contains(event.target) && 
-          !mobileMenu.contains(event.target)) {
-        mobileMenu.classList.remove('active');
-      }
-    });
-
-    // Evitar que el clic dentro del menú lo cierre
-    document.getElementById('mobileMenu').addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-</script>
 </body>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-R9HVBYS6QM');
+</script>
+</head>
 </html>
