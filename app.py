@@ -60,7 +60,7 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
     
-    @app.route('Servicio_2')
+    @app.route('/Servicio_2')
     def Servicio_2():
         return render_template('Servicio_2.html')
     
