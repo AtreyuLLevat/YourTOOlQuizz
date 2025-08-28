@@ -639,39 +639,14 @@ body {
       <a href="{{ url_for('about') }}" class="nav-link">Sobre Nosotros</a>
       <a href="{{ url_for('legal') }}" class="nav-link">Aviso Legal</a>
       <a href="{{ url_for('contact') }}" class="nav-link">Contáctanos</a>
-
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}" class="nav-link btn-logout">Cerrar sesión</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="nav-link btn-login">Iniciar sesión</a>
-      {% endif %}
     </div>
       
-    <button class="menu-toggle" id="menuToggle">☰</button>
-    
-    <!-- Mobile Search Container -->
-      <div class="mobile-search-container" id="mobileSearchContainer">
-      <form method="GET" action="/buscar">
-        <input type="text" 
-              name="q" 
-              class="mobile-search-input" 
-              placeholder="Buscar..."
-              aria-label="Buscar en el sitio">
-      </form>
-    </div>
-        
     <!-- Mobile Menu -->
     <div class="mobile-menu" id="mobileMenu">
       <ul>
         <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
         <li><a href="{{ url_for('legal') }}">Aviso Legal</a></li>
         <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
-        {% else %}
-          <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
-        {% endif %}
-      </ul>
     </div>
     
   </header>

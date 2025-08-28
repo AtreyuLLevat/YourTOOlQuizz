@@ -203,67 +203,11 @@
 </head>
 
 <body>
-  <header>
-   
-     <div class="left-nav">
-      <!-- Desktop Search -->
-      <form class="search-container" method="GET" action="/buscar">
-        <input type="text" name="q" class="search-input" placeholder="Buscar...">
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-
-      <!-- Mobile Search Button -->
-      <button class="mobile-search-btn" id="mobileSearchBtn">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
-    
-    <div class="logo">
-      <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
-    </div>
-    
-    <div class="right-nav">
-      <a href="{{ url_for('about') }}" class="nav-link">Sobre Nosotros</a>
-      <a href="{{ url_for('legal') }}" class="nav-link">Aviso Legal</a>
-      <a href="{{ url_for('contact') }}" class="nav-link">Contáctanos</a>
-
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}" class="nav-link btn-logout">Cerrar sesión</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="nav-link btn-login">Iniciar sesión</a>
-      {% endif %}
-    </div>
-      
-    <button class="menu-toggle" id="menuToggle">☰</button>
-    
-    <!-- Mobile Search Container -->
-      <div class="mobile-search-container" id="mobileSearchContainer">
-      <form method="GET" action="/buscar">
-        <input type="text" 
-              name="q" 
-              class="mobile-search-input" 
-              placeholder="Buscar..."
-              aria-label="Buscar en el sitio">
-      </form>
-    </div>
-        
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-      <ul>
-        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-        <li><a href="{{ url_for('legal') }}">Aviso Legal</a></li>
-        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
-        {% else %}
-          <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
-        {% endif %}
-      </ul>
-    </div>
-    
-  </header>
+<header>
+  <div class="logo">
+    <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
+  </div>
+</header>
   
 <main>
   <h2>Registro de Usuario</h2>

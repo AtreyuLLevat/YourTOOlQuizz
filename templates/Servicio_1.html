@@ -255,16 +255,18 @@ body {
   font-weight: 600;
   background: #E53935;
   color: #fff;
+  text-decoration: none; /* quita el subrayado */
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  transition: background 0.25s ease, transform 0.25s ease;
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
 .btn-start:hover {
   background: #C62828;
-  transform: translateY(-3px);
+  transform: translateX(-50%) scale(1.08); /* más grande */
 }
+
 /* RESEÑAS */
 .reviews {
   display: grid;
@@ -545,21 +547,7 @@ body {
 
   <!-- Barra de navegación -->
   <header>
-   
-     <div class="left-nav">
-      <!-- Desktop Search -->
-      <form class="search-container" method="GET" action="/buscar">
-        <input type="text" name="q" class="search-input" placeholder="Buscar...">
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
 
-      <!-- Mobile Search Button -->
-      <button class="mobile-search-btn" id="mobileSearchBtn">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
     
     <div class="logo">
       <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
@@ -570,24 +558,6 @@ body {
       <a href="{{ url_for('legal') }}" class="nav-link">Aviso Legal</a>
       <a href="{{ url_for('contact') }}" class="nav-link">Contáctanos</a>
 
-      {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}" class="nav-link btn-logout">Cerrar sesión</a>
-      {% else %}
-        <a href="{{ url_for('login') }}" class="nav-link btn-login">Iniciar sesión</a>
-      {% endif %}
-    </div>
-      
-    <button class="menu-toggle" id="menuToggle">☰</button>
-    
-    <!-- Mobile Search Container -->
-      <div class="mobile-search-container" id="mobileSearchContainer">
-      <form method="GET" action="/buscar">
-        <input type="text" 
-              name="q" 
-              class="mobile-search-input" 
-              placeholder="Buscar..."
-              aria-label="Buscar en el sitio">
-      </form>
     </div>
         
     <!-- Mobile Menu -->
@@ -596,12 +566,6 @@ body {
         <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
         <li><a href="{{ url_for('legal') }}">Aviso Legal</a></li>
         <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
-        {% else %}
-          <li><a href="{{ url_for('login') }}">Iniciar sesión</a></li>
-        {% endif %}
-      </ul>
     </div>
     
   </header>
@@ -615,7 +579,8 @@ body {
       <source src="video-intro.mp4" type="video/mp4">
       Tu navegador no soporta video HTML5.
     </video>
-    <button class="btn-start" id="btnStart">Empezar</button>
+    <a href="{{ url_for('Servicio_2') }}" class="btn-start">Empezar</a>
+
   </section>
 
   <!-- === RESEÑAS === -->
