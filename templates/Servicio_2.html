@@ -1,12 +1,21 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>YourToolQuizz - Inicio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}YourToolQuizz{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <!-- Fuentes, CSS, favicons, etc -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='Css/main.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Monoton&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
+    /* ============================
+   MAIN SECTION (Servicios)
+   ============================ */
     body {
       margin: 0;
       font-family: 'Roboto', sans-serif;
@@ -211,57 +220,224 @@
       background: rgba(255,255,255,0.1);
     }
     
-    /* Main Content Styles */
-    main {
-      max-width: 1200px;
-      margin: 30px auto;
-      padding: 20px;
-      flex: 1;
-    }
-    
-    /* Categories Section */
-    .categories-subheading {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 5px;
-      margin-bottom: 50px;
-    }
-    
-    .category-tag {
-      display: inline-flex;
-      align-items: center;
-      background: #fff;
-      padding: 6px 12px;
-      border-radius: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-decoration: none;
-      color: #333;
-      transition: all 0.3s;
-    }
-    
-    .category-tag:hover {
-      background: #ff6f61;
-      color: white;
-      transform: translateY(-2px);
-    }
-    
-    .category-tag:hover .category-icon {
-      color: white;
-    }
-    
-    .category-icon {
-      margin-right: 6px;
-      font-size: 1rem;
-      color: #ff6f61;
-    }
-    
-    .category-name {
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-    
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f5f7fa;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.pricing-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.pricing-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.pricing-header .disclaimer {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin: 60px auto;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+.service-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.service-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #111;
+}
+
+.service-card .description {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 10px 0 20px;
+  line-height: 1.6;
+}
+
+.service-card .price {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #111;
+  margin: 15px 0;
+}
+
+.service-card .price span {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #E53935; /* Rojo destacado */
+}
+
+.btn-choose {
+  background: #E53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease;
+  margin-top: auto;
+}
+
+.btn-choose:hover {
+  background: #C62828;
+}
+
+
+.offer-highlight {
+  margin: 80px auto;
+  max-width: 900px;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.offer-highlight h2 {
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: #111;
+}
+
+.offer-card {
+  background: linear-gradient(135deg, #E53935, #FF7043); /* Gradiente rojo-naranja */
+  border-radius: 16px;
+  padding: 50px 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offer-content {
+  max-width: 600px;
+}
+
+.offer-content h3 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.offer-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.offer-price {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 700;
+  background: #fff;
+  color: #E53935;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+}
+
+.btn-offer {
+  display: inline-block;
+  padding: 14px 36px;
+  background: #fff;
+  color: #E53935;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-offer:hover {
+  background: #f5f5f5;
+  transform: translateY(-3px);
+}
+
+
+.comparison {
+  margin: 80px auto;
+  padding: 0 20px;
+  max-width: 1200px;
+}
+
+.comparison h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.comparison-table-wrapper {
+  overflow-x: auto; /* Previene que se rompa en pantallas pequeñas */
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+.comparison-table thead {
+  background: #E53935;
+  color: #000000;
+}
+
+.comparison-table th, 
+.comparison-table td {
+  padding: 18px 20px;
+  text-align: center;
+  border-bottom: 1px solid #817f7f;
+  font-size: 0.95rem;
+}
+
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  background: #f9f9f9;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+
+
     /* Section Styles */
     .section {
       margin-bottom: 40px;
@@ -278,99 +454,6 @@
       padding-bottom: 10px;
       border-bottom: 2px solid #ff6f61;
     }
-    
-    /* Quiz and Blog Styles */
-    .featured-quiz {
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    
-    .quiz-image {
-      height: 250px;
-      background-size: cover;
-      background-position: center;
-    }
-    
-    .quiz-content {
-      padding: 20px;
-    }
-    
-    .quiz-title {
-      font-size: 1.5rem;
-      color: #ff6f61;
-      margin-bottom: 10px;
-    }
-    
-    .quiz-description {
-      color: #666;
-      margin-bottom: 15px;
-    }
-    
-    .quiz-button {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #ff6f61;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      transition: background 0.3s;
-    }
-    
-    .quiz-button:hover {
-      background: #e65a4e;
-    }
-    
-    .items-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 20px;
-    }
-    
-    .item-card {
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    
-    .item-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    
-    .item-image {
-      height: 180px;
-      background-size: cover;
-      background-position: center;
-    }
-    
-    .item-info {
-      padding: 15px;
-    }
-    
-    .item-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .item-meta {
-      color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    
-    .item-link {
-      color: #ff6f61;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-    
-    /* Footer Styles */
     footer {
       background: #2c3e50;
       color: white;
@@ -502,48 +585,25 @@
         position: static;
         transform: none;
       }
-    }
     
-    @media (max-width: 600px) {
-      .categories-subheading {
-        gap: 8px;
-      }
-      
-      .category-tag {
-        padding: 5px 10px;
-      }
-      
-      .section-title {
-        font-size: 1.5rem;
-      }
-      
-      .quiz-image {
-        height: 200px;
-      }
-      
-      .items-grid {
-        grid-template-columns: 1fr;
-      }
-      
       .footer-content {
         grid-template-columns: 1fr;
         text-align: center;
       }
-      
-      .footer-section h3::after {
+        
+       .footer-section h3::after {
         left: 50%;
         transform: translateX(-50%);
       }
-      
-      .social-links {
+        
+       .social-links {
         justify-content: center;
       }
     }
+
   </style>
 </head>
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -552,8 +612,11 @@
   gtag('config', 'G-R9HVBYS6QM');
 </script>
 <body>
+
+  <!-- Barra de navegación -->
   <header>
-    <div class="left-nav">
+   
+     <div class="left-nav">
       <!-- Desktop Search -->
       <form class="search-container" method="GET" action="/buscar">
         <input type="text" name="q" class="search-input" placeholder="Buscar...">
@@ -576,9 +639,6 @@
       <a href="{{ url_for('about') }}" class="nav-link">Sobre Nosotros</a>
       <a href="{{ url_for('legal') }}" class="nav-link">Aviso Legal</a>
       <a href="{{ url_for('contact') }}" class="nav-link">Contáctanos</a>
-      <a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a>
-
-
 
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('logout') }}" class="nav-link btn-logout">Cerrar sesión</a>
@@ -613,66 +673,118 @@
         {% endif %}
       </ul>
     </div>
+    
   </header>
-  
-  <main>
-    <!-- Categories Section -->
-    <div class="categories-subheading">
-      <a href="{{ url_for('seguridad') }}" class="category-tag">
-        <span class="category-icon">🛡️</span>
-        <span class="category-name">Seguridad</span>
-      </a>
-      <a href="{{ url_for('productividad') }}" class="category-tag">
-        <span class="category-icon">⏱️</span>
-        <span class="category-name">Productividad</span>
-      </a>
-      <a href="{{ url_for('diseño') }}" class="category-tag">
-        <span class="category-icon">🎨</span>
-        <span class="category-name">Diseño</span>
-      </a>
-      <a href="{{ url_for('Redes') }}" class="category-tag">
-        <span class="category-icon">📡</span>
-        <span class="category-name">Redes</span>
-      </a>
-      <a href="{{ url_for('Inteligenciasartificiales') }}" class="category-tag">
-        <span class="category-icon">🤖</span>
-        <span class="category-name">IA</span>
-      </a>
-      <a href="{{ url_for('blog') }}" class="category-tag">
-        <span class="category-icon">📚</span>
-        <span class="category-name">Blogs</span>
-      </a>
-    </div>
+</body>
+<main>
 
-    <!-- Latest Quiz Section -->
-    <section class="section">
-      <h2 class="section-title">Quiz más nuevo</h2>
-      <div class="featured-quiz">
-        <div class="quiz-image" style="background-image: url('https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg');"></div>
-        <div class="quiz-content">
-          <h3 class="quiz-title">¿Qué antivirus es el mejor para ti?</h3>
-          <p class="quiz-description">Descubre cuál es el antivirus que mejor se adapta a tus necesidades de seguridad y protección online con este test personalizado.</p>
-          <a href="{{ url_for('quizzantivirus') }}" class="quiz-button">Realizar quiz ahora</a>
-        </div>
-      </div>
-    </section>
-    
-    
-    <!-- Recent Blog Section -->
-    <section class="section">
-      <h2 class="section-title">Blogs</h2>
-      <div class="featured-quiz">
-        <div class="quiz-image" style="background-image: url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80');"></div>
-        <div class="quiz-content">
-          <h3 class="quiz-title">Blos relacionados con todos nuestro quizzes</h3>
-          <p class="quiz-description">Informate al completo sobre todos los temas relacionados con nuestros quizzes, desde las herramientas que usamos y sus usos hasta novedades del mercado</p>
-          <a href="{{ url_for('blog') }}" class="quiz-button">Leer artículo</a>
-        </div>
-      </div>
-    </section>
-  </main>
-  
-  
+  <main class="pricing-page">
+
+  <!-- Título y disclaimer -->
+  <section class="pricing-header">
+    <h1>Nuestros Servicios</h1>
+    <p class="disclaimer">*Los precios pueden variar según el tráfico en la web</p>
+  </section>
+
+  <!-- 3 servicios principales -->
+<section class="services">
+  <div class="service-card">
+    <h3>Banners Publicitarios</h3>
+    <p class="description">Promociona tu marca con anuncios visibles en nuestra web.</p>
+    <p class="price"><span>50€</span>/mes</p>
+    <button class="btn-choose">Elegir</button>
+  </div>
+  <div class="service-card">
+    <h3>Blogs</h3>
+    <p class="description">Contenido optimizado para SEO con alcance a tu público.</p>
+    <p class="price"><span>100€</span>/mes</p>
+    <button class="btn-choose">Elegir</button>
+  </div>
+  <div class="service-card">
+    <h3>Quizzes</h3>
+    <p class="description">Interacción directa con los usuarios para captar leads.</p>
+    <p class="price"><span>200€</span>/mes</p>
+    <button class="btn-choose">Elegir</button>
+  </div>
+</section>
+
+  <!-- Ofertas combinadas -->
+ <section class="offer-highlight">
+  <h2>Oferta Especial</h2>
+  <div class="offer-card">
+    <div class="offer-content">
+      <h3>Banner + Quiz</h3>
+      <p>
+        Combina la visibilidad de los banners con la interacción directa de los quizzes. 
+        Perfecto para aumentar tu alcance y captar clientes potenciales de forma rápida.
+      </p>
+      <span class="offer-price">220€</span>
+      <button class="btn-offer">Aprovechar Oferta</button>
+    </div>
+  </div>
+</section>
+
+  <!-- Tabla comparativa -->
+<section class="comparison">
+  <h2>Comparación de Servicios</h2>
+  <div class="comparison-table-wrapper">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>CARACTERÍSTICAS</th>
+          <th>BANNERS</th>
+          <th>BLOGS</th>
+          <th>QUIZZES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Público Objetivo</td>
+          <td>Usuarios generales</td>
+          <td>Usuarios interesados en contenido</td>
+          <td>Usuarios interactivos / leads cualificados</td>
+        </tr>
+        <tr>
+          <td>CTR (Rate de Click)</td>
+          <td>~2-5%</td>
+          <td>~5%</td>
+          <td>15-35%</td>
+        </tr>
+        <tr>
+          <td>Duración Recomendada</td>
+          <td>Corto plazo (días)</td>
+          <td>Medio plazo (semanas)</td>
+          <td>Largo plazo (campañas continuas)</td>
+        </tr>
+        <tr>
+          <td>Nivel de Engagement</td>
+          <td>Bajo</td>
+          <td>Medio</td>
+          <td>Alto</td>
+        </tr>
+        <tr>
+          <td>Flexibilidad en Diseño</td>
+          <td>Limitada</td>
+          <td>Media</td>
+          <td>Alta</td>
+        </tr>
+        <tr>
+          <td>Dificultad de Implementación</td>
+          <td>Fácil</td>
+          <td>Media</td>
+          <td>Alta</td>
+        </tr>
+        <tr>
+          <td>Precio</td>
+          <td>50€</td>
+          <td>100€</td>
+          <td>200€</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</main>
   <footer>
     <div class="footer-content">
       <div class="footer-section">
@@ -721,47 +833,12 @@
       &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
     </div>
   </footer>
-  
 
-<script>
-    // Mostrar / ocultar buscador móvil
-    document.getElementById('mobileSearchBtn').addEventListener('click', function() {
-      const searchContainer = document.getElementById('mobileSearchContainer');
-      searchContainer.classList.toggle('active');
-      
-      // Enfocar el campo de búsqueda cuando se muestra
-      if (searchContainer.classList.contains('active')) {
-        document.querySelector('.mobile-search-input').focus();
-      }
-      
-      // Cerrar el menú si está abierto
-      document.getElementById('mobileMenu').classList.remove('active');
-    });
 
-    // Mostrar / ocultar menú móvil
-    document.getElementById('menuToggle').addEventListener('click', function() {
-      document.getElementById('mobileMenu').classList.toggle('active');
-      // Cerrar el buscador si está abierto
-      document.getElementById('mobileSearchContainer').classList.remove('active');
-    });
-    
-    // Cerrar menús al hacer clic fuera de ellos
-    document.addEventListener('click', function(event) {
-      const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-      const mobileSearchContainer = document.getElementById('mobileSearchContainer');
-      const menuToggle = document.getElementById('menuToggle');
-      const mobileMenu = document.getElementById('mobileMenu');
-      
-      if (!mobileSearchBtn.contains(event.target)) {
-        mobileSearchContainer.classList.remove('active');
-      }
-      
-      if (!menuToggle.contains(event.target)) {
-        mobileMenu.classList.remove('active');
-      }
-    });
-</script>
+
+
+
+
+
 </body>
-
-</head>
 </html>
