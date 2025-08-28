@@ -106,7 +106,12 @@ def create_app():
 
     # -----------------------------
     # RUTAS DE BLOG Y CATEGORÍAS
+
+    
     # -----------------------------
+    @app.route('/Servicio_1')
+    def servicio1():
+        return render_template('Servicio_1.html')
     @app.route('/Categorias/Diseño/')
     def diseño():
         return render_template('Diseño.html')
