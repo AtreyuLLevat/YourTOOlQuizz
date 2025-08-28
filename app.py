@@ -59,6 +59,14 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
+    
+    @app.route('Servicio_2')
+    def Servicio_2():
+        return render_template('Servicio_2.html')
+    
+    @app.route('/Servicio_1')
+    def Servicio_1():
+        return render_template('Servicio_1.html')
 
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
     def quizzantivirus():
