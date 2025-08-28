@@ -80,7 +80,7 @@ def create_app():
             tool_data = quizzes_data[best_tool]
             return render_template('result.html', tool=tool_data)
 
-        return render_template('quizzantivirus.html', form=form, relacionados=resultados)
+        return render_template('Quizzes/Seguridad/quizzantivirus.html', form=form, relacionados=resultados)
 
     @app.route('/Quizzes/Productividad/quizzproductividad', methods=['GET', 'POST'])
     def quizzproductividad():
@@ -102,7 +102,7 @@ def create_app():
             tool_data = quizzes_data[best_tool]
             return render_template('result.html', tool=tool_data)
 
-        return render_template('quizzproductividad.html', form=form, relacionados=resultados)
+        return render_template('Quizzes/Productividad/quizzproductividad.html', form=form, relacionados=resultados)
 
     # -----------------------------
     # RUTAS DE BLOG Y CATEGORÍAS
@@ -112,41 +112,41 @@ def create_app():
     @app.route('/Servicio_1')
     def servicio1():
         return render_template('Servicio_1.html')
-    @app.route('/Categorias/Dise%C3%B1o')
+    @app.route('/Categorias/Diseño')
     def diseño():
-        return render_template('Diseño.html')
+        return render_template('Categorias/Diseño.html')
 
     @app.route('/Categorias/blogs')
     def blog():
-        return render_template('Blogs.html')
+        return render_template('Categorias/Blogs.html')
 
     @app.route('/Blogs/Seguridad/Blogs1antivirus')
     def blog1antivirus():
         keywords = ["seguridad", "antivirus", "firewall", "malware", "virus", "protección", "ciberseguridad", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
-        return render_template('Blogs1antivirus.html', relacionados=relacionados)
+        return render_template('Blogs/Seguridad/Blogs1antivirus.html', relacionados=relacionados)
 
     @app.route('/Blogs/Productividad/Blogproductividad')
     def blogproductividad():
         keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación", "blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
-        return render_template('Blogproductividad.html', relacionados=relacionados)
+        return render_template('Blogs/Productividad/Blogproductividad.html', relacionados=relacionados)
 
     @app.route('/Categorias/productividad')
     def productividad():
-        return render_template('productividad.html')
+        return render_template('Categorias/productividad.html')
 
     @app.route('/Categorias/Seguridad')
     def seguridad():
-        return render_template('Seguridad.html')
+        return render_template('Categorias/Seguridad.html')
 
     @app.route('/Categorias/Redes')
     def Redes():
-        return render_template('Redes.html')
+        return render_template('Categorias/Redes.html')
 
     @app.route('/Categorias/Inteligenciasartificiales')
     def Inteligenciasartificiales():
-        return render_template('Inteligenciasartificiales.html')
+        return render_template('Categorias/Inteligenciasartificiales.html')
 
     # -----------------------------
     # FUNCIONALIDADES CORE
@@ -242,7 +242,7 @@ def create_app():
 
     @app.route('/Paginas_errores/Error')
     def contact_error():
-        return render_template('Error.html')
+        return render_template('Paginas_errores/Error.html')
 
     # -----------------------------
     # RUTAS DE USUARIOS (LOGIN)
@@ -257,7 +257,7 @@ def create_app():
             db.session.commit()
             flash("Registro exitoso. Ahora puedes iniciar sesión.", "success")
             return redirect(url_for("login"))
-        return render_template("register.html", form=form)
+        return render_template("InicioSesion/register.html", form=form)
 
     @app.route("/InicioSesion/login", methods=["GET", "POST"])
     def login():
@@ -270,19 +270,19 @@ def create_app():
                 return redirect(url_for("homepage"))
             else:
                 flash("Correo o contraseña incorrectos", "danger")
-        return render_template("login.html", form=form)
+        return render_template("InicioSesion/login.html", form=form)
 
     @app.route("/InicioSesion/dashboard")
     @login_required
     def dashboard():
-        return render_template("dashboard.html", email=current_user.email)
+        return render_template("InicioSesion/dashboard.html", email=current_user.email)
 
     @app.route("/InicioSesion/logout")
     @login_required
     def logout():
         logout_user()
         flash("Sesión cerrada correctamente", "info")
-        return redirect(url_for("login"))
+        return redirect(url_for("InicioSesion/login"))
 
     # -----------------------------
     # Manejo de errores
