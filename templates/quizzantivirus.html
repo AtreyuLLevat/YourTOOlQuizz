@@ -621,8 +621,10 @@
       const submitBtn = document.getElementById("submitBtn");
       const progressBarInner = document.querySelector(".progress-bar-inner");
 
+
       let currentQuestion = 0;
       const totalQuestions = questions.length;
+
 
       // Mostrar la pregunta según índice
       function showQuestion(index) {
@@ -634,9 +636,11 @@
         updateNextBtnState();
       }
 
+
       // Actualizar botones Prev y Next / Submit
       function updateButtons() {
         prevBtn.disabled = currentQuestion === 0;
+
 
         if (currentQuestion === totalQuestions - 1) {
           nextBtn.style.display = "none";
@@ -647,24 +651,29 @@
         }
       }
 
+
       // Validar que pregunta actual tenga respuesta seleccionada
       function validateCurrentQuestion() {
         const currentQ = questions[currentQuestion];
         return currentQ.querySelector('input[type="radio"]:checked') !== null;
       }
 
+
       // Habilitar/deshabilitar botón siguiente
       function updateNextBtnState() {
         nextBtn.disabled = !validateCurrentQuestion();
       }
 
+
       // Actualizar barra de progreso (ancho en %)
       function updateProgressBar() {
         if (!progressBarInner) return; // Seguridad si no existe
 
+
         const progressPercent = ((currentQuestion + 1) / totalQuestions) * 100;
         progressBarInner.style.width = progressPercent + "%";
       }
+
 
       // Evento para selección de respuesta en cada opción
       document.querySelectorAll("ul.answers li").forEach((li) => {
@@ -674,15 +683,18 @@
             radio.checked = true;
           }
 
+
           // Visual feedback - marca opción seleccionada
           li.parentNode.querySelectorAll("li").forEach((item) => {
             item.classList.remove("selected");
           });
           li.classList.add("selected");
 
+
           updateNextBtnState();
         });
       });
+
 
       // Botón anterior
       prevBtn.addEventListener("click", () => {
@@ -690,6 +702,7 @@
           showQuestion(currentQuestion - 1);
         }
       });
+
 
       // Botón siguiente
       nextBtn.addEventListener("click", () => {
@@ -702,6 +715,7 @@
         }
       });
 
+
       // Inicializa la vista en la pregunta 0
       showQuestion(0);
     });
@@ -710,8 +724,10 @@
   const searchCloseBtn = document.getElementById("searchCloseBtn");
   const mobileSearchForm = document.getElementById("mobileSearchForm");
 
+
   const hamburgerBtn = document.getElementById("hamburgerBtn");
   const mobileNavMenu = document.getElementById("mobileNavMenu");
+
 
   // Mostrar formulario búsqueda al pulsar lupa
   searchToggleBtn.addEventListener("click", () => {
@@ -722,11 +738,13 @@
     mobileNavMenu.classList.add("hidden");
   });
 
+
   // Cerrar formulario búsqueda al pulsar X
   searchCloseBtn.addEventListener("click", () => {
     mobileSearchForm.style.display = "none";
     searchToggleBtn.style.display = "inline-block";
   });
+
 
   // Toggle menú hamburguesa
   hamburgerBtn.addEventListener("click", () => {
@@ -738,12 +756,14 @@
     }
   });
 
+
   // Opcional: cerrar menú o buscador si clic fuera
   document.addEventListener("click", (e) => {
     const insideSearch = mobileSearchForm.contains(e.target);
     const insideSearchBtn = searchToggleBtn.contains(e.target);
     const insideMenu = mobileNavMenu.contains(e.target);
     const insideHamburger = hamburgerBtn.contains(e.target);
+
 
     if (!insideSearch && !insideSearchBtn) {
       mobileSearchForm.style.display = "none";
@@ -766,3 +786,4 @@
 </head>
 
 </html>
+
