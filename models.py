@@ -80,7 +80,7 @@ class Blog(db.Model):
     titulo = db.Column(db.String(200), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
     keywords = db.Column(db.String(300), nullable=True)  # Coma-separadas
-    autor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # <-- corregido
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # <-- corregido
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     autor = db.relationship('User', backref=db.backref('blogst', lazy=True))
