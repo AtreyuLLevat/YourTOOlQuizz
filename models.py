@@ -74,7 +74,7 @@ class Result(db.Model):
 
 class Blog(db.Model):
 
-    __tablename__ = 'blogs'
+    __tablename__ = 'blogst'
     
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(200), nullable=False)
@@ -83,7 +83,7 @@ class Blog(db.Model):
     autor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # <-- corregido
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    autor = db.relationship('User', backref=db.backref('blogs', lazy=True))
+    autor = db.relationship('User', backref=db.backref('blogst', lazy=True))
     
     def __repr__(self):
         return f"<Blog {self.titulo}>"
