@@ -238,7 +238,7 @@ body {
   box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
-.video-presentation video {
+.video-presentation img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -555,14 +555,10 @@ body {
 <main>
 
   <!-- === VIDEO DE PRESENTACIÓN === -->
-  <section class="video-presentation">
-  <video autoplay muted loop>
-    <source src="{{ url_for('static', filename='videos/video-intro.mp4') }}" type="video/mp4">
-      Tu navegador no soporta video HTML5.
-    </video>
-    <a href="{{ url_for('Servicio_2') }}" class="btn-start">Empezar</a>
-
-  </section>
+<section class="video-presentation">
+  <img src="{{ url_for('static', filename='imagenes/video-intro.jpg') }}" alt="Banner de presentación">
+  <a href="{{ url_for('Servicio_2') }}" class="btn-start">Empezar</a>
+</section>
 
   <!-- === RESEÑAS === -->
   
