@@ -328,28 +328,23 @@ body {
 
 .text-sections .text-block {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 30px;
-  max-width: 1200px;
-  margin: 0 auto;
+  flex-direction: column; /* Cambiamos a columna para centrar verticalmente */
+  align-items: center;    /* Centra horizontalmente */
+  justify-content: center; /* Centra verticalmente */
+  gap: 20px;
+       /* Limita el ancho para mejor legibilidad */
+  margin: 0 auto;          /* Centra el bloque en la página */
   padding: 40px 30px;
   border-radius: 14px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-  text-align: left;
+  text-align: center;      /* Centra el texto dentro del bloque */
 }
 
 .text-sections .text-block:nth-child(even) {
   flex-direction: row-reverse;
 }
 
-.text-block img {
-  width: 40%;
-  max-width: 400px;
-  max-height: 250px;
-  object-fit: cover;
-  border-radius: 10px;
-}
+
 
 .text-block .text-content {
   flex: 1;
@@ -561,8 +556,8 @@ body {
 
   <!-- === VIDEO DE PRESENTACIÓN === -->
   <section class="video-presentation">
-    <video autoplay muted loop>
-      <source src="video-intro.mp4" type="video/mp4">
+  <video autoplay muted loop>
+    <source src="{{ url_for('static', filename='videos/video-intro.mp4') }}" type="video/mp4">
       Tu navegador no soporta video HTML5.
     </video>
     <a href="{{ url_for('Servicio_2') }}" class="btn-start">Empezar</a>
@@ -574,7 +569,6 @@ body {
   <!-- === CUERPO DE TEXTO === -->
   <section class="text-sections">
         <div class="text-block">
-    <img src="{{ url_for('static', filename='Imagenes/Quizz.png') }}" alt="Quizz">
     <div class="text-content">
         <h3>Quizzes Personalizados: Conecta con tu Cliente Ideal</h3>
         <p>Los quizzes de YourToolQuizz representan una herramienta de publicidad altamente efectiva, diseñada para conectar empresas con compradores potenciales cualificados. Cada cuestionario se adapta a la situación del usuario, ofreciendo resultados personalizados que reflejan sus necesidades y preferencias específicas. A partir de estos resultados, los clientes reciben una vista ampliada de las características principales de su empresa, destacando fortalezas y proporcionando una visión equilibrada con uno o dos puntos de mejora, lo que aporta credibilidad y transparencia.</p>
@@ -583,7 +577,7 @@ body {
     </div>
 
     <div class="text-block">
-    <img src="{{ url_for('static', filename='Imagenes/Blog.png') }}" alt="BLOG">
+  
     <div class="text-content">
         <h3>Blog con Recomendaciones: Posiciona tu Marca</h3>
         <p>Ser protagonista en uno de nuestros blogs te permite mostrar tu empresa de manera natural y confiable ante nuestra audiencia. Cada artículo se centra en ofrecer recomendaciones útiles a los compradores, destacando tu negocio junto con un máximo de tres empresas más. Esta forma de promoción combina contenido editorial de valor con visibilidad estratégica, ayudando a que los usuarios identifiquen tu empresa como una opción confiable y recomendada. Además, el blog proporciona un entorno donde los visitantes interactúan con información útil, lo que aumenta el tiempo de exposición a tu marca. Es ideal para empresas que buscan mejorar su posicionamiento y autoridad dentro de su sector.</p>
@@ -591,7 +585,7 @@ body {
     </div>
 
     <div class="text-block">
-    <img src="{{ url_for('static', filename='Imagenes/Banner.png') }}" alt="Banner de promoción">
+
     <div class="text-content">
         <h3>Banners Publicitarios: Visibilidad Directa y Económica</h3>
         <p>Los banners de YourToolQuizz son la forma más accesible y directa de promocionar tu empresa. Este estilo de publicidad tradicional permite colocar tu mensaje visual en lugares estratégicos de nuestra web. Es una solución económica que no requiere contenido adicional ni adaptaciones complejas, ofreciendo una forma inmediata de captar atención y generar reconocimiento de marca. Gracias a su visibilidad constante y su ubicación estratégica, los banners ayudan a mantener tu empresa presente en la mente de los usuarios, reforzando tu imagen y facilitando futuros contactos. Es la opción perfecta para empresas que buscan impacto rápido y asequible dentro de un público segmentado y activo.</p>
