@@ -251,20 +251,31 @@
   <main>
     <h1>Resultados para "{{ q }}"</h1>
     
-  <div class="results-container">
+    <div class="results-container">
       {% if resultados_quiz or resultados_blog %}
-      <ul>
-        {% for item in resultados_quiz %}
-          <li><strong>{{ item.titulo }}</strong><br>{{ item.contenido }}</li>
-        {% endfor %}
-        {% for item in resultados_blog %}
-          <li><strong>{{ item.titulo }}</strong><br>{{ item.contenido }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No se encontraron resultados para "{{ q }}"</p>
-    {% endif %}
-</div>
+        <ul class="results-list">
+          {% for item in resultados_quiz %}
+            <li class="result-item">
+              <a class="result-link" href="{{ url_for('quiz_por_slug', slug=item.slug) }}">
+                {{ item.titulo }}
+              </a>
+              <p>{{ item.contenido }}</p>
+            </li>
+          {% endfor %}
+
+          {% for item in resultados_blog %}
+            <li class="result-item">
+              <a class="result-link" href="{{ url_for('blog_por_slug', slug=item.slug) }}">
+                {{ item.titulo }}
+              </a>
+              <p>{{ item.contenido }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="no-results">No se encontraron resultados para "{{ q }}"</p>
+      {% endif %}
+    </div>
     <a href="/" class="back-link">
       <i class="fas fa-arrow-left"></i> Volver al inicio
     </a>

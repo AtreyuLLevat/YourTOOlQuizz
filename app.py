@@ -14,6 +14,8 @@ from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
 import base64
+from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
+
 
 load_dotenv()
 # -----------------------------
@@ -326,6 +328,31 @@ def create_app():
         logout_user()
         flash("Sesión cerrada correctamente", "info")
         return redirect(url_for("login"))
+    
+    @app.route("/quiz/<slug>")
+    def quiz_por_slug(slug):
+        rutas_quiz = {
+            "quizzantivirus": "quizzantivirus",
+            "quizzproductividad": "quizzproductividad",
+        }
+        if slug in rutas_quiz:
+            return redirect(url_for(rutas_quiz[slug]))
+        abort(404)
+
+
+
+    @app.route("/blog/<slug>")
+    def blog_por_slug(slug):
+        rutas_blog = {
+            "encuentra-la-herramienta-de-seguridad-adecuada-con-este-blog": "blog1antivirus",
+            "mejora-tu-productividad-notion-clickup-y-todoist": "blogproductividad",
+            # Añade aquí todos tus blogs con su slug y nombre de función real
+        }
+        if slug in rutas_blog:
+            return redirect(url_for(rutas_blog[slug]))
+        abort(404)
+
+
 
     # -----------------------------
     # Manejo de errores
