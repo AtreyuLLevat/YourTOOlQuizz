@@ -297,17 +297,21 @@ def create_app():
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
-            if user and check_password_hash(user.password, form.password.data):
-                # Validar código 2FA
-                totp = pyotp.TOTP(user.otp_secret)
-                if totp.verify(form.otp_code.data):
-                    login_user(user, remember=form.remember_me.data)
-                    flash("Inicio de sesión exitoso", "success")
-                    return redirect(url_for("dashboard"))
-                else:
-                    flash("Código 2FA incorrecto", "danger")
-            else:
-                flash("Correo o contraseña incorrectos", "danger")
+
+            if not user or not check_password_hash(user.password, form.password.data):
+                flash("Usuario o contraseña incorrectos", "error")
+                return redirect(url_for("login"))
+
+            # Verificación de OTP solo una vez
+            totp = pyotp.TOTP(user.otp_secret)
+            if not totp.verify(form.otp_code.data):
+                flash("Código 2FA inválido", "error")
+                return redirect(url_for("login"))
+
+            login_user(user, remember=form.remember_me.data)
+            flash("Sesión iniciada", "success")
+            return redirect(url_for("dashboard"))
+
         return render_template("login.html", form=form)
 
     @app.route("/dashboard")
