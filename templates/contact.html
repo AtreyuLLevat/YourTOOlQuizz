@@ -346,39 +346,41 @@
     </div>
   </header>
   
-  <main>
-    <h1>Contáctanos</h1>
+<main>
+  <h1>Contáctanos</h1>
 
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <div class="flash">{{ messages[0] }}</div>
-      {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">{{ messages[0] }}</div>
+    {% endif %}
+  {% endwith %}
 
-    <form method="post" action="{{ url_for('contact') }}">
-      <div class="form-group">
-        <label for="nombre">Tu nombre:</label>
-        <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required />
-      </div>
-      
-      <div class="form-group">
-        <label for="correo">Correo electrónico:</label>
-        <input type="email" id="correo" name="correo" placeholder="Ej: tu@email.com" required />
-      </div>
-      
-      <div class="form-group">
-        <label for="mensaje">Tu mensaje:</label>
-        <textarea id="mensaje" name="mensaje" placeholder="Escribe aquí tu consulta o comentario..." required></textarea>
-      </div>
-      
-      <button type="submit">Enviar mensaje</button>
-    </form>
-    
-    <div class="contact-info">
-      <p>También puedes contactarnos directamente a:</p>
-      <p><a href="atreyu@yourtoolquizz.site">info@yourtoolquizz.com</a></p>
+  <form method="post" action="{{ url_for('contact') }}">
+    {{ form.hidden_tag() }}  <!-- Token CSRF obligatorio -->
+
+    <div class="form-group">
+      {{ form.nombre.label }}
+      {{ form.nombre(class="form-control", placeholder="Ej: Juan Pérez") }}
     </div>
-  </main>
+    
+    <div class="form-group">
+      {{ form.correo.label }}
+      {{ form.correo(class="form-control", placeholder="Ej: tu@email.com") }}
+    </div>
+    
+    <div class="form-group">
+      {{ form.mensaje.label }}
+      {{ form.mensaje(class="form-control", placeholder="Escribe aquí tu consulta o comentario...") }}
+    </div>
+    
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+  
+  <div class="contact-info">
+    <p>También puedes contactarnos directamente a:</p>
+    <p><a href="mailto:info@yourtoolquizz.com">info@yourtoolquizz.com</a></p>
+  </div>
+</main>
   
   
   <footer>
