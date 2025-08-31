@@ -1,25 +1,25 @@
+# app.py
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app
+import io
+import pyotp
+import qrcode
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from models import db, User, Quiz, Question, Blog
 from forms import RegisterForm, LoginForm, ContactForm
-from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
 
 load_dotenv()
-
 # -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
 def create_app():
     app = Flask(__name__)
-
-    # Configuración básica
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"poolclass": NullPool}
@@ -33,19 +33,18 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
-    # Inicializar extensiones
     db.init_app(app)
     mail = Mail(app)
     Migrate(app, db)
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
-    # -----------------------------
-    # USER LOADER
-    # -----------------------------
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+
+    with app.app_context():
+        db.create_all()
 
     # -----------------------------
     # CONTEXTO DE LA APP
@@ -252,25 +251,54 @@ def create_app():
     # -----------------------------
     @app.route("/register", methods=["GET", "POST"])
     def register():
+        if current_user.is_authenticated:
+            return redirect(url_for("dashboard"))
+
         form = RegisterForm()
         if form.validate_on_submit():
             hashed_pw = generate_password_hash(form.password.data)
-            new_user = User(email=form.email.data, password=hashed_pw)
+            otp_secret = pyotp.random_base32()  # 🔐 genera secreto único
+            new_user = User(email=form.email.data, password=hashed_pw, otp_secret=otp_secret)
             db.session.add(new_user)
             db.session.commit()
-            flash("Registro exitoso. Ahora puedes iniciar sesión.", "success")
+
+            # Crear QR para Google Authenticator
+            totp = pyotp.TOTP(otp_secret)
+            otp_uri = totp.provisioning_uri(name=form.email.data, issuer_name="YourToolQuizz")
+            qr_img = qrcode.make(otp_uri)
+
+            # Guardar QR en memoria
+            img_bytes = io.BytesIO()
+            qr_img.save(img_bytes, format='PNG')
+            img_bytes.seek(0)
+
+            # Enviar email con QR y clave
+            msg = Message("Configura tu 2FA en YourToolQuizz", recipients=[form.email.data])
+            msg.body = f"Hola, añade esta clave en Google Authenticator: {otp_secret}\nO escanea el QR adjunto."
+            msg.attach("2fa_qr.png", "image/png", img_bytes.read())
+            mail.send(msg)
+
+            flash("Registro exitoso. Revisa tu correo para configurar el 2FA.", "success")
             return redirect(url_for("login"))
         return render_template("register.html", form=form)
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
+        if current_user.is_authenticated:
+            return redirect(url_for("dashboard"))
+
         form = LoginForm()
         if form.validate_on_submit():
             user = User.query.filter_by(email=form.email.data).first()
             if user and check_password_hash(user.password, form.password.data):
-                login_user(user)
-                flash("Inicio de sesión exitoso", "success")
-                return redirect(url_for("homepage"))
+                # Validar código 2FA
+                totp = pyotp.TOTP(user.otp_secret)
+                if totp.verify(form.otp_code.data):
+                    login_user(user, remember=form.remember_me.data)
+                    flash("Inicio de sesión exitoso", "success")
+                    return redirect(url_for("dashboard"))
+                else:
+                    flash("Código 2FA incorrecto", "danger")
             else:
                 flash("Correo o contraseña incorrectos", "danger")
         return render_template("login.html", form=form)
