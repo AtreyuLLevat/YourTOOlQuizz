@@ -215,9 +215,10 @@
         <span class="error">{{ error }}</span>
       {% endfor %}
     </div>
-    <div class="form-group">
+  <div class="form-group">
   {{ form.otp_code.label }}
   {{ form.otp_code(class="form-input", placeholder="Código de 6 dígitos") }}
+  {% for e in form.otp_code.errors %}<span class="error">{{ e }}</span>{% endfor %}
 </div>
 
 <div class="form-group">
@@ -229,11 +230,7 @@
       {{ form.submit(class="btn") }}
     </div>
   </form>
-  <div class="form-group">
-  {{ form.otp_code.label }}
-  {{ form.otp_code(class="form-input", placeholder="Código de 6 dígitos") }}
-  {% for e in form.otp_code.errors %}<span class="error">{{ e }}</span>{% endfor %}
-</div>
+
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -311,3 +308,4 @@
 </script>
 </head>
 </html>
+
