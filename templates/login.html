@@ -310,20 +310,28 @@
 
   gtag('config', 'G-R9HVBYS6QM');
 </script>
-<script type="module">
-  import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js'
 
-  const supabase = createClient('https://TU-PROJECT.supabase.co', 'PUBLIC-ANON-KEY')
+    const supabase = createClient(
+      'https://ouoodvqsezartigpzwke.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im91b29kdnFzZXphcnRpZ3B6d2tlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwMzI3NDUsImV4cCI6MjA3MTYwODc0NX0.LiS7sXDRc2KA0uYr3QXp0QM3C_PAmL1pVki0g0cp2wU'
+    )
 
-  document.getElementById('google-login').addEventListener('click', async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://tudominio.com/dashboard' // URL después del login
+    async function loginWithGoogle() {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin // tu dominio
+        }
+      })
+
+      if (error) {
+        console.error('Error al iniciar sesión con Google:', error)
       }
-    })
-    if (error) console.error(error)
-  })
-</script>
+    }
+
+    window.loginWithGoogle = loginWithGoogle
+  </script>
 </head>
 </html>
