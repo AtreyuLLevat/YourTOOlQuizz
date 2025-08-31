@@ -219,7 +219,6 @@ def create_app():
     @app.route('/legal')
     def legal():
         return render_template('legal.html')
-
     @app.route('/contact', methods=['GET', 'POST'])
     def contact():
         form = ContactForm()
@@ -233,8 +232,10 @@ def create_app():
                 msg.body = f"De: {form.nombre.data} <{form.correo.data}>\n\nMensaje:\n{form.mensaje.data}"
                 mail.send(msg)
                 flash('¡Mensaje enviado correctamente!', 'success')
+                print("✅ Correo enviado con éxito")  # <-- Para verificar en logs
                 return redirect(url_for('thank_you'))
             except Exception as e:
+                print(f"❌ Error enviando correo: {e}")  # <-- Para logs
                 flash(f'Error al enviar: {str(e)}', 'error')
                 return redirect(url_for('contact_error'))
         return render_template('contact.html', form=form)
