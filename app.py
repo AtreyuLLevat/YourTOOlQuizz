@@ -18,6 +18,9 @@ from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 
 
 load_dotenv()
+print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
+print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
+
 # -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
