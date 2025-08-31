@@ -13,6 +13,7 @@ from models import db, User, Quiz, Question, Blog
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
+import base64
 
 load_dotenv()
 # -----------------------------
@@ -257,29 +258,35 @@ def create_app():
         form = RegisterForm()
         if form.validate_on_submit():
             hashed_pw = generate_password_hash(form.password.data)
-            otp_secret = pyotp.random_base32()  # 🔐 genera secreto único
+            otp_secret = pyotp.random_base32()
             new_user = User(email=form.email.data, password=hashed_pw, otp_secret=otp_secret)
             db.session.add(new_user)
             db.session.commit()
 
-            # Crear QR para Google Authenticator
+            # Crear QR (otpauth://...)
             totp = pyotp.TOTP(otp_secret)
             otp_uri = totp.provisioning_uri(name=form.email.data, issuer_name="YourToolQuizz")
             qr_img = qrcode.make(otp_uri)
-
-            # Guardar QR en memoria
             img_bytes = io.BytesIO()
             qr_img.save(img_bytes, format='PNG')
-            img_bytes.seek(0)
+            qr_b64 = base64.b64encode(img_bytes.getvalue()).decode("utf-8")
 
-            # Enviar email con QR y clave
-            msg = Message("Configura tu 2FA en YourToolQuizz", recipients=[form.email.data])
-            msg.body = f"Hola, añade esta clave en Google Authenticator: {otp_secret}\nO escanea el QR adjunto."
-            msg.attach("2fa_qr.png", "image/png", img_bytes.read())
-            mail.send(msg)
+            # Intentar enviar email (pero no fallar si no se puede)
+            try:
+                msg = Message("Configura tu 2FA en YourToolQuizz", recipients=[form.email.data])
+                msg.body = f"Hola, añade esta clave en tu app TOTP: {otp_secret}\nO escanea el QR adjunto."
+                # adjunto
+                img_bytes.seek(0)
+                msg.attach("2fa_qr.png", "image/png", img_bytes.read())
+                mail.send(msg)
+                flash("Registro exitoso. Te enviamos el QR por email.", "success")
+            except Exception as e:
+                current_app.logger.exception("Fallo enviando email 2FA")
+                flash("Registro exitoso. No pudimos enviar el email: configura tu 2FA con el QR mostrado abajo.", "error")
 
-            flash("Registro exitoso. Revisa tu correo para configurar el 2FA.", "success")
-            return redirect(url_for("login"))
+            # Mostrar en la misma página (una sola vez) el QR y la clave
+            return render_template("register.html", form=RegisterForm(), qr_png=qr_b64, otp_secret=otp_secret)
+
         return render_template("register.html", form=form)
 
     @app.route("/login", methods=["GET", "POST"])

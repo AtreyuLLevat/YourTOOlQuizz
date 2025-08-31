@@ -1,22 +1,16 @@
-# models.py
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
 
 db = SQLAlchemy()
 
-
-
-
-# -------------------------
-# MODELO DE USUARIOS
-# -------------------------
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    otp_secret = db.Column(db.String(32), nullable=False)  # 🔐 Clave 2FA obligatoria
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
 
