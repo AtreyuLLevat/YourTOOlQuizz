@@ -21,9 +21,6 @@ load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 
-
-print(f"DEBUG MAIL_USERNAME: '{user}' (len={len(user) if user else 0})")
-print(f"DEBUG MAIL_PASSWORD: '{pwd}' (len={len(pwd) if pwd else 0})")
 # -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
