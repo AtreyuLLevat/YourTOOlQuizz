@@ -646,21 +646,22 @@ footer {
   }
 
   .logo {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 
   .right-nav {
     gap: 10px;
   }
 
-  .search-container {
-    min-width: 120px;
-    width: auto;
+  /* Mostrar solo el icono de búsqueda */
+  .search-input {
+    display: none;
   }
 
-  .search-input {
-    width: 90px;
-    font-size: 0.9rem;
+  .search-btn {
+    padding: 6px;
+    background: #f5f5f5;
+    border-radius: 10px;
   }
 
   .quiz-card {
@@ -692,40 +693,53 @@ footer {
 
 /* Mobile: hasta 720px */
 @media (max-width: 720px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
+ header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     padding: 8px 16px;
-    height: auto;
+    height: 56px;
   }
 
   .logo {
-    position: static;
-    transform: none;
-    margin: 8px 0;
-    font-size: 1.4rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
   }
 
   .left-nav {
-    width: 100%;
+    display: flex;
+    align-items: center;
   }
 
   .right-nav {
-    width: 100%;
-    justify-content: space-between;
     gap: 6px;
-    margin-bottom: 8px;
+    flex-direction: row;
   }
 
+  /* Solo mostrar ícono de búsqueda */
   .search-container {
-    width: 100%;
-    justify-content: space-between;
-    padding: 4px 8px;
+    padding: 0;
+    background: transparent;
   }
 
   .search-input {
-    width: 70%;
-    font-size: 0.85rem;
+    display: none;
+  }
+
+  .search-btn {
+    padding: 6px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .menu-btn {
+    font-size: 1.4rem;
+    padding: 6px;
   }
 
   .quiz-card {
