@@ -199,10 +199,13 @@ header {
 .ad-slider {
   position: relative;
   overflow: hidden;
-  height: 400px;
+  min-height: 400px; /* asegura altura mínima */
+  max-height: 600px; /* opcional: limita altura en pantallas grandes */
+  width: 100%;
   margin: 0 auto;
   border-radius: 0;
   background: linear-gradient(90deg, #000, #D60000);
+  z-index: 100; /* asegura que esté por encima de otros elementos */
 }
 
 .ad-slider img {
@@ -218,8 +221,8 @@ header {
 
 .ad-slider img.active {
   opacity: 1;
+  z-index: 1;
 }
-
 
 .ad-button {
   position: absolute;
@@ -233,11 +236,51 @@ header {
   font-size: 1rem;
   font-weight: bold;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 200; /* encima de las imágenes */
 }
 
 .ad-button:hover {
   background: #ff1a1a;
   transform: translateX(-50%) scale(1.05);
+}
+
+.ad-dots {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 200; /* encima de las imágenes */
+}
+
+.ad-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ad-dot.active {
+  background: #ff1a1a;
+  transform: scale(1.2);
+}
+
+/* ------------------ RESPONSIVE ------------------ */
+@media (max-width: 768px) {
+  .ad-slider {
+    min-height: 250px; /* slider más pequeño en móvil */
+  }
+  .ad-button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    bottom: 50px;
+  }
+  .ad-dots {
+    bottom: 30px;
+  }
 }
 
 /* Noticias */
