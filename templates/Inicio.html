@@ -814,13 +814,15 @@ footer {
       changeSlide((currentAd + 1) % slides.length);
     }
 
-    function changeSlide(index) {
-      slides[currentAd].classList.remove('active');
-      dots[currentAd].classList.remove('active');
-      currentAd = index;
-      slides[currentAd].classList.add('active');
-      dots[currentAd].classList.add('active');
-    }
+function changeSlide(index) {
+  if(slides.length === 0) return; // evita errores si no hay slides
+  slides[currentAd].classList.remove('active');
+  dots[currentAd].classList.remove('active');
+  currentAd = index;
+  slides[currentAd].classList.add('active');
+  dots[currentAd].classList.add('active');
+}
+
 
     dots.forEach(dot => {
       dot.addEventListener('click', () => {
@@ -832,3 +834,4 @@ footer {
   </script>
 </body>
 </html>
+
