@@ -803,30 +803,46 @@ footer {
 
 
 <script>
-let currentAd = 0;
-const slides = document.querySelectorAll('.ad-slider img'); // ahora selecciona imágenes
-const dots = document.querySelectorAll('.ad-dot');
-let slideInterval = setInterval(nextSlide, 4000);
+document.addEventListener('DOMContentLoaded', () => {
+  let currentAd = 0;
+  const slides = document.querySelectorAll('.ad-slider img');
+  const dots = document.querySelectorAll('.ad-dot');
+  
+  if (slides.length === 0) return; // Si no hay imágenes, no hacer nada
 
-function nextSlide() {
-  changeSlide((currentAd + 1) % slides.length);
-}
+  // Inicializar primer slide y dot activos
+  slides[0].classList.add('active');
+  if (dots.length) dots[0].classList.add('active');
 
-function changeSlide(index) {
-  if (slides.length === 0) return; // evita errores si no hay slides
-  slides[currentAd].classList.remove('active');
-  dots[currentAd].classList.remove('active');
-  currentAd = index;
-  slides[currentAd].classList.add('active');
-  dots[currentAd].classList.add('active');
-}
+  // Función para cambiar slide
+  function changeSlide(index) {
+    slides[currentAd].classList.remove('active');
+    if (dots.length) dots[currentAd].classList.remove('active');
 
-dots.forEach(dot => {
-  dot.addEventListener('click', () => {
-    clearInterval(slideInterval);
-    changeSlide(parseInt(dot.dataset.index));
-    slideInterval = setInterval(nextSlide, 4000);
-  });
+    currentAd = index;
+
+    slides[currentAd].classList.add('active');
+    if (dots.length) dots[currentAd].classList.add('active');
+  }
+
+  // Función siguiente slide
+  function nextSlide() {
+    changeSlide((currentAd + 1) % slides.length);
+  }
+
+  // Intervalo automático
+  let slideInterval = setInterval(nextSlide, 4000);
+
+  // Eventos para los dots
+  if (dots.length) {
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        clearInterval(slideInterval);
+        changeSlide(parseInt(dot.dataset.index));
+        slideInterval = setInterval(nextSlide, 4000);
+      });
+    });
+  }
 });
 </script>
 
