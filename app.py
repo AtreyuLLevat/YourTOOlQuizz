@@ -63,8 +63,11 @@ def create_app():
     # -----------------------------
     @app.route('/')
     def homepage():
-        return render_template('Untilted-1.html')
+        return render_template('homepage.html')
     
+    @app.route('/Untilted-1')
+    def Inicio():
+        return render_template('Untilted-1.html')  
     @app.route('/Servicio_2')
     def Servicio_2():
         return render_template('Servicio_2.html')
