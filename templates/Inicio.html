@@ -679,19 +679,22 @@ footer {
 </header>
 
 <section class="ad-slider">
-  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
-  </div>
-  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
-  </div>
-  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
+  <div class="slide">
+    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
 
-  <!-- Noticias sobre el slider -->
+  <div class="slide">
+    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
+    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
+  </div>
 
+  <div class="slide">
+    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
+    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
+  </div>
 
+  <!-- Dots del slider -->
   <div class="ad-dots">
     <div class="ad-dot active" data-index="0"></div>
     <div class="ad-dot" data-index="1"></div>
