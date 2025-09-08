@@ -208,20 +208,25 @@ header {
   z-index: 100; /* asegura que esté por encima de otros elementos */
 }
 
-.ad-slider img {
-  opacity: 0;
+.ad-slider .slide {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  opacity: 0;
   transition: opacity 1s ease;
 }
 
-.ad-slider img.active {
+.ad-slider .slide.active {
   opacity: 1;
   z-index: 1;
+}
+
+.ad-slider .slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .ad-button {
@@ -679,7 +684,7 @@ footer {
 </header>
 
 <section class="ad-slider">
-  <div class="slide">
+  <div class="slide active">
     <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
@@ -694,7 +699,6 @@ footer {
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
 
-  <!-- Dots del slider -->
   <div class="ad-dots">
     <div class="ad-dot active" data-index="0"></div>
     <div class="ad-dot" data-index="1"></div>
@@ -850,45 +854,38 @@ footer {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  let currentAd = 0;
-  const slides = document.querySelectorAll('.ad-slider img');
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.ad-slider .slide');
   const dots = document.querySelectorAll('.ad-dot');
-  
-  if (slides.length === 0) return; // Si no hay imágenes, no hacer nada
 
-  // Inicializar primer slide y dot activos
-  slides[0].classList.add('active');
-  if (dots.length) dots[0].classList.add('active');
+  if(slides.length === 0) return;
 
   // Función para cambiar slide
   function changeSlide(index) {
-    slides[currentAd].classList.remove('active');
-    if (dots.length) dots[currentAd].classList.remove('active');
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
 
-    currentAd = index;
+    currentSlide = index;
 
-    slides[currentAd].classList.add('active');
-    if (dots.length) dots[currentAd].classList.add('active');
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
   }
 
-  // Función siguiente slide
-  function nextSlide() {
-    changeSlide((currentAd + 1) % slides.length);
-  }
-
-  // Intervalo automático
-  let slideInterval = setInterval(nextSlide, 4000);
+  // Siguiente slide automáticamente
+  let slideInterval = setInterval(() => {
+    changeSlide((currentSlide + 1) % slides.length);
+  }, 4000);
 
   // Eventos para los dots
-  if (dots.length) {
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        clearInterval(slideInterval);
-        changeSlide(parseInt(dot.dataset.index));
-        slideInterval = setInterval(nextSlide, 4000);
-      });
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      clearInterval(slideInterval);
+      changeSlide(parseInt(dot.dataset.index));
+      slideInterval = setInterval(() => {
+        changeSlide((currentSlide + 1) % slides.length);
+      }, 4000);
     });
-  }
+  });
 });
 </script>
 
