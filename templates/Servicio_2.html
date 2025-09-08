@@ -1,752 +1,246 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}YourToolQuizz{% endblock %}</title>
+  <title>YourToolQuizz - Servicios</title>
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-  <!-- Fuentes, CSS, favicons, etc -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='Css/main.css') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Fascinate+Inline&family=Monoton&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    /* ============================
-   MAIN SECTION (Servicios)
-   ============================ */
+    /* ------------------ GLOBAL ------------------ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: #f5f7fa;
-      color: #333;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #fff;
+      color: #111;
+      line-height: 1.6;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
     }
-    
-    /* Header Styles */
-    header {
-      background: #ff6f61;
-      color: white;
-      padding: 35px 50px; /* Más alto y con más espacio a los lados */
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    a, button, .quiz-card, .ad-slide, header, footer { transition: all 0.3s ease; }
+
+    /* ------------------ HEADER ------------------ */
+header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 14px 28px;
+      background: #fff;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
       display: flex;
       align-items: center;
       justify-content: center;
+      height: 64px;
       position: relative;
-      z-index: 100;
     }
-    
+
     .logo {
-      font-family: "Fascinate Inline", system-ui;
-      font-weight: 400;
-      font-style: normal;
-      font-size: 2.5rem;
-      letter-spacing: -0.5px;
-      text-transform: none;
-      margin: 0;
-      text-align: center;
-      flex-grow: 1;
-      text-align: center;
-      position: absolute; /* Lo colocamos fijo en el centro */
+      position: absolute;
       left: 50%;
       transform: translateX(-50%);
-    }
-    
-    .logo a {
-      text-decoration: none;
-      color: inherit;
-    }
-    
-    /* Left Navigation with Search */
-    .left-nav {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      position: absolute;
-      left: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    
-    .search-container {
-      display: flex;
-      align-items: center;
-      background: rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 5px 15px;
-      transition: all 0.3s ease;
-    }
-    
-    .search-container:hover {
-      background: rgba(255,255,255,0.3);
-    }
-    
-    .search-input {
-      border: none;
-      background: transparent;
-      color: white;
-      padding: 5px;
-      width: 180px;
-      outline: none;
-    }
-    
-    .search-input::placeholder {
-      color: rgba(255,255,255,0.7);
-    }
-    
-    .search-btn {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      padding: 5px;
-    }
-    
-    /* Mobile Search */
-    .mobile-search-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-      padding: 8px;
-    }
-    
-    .mobile-search-container {
-      display: none;
-      width: 100%;
-      padding: 15px 20px;
-      background: #ff6f61;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      z-index: 99;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    
-    .mobile-search-container.active {
-      display: block;
-    }
-    
-    .mobile-search-input {
-      width: 100%;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 20px;
-    }
-    
-    /* Right Navigation */
-    .right-nav,
-    .menu-toggle {
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    
-    .nav-link {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 10px 20px;
-      border-radius: 4px;
-      transition: background-color 0.3s;
-    }
-    
-    .btn-login {
-      background: white;
-      color: #ff6f61;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 20px;
-      transition: background 0.3s;
-    }
-
-    .btn-login:hover {
-      background: #ff6f61;
-      color: white;
-    }
-    .nav-link:hover {
-      background-color: rgba(255,255,255,0.2);
-    }
-    
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    /* Mobile Menu */
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: #ff6f61;
-      width: 200px;
-      box-shadow: -2px 2px 5px rgba(0,0,0,0.2);
-      z-index: 99;
-    }
-    
-    .mobile-menu.active {
-      display: block;
-    }
-    
-    .mobile-menu ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .mobile-menu li {
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .mobile-menu a {
-      display: block;
-      padding: 12px 20px;
-      color: white;
-      text-decoration: none;
-    }
-    
-    .mobile-menu a:hover {
-      background: rgba(255,255,255,0.1);
-    }
-    
-
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background: #f5f7fa;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-.pricing-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.pricing-header h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-.pricing-header .disclaimer {
-  font-size: 0.9rem;
-  color: #777;
-}
-
-.services {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-  margin: 60px auto;
-  max-width: 1000px;
-  padding: 0 20px;
-}
-
-.service-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 30px 20px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-
-.service-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #111;
-}
-
-.service-card .description {
-  font-size: 0.95rem;
-  color: #555;
-  margin: 10px 0 20px;
-  line-height: 1.6;
-}
-
-.service-card .price {
-  font-size: 1.3rem;
-  font-weight: 500;
-  color: #111;
-  margin: 15px 0;
-}
-
-.service-card .price span {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #E53935; /* Rojo destacado */
-}
-
-.btn-choose {
-  background: #E53935;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease;
-  margin-top: auto;
-}
-
-.btn-choose:hover {
-  background: #C62828;
-}
-
-
-.offer-highlight {
-  margin: 80px auto;
-  max-width: 900px;
-  text-align: center;
-  padding: 0 20px;
-}
-
-.offer-highlight h2 {
-  font-size: 2rem;
-  margin-bottom: 30px;
-  color: #111;
-}
-
-.offer-card {
-  background: linear-gradient(135deg, #E53935, #FF7043); /* Gradiente rojo-naranja */
-  border-radius: 16px;
-  padding: 50px 30px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.offer-content {
-  max-width: 600px;
-}
-
-.offer-content h3 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-.offer-content p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  margin-bottom: 25px;
-}
-
-.offer-price {
-  display: inline-block;
-  font-size: 2rem;
-  font-weight: 700;
-  background: #fff;
-  color: #E53935;
-  padding: 10px 20px;
-  border-radius: 8px;
-  margin-bottom: 25px;
-}
-
-.btn-offer {
-  display: inline-block;
-  padding: 14px 36px;
-  background: #fff;
-  color: #E53935;
-  font-weight: 600;
-  font-size: 1.1rem;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.btn-offer:hover {
-  background: #f5f5f5;
-  transform: translateY(-3px);
-}
-
-
-.comparison {
-  margin: 80px auto;
-  padding: 0 20px;
-  max-width: 1200px;
-}
-
-.comparison h2 {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 30px;
-}
-
-.comparison-table-wrapper {
-  overflow-x: auto; /* Previene que se rompa en pantallas pequeñas */
-}
-
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #fff;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-}
-
-.comparison-table thead {
-  background: #E53935;
-  color: #000000;
-}
-
-.comparison-table th, 
-.comparison-table td {
-  padding: 18px 20px;
-  text-align: center;
-  border-bottom: 1px solid #817f7f;
-  font-size: 0.95rem;
-}
-
-.comparison-table th:first-child,
-.comparison-table td:first-child {
-  text-align: left;
-  font-weight: 600;
-  background: #f9f9f9;
-}
-
-.comparison-table tr:last-child td {
-  border-bottom: none;
-}
-
-
-
-    /* Section Styles */
-    .section {
-      margin-bottom: 40px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      padding: 25px;
-    }
-    
-    .section-title {
       font-size: 1.8rem;
-      color: #ff6f61;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #ff6f61;
-    }
-    footer {
-      background: #2c3e50;
-      color: white;
-      padding: 30px 20px;
-      text-align: center;
-    }
-    
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 30px;
-      text-align: left;
-    }
-    
-    .footer-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 15px;
-      position: relative;
-      padding-bottom: 10px;
-    }
-    
-    .footer-section h3::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 50px;
-      height: 2px;
-      background: #ff6f61;
-    }
-    
-    .footer-section ul {
-      list-style: none;
-      padding: 0;
-    }
-    
-    .footer-section ul li {
-      margin-bottom: 10px;
-    }
-    
-    .footer-section ul li a {
-      color: #ecf0f1;
+      font-weight: 800;
+      color: #9e2121;
       text-decoration: none;
-      transition: color 0.3s;
-    }
-    
-    .footer-section ul li a:hover {
-      color: #ff6f61;
-    }
-    
-    .social-links {
-      display: flex;
-      gap: 15px;
-      margin-top: 15px;
-    }
-    
-    .social-links a {
-      color: white;
-      font-size: 1.5rem;
-      transition: color 0.3s;
-    }
-    
-    .social-links a:hover {
-      color: #ff6f61;
-    }
-    
-    .footer-bottom {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #34495e;
-      font-size: 0.9rem;
-      color: #bdc3c7;
-    }
-    
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-      .logo {
-        font-size: 2rem;
-        position: static;
-        transform: none;
-        text-align: center;
-        margin: 0 auto;
-      }
-      
-      .left-nav {
-        position: static;
-        transform: none;
-      }
-      
-      .search-container {
-        display: none;
-      }
-      
-      .mobile-search-btn {
-        display: block;
-      }
-      
-      .right-nav {
-        display: none;
-      }
-      
-      .menu-toggle {
-        display: block;
-      }
-      
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px 20px;
-      }
-      
-      .left-nav {
-        order: 1;
-        position: static;
-      }
-      
-      .logo {
-        order: 2;
-        position: static;
-        transform: none;
-        flex-grow: 0;
-      }
-      
-      .menu-toggle {
-        order: 3;
-        position: static;
-        transform: none;
-      }
-    
-      .footer-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-        
-       .footer-section h3::after {
-        left: 50%;
-        transform: translateX(-50%);
-      }
-        
-       .social-links {
-        justify-content: center;
-      }
+      line-height: 1;
+      z-index: 1500;
     }
 
+    .logo a { color: inherit; text-decoration: none; }
+
+    /* ------------------ SERVICES (adapted to quiz-card style) ------------------ */
+    .quizzes-wrapper { padding: 80px 24px; max-width: 1200px; margin: 0 auto; text-align: center; background: #fff; }
+    .quizzes-title {
+      font-size: 2.4rem; font-weight: 800; color: #000; margin-bottom: 50px; position: relative;
+    }
+    .quizzes-title::after {
+      content: ""; display: block; width: 60px; height: 4px; background: #D60000; margin: 12px auto 0; border-radius: 2px;
+    }
+    .quizzes-section {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 36px;
+    }
+    .quiz-card {
+      background: #fff; padding: 36px 24px; border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      display: flex; flex-direction: column; align-items: center;
+      transform: scale(0.98); opacity: 0; animation: quizFadeIn 0.8s ease forwards;
+    }
+    .quiz-card:hover { transform: scale(1.03); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+    .quiz-card h3 { font-size: 1.2rem; font-weight: 700; color: #000; margin-bottom: 10px; }
+    .quiz-card p { font-size: 0.95rem; color: #333; margin-bottom: 20px; text-align: center; }
+    .quiz-btn, .btn-choose { padding: 10px 22px; border-radius: 8px; background: #D60000; color: #fff; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; }
+    .quiz-btn:hover, .btn-choose:hover { background: #ff1a1a; transform: scale(1.05); }
+
+    @keyframes quizFadeIn { to { opacity: 1; transform: scale(1); } }
+
+    /* ------------------ OFFER ------------------ */
+    .offer-highlight { margin: 80px auto; max-width: 900px; text-align: center; padding: 0 20px; }
+    .offer-card {
+      background: linear-gradient(90deg,#000,#D60000); border-radius: 16px; padding: 50px 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: #fff; display: flex; justify-content: center; align-items: center;
+    }
+    .offer-content { max-width: 600px; }
+    .offer-content h3 { font-size: 2rem; margin-bottom: 15px; font-weight: 700; }
+    .offer-content p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; }
+    .offer-price { display: inline-block; font-size: 2rem; font-weight: 700; background: #fff; color: #D60000; padding: 10px 20px; border-radius: 8px; margin-bottom: 25px; }
+    .btn-offer { display: inline-block; padding: 14px 36px; background: #fff; color: #D60000; font-weight: 600; font-size: 1.1rem; border-radius: 10px; border: none; cursor: pointer; }
+    .btn-offer:hover { background: #f5f5f5; transform: scale(1.05); }
+
+    /* ------------------ COMPARISON ------------------ */
+    .comparison { margin: 80px auto; padding: 0 20px; max-width: 1200px; }
+    .comparison h2 { text-align: center; font-size: 2rem; margin-bottom: 30px; }
+    .comparison-table-wrapper { overflow-x: auto; }
+    .comparison-table {
+      width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;
+      background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+    .comparison-table thead { background: #D60000; color: #fff; }
+    .comparison-table th, .comparison-table td { padding: 18px 20px; text-align: center; border-bottom: 1px solid #817f7f; font-size: 0.95rem; }
+    .comparison-table th:first-child, .comparison-table td:first-child { text-align: left; font-weight: 600; background: #f9f9f9; }
+    .comparison-table tr:last-child td { border-bottom: none; }
+
+    /* ------------------ FOOTER ------------------ */
+    footer { background: #ffffff; color: #000000; padding: 60px 24px 20px; font-size: 0.95rem; border-top: 4px solid #242424; }
+    .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; }
+    .footer-section h3 { font-size: 1.2rem; margin-bottom: 20px; position: relative; color: #000000; }
+    .footer-section h3::after { content: ""; display: block; width: 40px; height: 3px; background: #D60000; margin-top: 6px; border-radius: 2px; }
+    .footer-section ul { list-style: none; }
+    .footer-section ul li { margin-bottom: 12px; }
+    .footer-section ul li a { color: #000000; text-decoration: none; transition: color 0.3s ease; }
+    .footer-section ul li a:hover { color: #D60000; }
+    .social-links { display: flex; gap: 12px; }
+    .social-links a { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #000000; font-size: 1.2rem; transition: background 0.3s ease, transform 0.3s ease; }
+    .social-links a:hover { background: #D60000; transform: scale(1.1); }
+    .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; font-size: 0.85rem; color: #000000; }
+
+    @media (max-width: 768px) {
+      .logo { position: static; transform: none; margin: 0 auto; }
+      header { justify-content: space-between; }
+    }
   </style>
 </head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-R9HVBYS6QM"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-R9HVBYS6QM');
-</script>
 <body>
 
-  <!-- Barra de navegación -->
+  <!-- HEADER -->
   <header>
-   
-     <div class="left-nav">
-      <!-- Desktop Search -->
+    <div class="left-nav">
       <form class="search-container" method="GET" action="/buscar">
         <input type="text" name="q" class="search-input" placeholder="Buscar...">
-        <button type="submit" class="search-btn">
-          <i class="fas fa-search"></i>
-        </button>
+        <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
       </form>
-
-      <!-- Mobile Search Button -->
-      <button class="mobile-search-btn" id="mobileSearchBtn">
-        <i class="fas fa-search"></i>
-      </button>
     </div>
-    
+
     <div class="logo">
       <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
     </div>
-    
-    
   </header>
-</body>
-<main>
 
-  <main class="pricing-page">
+  <!-- MAIN -->
+  <main class="quizzes-wrapper">
 
-  <!-- Título y disclaimer -->
-  <section class="pricing-header">
-    <h1>Nuestros Servicios</h1>
-    <p class="disclaimer">*Los precios pueden variar según el tráfico en la web</p>
-  </section>
-
-  <!-- 3 servicios principales -->
-<section class="services">
-  <div class="service-card">
-    <h3>Banners Publicitarios</h3>
-    <p class="description">Promociona tu marca con anuncios visibles en nuestra web.</p>
-    <p class="price"><span>50€</span>/mes</p>
-    <button class="btn-choose">Elegir</button>
-  </div>
-  <div class="service-card">
-    <h3>Blogs</h3>
-    <p class="description">Contenido optimizado para SEO con alcance a tu público.</p>
-    <p class="price"><span>100€</span>/mes</p>
-    <button class="btn-choose">Elegir</button>
-  </div>
-  <div class="service-card">
-    <h3>Quizzes</h3>
-    <p class="description">Interacción directa con los usuarios para captar leads.</p>
-    <p class="price"><span>200€</span>/mes</p>
-    <button class="btn-choose">Elegir</button>
-  </div>
-</section>
-
-  <!-- Ofertas combinadas -->
- <section class="offer-highlight">
-  <h2>Oferta Especial</h2>
-  <div class="offer-card">
-    <div class="offer-content">
-      <h3>Banner + Quiz</h3>
-      <p>
-        Combina la visibilidad de los banners con la interacción directa de los quizzes. 
-        Perfecto para aumentar tu alcance y captar clientes potenciales de forma rápida.
-      </p>
-      <span class="offer-price">220€</span>
-      <button class="btn-offer">Aprovechar Oferta</button>
+    <h2 class="quizzes-title">Nuestros Servicios</h2>
+    <div class="quizzes-section">
+      <div class="quiz-card">
+        <h3>Banners Publicitarios</h3>
+        <p>Promociona tu marca con anuncios visibles en nuestra web.</p>
+        <p class="price"><span>10€-30€</span></p>
+        <button class="btn-choose">Elegir</button>
+      </div>
+      <div class="quiz-card">
+        <h3>Blogs</h3>
+        <p>Contenido optimizado para SEO con alcance a tu público.</p>
+        <p class="price"><span>30€-60€</span>/mes</p>
+        <button class="btn-choose">Elegir</button>
+      </div>
+      <div class="quiz-card">
+        <h3>Quizzes</h3>
+        <p>Interacción directa con los usuarios para captar leads.</p>
+        <p class="price"><span>50€-100€</span>/mes</p>
+        <button class="btn-choose">Elegir</button>
+      </div>
     </div>
-  </div>
-</section>
 
-  <!-- Tabla comparativa -->
-<section class="comparison">
-  <h2>Comparación de Servicios</h2>
-  <div class="comparison-table-wrapper">
-    <table class="comparison-table">
-      <thead>
-        <tr>
-          <th>CARACTERÍSTICAS</th>
-          <th>BANNERS</th>
-          <th>BLOGS</th>
-          <th>QUIZZES</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Público Objetivo</td>
-          <td>Usuarios generales</td>
-          <td>Usuarios interesados en contenido</td>
-          <td>Usuarios interactivos / leads cualificados</td>
-        </tr>
-        <tr>
-          <td>CTR (Rate de Click)</td>
-          <td>~2-5%</td>
-          <td>~5%</td>
-          <td>15-35%</td>
-        </tr>
-        <tr>
-          <td>Duración Recomendada</td>
-          <td>Corto plazo (días)</td>
-          <td>Medio plazo (semanas)</td>
-          <td>Largo plazo (campañas continuas)</td>
-        </tr>
-        <tr>
-          <td>Nivel de Engagement</td>
-          <td>Bajo</td>
-          <td>Medio</td>
-          <td>Alto</td>
-        </tr>
-        <tr>
-          <td>Flexibilidad en Diseño</td>
-          <td>Limitada</td>
-          <td>Media</td>
-          <td>Alta</td>
-        </tr>
-        <tr>
-          <td>Dificultad de Implementación</td>
-          <td>Fácil</td>
-          <td>Media</td>
-          <td>Alta</td>
-        </tr>
-        <tr>
-          <td>Precio</td>
-          <td>50€</td>
-          <td>100€</td>
-          <td>200€</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-</main>
+    <!-- Oferta -->
+    <section class="offer-highlight">
+      <h2>Oferta Especial</h2>
+      <div class="offer-card">
+        <div class="offer-content">
+          <h3>Banner + Quiz</h3>
+          <p>Combina la visibilidad de los banners con la interacción directa de los quizzes. Perfecto para aumentar tu alcance y captar clientes potenciales de forma rápida.</p>
+          <span class="offer-price">220€</span>
+          <button class="btn-offer">Aprovechar Oferta</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparación -->
+    <section class="comparison">
+      <h2>Comparación de Servicios</h2>
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>CARACTERÍSTICAS</th>
+              <th>BANNERS</th>
+              <th>BLOGS</th>
+              <th>QUIZZES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Público Objetivo</td>
+              <td>Usuarios generales</td>
+              <td>Usuarios interesados en contenido</td>
+              <td>Usuarios interactivos / leads cualificados</td>
+            </tr>
+            <tr>
+              <td>CTR (Rate de Click)</td>
+              <td>~2-5%</td>
+              <td>~5%</td>
+              <td>15-35%</td>
+            </tr>
+            <tr>
+              <td>Duración Recomendada</td>
+              <td>Corto plazo (días)</td>
+              <td>Medio plazo (semanas)</td>
+              <td>Largo plazo (campañas continuas)</td>
+            </tr>
+            <tr>
+              <td>Nivel de Engagement</td>
+              <td>Bajo</td>
+              <td>Medio</td>
+              <td>Alto</td>
+            </tr>
+            <tr>
+              <td>Flexibilidad en Diseño</td>
+              <td>Limitada</td>
+              <td>Media</td>
+              <td>Alta</td>
+            </tr>
+            <tr>
+              <td>Dificultad de Implementación</td>
+              <td>Fácil</td>
+              <td>Media</td>
+              <td>Alta</td>
+            </tr>
+            <tr>
+              <td>Precio</td>
+              <td>50€</td>
+              <td>100€</td>
+              <td>200€</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
   <footer>
     <div class="footer-content">
       <div class="footer-section">
@@ -759,7 +253,6 @@ body {
           <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
         </ul>
       </div>
-      
       <div class="footer-section">
         <h3>Quizzes</h3>
         <ul>
@@ -771,7 +264,6 @@ body {
           <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
         </ul>
       </div>
-      
       <div class="footer-section">
         <h3>Contacto</h3>
         <ul>
@@ -779,7 +271,6 @@ body {
           <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
         </ul>
       </div>
-      
       <div class="footer-section">
         <h3>Síguenos</h3>
         <div class="social-links">
@@ -790,17 +281,10 @@ body {
         </div>
       </div>
     </div>
-    
     <div class="footer-bottom">
-      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
+      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
     </div>
   </footer>
-
-
-
-
-
-
 
 </body>
 </html>
