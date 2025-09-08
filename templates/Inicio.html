@@ -606,8 +606,9 @@ footer {
       <!-- dropdown -->
       <nav id="main-menu" class="dropdown" role="menu" aria-hidden="true">
         <a role="menuitem" href="{{ url_for('about') }}">Acerca</a>
-        <a role="menuitem" href="{{ url_for('blog') }}">Blog</a>
+        <a role="menuitem" href="{{ url_for('legal') }}">Blog</a>
         <a role="menuitem" href="{{ url_for('contact') }}">Ayuda</a>
+        <a role="menuitem" href="{{ url_for('Servicio_1') }}">Nuestros servicios</a>
       </nav>
     </div>
   </div>
@@ -637,13 +638,13 @@ footer {
 </header>
 
 <section class="ad-slider">
-  <div class="ad-slide active" style="background-image: url('descarga.jpeg');">
+  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
-  <div class="ad-slide" style="background-image: url('descarga (1).jpeg');">
+  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
-  <div class="ad-slide" style="background-image: url('images.jpeg');">
+  <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
   </div>
 
