@@ -205,23 +205,21 @@ header {
   background: linear-gradient(90deg, #000, #D60000);
 }
 
-.ad-slide {
-  min-width: 100%;
-  height: 400px;
-  background-size: cover;
-  background-position: center;
+.ad-slider img {
+  opacity: 0;
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0;
-  transform: scale(1.05);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 1s ease;
 }
 
-.ad-slide.active {
+.ad-slider img.active {
   opacity: 1;
-  transform: scale(1);
-  transition: transform 1s ease, opacity 1s ease;
 }
+
 
 .ad-button {
   position: absolute;
@@ -804,18 +802,18 @@ footer {
 </footer>
 
 
-  <script>
-    let currentAd = 0;
-    const slides = document.querySelectorAll('.ad-slide');
-    const dots = document.querySelectorAll('.ad-dot');
-    let slideInterval = setInterval(nextSlide, 4000);
+<script>
+let currentAd = 0;
+const slides = document.querySelectorAll('.ad-slider img'); // ahora selecciona imágenes
+const dots = document.querySelectorAll('.ad-dot');
+let slideInterval = setInterval(nextSlide, 4000);
 
-    function nextSlide() {
-      changeSlide((currentAd + 1) % slides.length);
-    }
+function nextSlide() {
+  changeSlide((currentAd + 1) % slides.length);
+}
 
 function changeSlide(index) {
-  if(slides.length === 0) return; // evita errores si no hay slides
+  if (slides.length === 0) return; // evita errores si no hay slides
   slides[currentAd].classList.remove('active');
   dots[currentAd].classList.remove('active');
   currentAd = index;
@@ -823,15 +821,14 @@ function changeSlide(index) {
   dots[currentAd].classList.add('active');
 }
 
+dots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    clearInterval(slideInterval);
+    changeSlide(parseInt(dot.dataset.index));
+    slideInterval = setInterval(nextSlide, 4000);
+  });
+});
+</script>
 
-    dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        clearInterval(slideInterval);
-        changeSlide(parseInt(dot.dataset.index));
-        slideInterval = setInterval(nextSlide, 4000);
-      });
-    });
-  </script>
 </body>
 </html>
-
