@@ -1,231 +1,222 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard | YourToolQuizz</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - YourToolQuizz</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* ------------------ GLOBAL ------------------ */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { background: #f5f6fa; color: #333; min-height: 100vh; line-height: 1.6; }
+a, button { transition: all 0.3s ease; text-decoration: none; color: inherit; }
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #fff;
-      color: #111;
-      line-height: 1.6;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    a, button, header, footer { transition: all 0.3s ease; }
-
-    /* ------------------ HEADER ------------------ */
+/* ------------------ HEADER ------------------ */
 header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 14px 28px;
-      background: #fff;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 64px;
-      position: relative;
-    }
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 14px 28px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  position: relative;
+}
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #9e2121;
+  text-decoration: none;
+  line-height: 1;
+  z-index: 1500;
+}
+.logo a { color: inherit; text-decoration: none; }
 
-    .logo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #9e2121;
-      text-decoration: none;
-      line-height: 1;
-      z-index: 1500;
-    }
+/* ------------------ MAIN ------------------ */
+main {
+  flex: 1;
+  width: 100%;
+  padding: 80px 60px; /* márgenes internos para comodidad */
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.container { display: flex; flex-direction: column; gap: 30px; }
 
-    .logo a { color: inherit; text-decoration: none; }
+/* ------------------ SALUDO ------------------ */
+.greeting-card { background:#fff; padding:24px; border-radius:20px; box-shadow:0 8px 24px rgba(0,0,0,0.06); }
+.greeting { font-size:1.8rem; font-weight:700; color:#000; margin-bottom:12px; }
 
-    /* ------------------ MAIN / DASHBOARD ------------------ */
-    main {
-      flex: 1;
-      padding: 80px 24px;
-      max-width: 800px;
-      margin: 0 auto;
-      text-align: center;
-      background: #fff;
-    }
-    .dashboard h2 {
-      font-size: 2.4rem;
-      font-weight: 800;
-      color: #000;
-      margin-bottom: 20px;
-    }
-    .dashboard p {
-      font-size: 1rem;
-      color: #333;
-      margin-bottom: 40px;
-    }
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-    .action-btn {
-      padding: 10px 22px;
-      border-radius: 8px;
-      background: #D60000;
-      color: #fff;
-      font-weight: 600;
-      text-decoration: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .action-btn:hover { background: #ff1a1a; transform: scale(1.05); }
+/* ------------------ GRID ------------------ */
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:24px; width:100%; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:24px; width:100%; }
 
-    /* ------------------ FOOTER ------------------ */
-    footer {
-      background: #ffffff;
-      color: #000000;
-      padding: 60px 24px 20px;
-      font-size: 0.95rem;
-      border-top: 4px solid #242424;
-    }
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 40px;
-    }
-    .footer-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
-      position: relative;
-      color: #000000;
-    }
-    .footer-section h3::after {
-      content: "";
-      display: block;
-      width: 40px;
-      height: 3px;
-      background: #D60000;
-      margin-top: 6px;
-      border-radius: 2px;
-    }
-    .footer-section ul { list-style: none; }
-    .footer-section ul li { margin-bottom: 12px; }
-    .footer-section ul li a {
-      color: #000000;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-    .footer-section ul li a:hover { color: #D60000; }
-    .social-links { display: flex; gap: 12px; margin-top: 15px; }
-    .social-links a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      color: #000000;
-      font-size: 1.2rem;
-      transition: background 0.3s ease, transform 0.3s ease;
-    }
-    .social-links a:hover { background: #D60000; transform: scale(1.1); }
-    .footer-bottom {
-      text-align: center;
-      padding-top: 30px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      margin-top: 40px;
-      font-size: 0.85rem;
-      color: #000000;
-    }
+/* ------------------ CARDS ------------------ */
+.card { background: #fff; padding: 24px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); transition: transform 0.3s, box-shadow 0.3s; }
+.card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      main { padding: 40px 20px; margin: 20px; }
-      .dashboard h2 { font-size: 2rem; }
-      .dashboard p { font-size: 0.95rem; }
-      .action-buttons { flex-direction: column; gap: 15px; }
-      .footer-content { grid-template-columns: 1fr; text-align: center; }
-      .footer-section h3::after { left: 50%; transform: translateX(-50%); }
-      .social-links { justify-content: center; }
-    }
-  </style>
+/* ------------------ INFO USUARIO ------------------ */
+.user-info h2, .contract-info h2 { font-size:1.4rem; font-weight:700; color:#000; margin-bottom:16px; }
+.user-info label { font-weight: 600; display:block; margin-bottom:6px; color:#000; }
+.user-info input { width:100%; padding:14px; margin-bottom:16px; border:1px solid #ddd; border-radius:12px; font-size:1rem; background:#f9f9f9; }
+
+/* ------------------ INFO CONTRATO ------------------ */
+.contract-info p { margin-bottom:10px; font-size:0.95rem; color:#000; }
+.contract-info span { font-weight:600; color:#D60000; }
+
+/* ------------------ QUIZZES ------------------ */
+.quizzes-title { font-size:2.4rem; font-weight:800; margin-bottom:32px; text-align:center; color:#000; }
+.quizzes-title::after { content:""; display:block; width:60px; height:4px; background:#D60000; margin:12px auto 0; border-radius:2px; }
+
+.quiz-card { display:flex; flex-direction:column; background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.06); overflow:hidden; cursor:pointer; transition: transform 0.3s, box-shadow 0.3s; }
+.quiz-card:hover { transform: translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.12); }
+.quiz-card img { width:100%; height:160px; object-fit:cover; }
+.quiz-card .quiz-content { padding:16px; text-align:center; }
+.quiz-card .quiz-content h3 { margin-bottom:8px; color:#000; font-size:1.2rem; }
+.quiz-card .quiz-content p { font-size:0.95rem; color:#333; }
+
+/* ------------------ FOOTER ------------------ */
+footer {
+  background: #ffffff;
+  color: #000000;
+  padding: 60px 60px 20px;
+  font-size: 0.95rem;
+  border-top: 4px solid #242424;
+}
+.footer-content { max-width: 100%; margin:0 auto; display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:40px; }
+.footer-section h3 { font-size:1.2rem; margin-bottom:20px; position:relative; color:#000; }
+.footer-section h3::after { content:""; display:block; width:40px; height:3px; background:#D60000; margin-top:6px; border-radius:2px; }
+.footer-section ul { list-style:none; }
+.footer-section ul li { margin-bottom:12px; }
+.footer-section ul li a { color:#000; text-decoration:none; transition:color 0.3s; }
+.footer-section ul li a:hover { color:#D60000; }
+.social-links { display:flex; gap:12px; }
+.social-links a { display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background: rgba(255,255,255,0.1); color:#000; font-size:1.2rem; transition: background 0.3s, transform 0.3s; }
+.social-links a:hover { background:#D60000; transform:scale(1.1); color:#fff; }
+.footer-bottom { text-align:center; padding-top:30px; border-top:1px solid rgba(255,255,255,0.1); margin-top:40px; font-size:0.85rem; color:#000; }
+
+/* ------------------ RESPONSIVE ------------------ */
+@media(max-width:768px) {
+  main { padding:80px 24px; }
+  .grid-2, .grid-3 { grid-template-columns:1fr; }
+  .footer-content { grid-template-columns:1fr; text-align:center; }
+  .footer-section h3::after { left:50%; transform:translateX(-50%); }
+  .social-links { justify-content:center; }
+}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">
-      <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
-    </div>
-  </header>
+<header>
+  <div class="logo"><a href="#">YourToolQuizz</a></div>
+</header>
 
-  <main>
-    <section class="dashboard">
-      <h2>Bienvenido, {{ email }} 🎉</h2>
-      <p>Has iniciado sesión de forma exitosa.</p>
+<main class="container">
 
-      <div class="action-buttons">
-        <a href="{{ url_for('homepage') }}" class="action-btn"><i class="fas fa-home"></i> Ir al inicio</a>
-        <a href="{{ url_for('blog') }}" class="action-btn"><i class="fas fa-book"></i> Leer blogs</a>
-      </div>
-    </section>
-  </main>
+  <!-- SALUDO -->
+  <div class="card greeting-card">
+    <div class="greeting">¡Hola, Juan!</div>
+    <p>Bienvenido a tu dashboard de YourToolQuizz. Explora tu información y los quizzes recomendados para ti.</p>
+  </div>
 
-  <footer>
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Navegación</h3>
-        <ul>
-          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-          <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h3>Quizzes</h3>
-        <ul>
-          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
-          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
-          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
-          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
-          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
-          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h3>Contacto</h3>
-        <ul>
-          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
-          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-section">
-        <h3>Síguenos</h3>
-        <div class="social-links">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-        </div>
-      </div>
+  <!-- INFO USUARIO y CONTRATO -->
+  <div class="grid-2">
+    <!-- INFO USUARIO -->
+    <div class="card user-info">
+      <h2>Tu información</h2>
+      <label for="name">Nombre</label>
+      <input type="text" id="name" value="Juan Pérez" readonly>
+      <label for="email">Email</label>
+      <input type="email" id="email" value="juan@example.com" readonly>
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" value="12345678" readonly>
     </div>
 
-    <div class="footer-bottom">
-      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+    <!-- INFO CONTRATO -->
+    <div class="card contract-info">
+      <h2>Información de tu contrato</h2>
+      <p><span>Número de contrato:</span> 0012345</p>
+      <p><span>Tipo de plan:</span> Premium</p>
+      <p><span>Fecha de inicio:</span> 01/06/2025</p>
+      <p><span>Fecha de fin:</span> 31/12/2025</p>
+      <p><span>Estado:</span> Activo</p>
     </div>
-  </footer>
+  </div>
+
+  <!-- QUIZZES RECOMENDADOS -->
+  <h2 class="quizzes-title">Quizzes que te pueden interesar</h2>
+  <div class="grid-3">
+    <div class="quiz-card">
+      <img src="https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg" alt="Marketing">
+      <div class="quiz-content">
+        <h3>Quiz de Marketing</h3>
+        <p>Aprende cómo promocionar tu marca y atraer más clientes con este quiz interactivo.</p>
+      </div>
+    </div>
+    <div class="quiz-card">
+      <img src="https://images.unsplash.com/photo-1581091215368-3c33f6b6d1dc" alt="Tecnología">
+      <div class="quiz-content">
+        <h3>Quiz de Tecnología</h3>
+        <p>Explora nuevas herramientas y tendencias tecnológicas para potenciar tu negocio.</p>
+      </div>
+    </div>
+    <div class="quiz-card">
+      <img src="https://images.unsplash.com/photo-1588776814546-63fdd1dbf880" alt="Salud">
+      <div class="quiz-content">
+        <h3>Quiz de Salud</h3>
+        <p>Descubre cómo mantener un estilo de vida saludable mientras gestionas tu empresa.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Navegación</h3>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Sobre Nosotros</a></li>
+        <li><a href="#">Aviso legal</a></li>
+        <li><a href="#">Contáctanos</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Quizzes</h3>
+      <ul>
+        <li><a href="#">Herramientas para diseño</a></li>
+        <li><a href="#">Herramientas para IA</a></li>
+        <li><a href="#">Herramientas para productividad</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Contacto</h3>
+      <ul>
+        <li><a href="mailto:info@yourtoolquizz.site">info@yourtoolquizz.site</a></li>
+        <li><a href="#">Teléfono: +34 651 83 06 95</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Síguenos</h3>
+      <div class="social-links">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 YourToolQuizz. Todos los derechos reservados.</div>
+</footer>
 
 </body>
 </html>
