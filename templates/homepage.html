@@ -1,887 +1,295 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YourToolQuizz</title>
   <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: #fff;
-  color: #111;
-  line-height: 1.6;
-}
-
-a, button, .quiz-card, .ad-slide, header, footer {
-  transition: all 0.3s ease;
-}
-
-/* ------------------ HEADER ------------------ */
-/* ------------------ HEADER ------------------ */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  padding: 14px 28px;
-  background: #fff;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  /* relative para que .logo absoluto se centre */
-  position: relative;
-}
-
-/* Left area (menu) */
-.left-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Botón del menú (hamburguesa) */
-.menu {
-  position: relative;
-  display: inline-block;
-  font-size: 1.2rem;
-}
-
-.menu-btn {
-  appearance: none;
-  -webkit-appearance: none;
-  border: none;
-  background: transparent;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  color: #111;
-}
-.menu-btn:hover,
-.menu-btn:focus {
-  background: rgba(0,0,0,0.04);
-  outline: none;
-}
-
-/* Dropdown: oculto por defecto, aparece con :hover o :focus-within */
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  min-width: 220px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  padding: 8px 0;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
-  z-index: 2000;
-}
-
-/* Mostrar dropdown si hover o focus-within (teclado) */
-.menu:hover .dropdown,
-.menu:focus-within .dropdown,
-.dropdown:hover {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* Links del dropdown */
-.dropdown a {
-  display: block;
-  padding: 10px 16px;
-  color: #111;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-.dropdown a:hover,
-.dropdown a:focus {
-  background: #f6f6f6;
-  color: #D60000;
-  outline: none;
-}
-
-/* ---------------- LOGO CENTRADO ---------------- */
-.logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #9e2121;
-  text-decoration: none;
-  line-height: 1;
-  z-index: 1500; /* encima de otras cosas */
-}
-.logo a { color: inherit; text-decoration: none; }
-
-/* ---------------- RIGHT NAV (search + auth) ---------------- */
-.right-nav {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* Buscador minimalista (sin icon font) */
-.search-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f5f5f5;
-  padding: 6px 10px;
-  border-radius: 10px;
-  min-width: 160px;
-}
-
-.search-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 0.95rem;
-  color: #111;
-  width: 120px;
-}
-
-/* Botón con SVG minimalista negro */
-.search-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-.search-btn svg { width: 18px; height: 18px; fill: #111; }
-
-/* Botones de login/logout */
-.nav-auth {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.btn-login, .btn-logout {
-  padding: 6px 12px;
-  background: #D60000;
-  color: #fff;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-.btn-login:hover, .btn-logout:hover {
-  background: #ff1a1a;
-}
-
-/* pequeño ajuste responsive */
-@media (max-width: 720px) {
-  .logo { position: static; transform: none; margin: 0 auto; }
-  header { justify-content: space-between; }
-}
-.ad-slider {
-  position: relative;
-  overflow: hidden;
-  min-height: 400px; /* altura mínima para que siempre se vea */
-  max-height: 600px;
-  width: 100%;
-  margin: 0 auto;
-  background: linear-gradient(90deg, #000, #D60000);
-  z-index: 100;
-}
-
-/* Aseguramos que las imágenes llenen el slider */
-.ad-slider .slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* Fuerza visibilidad de la slide activa */
-.ad-slider .slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 1s ease;
-  z-index: 1;
-}
-
-.ad-slider .slide.active {
-  opacity: 1;
-  z-index: 2;
-}
-
-/* ------------------ RESPONSIVE ------------------ */
-@media (max-width: 768px) {
-  .ad-slider {
-    min-height: 250px; /* slider más pequeño en móvil */
-  }
-  .ad-button {
-    padding: 8px 20px;
-    font-size: 0.9rem;
-    bottom: 50px;
-  }
-  .ad-dots {
-    bottom: 30px;
-  }
-}
-/* ------------------ QUIZZES ------------------ */
-.quizzes-wrapper {
-  padding: 80px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  text-align: center;
-  background: #fff;
-}
-
-.quizzes-title {
-  font-size: 2.4rem;
-  font-weight: 800;
-  color: #000;
-  margin-bottom: 50px;
-  position: relative;
-}
-
-.quizzes-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 4px;
-  background: #D60000;
-  margin: 12px auto 0;
-  border-radius: 2px;
-}
-
-.quizzes-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 36px;
-}
-
-.quiz-card {
-  background: #fff;
-  padding: 36px 24px;
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: scale(0.98);
-  opacity: 0;
-  animation: quizFadeIn 0.8s ease forwards;
-  animation-delay: calc(var(--i, 0) * 0.1s);
-}
-
-.quiz-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-}
-
-.quiz-icon {
-  font-size: 2rem;
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background: #D60000;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.quiz-card h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.quiz-card p {
-  font-size: 0.95rem;
-  color: #333;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.quiz-btn {
-  padding: 10px 22px;
-  border-radius: 8px;
-  background: #D60000;
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.quiz-btn:hover {
-  background: #ff1a1a;
-  transform: scale(1.05);
-}
-
-@keyframes quizFadeIn {
-  to { opacity: 1; transform: scale(1); }
-}
-
-/* ------------------ BLOG ------------------ */
-.blog-section {
-  padding: 80px 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  text-align: center;
-  background: #fff;
-}
-
-.blog-title {
-  font-size: 2.4rem;
-  font-weight: 800;
-  color: #000;
-  margin-bottom: 50px;
-  position: relative;
-}
-
-.blog-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 4px;
-  background: #D60000;
-  margin: 12px auto 0;
-  border-radius: 2px;
-}
-
-.blog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 36px;
-}
-
-.blog-card {
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  text-align: left;
-  transform: scale(0.98);
-  opacity: 0;
-  animation: blogFadeIn 0.8s ease forwards;
-  animation-delay: calc(var(--i, 0) * 0.1s);
-}
-
-.blog-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
-}
-
-.blog-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-}
-
-.blog-content {
-  padding: 20px;
-}
-
-.blog-meta {
-  font-size: 0.85rem;
-  color: #666;
-  margin-bottom: 10px;
-}
-
-.blog-card h4 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.blog-card p {
-  font-size: 0.95rem;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-.blog-btn {
-  padding: 8px 18px;
-  border-radius: 8px;
-  background: #D60000;
-  color: #fff;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  align-self: flex-start;
-}
-
-.blog-btn:hover {
-  background: #ff1a1a;
-  transform: scale(1.05);
-}
-
-@keyframes blogFadeIn {
-  to { opacity: 1; transform: scale(1); }
-}
-
-
-/* ------------------ FOOTER ------------------ */
-/* ------------------ FOOTER ------------------ */
-footer {
-  background: #ffffff;
-  color: #000000;
-  padding: 60px 24px 20px;
-  font-size: 0.95rem;
-  border-top: 4px solid #242424; /* Línea roja principal */
-  box-shadow:  1px solid rgba(78, 78, 78, 0.1); /* Línea sutil gris */
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
-}
-
-.footer-section h3 {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  position: relative;
-  color: #000000;
-}
-
-.footer-section h3::after {
-  content: "";
-  display: block;
-  width: 40px;
-  height: 3px;
-  background: #D60000;
-  margin-top: 6px;
-  border-radius: 2px;
-}
-
-.footer-section ul {
-  list-style: none;
-}
-
-.footer-section ul li {
-  margin-bottom: 12px;
-}
-
-.footer-section ul li a {
-  color: #000000;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-section ul li a:hover {
-  color: #D60000;
-}
-
-.social-links {
-  display: flex;
-  gap: 12px;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: #000000;
-  font-size: 1.2rem;
-  transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.social-links a:hover {
-  background: #D60000;
-  transform: scale(1.1);
-}
-
-.footer-bottom {
-  text-align: center;
-  padding-top: 30px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: 40px;
-  font-size: 0.85rem;
-  color: #000000;
-}
-
-/* Tablets: 721px a 1024px */
-/* Tablets: 721px a 1024px */
-@media (max-width: 1024px) and (min-width: 721px) {
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    height: 60px;
-    position: relative;
-  }
-
-  /* Logo centrado */
-  .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.6rem;
-  }
-
-  /* Movemos la búsqueda al lado del menú */
-  .left-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .search-container {
-    order: 1; /* junto al menú */
-    background: transparent;
-    padding: 0;
-  }
-
-  .search-input {
-    display: none; /* ocultamos input */
-  }
-
-  .search-btn {
-    padding: 6px;
-    background: #f5f5f5;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .right-nav {
-    gap: 10px;
-  }
-}
-
-/* Mobile: hasta 720px */
-@media (max-width: 720px) {
-  header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 8px 16px;
-    height: 56px;
-    position: relative;
-  }
-
-  .logo {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
-  }
-
-  .left-nav {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Buscador junto al menú */
-  .search-container {
-    order: 1;
-    background: transparent;
-    padding: 0;
-  }
-
-  .search-input {
-    display: none;
-  }
-
-  .search-btn {
-    padding: 6px;
-    background: #f5f5f5;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .right-nav {
-    margin-left: auto; /* empuja los botones de login/logout a la derecha */
-    gap: 6px;
-  }
-}
-
+    /* ---------------- RESET ---------------- */
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; line-height:1.6; color:#111; background:#fff; }
+
+    a { text-decoration: none; color: inherit; transition: 0.3s ease; }
+    button { cursor: pointer; transition: 0.3s ease; }
+
+    /* ---------------- HEADER ---------------- */
+    header {
+      position: sticky; top:0; z-index:1000;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 24px; background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+    }
+    .logo { position:absolute; left:50%; transform:translateX(-50%); font-weight:800; font-size:1.8rem; color:#9e2121; }
+    .left-nav, .right-nav { display:flex; align-items:center; gap:12px; }
+    .menu-btn { font-size:1.4rem; background:none; border:none; }
+    .dropdown {
+      position:absolute; top:100%; left:0; background:#fff; border-radius:10px;
+      box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:8px 0; opacity:0; transform:translateY(-6px); pointer-events:none;
+      transition:0.2s ease; z-index:2000;
+    }
+    .menu:hover .dropdown, .menu:focus-within .dropdown { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .dropdown a { display:block; padding:10px 16px; color:#111; }
+    .dropdown a:hover { background:#f6f6f6; color:#D60000; }
+
+    /* ---------------- SEARCH & AUTH ---------------- */
+    .search-container { display:flex; align-items:center; background:#f5f5f5; padding:6px 10px; border-radius:10px; }
+    .search-input { border:none; background:transparent; outline:none; width:120px; }
+    .search-btn { border:none; background:none; display:flex; align-items:center; justify-content:center; }
+    .nav-auth a { padding:6px 12px; background:#D60000; color:#fff; border-radius:8px; font-weight:600; }
+    .nav-auth a:hover { background:#ff1a1a; }
+
+    /* ---------------- SLIDER ---------------- */
+    .ad-slider {
+      position: relative; overflow:hidden;
+      min-height:400px; max-height:600px; width:100%;
+      margin:20px auto; border-radius:12px;
+    }
+    .ad-slider .slide {
+      position:absolute; top:0; left:0; width:100%; height:100%;
+      opacity:0; transition:opacity 1s ease; z-index:1;
+    }
+    .ad-slider .slide.active { opacity:1; z-index:2; }
+    .ad-slider img { width:100%; height:100%; object-fit:cover; display:block; border-radius:12px; }
+    .ad-button {
+      position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+      background:#D60000; color:#fff; padding:12px 24px; border-radius:8px; font-weight:600;
+      text-decoration:none;
+    }
+    .ad-button:hover { background:#ff1a1a; }
+
+    .ad-dots { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+    .ad-dot { width:12px; height:12px; border-radius:50%; background:#fff; opacity:0.5; cursor:pointer; }
+    .ad-dot.active { opacity:1; background:#D60000; }
+
+    /* ---------------- QUIZZES ---------------- */
+    .quizzes-wrapper { padding:80px 24px; max-width:1200px; margin:0 auto; text-align:center; }
+    .quizzes-title { font-size:2.4rem; font-weight:800; margin-bottom:50px; position:relative; }
+    .quizzes-title::after { content:""; display:block; width:60px; height:4px; background:#D60000; margin:12px auto 0; border-radius:2px; }
+    .quizzes-section { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:36px; }
+    .quiz-card {
+      background:#fff; padding:36px 24px; border-radius:20px; box-shadow:0 8px 24px rgba(0,0,0,0.06);
+      display:flex; flex-direction:column; align-items:center; transition:0.3s ease;
+    }
+    .quiz-card:hover { transform:scale(1.03); box-shadow:0 16px 40px rgba(0,0,0,0.08); }
+    .quiz-icon { font-size:2rem; width:70px; height:70px; border-radius:50%; background:#D60000; color:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .quiz-btn { padding:10px 22px; border-radius:8px; background:#D60000; color:#fff; font-weight:600; margin-top:auto; }
+    .quiz-btn:hover { background:#ff1a1a; transform:scale(1.05); }
+
+    /* ---------------- BLOG ---------------- */
+    .blog-section { padding:80px 24px; max-width:1200px; margin:0 auto; text-align:center; }
+    .blog-title { font-size:2.4rem; font-weight:800; margin-bottom:50px; position:relative; }
+    .blog-title::after { content:""; display:block; width:60px; height:4px; background:#D60000; margin:12px auto 0; border-radius:2px; }
+    .blog-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:36px; }
+    .blog-card { background:#fff; border-radius:20px; box-shadow:0 8px 24px rgba(0,0,0,0.06); overflow:hidden; text-align:left; display:flex; flex-direction:column; }
+    .blog-image { width:100%; height:180px; object-fit:cover; }
+    .blog-content { padding:20px; }
+    .blog-meta { font-size:0.85rem; color:#666; margin-bottom:10px; }
+    .blog-btn { padding:8px 18px; border-radius:8px; background:#D60000; color:#fff; font-weight:600; text-decoration:none; margin-top:auto; display:inline-block; }
+    .blog-btn:hover { background:#ff1a1a; transform:scale(1.05); }
+
+    /* ---------------- FOOTER ---------------- */
+    footer { background:#fff; color:#000; padding:60px 24px 20px; border-top:4px solid #242424; }
+    .footer-content { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:40px; }
+    .footer-section h3 { font-size:1.2rem; margin-bottom:20px; position:relative; }
+    .footer-section h3::after { content:""; display:block; width:40px; height:3px; background:#D60000; margin-top:6px; border-radius:2px; }
+    .footer-section ul { list-style:none; }
+    .footer-section ul li { margin-bottom:12px; }
+    .footer-section ul li a { color:#000; }
+    .footer-section ul li a:hover { color:#D60000; }
+    .social-links { display:flex; gap:12px; }
+    .social-links a { display:flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.05); color:#000; font-size:1.2rem; }
+    .social-links a:hover { background:#D60000; color:#fff; transform:scale(1.1); }
+    .footer-bottom { text-align:center; padding-top:30px; border-top:1px solid rgba(0,0,0,0.1); margin-top:40px; font-size:0.85rem; }
+
+    /* ---------------- RESPONSIVE ---------------- */
+    @media(max-width:1024px) {
+      .ad-slider { min-height:300px; }
+      .ad-button { bottom:30px; padding:10px 20px; font-size:0.9rem; }
+      .ad-dots { bottom:15px; }
+    }
+    @media(max-width:720px) {
+      header { padding:8px 16px; height:56px; }
+      .logo { position:absolute; left:50%; transform:translateX(-50%); font-size:1.5rem; }
+      .quizzes-section { gap:20px; }
+      .blog-grid { gap:20px; }
+    }
   </style>
 </head>
 <body>
-<header>
-  <!-- Left: menu -->
-  <div class="left-nav">
-    <div class="menu" tabindex="0">
-      <!-- botón accesible (permite focus para :focus-within) -->
-      <button class="menu-btn" aria-expanded="false" aria-controls="main-menu" aria-label="Abrir menú">☰</button>
-
-      <!-- dropdown -->
-      <nav id="main-menu" class="dropdown" role="menu" aria-hidden="true">
-        <a role="menuitem" href="{{ url_for('about') }}">Acerca</a>
-        <a role="menuitem" href="{{ url_for('legal') }}">Blog</a>
-        <a role="menuitem" href="{{ url_for('contact') }}">Ayuda</a>
-        <a role="menuitem" href="{{ url_for('Servicio_1') }}">Nuestros servicios</a>
-      </nav>
-    </div>
-  </div>
-
-  <!-- Center: logo (absoluto para centrar perfecto) -->
-  <div class="logo"><a href="{{ url_for('homepage') }}">YourToolQuizz</a></div>
-
-  <!-- Right: search + auth -->
-  <div class="right-nav">
-    <form class="search-container" method="GET" action="/buscar" role="search">
-      <input class="search-input" type="text" name="q" placeholder="Buscar..." aria-label="Buscar">
-      <button class="search-btn" type="submit" aria-label="Buscar">
-        <!-- SVG minimalista negro -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19 15.5 14zM4 9.5A5.5 5.5 0 119.5 15 5.5 5.5 0 014 9.5z"/>
-        </svg>
-      </button>
-    </form>
-
-    <!-- Auth links (actualízalas según templates) -->
-    {% if current_user.is_authenticated %}
-      <a class="btn-logout" href="{{ url_for('logout') }}">Cerrar sesión</a>
-    {% else %}
-      <a class="btn-login" href="{{ url_for('login') }}">Iniciar sesión</a>
-    {% endif %}
-  </div>
-</header>
-<main>
-<section class="ad-slider">
-  <div class="slide active">
-    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
-  </div>
-
-  <div class="slide">
-    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
-  </div>
-
-  <div class="slide">
-    <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
-  </div>
-
-  <div class="ad-dots">
-    <div class="ad-dot active" data-index="0"></div>
-    <div class="ad-dot" data-index="1"></div>
-    <div class="ad-dot" data-index="2"></div>
-  </div>
-</section>
-
-
-  
-
-<div class="quizzes-wrapper">
-  <h2 class="quizzes-title">Explora nuestros quizzes</h2>
-  <section class="quizzes-section">
-    <div class="quiz-card"style="--i:0">
-      <div class="quiz-icon">🦠</div>
-      <h3>Quiz seguridad</h3>
-      <p>Descubre tu mejor herramienta antivirus para ti.</p>
-      <a href="{{ url_for('quizzantivirus') }}" class="quiz-btn">Empezar</a>
-    </div>
-    <div class="quiz-card"style="--i:1">
-      <div class="quiz-icon">🧠</div>
-      <h3>Quiz productividad</h3>
-      <p>Encuentra la app que mejor organize tus ideas y proyectos.</p>
-      <a href="{{ url_for('quizzproductividad') }}" class="quiz-btn">Empezar</a>
-    </div>
-    <div class="quiz-card"style="--i:2">
-      <div class="quiz-icon">🎨</div>
-      <h3>Quiz diseño</h3>
-      <p>Descubre la app de diseño que mejor se adapta a tus necesidades.</p>
-      <a href="{{ url_for('diseño') }}" class="quiz-btn">Empezar</a>
-    </div>
-    <div class="quiz-card"style="--i:3">
-      <div class="quiz-icon">📚</div>
-      <h3>Quizz redes sociales</h3>
-      <p>Encuentra la mejor app para usar las redes sociales a tu beneficio.</p>
-      <a href="{{ url_for('Redes') }}" class="quiz-btn">Empezar</a>
-    </div>
-    <div class="quiz-card"style="--i:4">
-      <div class="quiz-icon">🎯</div>
-      <h3>Quiz IA</h3>
-      <p>Descubre la inteligencia artificial que mejor se adapta a tu situacion.</p>
-      <a href="{{ url_for('Inteligenciasartificiales') }}" class="quiz-btn">Empezar</a>
-    </div>
-    <div class="quiz-card" style="--i:5">
-      <div class="quiz-icon">⚙️</div>
-      <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
-      <a href="#" class="quiz-btn">Empezar</a>
-    </div>
-        <div class="quiz-card"style="--i:6">
-      <div class="quiz-icon">⚙️</div>
-      <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
-      <a href="#" class="quiz-btn">Empezar</a>
-    </div>
-        <div class="quiz-card"style="--i:7">
-      <div class="quiz-icon">⚙️</div>
-      <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
-      <a href="#" class="quiz-btn">Empezar</a>
-    </div>
-  </section>
-</div>
-
-
-<section class="blog-section">
-  <h2 class="blog-title">Últimas entradas</h2>
-  <div class="blog-grid">
-    <div class="blog-card" style="--i:0">
-      <img src="img/blog1.jpg" alt="Portada blog 1" class="blog-image">
-      <div class="blog-content">
-        <div class="blog-meta">05 Sept 2025 | Autor: Juan Pérez Tomillo</div>
-        <h4>Encuentra la herramienta de seguridad adecuada con nuestro quiz</h4>
-        <p>En la <strong>era digital</strong>, elegir la <strong>herramienta de seguridad adecuada</strong> para tu ordenador es esencial. Cada día millones de personas corren riesgos por virus, malware y ataques informáticos, y no siempre un antivirus estándar es suficiente.</p>
-        <a href="{{ url_for('blog1antivirus') }}" class="blog-btn">Leer más</a>
+  <header>
+    <div class="left-nav">
+      <div class="menu" tabindex="0">
+        <button class="menu-btn" aria-label="Abrir menú">☰</button>
+        <nav class="dropdown" role="menu">
+          <a role="menuitem" href="{{ url_for('about') }}">Acerca</a>
+          <a role="menuitem" href="{{ url_for('blog') }}">Blog</a>
+          <a role="menuitem" href="{{ url_for('contact') }}">Ayuda</a>
+          <a role="menuitem" href="{{ url_for('Servicio_1') }}">Nuestros servicios</a>
+        </nav>
       </div>
     </div>
-    <div class="blog-card" style="--i:1">
-      <img src="img/blog2.jpg" alt="Portada blog 2" class="blog-image">
-      <div class="blog-content">
-        <div class="blog-meta">03 Sept 2025 | Autor: María Gómez Smith</div>
-        <h4>Mejora tu productividad: Notion, ClickUp y Todoist</h4>
-        <p>En un mundo donde el tiempo es uno de nuestros recursos más valiosos, contar con una <strong>app de productividad</strong> puede marcar la diferencia entre sentirse abrumado y lograr un flujo de trabajo eficiente. Estas herramientas permiten <strong>gestionar tareas, planificar proyectos y organizar ideas</strong> de manera centralizada.</p>
-        <a href="{{ url_for('blogproductividad') }}" class="blog-btn">Leer más</a>
-      </div>
-    </div>
-    <div class="blog-card" style="--i:2">
-      <img src="img/blog3.jpg" alt="Portada blog 3" class="blog-image">
-      <div class="blog-content">
-        <div class="blog-meta"></div>
-        <h4>Otros Blogs</h4>
-        <p>Todos los blogs de YourToolQuizz en una sola página.</p>
-        <a href="#" class="blog-btn">Descubrelos</a>
-      </div>
-    </div>
-  </div>
-</section>
 
+    <div class="logo"><a href="{{ url_for('homepage') }}">YourToolQuizz</a></div>
+
+    <div class="right-nav">
+      <form class="search-container" method="GET" action="/buscar">
+        <input class="search-input" type="text" name="q" placeholder="Buscar...">
+        <button class="search-btn" type="submit">
+          🔍
+        </button>
+      </form>
+
+      <div class="nav-auth">
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+        {% else %}
+          <a href="{{ url_for('login') }}">Iniciar sesión</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- SLIDER -->
+    <section class="ad-slider">
+      <div class="slide active">
+        <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner 1">
+        <a href="{{ url_for('Servicio_1') }}" class="ad-button">Contratar espacio</a>
+      </div>
+      <div class="slide">
+        <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario2.png') }}" alt="Banner 2">
+        <a href="{{ url_for('Servicio_1') }}" class="ad-button">Contratar espacio</a>
+      </div>
+      <div class="slide">
+        <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario3.png') }}" alt="Banner 3">
+        <a href="{{ url_for('Servicio_1') }}" class="ad-button">Contratar espacio</a>
+      </div>
+      <div class="ad-dots">
+        <div class="ad-dot active" data-index="0"></div>
+        <div class="ad-dot" data-index="1"></div>
+        <div class="ad-dot" data-index="2"></div>
+      </div>
+    </section>
+
+    <!-- QUIZZES -->
+    <div class="quizzes-wrapper">
+      <h2 class="quizzes-title">Explora nuestros quizzes</h2>
+      <section class="quizzes-section">
+        <div class="quiz-card"><div class="quiz-icon">🦠</div><h3>Quiz seguridad</h3><p>Descubre tu mejor herramienta antivirus.</p><a href="{{ url_for('quizzantivirus') }}" class="quiz-btn">Empezar</a></div>
+        <div class="quiz-card"><div class="quiz-icon">🧠</div><h3>Quiz productividad</h3><p>Encuentra la app que mejor organiza tus ideas.</p><a href="{{ url_for('quizzproductividad') }}" class="quiz-btn">Empezar</a></div>
+        <div class="quiz-card"><div class="quiz-icon">🎨</div><h3>Quiz diseño</h3><p>Descubre la app de diseño que mejor se adapta.</p><a href="{{ url_for('diseño') }}" class="quiz-btn">Empezar</a></div>
+        <div class="quiz-card"><div class="quiz-icon">📚</div><h3>Quiz redes sociales</h3><p>Encuentra la mejor app para tus redes sociales.</p><a href="{{ url_for('Redes') }}" class="quiz-btn">Empezar</a></div>
+        <div class="quiz-card"><div class="quiz-icon">🎯</div><h3>Quiz IA</h3><p>Descubre la inteligencia artificial que mejor se adapta.</p><a href="{{ url_for('Inteligenciasartificiales') }}" class="quiz-btn">Empezar</a></div>
+      </section>
+    </div>
+
+    <!-- BLOG -->
+    <section class="blog-section">
+      <h2 class="blog-title">Últimas entradas</h2>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <img src="{{ url_for('static', filename='img/blog1.jpg') }}" alt="Portada blog 1" class="blog-image">
+          <div class="blog-content">
+            <div class="blog-meta">05 Sept 2025 | Autor: Juan Pérez</div>
+            <h4>Encuentra la herramienta de seguridad adecuada</h4>
+            <p>Selecciona la mejor herramienta antivirus para tu ordenador.</p>
+            <a href="{{ url_for('blog1antivirus') }}" class="blog-btn">Leer más</a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <img src="{{ url_for('static', filename='img/blog2.jpg') }}" alt="Portada blog 2" class="blog-image">
+          <div class="blog-content">
+            <div class="blog-meta">03 Sept 2025 | Autor: María Gómez</div>
+            <h4>Mejora tu productividad: Notion, ClickUp y Todoist</h4>
+            <p>Gestiona tareas y proyectos de manera centralizada.</p>
+            <a href="{{ url_for('blogproductividad') }}" class="blog-btn">Leer más</a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <img src="{{ url_for('static', filename='img/blog3.jpg') }}" alt="Portada blog 3" class="blog-image">
+          <div class="blog-content">
+            <div class="blog-meta">01 Sept 2025 | Autor: Equipo YourToolQuizz</div>
+            <h4>Otros Blogs</h4>
+            <p>Todos los blogs en un solo lugar.</p>
+            <a href="#" class="blog-btn">Descubrelos</a>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
 
-<footer>
-  <div class="footer-content">
-    
-    <div class="footer-section">
-      <h3>Navegación</h3>
-      <ul>
-        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h3>Quizzes</h3>
-      <ul>
-        <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
-        <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
-        <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
-        <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
-        <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
-        <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h3>Contacto</h3>
-      <ul>
-        <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
-        <li><a href="tel:+34651830695">Teléfono: +34 651 83 06 95</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h3>Síguenos</h3>
-      <div class="social-links">
-        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
-        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+          <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Seguridad</a></li>
+          <li><a href="{{ url_for('blog') }}">Blog</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="tel:+34651830695">+34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook">F</a>
+          <a href="#" aria-label="TikTok">T</a>
+          <a href="#" aria-label="Instagram">I</a>
+          <a href="#" aria-label="YouTube">Y</a>
+        </div>
       </div>
     </div>
+    <div class="footer-bottom">&copy; 2025 YourToolQuizz. Todos los derechos reservados.</div>
+  </footer>
 
-  </div>
+  <!-- ---------------- SLIDER SCRIPT ---------------- -->
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentSlide = 0;
+      const slides = document.querySelectorAll('.ad-slider .slide');
+      const dots = document.querySelectorAll('.ad-dot');
 
-  <div class="footer-bottom">
-    &copy; 2023 YourToolQuizz. Todos los derechos reservados.
-  </div>
-</footer>
+      function changeSlide(index){
+        slides[currentSlide].classList.remove('active');
+        dots[currentSlide].classList.remove('active');
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+        dots[currentSlide].classList.add('active');
+      }
 
-
-<script defer>
-document.addEventListener('DOMContentLoaded', () => {
-  let currentSlide = 0;
-  const slides = document.querySelectorAll('.ad-slider .slide');
-  const dots = document.querySelectorAll('.ad-dot');
-
-  if (slides.length === 0) return;
-
-  function changeSlide(index) {
-    slides[currentSlide].classList.remove('active');
-    dots[currentSlide].classList.remove('active');
-
-    currentSlide = index;
-
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
-  }
-
-  let slideInterval = setInterval(() => {
-    changeSlide((currentSlide + 1) % slides.length);
-  }, 4000);
-
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      clearInterval(slideInterval);
-      changeSlide(parseInt(dot.dataset.index));
-      slideInterval = setInterval(() => {
-        changeSlide((currentSlide + 1) % slides.length);
+      let slideInterval = setInterval(() => {
+        changeSlide((currentSlide+1)%slides.length);
       }, 4000);
+
+      dots.forEach(dot => {
+        dot.addEventListener('click', ()=>{
+          clearInterval(slideInterval);
+          changeSlide(parseInt(dot.dataset.index));
+          slideInterval = setInterval(() => { changeSlide((currentSlide+1)%slides.length); }, 4000);
+        });
+      });
     });
-  });
-});
-</script>
-
-
-
-
+  </script>
 </body>
 </html>
