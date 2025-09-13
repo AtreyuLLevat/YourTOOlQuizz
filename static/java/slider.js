@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   let currentSlide = 0;
-  const slides = document.querySelectorAll('.ad-slider .slide');
-  const dots = document.querySelectorAll('.ad-dot');
+  const slides = document.querySelectorAll('.slider .slide');
+  const dots = document.querySelectorAll('.dots .dot');
 
-  if(slides.length === 0) return;
+  if (slides.length === 0) return;
 
   // Función para cambiar slide
   function changeSlide(index) {
