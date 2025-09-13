@@ -198,15 +198,23 @@ header {
 .ad-slider {
   position: relative;
   overflow: hidden;
-  min-height: 400px; /* asegura altura mínima */
-  max-height: 600px; /* opcional: limita altura en pantallas grandes */
+  min-height: 400px; /* altura mínima para que siempre se vea */
+  max-height: 600px;
   width: 100%;
   margin: 0 auto;
-  border-radius: 0;
   background: linear-gradient(90deg, #000, #D60000);
-  z-index: 100; /* asegura que esté por encima de otros elementos */
+  z-index: 100;
 }
 
+/* Aseguramos que las imágenes llenen el slider */
+.ad-slider .slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fuerza visibilidad de la slide activa */
 .ad-slider .slide {
   position: absolute;
   top: 0;
@@ -215,61 +223,12 @@ header {
   height: 100%;
   opacity: 0;
   transition: opacity 1s ease;
+  z-index: 1;
 }
 
 .ad-slider .slide.active {
   opacity: 1;
-  z-index: 1;
-}
-
-.ad-slider .slide img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.ad-button {
-  position: absolute;
-  bottom: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #D60000;
-  color: white;
-  padding: 12px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  z-index: 200; /* encima de las imágenes */
-}
-
-.ad-button:hover {
-  background: #ff1a1a;
-  transform: translateX(-50%) scale(1.05);
-}
-
-.ad-dots {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 200; /* encima de las imágenes */
-}
-
-.ad-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.6);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.ad-dot.active {
-  background: #ff1a1a;
-  transform: scale(1.2);
+  z-index: 2;
 }
 
 /* ------------------ RESPONSIVE ------------------ */
@@ -721,17 +680,17 @@ footer {
 <section class="ad-slider">
   <div class="slide active">
     <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
+    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
   </div>
 
   <div class="slide">
     <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
+    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
   </div>
 
   <div class="slide">
     <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
-    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">contratar espacio</a>
+    <a href="{{ url_for('Servicio_1') }}" target="_blank" class="ad-button">Contratar espacio</a>
   </div>
 
   <div class="ad-dots">
@@ -740,6 +699,7 @@ footer {
     <div class="ad-dot" data-index="2"></div>
   </div>
 </section>
+
 
   
 
@@ -886,7 +846,40 @@ footer {
 </footer>
 
 
-<script src="{{ url_for('static', filename='java/slider.js') }}"></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => {
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.ad-slider .slide');
+  const dots = document.querySelectorAll('.ad-dot');
+
+  if (slides.length === 0) return;
+
+  function changeSlide(index) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+
+    currentSlide = index;
+
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+  }
+
+  let slideInterval = setInterval(() => {
+    changeSlide((currentSlide + 1) % slides.length);
+  }, 4000);
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      clearInterval(slideInterval);
+      changeSlide(parseInt(dot.dataset.index));
+      slideInterval = setInterval(() => {
+        changeSlide((currentSlide + 1) % slides.length);
+      }, 4000);
+    });
+  });
+});
+</script>
+
 
 
 
