@@ -195,7 +195,6 @@ header {
   .logo { position: static; transform: none; margin: 0 auto; }
   header { justify-content: space-between; }
 }
-/* ------------------ SLIDER ------------------ */
 .ad-slider {
   position: relative;
   overflow: hidden;
@@ -287,70 +286,6 @@ header {
     bottom: 30px;
   }
 }
-
-/* Noticias */
-.news-overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: rgba(0,0,0,0.7);
-  padding: 12px 0;
-  color: #fff;
-  font-size: 1rem;
-  overflow: hidden;
-}
-
-.news-ticker-wrapper {
-  overflow: hidden;
-  height: 26px;
-}
-
-.news-ticker {
-  display: inline-block;
-  white-space: nowrap;
-  animation: ticker 18s linear infinite;
-}
-
-.news-ticker span {
-  margin: 0 40px;
-}
-
-.news-overlay:hover .news-ticker {
-  animation-play-state: paused;
-}
-
-.news-icon {
-  margin-right: 8px;
-  font-weight: bold;
-  color: #ff1a1a;
-}
-
-@keyframes ticker {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
-.ad-dots {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-}
-
-.ad-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.6);
-}
-
-.ad-dot.active {
-  background: #ff1a1a;
-  transform: scale(1.2);
-}
-
 /* ------------------ QUIZZES ------------------ */
 .quizzes-wrapper {
   padding: 80px 24px;
@@ -782,7 +717,7 @@ footer {
     {% endif %}
   </div>
 </header>
-
+<main>
 <section class="ad-slider">
   <div class="slide active">
     <img src="{{ url_for('static', filename='Imagenes/espaciopublicitario.png') }}" alt="Banner de presentación">
@@ -808,7 +743,6 @@ footer {
 
   
 
-  <main>
 <div class="quizzes-wrapper">
   <h2 class="quizzes-title">Explora nuestros quizzes</h2>
   <section class="quizzes-section">
