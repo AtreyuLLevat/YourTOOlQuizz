@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Promociona tu empresa - YourToolQuizz</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+/* ------------------ GLOBAL ------------------ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #fff; color: #111; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+a, button, header, footer, .card { transition: all 0.3s ease; }
+
+/* ------------------ HEADER ------------------ */
+header {
+  position: sticky; top: 0; z-index: 1000;
+  padding: 14px 28px; background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: center; height: 64px;
+}
+.logo { font-size: 1.8rem; font-weight: 800; color: #9e2121; text-decoration: none; line-height: 1; }
+.logo a { color: inherit; text-decoration: none; }
+
+/* ------------------ MAIN ------------------ */
+main { flex: 1; padding: 80px 24px; max-width: 1000px; margin: 0 auto; text-align: center; }
+
+.section-title {
+  font-size: 2.2rem; font-weight: 800; color: #000; margin-bottom: 40px; position: relative;
+}
+.section-title::after {
+  content: ""; display: block; width: 70px; height: 4px; background: #D60000; margin: 12px auto 0; border-radius: 2px;
+}
+
+/* ------------------ CATEGORY BUTTONS ------------------ */
+.categories {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px;
+  margin-bottom: 50px;
+}
+.categories button {
+  padding: 16px; border-radius: 14px; border: 2px solid #D60000; background: #fff; font-weight: 600;
+  cursor: pointer; font-size: 1rem;
+}
+.categories button:hover { background: #ffeaea; }
+.categories button.selected { background: #D60000; color: #fff; box-shadow: 0 6px 18px rgba(214,0,0,0.3); }
+
+/* ------------------ TIME OPTIONS ------------------ */
+.time-options {
+  display: flex; justify-content: center; gap: 16px; margin-bottom: 50px;
+}
+.time-options button {
+  padding: 14px 24px; border-radius: 14px; border: 2px solid #D60000; background: #fff; font-weight: 600; cursor: pointer;
+}
+.time-options button:hover { background: #ffeaea; }
+.time-options button.selected { background: #D60000; color: #fff; box-shadow: 0 6px 18px rgba(214,0,0,0.3); }
+
+/* ------------------ PRICE BOX ------------------ */
+.price-box {
+  background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  max-width: 400px; margin: 0 auto 40px;
+}
+.price-box h3 { font-size: 2rem; color: #D60000; margin-bottom: 10px; }
+.price-box p { margin: 6px 0; }
+
+/* ------------------ BUTTON ------------------ */
+.pay-button button {
+  padding: 16px 40px; font-size: 1.2rem; background: #D60000; color: white; border: none; border-radius: 14px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 6px 20px rgba(214,0,0,0.4);
+}
+.pay-button button:hover { background: #b80000; transform: scale(1.05); }
+
+/* ------------------ QUIZ COVER ------------------ */
+/* ------------------ QUIZ COVER ------------------ */
+.quiz-cover {
+  background: #fff; /* Fondo blanco */
+  color: #D60000;
+  padding: 60px 20px;
+  border-radius: 20px;
+  margin: 60px auto 80px; /* Más espacio arriba y abajo */
+  max-width: 800px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.quiz-cover h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+.quiz-cover p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #333;
+}
+.quiz-cover button {
+  padding: 14px 40px;
+  font-size: 1.1rem;
+  background: #D60000;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.quiz-cover button:hover {
+  background: #b80000;
+  transform: scale(1.05);
+}
+
+
+/* ------------------ QUIZ SAMPLE ------------------ */
+.quiz-sample {
+  background: #fff; padding: 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  margin-top: 80px; /* MÁS ESPACIO respecto al botón de pagar */
+}
+.quiz-sample h2 { font-size: 1.6rem; font-weight: 700; color: #D60000; margin-bottom: 16px; }
+
+/* ------------------ FOOTER ------------------ */
+footer {
+  background: #fff; color: #000; padding: 60px 24px 20px; font-size: 0.95rem; border-top: 4px solid #242424;
+}
+.footer-content {
+  max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px;
+}
+.footer-section h3 {
+  font-size: 1.2rem; margin-bottom: 20px; position: relative; color: #000;
+}
+.footer-section h3::after { content: ""; display: block; width: 40px; height: 3px; background: #D60000; margin-top: 6px; border-radius: 2px; }
+.footer-section ul { list-style: none; }
+.footer-section ul li { margin-bottom: 12px; }
+.footer-section ul li a { color: #000; text-decoration: none; }
+.footer-section ul li a:hover { color: #D60000; }
+.social-links { display: flex; gap: 12px; margin-top: 12px; }
+.social-links a { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.05); color: #000; font-size: 1.2rem; }
+.social-links a:hover { background: #D60000; color: #fff; }
+.footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); margin-top: 40px; font-size: 0.85rem; color: #000; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo"><a href="#">YourToolQuizz</a></div>
+</header>
+
+<main>
+
+  <!-- CATEGORÍAS -->
+  <h2 class="section-title">Escoge la categoría de tu marca</h2>
+  <div class="categories">
+    <button>Moda</button>
+    <button>Tecnología</button>
+    <button>Comida</button>
+    <button>Salud</button>
+    <button>Educación</button>
+    <button>Deportes</button>
+    <button>Viajes</button>
+    <button>Otros</button>
+  </div>
+
+  <!-- TIEMPO -->
+  <h2 class="section-title">Selecciona el tiempo</h2>
+  <div class="time-options">
+    <button data-months="1">1 mes</button>
+    <button data-months="2">2 meses</button>
+    <button data-months="3">3 meses</button>
+  </div>
+
+  <!-- PRECIO -->
+  <div class="price-box">
+    <h3 id="price">$100</h3>
+    <p id="tax">Tax (21%): $21</p>
+    <hr>
+    <p><strong id="total">Total con impuesto: $121</strong></p>
+    <p style="margin-top:12px; font-size:0.9rem; color:#555;">
+      Al continuar aceptas nuestros 
+      <a href="#" style="color:#D60000; font-weight:600; text-decoration:none;">Términos legales</a>.
+    </p>
+  </div>
+
+  <div class="pay-button">
+    <button>💳 Pagar ahora</button>
+  </div>
+
+  <!-- PORTADA DEL QUIZ -->
+  <div class="quiz-cover">
+    <h2>¡Bienvenido a tu Quiz de Promoción!</h2>
+    <p>Descubre cuánto puedes potenciar tu marca con nuestro quiz interactivo.</p>
+    <button id="start-quiz">Comenzar Quiz</button>
+  </div>
+
+  <!-- QUIZ DE MUESTRA -->
+  <div class="quiz-sample">
+    <h2>Quiz de muestra</h2>
+    <p>Aquí aparecerá un quiz interactivo como ejemplo de cómo funcionará tu promoción.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Navegación</h3>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Sobre Nosotros</a></li>
+        <li><a href="#">Aviso legal</a></li>
+        <li><a href="#">Contáctanos</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Categorías</h3>
+      <ul>
+        <li><a href="#">Moda</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Comida</a></li>
+        <li><a href="#">Salud</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Contacto</h3>
+      <ul>
+        <li><a href="mailto:info@yourtoolquizz.site">info@yourtoolquizz.site</a></li>
+        <li><a href="#">Tel: +34 651 83 06 95</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Síguenos</h3>
+      <div class="social-links">
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2023 YourToolQuizz. Todos los derechos reservados.</div>
+</footer>
+
+<script>
+const categories = document.querySelectorAll(".categories button");
+categories.forEach(btn => {
+  btn.addEventListener("click", () => {
+    categories.forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+  });
+});
+
+const timeButtons = document.querySelectorAll(".time-options button");
+const priceEl = document.getElementById("price");
+const taxEl = document.getElementById("tax");
+const totalEl = document.getElementById("total");
+
+const taxPercent = 0.21;
+const prices = { 1: 100, 2: 180, 3: 250 };
+
+function updatePrice(months) {
+  const price = prices[months];
+  const tax = price * taxPercent;
+  const total = price + tax;
+
+  priceEl.textContent = `$${price}`;
+  taxEl.textContent = `Tax (21%): $${tax.toFixed(2)}`;
+  totalEl.textContent = `Total con impuesto: $${total.toFixed(2)}`;
+}
+
+timeButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    timeButtons.forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    const months = btn.getAttribute("data-months");
+    updatePrice(months);
+  });
+});
+
+// Inicializa con 1 mes
+timeButtons[0].classList.add("selected");
+updatePrice(1);
+
+// -------------------- QUIZ COVER SCRIPT --------------------
+const startBtn = document.getElementById("start-quiz");
+const quizCover = document.querySelector(".quiz-cover");
+const quizSample = document.querySelector(".quiz-sample");
+
+quizSample.style.display = "none"; // Oculta el quiz al inicio
+
+startBtn.addEventListener("click", () => {
+  quizCover.style.display = "none";
+  quizSample.style.display = "block";
+  quizSample.scrollIntoView({ behavior: "smooth" });
+});
+</script>
+</body>
+</html>
