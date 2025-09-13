@@ -1,34 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let currentSlide = 0;
   const slides = document.querySelectorAll('.slider .slide');
   const dots = document.querySelectorAll('.dots .dot');
+  let currentSlide = 0;
+  const slideIntervalTime = 5000; // 5 segundos
+  let slideInterval;
 
-  if (slides.length === 0) return;
+  if (slides.length === 0 || dots.length === 0) return;
 
-  // Función para cambiar slide
-  function changeSlide(index) {
-    slides[currentSlide].classList.remove('active');
-    dots[currentSlide].classList.remove('active');
-
+  // Función para mostrar un slide según índice
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
     currentSlide = index;
-
-    slides[currentSlide].classList.add('active');
-    dots[currentSlide].classList.add('active');
   }
 
-  // Siguiente slide automáticamente
-  let slideInterval = setInterval(() => {
-    changeSlide((currentSlide + 1) % slides.length);
-  }, 4000);
+  // Función para pasar al siguiente slide
+  function nextSlide() {
+    showSlide((currentSlide + 1) % slides.length);
+  }
 
-  // Eventos para los dots
+  // Iniciar autoplay
+  function startAutoplay() {
+    slideInterval = setInterval(nextSlide, slideIntervalTime);
+  }
+
+  // Detener autoplay
+  function stopAutoplay() {
+    clearInterval(slideInterval);
+  }
+
+  // Click en dots
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
-      clearInterval(slideInterval);
-      changeSlide(parseInt(dot.dataset.index));
-      slideInterval = setInterval(() => {
-        changeSlide((currentSlide + 1) % slides.length);
-      }, 4000);
+      stopAutoplay();
+      const index = parseInt(dot.dataset.index);
+      showSlide(index);
+      startAutoplay();
     });
   });
+
+  // Iniciar slider
+  showSlide(0);
+  startAutoplay();
 });
