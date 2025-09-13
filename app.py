@@ -60,8 +60,8 @@ def create_app():
 
     @app.after_request
     def add_csp(response):
-    response.headers['Content-Security-Policy'] = "script-src 'self';"
-    return response
+        response.headers['Content-Security-Policy'] = "script-src 'self';"
+        return response
 
     # -----------------------------
     # RUTAS
