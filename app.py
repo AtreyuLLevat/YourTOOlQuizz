@@ -58,6 +58,11 @@ def create_app():
     with app.app_context():
         db.create_all()  # Crea tablas si no existen
 
+    @app.after_request
+    def add_csp(response):
+    response.headers['Content-Security-Policy'] = "script-src 'self';"
+    return response
+
     # -----------------------------
     # RUTAS
     # -----------------------------
