@@ -329,7 +329,22 @@ def create_app():
     @app.route("/dashboard")
     @login_required
     def dashboard():
-        return render_template("dashboard.html", email=current_user.email)
+        # Conectar a Supabase desde backend
+        from supabase import create_client
+
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")  # Solo backend
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+        # Buscar usuario por email en la tabla 'users'
+        response = supabase.table("users").select("*").eq("email", current_user.email).single().execute()
+        usuario = response.data if response.data else {}
+
+        # Pasar al template
+        return render_template("dashboard.html",
+                            email=current_user.email,
+                            usuario=usuario)
+
 
     @app.route("/logout")
     @login_required

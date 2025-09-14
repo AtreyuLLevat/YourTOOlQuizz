@@ -125,29 +125,30 @@ footer {
     <p>Bienvenido a tu dashboard de YourToolQuizz. Explora tu información y los quizzes recomendados para ti.</p>
   </div>
 
-  <!-- INFO USUARIO y CONTRATO -->
-  <div class="grid-2">
-    <!-- INFO USUARIO -->
-    <div class="card user-info">
-      <h2>Tu información</h2>
-      <label for="name">Nombre</label>
-      <input type="text" id="name" value="" readonly>
-      <label for="email">Email</label>
-      <input type="email" id="email" value="" readonly>
-      <label for="password">Contraseña</label>
-      <input type="password" id="password" value="" readonly>
-    </div>
 
-    <!-- INFO CONTRATO -->
-    <div class="card contract-info">
-      <h2>Información de tu contrato</h2>
-      <p><span>Número de contrato:</span> -</p>
-      <p><span>Tipo de plan:</span> -</p>
-      <p><span>Fecha de inicio:</span> -</p>
-      <p><span>Fecha de fin:</span> -</p>
-      <p><span>Estado:</span> -</p>
-    </div>
+<div class="grid-2">
+  <div class="greeting">¡Hola, {{ email }}!</div>
+  <!-- INFO USUARIO -->
+  <div class="card user-info">
+    <h2>Tu información</h2>
+    <label for="name">Nombre</label>
+    <input type="text" id="name" value="{{ email }}" readonly>
+    <label for="email">Email</label>
+    <input type="email" id="email" value="{{ email }}" readonly>
+    <label for="password">Contraseña</label>
+    <input type="password" id="password" value="********" readonly>
   </div>
+
+  <!-- INFO CONTRATO -->
+  <div class="card contract-info">
+    <h2>Información de tu contrato</h2>
+    <p><span>Número de contrato:</span> -</p>
+    <p><span>Tipo de plan:</span> -</p>
+    <p><span>Fecha de inicio:</span> -</p>
+    <p><span>Fecha de fin:</span> -</p>
+    <p><span>Estado:</span> -</p>
+  </div>
+</div>
 
  <!-- QUIZZES RECOMENDADOS -->
   <h2 class="quizzes-title">Quizzes que te pueden interesar</h2>
@@ -218,9 +219,7 @@ footer {
   <div class="footer-bottom">&copy; 2025 YourToolQuizz. Todos los derechos reservados.</div>
 </footer>
 
-<!-- 🔹 Script para conectar a Supabase -->
-<script type="module"
-src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
+
 
 
 </body>

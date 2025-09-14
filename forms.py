@@ -9,7 +9,7 @@ class RegisterForm(FlaskForm):
         DataRequired(),
         Length(min=8, max=150),
         Regexp(
-            regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).+$",
+            regex=r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&_-*¿¡/|~=]).+$",
             message="Debe tener mayúscula, minúscula, número y símbolo"
         )
     ])
