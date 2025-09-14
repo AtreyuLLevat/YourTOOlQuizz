@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
 import base64
 from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
+from supabase import create_client
 
 
 load_dotenv()
