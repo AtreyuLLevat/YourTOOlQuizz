@@ -121,7 +121,7 @@ footer {
 
   <!-- SALUDO -->
   <div class="card greeting-card">
-    <div class="greeting">¡Hola, Juan!</div>
+    <div class="greeting">¡Hola!</div>
     <p>Bienvenido a tu dashboard de YourToolQuizz. Explora tu información y los quizzes recomendados para ti.</p>
   </div>
 
@@ -131,25 +131,25 @@ footer {
     <div class="card user-info">
       <h2>Tu información</h2>
       <label for="name">Nombre</label>
-      <input type="text" id="name" value="Juan Pérez" readonly>
+      <input type="text" id="name" value="" readonly>
       <label for="email">Email</label>
-      <input type="email" id="email" value="juan@example.com" readonly>
+      <input type="email" id="email" value="" readonly>
       <label for="password">Contraseña</label>
-      <input type="password" id="password" value="12345678" readonly>
+      <input type="password" id="password" value="" readonly>
     </div>
 
     <!-- INFO CONTRATO -->
     <div class="card contract-info">
       <h2>Información de tu contrato</h2>
-      <p><span>Número de contrato:</span> 0012345</p>
-      <p><span>Tipo de plan:</span> Premium</p>
-      <p><span>Fecha de inicio:</span> 01/06/2025</p>
-      <p><span>Fecha de fin:</span> 31/12/2025</p>
-      <p><span>Estado:</span> Activo</p>
+      <p><span>Número de contrato:</span> -</p>
+      <p><span>Tipo de plan:</span> -</p>
+      <p><span>Fecha de inicio:</span> -</p>
+      <p><span>Fecha de fin:</span> -</p>
+      <p><span>Estado:</span> -</p>
     </div>
   </div>
 
-  <!-- QUIZZES RECOMENDADOS -->
+ <!-- QUIZZES RECOMENDADOS -->
   <h2 class="quizzes-title">Quizzes que te pueden interesar</h2>
   <div class="grid-3">
     <div class="quiz-card">
@@ -217,6 +217,50 @@ footer {
   </div>
   <div class="footer-bottom">&copy; 2025 YourToolQuizz. Todos los derechos reservados.</div>
 </footer>
+
+<!-- 🔹 Script para conectar a Supabase -->
+<script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+  const supabaseUrl = 'https://ouoodvqsezartigpzwke.supabase.co'
+  const supabaseKey = 'sb_publishable_DTWfFZNCYFZdcXK_s6JWXg_JAOwa9MV'
+  const supabase = createClient(supabaseUrl, supabaseKey)
+
+  async function cargarUsuario() {
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (user) {
+      // Actualizar saludo y datos
+      document.querySelector('.greeting').textContent = `¡Hola, ${user.user_metadata?.nombre || user.email}!`
+      document.querySelector('#name').value = user.user_metadata?.nombre || "Sin nombre"
+      document.querySelector('#email').value = user.email
+      document.querySelector('#password').value = "********"
+
+      // Consultar tabla perfiles (ejemplo)
+      let { data: perfil, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (perfil) {
+        document.querySelector('.contract-info').innerHTML = `
+          <h2>Información de tu contrato</h2>
+          <p><span>Número de contrato:</span> ${perfil.contrato}</p>
+          <p><span>Tipo de plan:</span> ${perfil.plan}</p>
+          <p><span>Fecha de inicio:</span> ${perfil.fecha_inicio}</p>
+          <p><span>Fecha de fin:</span> ${perfil.fecha_fin}</p>
+          <p><span>Estado:</span> ${perfil.estado}</p>
+        `
+      }
+    } else {
+      // Si no hay sesión activa → redirigir
+      window.location.href = '/login.html'
+    }
+  }
+
+  cargarUsuario()
+</script>
 
 </body>
 </html>
