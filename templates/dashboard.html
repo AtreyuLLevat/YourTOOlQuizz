@@ -121,58 +121,33 @@ footer {
 
   <!-- SALUDO -->
   <div class="card greeting-card">
-    <div class="greeting">¡Hola!</div>
+    <div class="greeting">
+      ¡Hola, {{ usuario.nombre or usuario.email or 'Usuario' }}!
+    </div>
     <p>Bienvenido a tu dashboard de YourToolQuizz. Explora tu información y los quizzes recomendados para ti.</p>
   </div>
 
-
-<div class="grid-2">
-  <div class="greeting">¡Hola, {{ email }}!</div>
-  <!-- INFO USUARIO -->
-  <div class="card user-info">
-    <h2>Tu información</h2>
-    <label for="name">Nombre</label>
-    <input type="text" id="name" value="{{ email }}" readonly>
-    <label for="email">Email</label>
-    <input type="email" id="email" value="{{ email }}" readonly>
-    <label for="password">Contraseña</label>
-    <input type="password" id="password" value="********" readonly>
-  </div>
-
-  <!-- INFO CONTRATO -->
-  <div class="card contract-info">
-    <h2>Información de tu contrato</h2>
-    <p><span>Número de contrato:</span> -</p>
-    <p><span>Tipo de plan:</span> -</p>
-    <p><span>Fecha de inicio:</span> -</p>
-    <p><span>Fecha de fin:</span> -</p>
-    <p><span>Estado:</span> -</p>
-  </div>
-</div>
-
- <!-- QUIZZES RECOMENDADOS -->
-  <h2 class="quizzes-title">Quizzes que te pueden interesar</h2>
-  <div class="grid-3">
-    <div class="quiz-card">
-      <img src="https://cdn.mos.cms.futurecdn.net/UjSNcAZ5SebctebKAMQNVF.jpg" alt="Marketing">
-      <div class="quiz-content">
-        <h3>Quiz de Marketing</h3>
-        <p>Aprende cómo promocionar tu marca y atraer más clientes con este quiz interactivo.</p>
-      </div>
+  <!-- INFO USUARIO y CONTRATO -->
+  <div class="grid-2">
+    <!-- INFO USUARIO -->
+    <div class="card user-info">
+      <h2>Tu información</h2>
+      <label for="name">Nombre</label>
+      <input type="text" id="name" value="{{ usuario.nombre or 'Sin nombre' }}" readonly>
+      <label for="email">Email</label>
+      <input type="email" id="email" value="{{ usuario.email or '' }}" readonly>
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" value="********" readonly>
     </div>
-    <div class="quiz-card">
-      <img src="https://images.unsplash.com/photo-1581091215368-3c33f6b6d1dc" alt="Tecnología">
-      <div class="quiz-content">
-        <h3>Quiz de Tecnología</h3>
-        <p>Explora nuevas herramientas y tendencias tecnológicas para potenciar tu negocio.</p>
-      </div>
-    </div>
-    <div class="quiz-card">
-      <img src="https://images.unsplash.com/photo-1588776814546-63fdd1dbf880" alt="Salud">
-      <div class="quiz-content">
-        <h3>Quiz de Salud</h3>
-        <p>Descubre cómo mantener un estilo de vida saludable mientras gestionas tu empresa.</p>
-      </div>
+
+    <!-- INFO CONTRATO -->
+    <div class="card contract-info">
+      <h2>Información de tu contrato</h2>
+      <p><span>Número de contrato:</span> {{ usuario.contrato or '-' }}</p>
+      <p><span>Tipo de plan:</span> {{ usuario.plan or '-' }}</p>
+      <p><span>Fecha de inicio:</span> {{ usuario.fecha_inicio or '-' }}</p>
+      <p><span>Fecha de fin:</span> {{ usuario.fecha_fin or '-' }}</p>
+      <p><span>Estado:</span> {{ usuario.estado or '-' }}</p>
     </div>
   </div>
 
