@@ -229,14 +229,129 @@ footer {
 }
 
 /* ------------------ RESPONSIVE ------------------ */
-@media (max-width: 768px) {
-  .text-sections { padding: 0 12px; }
-  .logo { position: static; transform: none; text-align: center; }
-  .left-nav, .right-nav { display: none; }
-  .footer-content { grid-template-columns: 1fr; text-align: center; }
-  .footer-section h3::after { left: 50%; transform: translateX(-50%); }
-  .social-links { justify-content: center; }
+/* ==========================
+   AJUSTES RESPONSIVE
+========================== */
+
+/* Tablets (≤1024px) */
+@media (max-width: 1024px) {
+  header {
+    padding: 12px 20px;
+    height: 56px;
+  }
+
+  .logo {
+    font-size: 1.6rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .video-presentation {
+    height: 35vh;
+    padding: 16px;
+  }
+
+  .presentation-title {
+    font-size: 3rem;
+    max-width: 700px;
+  }
+
+  .btn-start {
+    padding: 10px 28px;
+    font-size: 1.1rem;
+  }
+
+  .text-sections {
+    padding: 0 20px;
+  }
+
+  .text-block {
+    padding: 30px 20px;
+  }
+
+  .text-block .text-content h3 {
+    font-size: 1.8rem;
+  }
+
+  .text-block .text-content p {
+    font-size: 0.95rem;
+  }
 }
+
+/* Móviles (≤768px) */
+@media (max-width: 768px) {
+  header {
+    justify-content: center;
+    padding: 10px 14px;
+    height: auto;
+  }
+
+  .logo {
+    position: static;
+    transform: none;
+    text-align: center;
+    font-size: 1.4rem;
+  }
+
+  .video-presentation {
+    height: 28vh;
+    padding: 14px;
+  }
+
+  .presentation-title {
+    font-size: 2rem;
+    max-width: 90%;
+    line-height: 1.2;
+  }
+
+  .btn-start {
+    padding: 8px 22px;
+    font-size: 1rem;
+  }
+
+  .text-sections {
+    gap: 30px;
+    padding: 0 12px;
+  }
+
+  .text-block {
+    padding: 20px 16px;
+  }
+
+  .text-block .text-content h3 {
+    font-size: 1.4rem;
+  }
+
+  .text-block .text-content p {
+    font-size: 0.9rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 24px;
+  }
+
+  footer {
+    padding: 40px 16px 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .footer-section h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+}
+
+
   </style>
 </head>
 <body>

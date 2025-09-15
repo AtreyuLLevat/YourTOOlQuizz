@@ -116,11 +116,117 @@ header {
     .social-links a { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #000000; font-size: 1.2rem; transition: background 0.3s ease, transform 0.3s ease; }
     .social-links a:hover { background: #D60000; transform: scale(1.1); }
     .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; font-size: 0.85rem; color: #000000; }
+/* ==========================
+   RESPONSIVE AJUSTES
+========================== */
 
-    @media (max-width: 768px) {
-      .logo { position: static; transform: none; margin: 0 auto; }
-      header { justify-content: space-between; }
-    }
+/* Tablets (≤1024px) */
+@media (max-width: 1024px) {
+  header {
+    padding: 12px 18px;
+    height: 56px;
+  }
+
+  .quizzes-wrapper {
+    padding: 50px 16px;
+  }
+
+  .quizzes-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+
+  .quiz-card {
+    padding: 24px 18px;
+  }
+
+  .offer-card {
+    flex-direction: column;
+    padding: 36px 24px;
+    text-align: center;
+  }
+
+  .offer-content h3 { font-size: 1.6rem; }
+  .offer-content p { font-size: 1rem; }
+  .offer-price { font-size: 1.6rem; }
+}
+
+/* Móviles (≤768px) */
+@media (max-width: 768px) {
+  header {
+    padding: 10px 14px;
+    height: auto;
+    justify-content: center;
+  }
+
+  .logo {
+    font-size: 1.4rem;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .quizzes-wrapper {
+    padding: 40px 14px;
+  }
+
+  .quizzes-title {
+    font-size: 1.6rem;
+    margin-bottom: 24px;
+  }
+
+  .quizzes-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .quiz-card {
+    padding: 20px 16px;
+  }
+
+  .quiz-card h3 { font-size: 1.1rem; }
+  .quiz-card p { font-size: 0.9rem; }
+
+  .btn-choose, .quiz-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .offer-highlight {
+    margin: 50px auto;
+    padding: 0 10px;
+  }
+
+  .offer-content h3 { font-size: 1.4rem; }
+  .offer-content p { font-size: 0.9rem; }
+  .offer-price { font-size: 1.4rem; }
+
+  .comparison {
+    margin: 50px auto;
+    padding: 0 10px;
+  }
+
+  .comparison h2 {
+    font-size: 1.5rem;
+  }
+
+  .comparison-table th, .comparison-table td {
+    padding: 12px 10px;
+    font-size: 0.8rem;
+  }
+
+  footer {
+    padding: 40px 16px 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .footer-section h3 { font-size: 1rem; }
+  .footer-section ul li a { font-size: 0.9rem; }
+}
+
   </style>
 </head>
 <body>

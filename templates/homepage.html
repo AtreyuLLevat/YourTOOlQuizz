@@ -195,6 +195,44 @@ header {
   .logo { position: static; transform: none; margin: 0 auto; }
   header { justify-content: space-between; }
 }
+
+/* ==========================
+   HEADER - Iconos en móvil/tablet
+========================== */
+
+/* Aseguramos que los iconos svg se vean bien */
+header svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+/* Versión tablet y móvil */
+@media (max-width: 1024px) {
+  /* Ocultar texto en login/logout y buscador */
+  .desktop-only { display: none !important; }
+  .mobile-only { display: inline-flex !important; }
+
+  /* Botones más limpios */
+  .btn-login, .btn-logout, .search-btn, .menu-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    border-radius: 8px;
+    color: #111;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-login:hover, .btn-logout:hover, .search-btn:hover, .menu-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  /* Input de búsqueda oculto en móvil/tablet */
+  .search-input { display: none; }
+}
+
 /* ------------------ SLIDER ------------------ */
 /* SLIDER */
 .slider {
@@ -272,6 +310,31 @@ header {
 .dot.active {
   background: #ff1a1a;
   transform: scale(1.2);
+}
+.slide picture,
+.slide img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Ajustes responsive */
+@media (max-width: 1024px) {
+  .slider {
+    min-height: 300px; /* tablet */
+  }
+}
+
+@media (max-width: 720px) {
+  .slider {
+    min-height: 220px; /* móvil */
+  }
+  .slide-button {
+    font-size: 0.85rem;
+    padding: 6px 16px;
+    bottom: 40px;
+  }
 }
 
 /* Responsive */
@@ -683,12 +746,10 @@ footer {
 <body>
 <header>
   <!-- Left: menu -->
+<header>
   <div class="left-nav">
     <div class="menu" tabindex="0">
-      <!-- botón accesible (permite focus para :focus-within) -->
-      <button class="menu-btn" aria-expanded="false" aria-controls="main-menu" aria-label="Abrir menú">☰</button>
-
-      <!-- dropdown -->
+      <button class="menu-btn" aria-label="Abrir menú">☰</button>
       <nav id="main-menu" class="dropdown" role="menu" aria-hidden="true">
         <a role="menuitem" href="{{ url_for('about') }}">Acerca</a>
         <a role="menuitem" href="{{ url_for('legal') }}">Blog</a>
@@ -698,43 +759,81 @@ footer {
     </div>
   </div>
 
+  <div class="logo"><a href="{{ url_for('homepage') }}">YourToolQuizz</a></div>
+
   <!-- Center: logo (absoluto para centrar perfecto) -->
   <div class="logo"><a href="{{ url_for('homepage') }}">YourToolQuizz</a></div>
 
   <!-- Right: search + auth -->
-  <div class="right-nav">
-    <form class="search-container" method="GET" action="/buscar" role="search">
-      <input class="search-input" type="text" name="q" placeholder="Buscar..." aria-label="Buscar">
-      <button class="search-btn" type="submit" aria-label="Buscar">
-        <!-- SVG minimalista negro -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 20.49 21.49 19 15.5 14zM4 9.5A5.5 5.5 0 119.5 15 5.5 5.5 0 014 9.5z"/>
-        </svg>
-      </button>
-    </form>
+<div class="right-nav">
+  <!-- Buscar -->
+  <form class="search-container" method="GET" action="/buscar" role="search">
+    <input class="search-input desktop-only" type="text" name="q" placeholder="Buscar..." aria-label="Buscar">
 
-    <!-- Auth links (actualízalas según templates) -->
-    {% if current_user.is_authenticated %}
-      <a class="btn-logout" href="{{ url_for('logout') }}">Cerrar sesión</a>
-    {% else %}
-      <a class="btn-login" href="{{ url_for('login') }}">Iniciar sesión</a>
-    {% endif %}
-  </div>
+    <!-- Botón con texto en desktop -->
+    <button class="search-btn desktop-only" type="submit" aria-label="Buscar">Buscar</button>
+
+    <!-- Botón con icono en mobile/tablet -->
+    <button class="search-btn mobile-only" type="submit" aria-label="Buscar">
+      <!-- Icono lupa SVG -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M10 2a8 8 0 015.29 13.71l4 4a1 1 0 01-1.42 1.42l-4-4A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+      </svg>
+    </button>
+  </form>
+
+  <!-- Login / Logout -->
+  {% if current_user.is_authenticated %}
+    <!-- Texto en desktop -->
+    <a class="btn-logout desktop-only" href="{{ url_for('logout') }}">Cerrar sesión</a>
+    <!-- Icono en mobile/tablet -->
+    <a class="btn-logout mobile-only" href="{{ url_for('logout') }}" title="Cerrar sesión">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H10a2 2 0 00-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+      </svg>
+    </a>
+  {% else %}
+    <!-- Texto en desktop -->
+    <a class="btn-login desktop-only" href="{{ url_for('login') }}">Iniciar sesión</a>
+    <!-- Icono en mobile/tablet -->
+    <a class="btn-login mobile-only" href="{{ url_for('login') }}" title="Iniciar sesión">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
+      </svg>
+    </a>
+  {% endif %}
+</div>
+
 </header>
 
 <section class="slider">
   <div class="slide active">
-    <img src="{{ url_for('static', filename='Imagenes/banner1.png') }}" alt="Banner 1">
+    <picture>
+      <!-- Imagen móvil -->
+      <source srcset="{{ url_for('static', filename='Imagenes/banner1-mobile.png') }}" media="(max-width: 720px)">
+      <!-- Imagen tablet -->
+      <source srcset="{{ url_for('static', filename='Imagenes/banner1-tablet.png') }}" media="(max-width: 1024px)">
+      <!-- Imagen escritorio -->
+      <img src="{{ url_for('static', filename='Imagenes/banner1.png') }}" alt="Banner 1">
+    </picture>
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="slide-button">Ver más</a>
   </div>
 
   <div class="slide">
-    <img src="{{ url_for('static', filename='Imagenes/banner2.png') }}" alt="Banner 2">
+    <picture>
+      <source srcset="{{ url_for('static', filename='Imagenes/banner2-mobile.png') }}" media="(max-width: 720px)">
+      <source srcset="{{ url_for('static', filename='Imagenes/banner2-tablet.png') }}" media="(max-width: 1024px)">
+      <img src="{{ url_for('static', filename='Imagenes/banner2.png') }}" alt="Banner 2">
+    </picture>
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="slide-button">Ver más</a>
   </div>
 
   <div class="slide">
-    <img src="{{ url_for('static', filename='Imagenes/banner3.png') }}" alt="Banner 3">
+    <picture>
+      <source srcset="{{ url_for('static', filename='Imagenes/banner3-mobile.png') }}" media="(max-width: 720px)">
+      <source srcset="{{ url_for('static', filename='Imagenes/banner3-tablet.png') }}" media="(max-width: 1024px)">
+      <img src="{{ url_for('static', filename='Imagenes/banner3.png') }}" alt="Banner 3">
+    </picture>
     <a href="{{ url_for('Servicio_1') }}" target="_blank" class="slide-button">Ver más</a>
   </div>
 

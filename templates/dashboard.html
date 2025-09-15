@@ -65,10 +65,26 @@ main {
 .user-info h2, .contract-info h2 { font-size:1.4rem; font-weight:700; color:#000; margin-bottom:16px; }
 .user-info label { font-weight: 600; display:block; margin-bottom:6px; color:#000; }
 .user-info input { width:100%; padding:14px; margin-bottom:16px; border:1px solid #ddd; border-radius:12px; font-size:1rem; background:#f9f9f9; }
+.change-password-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 10px 16px;
+  background-color: #D60000;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.change-password-btn:hover {
+  background-color: #9e2121;
+}
 
 /* ------------------ INFO CONTRATO ------------------ */
 .contract-info p { margin-bottom:10px; font-size:0.95rem; color:#000; }
 .contract-info span { font-weight:600; color:#D60000; }
+
 
 /* ------------------ QUIZZES ------------------ */
 .quizzes-title { font-size:2.4rem; font-weight:800; margin-bottom:32px; text-align:center; color:#000; }
@@ -138,6 +154,10 @@ footer {
       <input type="email" id="email" value="{{ usuario.email or '' }}" readonly>
       <label for="password">Contraseña</label>
       <input type="password" id="password" value="********" readonly>
+      <div class="card user-info">
+ <!-- Botón para cambiar contraseña -->
+        <a href="{{ url_for('change_password') }}" class="change-password-btn">Cambiar contraseña</a>
+</div>
     </div>
 
     <!-- INFO CONTRATO -->
