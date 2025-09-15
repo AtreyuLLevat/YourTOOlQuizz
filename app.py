@@ -1,4 +1,3 @@
-# app.py
 import os
 import json
 import io
@@ -79,6 +78,16 @@ def create_app():
     @app.route('/Servicio_1')
     def Servicio_1():
         return render_template('Servicio_1.html')
+
+    @app.route('/serviciosbanner')
+    def serviciosbanner():
+        return render_template('serviciosbanner.html')
+    @app.route('/serviciosblogs')
+    def serviciosblogs():
+        return render_template('serviciosblog.html')
+    @app.route('/serviciosquizz')
+    def serviciosquizz():
+        return render_template('serviciosquizz.html')
 
     @app.route('/quizzantivirus', methods=['GET', 'POST'])
     def quizzantivirus():
@@ -339,6 +348,30 @@ def create_app():
         usuario = response.data if response.data else {}
 
         return render_template("dashboard.html", usuario=usuario)
+        
+    @app.route("/change_password", methods=["POST"])
+    @login_required
+    def change_password():
+        current_pw = request.form.get("current_password")
+        new_pw = request.form.get("new_password")
+        confirm_pw = request.form.get("confirm_password")
+
+        # Validar contraseña actual
+        if not check_password_hash(current_user.password, current_pw):
+            flash("Contraseña actual incorrecta", "error")
+            return redirect(url_for("dashboard"))
+
+        # Verificar coincidencia de nueva contraseña
+        if new_pw != confirm_pw:
+            flash("La nueva contraseña no coincide", "error")
+            return redirect(url_for("dashboard"))
+
+        # Actualizar la contraseña en la base de datos
+        current_user.password = generate_password_hash(new_pw)
+        db.session.commit()
+
+        flash("Contraseña actualizada correctamente", "success")
+        return redirect(url_for("dashboard"))
 
 
 
