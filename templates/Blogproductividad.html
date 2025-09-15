@@ -7,43 +7,48 @@
   <meta name="description" content="Descubre si tu ordenador está realmente protegido contra virus, malware y ataques informáticos. Haz nuestro quiz gratuito de seguridad informática y recibe consejos personalizados.">
   <meta name="keywords" content="seguridad informática, protección del ordenador, antivirus actualizado, malware, virus, quiz de seguridad digital, seguridad PC, protección online">
 
-  <!-- Google Fonts -->
-
-
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* ------------------ UNIFICADO CON TU CSS ------------------ */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: #fff; color: #111; line-height: 1.6; }
-    a, button, .quiz-card, header, footer { transition: all 0.3s ease; }
-
-    /* HEADER */
-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 14px 28px;
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
       background: #fff;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      color: #111;
+      line-height: 1.6;
+      min-height: 100vh;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 64px;
-      position: relative;
+      flex-direction: column;
     }
+    a, button, header, footer { transition: all 0.3s ease; }
 
-    .logo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #9e2121;
-      text-decoration: none;
-      line-height: 1;
-      z-index: 1500;
-    }
+    /* ------------------ HEADER ------------------ */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 28px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  position: relative;
+  height: 64px;
+}
 
-    .logo a { color: inherit; text-decoration: none; }
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #9e2121;
+  text-decoration: none;
+  z-index: 1500;
+}
+.logo a {
+  color: #9e2121;
+  text-decoration: none; /* opcional si no quieres subrayado */
+}
 
     main { max-width: 900px; margin: 80px auto; padding: 40px; }
 
