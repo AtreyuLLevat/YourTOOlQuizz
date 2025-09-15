@@ -25,23 +25,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Iniciar autoplay
   function startAutoplay() {
+    stopAutoplay(); // asegurar que no haya intervalos duplicados
     slideInterval = setInterval(nextSlide, slideIntervalTime);
   }
 
   // Detener autoplay
   function stopAutoplay() {
-    clearInterval(slideInterval);
+    if (slideInterval) clearInterval(slideInterval);
   }
 
   // Click en dots
   dots.forEach(dot => {
     dot.addEventListener('click', () => {
-      stopAutoplay();
       const index = parseInt(dot.dataset.index);
       showSlide(index);
       startAutoplay();
     });
+
+    // Accesibilidad: activar con teclado
+    dot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const index = parseInt(dot.dataset.index);
+        showSlide(index);
+        startAutoplay();
+      }
+    });
   });
+
+  // Pausar autoplay al hover o focus en el slider
+  const slider = document.querySelector('.slider');
+  slider.addEventListener('mouseenter', stopAutoplay);
+  slider.addEventListener('mouseleave', startAutoplay);
+  slider.addEventListener('focusin', stopAutoplay);
+  slider.addEventListener('focusout', startAutoplay);
 
   // Iniciar slider
   showSlide(0);
