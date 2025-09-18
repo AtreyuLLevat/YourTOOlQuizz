@@ -251,21 +251,21 @@ header {
       <div class="quiz-card">
         <h3>Banners Publicitarios</h3>
         <p>Promociona tu marca con anuncios visibles en nuestra web.</p>
-        <p class="price"><span>10€-30€</span></p>
-<a href="{{ url_for('serviciosquizz') }}" class="btn-choose">Elegir</a>
+        <p class="price"><span>variable</span></p>
+<a href="{{ url_for('serviciosbanner') }}" class="btn-choose">Elegir</a>
 
       </div>
       <div class="quiz-card">
         <h3>Blogs</h3>
         <p>Contenido optimizado para SEO con alcance a tu público.</p>
-        <p class="price"><span>30€-60€</span>/mes</p>
+        <p class="price"><span>30€</span>/mes</p>
 <a href="{{ url_for('serviciosblogs') }}" class="btn-choose">Elegir</a>
       </div>
       <div class="quiz-card">
         <h3>Quizzes</h3>
         <p>Interacción directa con los usuarios para captar leads.</p>
-        <p class="price"><span>50€-100€</span>/mes</p>
-<a href="{{ url_for('serviciosbanner') }}" class="btn-choose">Elegir</a>
+        <p class="price"><span>variable</span>/mes</p>
+<a href="{{ url_for('serviciosquizz') }}" class="btn-choose">Elegir</a>
       </div>
     </div>
 
@@ -348,16 +348,17 @@ header {
   <!-- FOOTER -->
   <footer>
     <div class="footer-content">
-      <div class="footer-section">
-        <h3>Navegación</h3>
-        <ul>
-          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-          <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-        </ul>
-      </div>
+    <div class="footer-section">
+      <h3>Navegación</h3>
+      <ul>
+        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
+      </ul>
+    </div>
       <div class="footer-section">
         <h3>Quizzes</h3>
         <ul>

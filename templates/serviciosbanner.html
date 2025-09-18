@@ -229,44 +229,51 @@ footer {
     </div>
   </section>
 </main>
-<footer>
-  <div class="footer-content">
+  <footer>
+    <div class="footer-content">
     <div class="footer-section">
       <h3>Navegación</h3>
       <ul>
-        <li><a href="#">Inicio</a></li>
-        <li><a href="#">Sobre Nosotros</a></li>
-        <li><a href="#">Aviso legal</a></li>
-        <li><a href="#">Contáctanos</a></li>
+        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
       </ul>
     </div>
-    <div class="footer-section">
-      <h3>Categorías</h3>
-      <ul>
-        <li><a href="#">Moda</a></li>
-        <li><a href="#">Tecnología</a></li>
-        <li><a href="#">Comida</a></li>
-        <li><a href="#">Salud</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h3>Contacto</h3>
-      <ul>
-        <li><a href="mailto:info@yourtoolquizz.site">info@yourtoolquizz.site</a></li>
-        <li><a href="#">Tel: +34 651 83 06 95</a></li>
-      </ul>
-    </div>
-    <div class="footer-section">
-      <h3>Síguenos</h3>
-      <div class="social-links">
-        <a href="#"><i class="fab fa-facebook"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-youtube"></i></a>
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
+          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom">© 2023 YourToolQuizz. Todos los derechos reservados.</div>
-</footer>
+    <div class="footer-bottom">
+      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+    </div>
+  </footer>
 <script>
 const slider = document.getElementById('duration');
 const priceEl = document.getElementById('price');
@@ -274,7 +281,13 @@ const taxEl = document.getElementById('tax');
 const totalEl = document.getElementById('total');
 
 const taxPercent = 0.21;
-const prices = { 1: 100, 2: 180, 3: 250, 4: 800 };
+// ✅ Precios actualizados en euros
+const prices = { 
+  1: 10, 
+  2: 15, 
+  3: 20, 
+  4: 25 
+};
 
 function updatePrice() {
   const value = slider.value;
@@ -282,13 +295,14 @@ function updatePrice() {
   const tax = price * taxPercent;
   const total = price + tax;
 
-  priceEl.textContent = `$${price}`;
-  taxEl.textContent = `Tax (21%): $${tax.toFixed(2)}`;
-  totalEl.textContent = `Total con impuesto: $${total.toFixed(2)}`;
+  priceEl.textContent = `${price} €`;
+  taxEl.textContent = `IVA (21%): ${tax.toFixed(2)} €`;
+  totalEl.textContent = `Total con IVA: ${total.toFixed(2)} €`;
 }
 slider.addEventListener('input', updatePrice);
 updatePrice();
 </script>
+
 
 </body>
 </html>

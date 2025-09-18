@@ -234,11 +234,6 @@
       {{ form.submit(class="quiz-btn") }}
     </form>
 
-    <button id="google-login" class="google-btn">
-      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
-      Iniciar sesión con Google
-    </button>
-
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -254,16 +249,17 @@
 
   <footer>
     <div class="footer-content">
-      <div class="footer-section">
-        <h3>Navegación</h3>
-        <ul>
-          <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-          <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-          <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-          <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-          <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-        </ul>
-      </div>
+    <div class="footer-section">
+      <h3>Navegación</h3>
+      <ul>
+        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
+      </ul>
+    </div>
       <div class="footer-section">
         <h3>Quizzes</h3>
         <ul>

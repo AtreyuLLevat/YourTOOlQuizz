@@ -349,32 +349,53 @@ def create_app():
 
         return render_template("dashboard.html", usuario=usuario)
         
-    @app.route("/change_password", methods=["POST"])
+    @app.route("/change_password", methods=["GET", "POST"])
     @login_required
     def change_password():
-        current_pw = request.form.get("current_password")
-        new_pw = request.form.get("new_password")
-        confirm_pw = request.form.get("confirm_password")
+        email = current_user.email
 
-        # Validar contraseña actual
-        if not check_password_hash(current_user.password, current_pw):
-            flash("Contraseña actual incorrecta", "error")
-            return redirect(url_for("dashboard"))
+        # Cliente admin con service_role
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
-        # Verificar coincidencia de nueva contraseña
-        if new_pw != confirm_pw:
-            flash("La nueva contraseña no coincide", "error")
-            return redirect(url_for("dashboard"))
+        # Cliente normal (anon) para verificar contraseña
+        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-        # Actualizar la contraseña en la base de datos
-        current_user.password = generate_password_hash(new_pw)
-        db.session.commit()
+        if request.method == "POST":
+            current_password = request.form.get("current_password")
+            new_password = request.form.get("new_password")
+            confirm_password = request.form.get("confirm_password")
 
-        flash("Contraseña actualizada correctamente", "success")
-        return redirect(url_for("dashboard"))
+            if new_password != confirm_password:
+                flash("Las contraseñas no coinciden", "error")
+                return redirect(url_for("change_password"))
 
+            # 1️⃣ Verificar contraseña actual
+            try:
+                user = supabase_client.auth.sign_in_with_password({
+                    "email": email,
+                    "password": current_password
+                })
+                if not user.user:
+                    flash("La contraseña actual no es correcta", "error")
+                    return redirect(url_for("change_password"))
+            except Exception:
+                flash("Error al verificar la contraseña actual", "error")
+                return redirect(url_for("change_password"))
 
+            # 2️⃣ Actualizar contraseña usando service_role
+            try:
+                user_id = user.user.id
+                supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
+                flash("Contraseña actualizada con éxito 🎉", "success")
+                return redirect(url_for("dashboard"))
+            except Exception as e:
+                flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
+                return redirect(url_for("change_password"))
 
+        return render_template("change_password.html")
 
     @app.route("/logout")
     @login_required

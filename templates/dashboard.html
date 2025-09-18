@@ -65,9 +65,24 @@ main {
 .user-info h2, .contract-info h2 { font-size:1.4rem; font-weight:700; color:#000; margin-bottom:16px; }
 .user-info label { font-weight: 600; display:block; margin-bottom:6px; color:#000; }
 .user-info input { width:100%; padding:14px; margin-bottom:16px; border:1px solid #ddd; border-radius:12px; font-size:1rem; background:#f9f9f9; }
+/* Ajuste de botón junto al input */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espacio entre input y botón */
+}
+
+.input-wrapper input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #f9f9f9;
+}
+
 .change-password-btn {
-  display: inline-block;
-  margin-top: 8px;
+  display: inline-flex;
   padding: 10px 16px;
   background-color: #D60000;
   color: #fff;
@@ -130,7 +145,8 @@ footer {
 <body>
 
 <header>
-  <div class="logo"><a href="#">YourToolQuizz</a></div>
+    <div class="logo">
+     <a href="{{ url_for('homepage') }}" style="text-decoration: none; color: inherit;">YourToolQuizz</a>
 </header>
 
 <main class="container">
@@ -146,19 +162,21 @@ footer {
   <!-- INFO USUARIO y CONTRATO -->
   <div class="grid-2">
     <!-- INFO USUARIO -->
-    <div class="card user-info">
-      <h2>Tu información</h2>
-      <label for="name">Nombre</label>
-      <input type="text" id="name" value="{{ usuario.nombre or 'Sin nombre' }}" readonly>
-      <label for="email">Email</label>
-      <input type="email" id="email" value="{{ usuario.email or '' }}" readonly>
-      <label for="password">Contraseña</label>
+<!-- INFO USUARIO -->
+<div class="card user-info">
+  <h2>Tu información</h2>
+  <label for="name">Nombre</label>
+  <input type="text" id="name" value="{{ usuario.nombre or 'Sin nombre' }}" readonly>
+  <label for="email">Email</label>
+  <input type="email" id="email" value="{{ usuario.email or '' }}" readonly>
+  <label for="password">Contraseña</label>
+  <div class="input-wrapper">
       <input type="password" id="password" value="********" readonly>
-      <div class="card user-info">
- <!-- Botón para cambiar contraseña -->
-        <a href="{{ url_for('change_password') }}" class="change-password-btn">Cambiar contraseña</a>
+      <!-- Botón de cambiar contraseña -->
+      <a href="{{ url_for('change_password') }}" class="change-password-btn">Cambiar</a>
+  </div>
 </div>
-    </div>
+
 
     <!-- INFO CONTRATO -->
     <div class="card contract-info">
@@ -173,47 +191,50 @@ footer {
 
 </main>
 
-<footer>
-  <div class="footer-content">
+  <footer>
+    <div class="footer-content">
     <div class="footer-section">
       <h3>Navegación</h3>
       <ul>
-        <li><a href="#">Inicio</a></li>
-        <li><a href="#">Sobre Nosotros</a></li>
-        <li><a href="#">Aviso legal</a></li>
-        <li><a href="#">Contáctanos</a></li>
+        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
       </ul>
     </div>
-
-    <div class="footer-section">
-      <h3>Quizzes</h3>
-      <ul>
-        <li><a href="#">Herramientas para diseño</a></li>
-        <li><a href="#">Herramientas para IA</a></li>
-        <li><a href="#">Herramientas para productividad</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h3>Contacto</h3>
-      <ul>
-        <li><a href="mailto:info@yourtoolquizz.site">info@yourtoolquizz.site</a></li>
-        <li><a href="#">Teléfono: +34 651 83 06 95</a></li>
-      </ul>
-    </div>
-
-    <div class="footer-section">
-      <h3>Síguenos</h3>
-      <div class="social-links">
-        <a href="#"><i class="fab fa-facebook"></i></a>
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-youtube"></i></a>
+      <div class="footer-section">
+        <h3>Quizzes</h3>
+        <ul>
+          <li><a href="{{ url_for('diseño') }}">Herramientas para diseño</a></li>
+          <li><a href="{{ url_for('Inteligenciasartificiales') }}">Herramientas para IA</a></li>
+          <li><a href="{{ url_for('productividad') }}">Herramientas para productividad</a></li>
+          <li><a href="{{ url_for('Redes') }}">Herramientas para redes sociales</a></li>
+          <li><a href="{{ url_for('seguridad') }}">Herramientas de seguridad</a></li>
+          <li><a href="{{ url_for('blog') }}">Blogs relacionados con los quizz</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="footer-bottom">&copy; 2025 YourToolQuizz. Todos los derechos reservados.</div>
-</footer>
 
+    <div class="footer-bottom">&copy; 2023 YourToolQuizz. Todos los derechos reservados.</div>
+  </footer>
 
 
 
