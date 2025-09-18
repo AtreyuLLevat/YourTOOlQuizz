@@ -15,6 +15,8 @@ from sqlalchemy.pool import NullPool
 import base64
 from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 from supabase import create_client
+from forms import ChangePasswordForm
+
 
 
 load_dotenv()
@@ -352,6 +354,7 @@ def create_app():
     @app.route("/change_password", methods=["GET", "POST"])
     @login_required
     def change_password():
+        form = ChangePasswordForm()
         email = current_user.email
 
         # Cliente admin con service_role
@@ -363,14 +366,10 @@ def create_app():
         SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
         supabase_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-        if request.method == "POST":
-            current_password = request.form.get("current_password")
-            new_password = request.form.get("new_password")
-            confirm_password = request.form.get("confirm_password")
-
-            if new_password != confirm_password:
-                flash("Las contraseñas no coinciden", "error")
-                return redirect(url_for("change_password"))
+        if form.validate_on_submit():
+            current_password = form.current_password.data
+            new_password = form.new_password.data
+            confirm_password = form.confirm_password.data
 
             # 1️⃣ Verificar contraseña actual
             try:
@@ -395,7 +394,8 @@ def create_app():
                 flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
                 return redirect(url_for("change_password"))
 
-        return render_template("change_password.html")
+        return render_template("change_password.html", form=form)
+
 
     @app.route("/logout")
     @login_required

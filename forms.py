@@ -33,3 +33,25 @@ class ContactForm(FlaskForm):
     correo = StringField('Email', validators=[Email(), DataRequired()])
     mensaje = TextAreaField('Mensaje', validators=[DataRequired(), Length(min=10)])
     submit = SubmitField("Enviar")
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Contraseña actual', validators=[DataRequired()])
+    new_password = PasswordField(
+        'Nueva contraseña',
+        validators=[
+            DataRequired(),
+            Length(min=8, message='Debe tener al menos 8 caracteres'),
+            Regexp(
+                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&¿¡?_\'-])',
+                message='Debe incluir mayúscula, minúscula, número y símbolo'
+            )
+        ]
+    )
+    confirm_password = PasswordField(
+        'Confirmar nueva contraseña',
+        validators=[
+            DataRequired(),
+            EqualTo('new_password', message='Las contraseñas no coinciden')
+        ]
+    )
+    submit = SubmitField('Actualizar contraseña')
