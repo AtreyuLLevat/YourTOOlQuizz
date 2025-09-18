@@ -42,6 +42,7 @@ def create_app():
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
 
+
     db.init_app(app)
     mail = Mail(app)
     Migrate(app, db)
@@ -65,6 +66,10 @@ def create_app():
     def add_csp(response):
         response.headers['Content-Security-Policy'] = "script-src 'self';"
         return response
+
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
     # -----------------------------
     # RUTAS
@@ -351,50 +356,43 @@ def create_app():
 
         return render_template("dashboard.html", usuario=usuario)
         
-    @app.route("/change_password", methods=["GET", "POST"])
-    @login_required
-    def change_password():
-        form = ChangePasswordForm()
-        email = current_user.email
+@app.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    email = current_user.email
 
-        # Cliente admin con service_role
-        SUPABASE_URL = os.getenv("SUPABASE_URL")
-        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    if request.method == "POST":
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
 
-        # Cliente normal (anon) para verificar contraseña
-        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-        supabase_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+        if new_password != confirm_password:
+            flash("Las contraseñas no coinciden", "error")
+            return redirect(url_for("change_password"))
 
-        if form.validate_on_submit():
-            current_password = form.current_password.data
-            new_password = form.new_password.data
-            confirm_password = form.confirm_password.data
+        try:
+            # 1️⃣ Verificar contraseña actual usando sign_in con service_role
+            # NOTA: sign_in_with_password normalmente se usa con anon key, pero aquí podemos usar admin client
+            auth_response = supabase_admin.auth.sign_in_with_password({
+                "email": email,
+                "password": current_password
+            })
 
-            # 1️⃣ Verificar contraseña actual
-            try:
-                user = supabase_client.auth.sign_in_with_password({
-                    "email": email,
-                    "password": current_password
-                })
-                if not user.user:
-                    flash("La contraseña actual no es correcta", "error")
-                    return redirect(url_for("change_password"))
-            except Exception:
-                flash("Error al verificar la contraseña actual", "error")
+            if not auth_response.user:
+                flash("La contraseña actual no es correcta", "error")
                 return redirect(url_for("change_password"))
 
-            # 2️⃣ Actualizar contraseña usando service_role
-            try:
-                user_id = user.user.id
-                supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
-                flash("Contraseña actualizada con éxito 🎉", "success")
-                return redirect(url_for("dashboard"))
-            except Exception as e:
-                flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
-                return redirect(url_for("change_password"))
+            # 2️⃣ Actualizar contraseña con service_role
+            user_id = auth_response.user.id
+            supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
+            flash("Contraseña actualizada con éxito 🎉", "success")
+            return redirect(url_for("dashboard"))
 
-        return render_template("change_password.html", form=form)
+        except Exception as e:
+            flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
+            return redirect(url_for("change_password"))
+
+    return render_template("change_password.html")
 
 
     @app.route("/logout")
