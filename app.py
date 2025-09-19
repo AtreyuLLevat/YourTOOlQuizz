@@ -359,20 +359,16 @@ def create_app():
     @app.route("/change_password", methods=["GET", "POST"])
     @login_required
     def change_password():
+        form = ChangePasswordForm()
         email = current_user.email
 
-        if request.method == "POST":
-            current_password = request.form.get("current_password")
-            new_password = request.form.get("new_password")
-            confirm_password = request.form.get("confirm_password")
+        if form.validate_on_submit():
+            current_password = form.current_password.data
+            new_password = form.new_password.data
+            confirm_password = form.confirm_password.data
 
-            if new_password != confirm_password:
-                flash("Las contraseñas no coinciden", "error")
-                return redirect(url_for("change_password"))
-
+            # Aquí tu lógica de conexión con Supabase ↓
             try:
-                # 1️⃣ Verificar contraseña actual usando sign_in con service_role
-                # NOTA: sign_in_with_password normalmente se usa con anon key, pero aquí podemos usar admin client
                 auth_response = supabase_admin.auth.sign_in_with_password({
                     "email": email,
                     "password": current_password
@@ -382,7 +378,7 @@ def create_app():
                     flash("La contraseña actual no es correcta", "error")
                     return redirect(url_for("change_password"))
 
-                # 2️⃣ Actualizar contraseña con service_role
+                # Actualizar contraseña
                 user_id = auth_response.user.id
                 supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
                 flash("Contraseña actualizada con éxito 🎉", "success")
@@ -392,8 +388,7 @@ def create_app():
                 flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
                 return redirect(url_for("change_password"))
 
-        return render_template("change_password.html")
-
+        return render_template("change_password.html", form=form)
 
     @app.route("/logout")
     @login_required
