@@ -356,43 +356,43 @@ def create_app():
 
         return render_template("dashboard.html", usuario=usuario)
         
-@app.route("/change_password", methods=["GET", "POST"])
-@login_required
-def change_password():
-    email = current_user.email
+    @app.route("/change_password", methods=["GET", "POST"])
+    @login_required
+    def change_password():
+        email = current_user.email
 
-    if request.method == "POST":
-        current_password = request.form.get("current_password")
-        new_password = request.form.get("new_password")
-        confirm_password = request.form.get("confirm_password")
+        if request.method == "POST":
+            current_password = request.form.get("current_password")
+            new_password = request.form.get("new_password")
+            confirm_password = request.form.get("confirm_password")
 
-        if new_password != confirm_password:
-            flash("Las contraseñas no coinciden", "error")
-            return redirect(url_for("change_password"))
-
-        try:
-            # 1️⃣ Verificar contraseña actual usando sign_in con service_role
-            # NOTA: sign_in_with_password normalmente se usa con anon key, pero aquí podemos usar admin client
-            auth_response = supabase_admin.auth.sign_in_with_password({
-                "email": email,
-                "password": current_password
-            })
-
-            if not auth_response.user:
-                flash("La contraseña actual no es correcta", "error")
+            if new_password != confirm_password:
+                flash("Las contraseñas no coinciden", "error")
                 return redirect(url_for("change_password"))
 
-            # 2️⃣ Actualizar contraseña con service_role
-            user_id = auth_response.user.id
-            supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
-            flash("Contraseña actualizada con éxito 🎉", "success")
-            return redirect(url_for("dashboard"))
+            try:
+                # 1️⃣ Verificar contraseña actual usando sign_in con service_role
+                # NOTA: sign_in_with_password normalmente se usa con anon key, pero aquí podemos usar admin client
+                auth_response = supabase_admin.auth.sign_in_with_password({
+                    "email": email,
+                    "password": current_password
+                })
 
-        except Exception as e:
-            flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
-            return redirect(url_for("change_password"))
+                if not auth_response.user:
+                    flash("La contraseña actual no es correcta", "error")
+                    return redirect(url_for("change_password"))
 
-    return render_template("change_password.html")
+                # 2️⃣ Actualizar contraseña con service_role
+                user_id = auth_response.user.id
+                supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
+                flash("Contraseña actualizada con éxito 🎉", "success")
+                return redirect(url_for("dashboard"))
+
+            except Exception as e:
+                flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
+                return redirect(url_for("change_password"))
+
+        return render_template("change_password.html")
 
 
     @app.route("/logout")
