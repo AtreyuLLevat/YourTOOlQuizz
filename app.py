@@ -66,8 +66,8 @@ def create_app():
     def add_csp(response):
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com"
         )
         return response
 
@@ -369,30 +369,36 @@ def create_app():
         if form.validate_on_submit():
             current_password = form.current_password.data
             new_password = form.new_password.data
-            confirm_password = form.confirm_password.data
 
-            # Aquí tu lógica de conexión con Supabase ↓
             try:
+                # Intentar iniciar sesión con la contraseña actual
                 auth_response = supabase_admin.auth.sign_in_with_password({
                     "email": email,
                     "password": current_password
                 })
 
-                if not auth_response.user:
+                # auth_response es un dict: {'user': ..., 'session': ...}
+                user = auth_response.get("user")
+
+                if not user:
                     flash("La contraseña actual no es correcta", "error")
                     return redirect(url_for("change_password"))
 
-                # Actualizar contraseña
-                user_id = auth_response.user.id
+                # Cambiar la contraseña usando admin.update_user_by_id
+                user_id = user["id"]  # extraer el ID correctamente
                 supabase_admin.auth.admin.update_user_by_id(user_id, {"password": new_password})
+
                 flash("Contraseña actualizada con éxito 🎉", "success")
                 return redirect(url_for("dashboard"))
 
             except Exception as e:
+                # Mostrar error de forma amigable y registrar el detalle
+                current_app.logger.exception("Error cambiando la contraseña")
                 flash(f"No se pudo actualizar la contraseña: {str(e)}", "error")
                 return redirect(url_for("change_password"))
 
         return render_template("change_password.html", form=form)
+
 
     @app.route("/logout")
     @login_required
