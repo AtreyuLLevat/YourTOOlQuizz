@@ -64,7 +64,11 @@ def create_app():
 
     @app.after_request
     def add_csp(response):
-        response.headers['Content-Security-Policy'] = "script-src 'self';"
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline'; "
+        )
         return response
 
     SUPABASE_URL = os.getenv("SUPABASE_URL")
