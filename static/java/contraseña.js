@@ -1,4 +1,3 @@
-// Mostrar / ocultar la contraseña con SVG
 function togglePassword(id, btn) {
     const input = document.getElementById(id);
     const svg = btn.querySelector('svg');
@@ -7,12 +6,12 @@ function togglePassword(id, btn) {
 
     if (input.type === "password") {
         input.type = "text";
-        slash.style.display = 'none';
-        eye.setAttribute('fill', '#000');
+        slash.style.display = "none"; // quitar tachado
+        eye.setAttribute("fill", "#000");
     } else {
         input.type = "password";
-        slash.style.display = 'block';
-        eye.setAttribute('fill', '#888');
+        slash.style.display = "block"; // poner tachado
+        eye.setAttribute("fill", "#888");
     }
 }
 
