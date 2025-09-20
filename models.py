@@ -3,6 +3,8 @@ from flask_login import UserMixin
 from datetime import datetime
 from sqlalchemy import event
 import unicodedata, re
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 db = SQLAlchemy()
 
@@ -33,6 +35,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    supabase_id = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
     otp_secret = db.Column(db.String(32), nullable=False)  # 🔐 Clave 2FA obligatoria
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
