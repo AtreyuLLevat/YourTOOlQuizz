@@ -73,8 +73,10 @@ def create_app():
 
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
+    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)  # admin (service role)
+    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)  # cliente público
     # -----------------------------
     # RUTAS
     # -----------------------------
@@ -374,30 +376,27 @@ def create_app():
                 flash("Las contraseñas no coinciden", "error")
                 return redirect(url_for("change_password"))
 
-            # Obtener supabase_id
             supabase_id = getattr(current_user, "supabase_id", None)
             if not supabase_id:
                 flash("No se encontró el identificador de Supabase para tu cuenta. Contacta soporte.", "error")
                 return redirect(url_for("change_password"))
 
             try:
-                # (OPCIONAL) Verificar la contraseña actual en Supabase
-                # Si quieres comprobar la contraseña actual, intenta sign_in_with_password:
-                try:
-                    verify = supabase_admin.auth.sign_in_with_password({
-                        "email": current_user.email,
-                        "password": current_password
-                    })
-                    if not verify.get("user"):
-                        flash("La contraseña actual es incorrecta", "error")
-                        return redirect(url_for("change_password"))
-                except Exception:
-                    # Aquí puedes decidir: o fallar la verificación o continuar (según tu política)
-                    flash("Error verificando la contraseña actual.", "error")
+                # Verificar contraseña actual con cliente público
+                verify = supabase.auth.sign_in_with_password({
+                    "email": current_user.email,
+                    "password": current_password
+                })
+                if not verify.user:
+                    flash("La contraseña actual es incorrecta", "error")
                     return redirect(url_for("change_password"))
 
-                # Actualizar contraseña usando el UUID guardado
-                supabase_admin.auth.admin.update_user_by_id(supabase_id, {"password": new_password})
+                # Actualizar contraseña con cliente admin
+                supabase_admin.auth.admin.update_user_by_id(
+                    str(supabase_id),
+                    {"password": new_password}
+                )
+
                 flash("Contraseña actualizada con éxito 🎉", "success")
                 return redirect(url_for("dashboard"))
 
@@ -407,7 +406,6 @@ def create_app():
                 return redirect(url_for("change_password"))
 
         return render_template("change_password.html", form=form)
-
 
 
     @app.route("/logout")
