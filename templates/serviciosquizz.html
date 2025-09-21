@@ -92,7 +92,7 @@ main { flex: 1; padding: 80px 24px; max-width: 1000px; margin: 0 auto; text-alig
   margin-bottom: 30px;
   color: #333;
 }
-.quiz-cover button {
+.button {
   padding: 14px 40px;
   font-size: 1.1rem;
   background: #D60000;
@@ -183,11 +183,16 @@ footer {
 
   <!-- PORTADA DEL QUIZ -->
   <div class="quiz-cover">
-    <h2>¡Bienvenido a tu Quiz de prueba!</h2>
+    <h2>¡Bienvenido a tu Quiz de prueba 1!</h2>
     <p>Descubre cuánto puedes potenciar tu marca con nuestro quiz de ejemplo.</p>
-    <button id="start-quiz">Comenzar Quiz</button>
-  </div>
+    <a href="{{ url_for('quizzantivirus') }}" id="start-quiz" class="button">Comenzar Quiz</a>
 
+  </div>
+  <div class="quiz-cover">
+    <h2>¡Bienvenido a tu Quiz de prueba 2!</h2>
+    <p>Descubre cuánto puedes potenciar tu marca con nuestro quiz de ejemplo.</p>
+    <a href="{{ url_for('quizzproductividad') }}" id="start-quiz" class="button">Comenzar Quiz</a>
+  </div>
   <!-- QUIZ DE MUESTRA -->
 
 </main>
