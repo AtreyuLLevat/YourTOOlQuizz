@@ -404,20 +404,6 @@ def create_app():
 
             str_id = str(supabase_id)
 
-            # 1️⃣ Verificar la contraseña actual
-            try:
-                sign_in_check = supabase_public.auth.sign_in_with_password({
-                    "email": current_user.email,
-                    "password": current_password
-                })
-                if not getattr(sign_in_check, "user", None) and not sign_in_check.get("user"):
-                    flash("La contraseña actual es incorrecta", "error")
-                    return redirect(url_for("change_password"))
-            except Exception as e:
-                current_app.logger.exception("Error verificando contraseña actual")
-                flash("No se pudo verificar la contraseña actual. Revisa logs.", "error")
-                return redirect(url_for("change_password"))
-
             # 2️⃣ Actualizar la contraseña en Supabase con admin
             try:
                 str_id = str(current_user.supabase_id)
