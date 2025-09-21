@@ -398,10 +398,11 @@ def create_app():
 
             try:
                 # Actualizar la contraseña con el cliente admin
-                supabase.auth.admin.update_user_by_id(
-                    supabase_id,
+                supabase_admin.auth.admin.update_user_by_id(
+                    str(supabase_id),
                     {"password": new_password}
                 )
+
 
                 flash("Contraseña actualizada con éxito 🎉", "success")
                 return redirect(url_for("dashboard"))
