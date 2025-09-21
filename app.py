@@ -377,11 +377,13 @@ def create_app():
 
         return render_template("dashboard.html", usuario=usuario)
         
+
+
+
     @app.route("/change_password", methods=["GET", "POST"])
     @login_required
     def change_password():
         form = ChangePasswordForm()
-
         if form.validate_on_submit():
             current_password = form.current_password.data
             new_password = form.new_password.data
@@ -392,27 +394,87 @@ def create_app():
                 return redirect(url_for("change_password"))
 
             supabase_id = getattr(current_user, "supabase_id", None)
+            current_app.logger.info("supabase_id raw: %r (type=%s)", supabase_id, type(supabase_id))
+
             if not supabase_id:
                 flash("No se encontró el identificador de Supabase para tu cuenta. Contacta soporte.", "error")
                 return redirect(url_for("change_password"))
 
+            str_id = str(supabase_id)
+
+            # 1) Verificar que el usuario existe en Supabase por ese id
             try:
-                # Actualizar la contraseña con el cliente admin
-                supabase_admin.auth.admin.update_user_by_id(
-                    str(supabase_id),
-                    {"password": new_password}
-                )
-
-
-                flash("Contraseña actualizada con éxito 🎉", "success")
-                return redirect(url_for("dashboard"))
-
+                user_resp = supabase_admin.auth.admin.get_user_by_id(str_id)
+                current_app.logger.info("get_user_by_id repr: %s", repr(user_resp))
             except Exception as e:
-                current_app.logger.exception("Error al cambiar contraseña")
+                current_app.logger.exception("Error al obtener usuario desde Supabase por id")
+                flash("No se pudo verificar el usuario en Supabase. Revisa logs.", "error")
+                return redirect(url_for("change_password"))
+
+            # (Opcional) comprobar que el email del usuario en Supabase coincide con el current_user
+            try:
+                # Intenta extraer email de la respuesta de forma robusta
+                user_email = None
+                if isinstance(user_resp, dict):
+                    user_email = user_resp.get("email") or (user_resp.get("user") or {}).get("email")
+                    # algunos SDK devuelven .get("data")
+                    if not user_email and user_resp.get("data"):
+                        data = user_resp.get("data")
+                        if isinstance(data, dict):
+                            user_email = data.get("email")
+                else:
+                    # objeto con atributos
+                    if hasattr(user_resp, "user") and getattr(user_resp, "user"):
+                        user_email = getattr(user_resp.user, "email", None)
+                    if not user_email and hasattr(user_resp, "data"):
+                        d = getattr(user_resp, "data")
+                        if isinstance(d, dict):
+                            user_email = d.get("email")
+                current_app.logger.info("email encontrado en auth: %s", user_email)
+                if user_email and user_email != current_user.email:
+                    flash("El supabase_id no corresponde al email actual. Contacta soporte.", "error")
+                    return redirect(url_for("change_password"))
+            except Exception:
+                current_app.logger.exception("No se pudo extraer email de la respuesta get_user_by_id; continuaré con la actualización")
+
+            # 2) Intentar actualizar la contraseña
+            try:
+                upd = supabase_admin.auth.admin.update_user_by_id(str_id, {"password": new_password})
+                current_app.logger.info("update_user_by_id repr: %s", repr(upd))
+            except Exception as e:
+                current_app.logger.exception("Error al llamar update_user_by_id")
                 flash(f"No se pudo actualizar la contraseña: {e}", "error")
                 return redirect(url_for("change_password"))
 
+            # 3) Verificar si el cambio surtió efecto intentando iniciar sesión con la nueva contraseña
+            try:
+                sign = supabase_public.auth.sign_in_with_password({
+                    "email": current_user.email,
+                    "password": new_password
+                })
+                current_app.logger.info("sign_in_with_password repr: %s", repr(sign))
+
+                # comprobar de forma simple si el sign in devolvió usuario
+                sign_ok = False
+                if isinstance(sign, dict):
+                    sign_ok = bool(sign.get("user") or sign.get("data"))
+                else:
+                    sign_ok = bool(getattr(sign, "user", None) or getattr(sign, "data", None))
+
+                if not sign_ok:
+                    flash("No se pudo iniciar sesión con la nueva contraseña. Revisa los logs del servidor.", "error")
+                    return redirect(url_for("change_password"))
+
+            except Exception as e:
+                current_app.logger.exception("Error al verificar la nueva contraseña mediante sign_in")
+                flash("La contraseña fue actualizada (o hubo un error), pero no se pudo verificar el inicio de sesión automáticamente. Revisa logs.", "warning")
+                return redirect(url_for("change_password"))
+
+            flash("Contraseña actualizada con éxito 🎉", "success")
+            return redirect(url_for("dashboard"))
+
         return render_template("change_password.html", form=form)
+
 
 
     @app.route("/logout")
