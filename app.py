@@ -386,7 +386,6 @@ def create_app():
     def change_password():
         form = ChangePasswordForm()
         if form.validate_on_submit():
-            current_password = form.current_password.data
             new_password = form.new_password.data
             confirm_password = form.confirm_password.data
 
@@ -394,48 +393,31 @@ def create_app():
                 flash("Las contraseñas no coinciden", "error")
                 return redirect(url_for("change_password"))
 
-            # Verificar que tenemos el supabase_id del usuario
             supabase_id = getattr(current_user, "supabase_id", None)
-            current_app.logger.info("Usuario actual: %s, supabase_id=%s", current_user.email, supabase_id)
-
             if not supabase_id:
-                flash("No se encontró el identificador de Supabase. Contacta soporte.", "error")
+                flash("No se encontró el identificador de Supabase para tu cuenta. Contacta soporte.", "error")
                 return redirect(url_for("change_password"))
 
             str_id = str(supabase_id)
+            current_app.logger.info("Intentando cambiar contraseña del usuario Supabase: %s", str_id)
 
-            # 2️⃣ Actualizar la contraseña en Supabase con admin
             try:
-                str_id = str(current_user.supabase_id)
-
-                upd = supabase_admin.auth.admin.update_user(
-                    user_id=str_id,
-                    attributes={"password": new_password}
-)
-                current_app.logger.info("update_user response: %s", repr(upd))
+                # Actualizar contraseña usando la API correcta
+                upd = supabase_admin.auth.admin.update_user_by_id(
+                    str_id,
+                    {"password": new_password}
+                )
+                current_app.logger.info("Respuesta update_user_by_id: %s", repr(upd))
             except Exception as e:
-                current_app.logger.exception("Error actualizando contraseña")
+                current_app.logger.exception("Error actualizando contraseña en Supabase")
                 flash(f"No se pudo actualizar la contraseña: {e}", "error")
-                return redirect(url_for("change_password"))
-
-            # 3️⃣ Verificar que el cambio surtió efecto
-            try:
-                sign_new = supabase_public.auth.sign_in_with_password({
-                    "email": current_user.email,
-                    "password": new_password
-                })
-                if not getattr(sign_new, "user", None) and not sign_new.get("user"):
-                    flash("No se pudo iniciar sesión con la nueva contraseña. Revisa logs.", "error")
-                    return redirect(url_for("change_password"))
-            except Exception as e:
-                current_app.logger.exception("Error iniciando sesión con nueva contraseña")
-                flash("Contraseña actualizada, pero no se pudo verificar el inicio de sesión automáticamente.", "warning")
                 return redirect(url_for("change_password"))
 
             flash("Contraseña actualizada con éxito 🎉", "success")
             return redirect(url_for("dashboard"))
 
         return render_template("change_password.html", form=form)
+
 
 
 
