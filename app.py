@@ -87,10 +87,11 @@ def create_app():
     )
 
     # Cliente público (para operaciones normales de usuario)
-    supabase = create_client(
+    supabase_public = create_client(
         SUPABASE_URL,
         SUPABASE_ANON_KEY
     )
+
 # -----------------------------
 
     # RUTAS
@@ -405,7 +406,15 @@ def create_app():
             # 1) Verificar que el usuario existe en Supabase por ese id
             try:
                 user_resp = supabase_admin.auth.admin.get_user_by_id(str_id)
-                current_app.logger.info("get_user_by_id repr: %s", repr(user_resp))
+                current_app.logger.info("get_user_by_id raw: %s", repr(user_resp))
+
+                # Forma estándar en supabase-py 2.x
+                if hasattr(user_resp, "model_dump"):
+                    user_data = user_resp.model_dump()
+                else:
+                    user_data = getattr(user_resp, "data", user_resp)
+
+                current_app.logger.info("get_user_by_id data: %s", user_data)
             except Exception as e:
                 current_app.logger.exception("Error al obtener usuario desde Supabase por id")
                 flash("No se pudo verificar el usuario en Supabase. Revisa logs.", "error")
@@ -456,10 +465,10 @@ def create_app():
 
                 # comprobar de forma simple si el sign in devolvió usuario
                 sign_ok = False
-                if isinstance(sign, dict):
-                    sign_ok = bool(sign.get("user") or sign.get("data"))
-                else:
-                    sign_ok = bool(getattr(sign, "user", None) or getattr(sign, "data", None))
+                if hasattr(sign, "user") and sign.user:
+                    sign_ok = True
+                elif isinstance(sign, dict) and sign.get("user"):
+                    sign_ok = True
 
                 if not sign_ok:
                     flash("No se pudo iniciar sesión con la nueva contraseña. Revisa los logs del servidor.", "error")
@@ -470,8 +479,6 @@ def create_app():
                 flash("La contraseña fue actualizada (o hubo un error), pero no se pudo verificar el inicio de sesión automáticamente. Revisa logs.", "warning")
                 return redirect(url_for("change_password"))
 
-            flash("Contraseña actualizada con éxito 🎉", "success")
-            return redirect(url_for("dashboard"))
 
         return render_template("change_password.html", form=form)
 
