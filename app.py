@@ -391,11 +391,11 @@ def create_app():
                     flash("La contraseña actual es incorrecta", "error")
                     return redirect(url_for("change_password"))
 
-                # Actualizar contraseña con cliente admin
-                supabase_admin.auth.admin.update_user_by_id(
-                    str(supabase_id),
+                supabase_admin.auth.admin.update_user(
+                    supabase_id,
                     {"password": new_password}
                 )
+
 
                 flash("Contraseña actualizada con éxito 🎉", "success")
                 return redirect(url_for("dashboard"))
