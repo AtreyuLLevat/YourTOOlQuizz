@@ -390,58 +390,58 @@ def create_app():
             new_password = form.new_password.data
             confirm_password = form.confirm_password.data
 
-            current_app.logger.info("validate_on_submit=True")
-
             if new_password != confirm_password:
                 flash("Las contraseñas no coinciden", "error")
                 return redirect(url_for("change_password"))
 
+            # Verificar que tenemos el supabase_id del usuario
             supabase_id = getattr(current_user, "supabase_id", None)
-            current_app.logger.info("supabase_id raw: %r (type=%s)", supabase_id, type(supabase_id))
+            current_app.logger.info("Usuario actual: %s, supabase_id=%s", current_user.email, supabase_id)
 
             if not supabase_id:
-                flash("No se encontró el identificador de Supabase para tu cuenta. Contacta soporte.", "error")
+                flash("No se encontró el identificador de Supabase. Contacta soporte.", "error")
                 return redirect(url_for("change_password"))
 
             str_id = str(supabase_id)
 
-            # 1) Obtener usuario desde Supabase
+            # 1️⃣ Verificar la contraseña actual
             try:
-                user_resp = supabase_admin.auth.admin.get_user_by_id(str_id)
-                current_app.logger.info("get_user_by_id raw: %s", repr(user_resp))
-                user_email = getattr(user_resp.user, "email", None) if hasattr(user_resp, "user") else None
-                current_app.logger.info("email encontrado en auth: %s", user_email)
-                if not user_email or user_email != current_user.email:
-                    flash("El supabase_id no corresponde al email actual. Contacta soporte.", "error")
+                sign_in_check = supabase_public.auth.sign_in_with_password({
+                    "email": current_user.email,
+                    "password": current_password
+                })
+                if not getattr(sign_in_check, "user", None) and not sign_in_check.get("user"):
+                    flash("La contraseña actual es incorrecta", "error")
                     return redirect(url_for("change_password"))
             except Exception as e:
-                current_app.logger.exception("Error al obtener usuario desde Supabase por id")
-                flash("No se pudo verificar el usuario en Supabase. Revisa logs.", "error")
+                current_app.logger.exception("Error verificando contraseña actual")
+                flash("No se pudo verificar la contraseña actual. Revisa logs.", "error")
                 return redirect(url_for("change_password"))
 
-            # 2) Actualizar contraseña
+            # 2️⃣ Actualizar la contraseña en Supabase con admin
             try:
-                upd = supabase_admin.auth.admin.update_user_by_id(str_id, {"password": new_password})
-                current_app.logger.info("update_user_by_id repr: %s", repr(upd))
+                upd = supabase_admin.auth.admin.update_user(
+                    user_id=str_id,
+                    attributes={"password": new_password}
+                )
+                current_app.logger.info("update_user response: %s", repr(upd))
             except Exception as e:
-                current_app.logger.exception("Error al llamar update_user_by_id")
+                current_app.logger.exception("Error actualizando contraseña")
                 flash(f"No se pudo actualizar la contraseña: {e}", "error")
                 return redirect(url_for("change_password"))
 
-            # 3) Verificar inicio de sesión con la nueva contraseña
+            # 3️⃣ Verificar que el cambio surtió efecto
             try:
-                sign = supabase_public.auth.sign_in_with_password({
+                sign_new = supabase_public.auth.sign_in_with_password({
                     "email": current_user.email,
                     "password": new_password
                 })
-                current_app.logger.info("sign_in_with_password repr: %s", repr(sign))
-                sign_ok = bool(getattr(sign, "user", None) or (isinstance(sign, dict) and sign.get("user")))
-                if not sign_ok:
-                    flash("No se pudo iniciar sesión con la nueva contraseña. Revisa los logs del servidor.", "error")
+                if not getattr(sign_new, "user", None) and not sign_new.get("user"):
+                    flash("No se pudo iniciar sesión con la nueva contraseña. Revisa logs.", "error")
                     return redirect(url_for("change_password"))
             except Exception as e:
-                current_app.logger.exception("Error al verificar la nueva contraseña mediante sign_in")
-                flash("La contraseña fue actualizada, pero no se pudo verificar el inicio de sesión automáticamente.", "warning")
+                current_app.logger.exception("Error iniciando sesión con nueva contraseña")
+                flash("Contraseña actualizada, pero no se pudo verificar el inicio de sesión automáticamente.", "warning")
                 return redirect(url_for("change_password"))
 
             flash("Contraseña actualizada con éxito 🎉", "success")
