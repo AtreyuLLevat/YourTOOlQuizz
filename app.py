@@ -420,10 +420,12 @@ def create_app():
 
             # 2️⃣ Actualizar la contraseña en Supabase con admin
             try:
+                str_id = str(current_user.supabase_id)
+
                 upd = supabase_admin.auth.admin.update_user(
                     user_id=str_id,
                     attributes={"password": new_password}
-                )
+)
                 current_app.logger.info("update_user response: %s", repr(upd))
             except Exception as e:
                 current_app.logger.exception("Error actualizando contraseña")
