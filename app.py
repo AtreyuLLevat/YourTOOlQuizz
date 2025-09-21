@@ -382,15 +382,6 @@ def create_app():
                 return redirect(url_for("change_password"))
 
             try:
-                # Verificar contraseña actual con cliente público
-                verify = supabase.auth.sign_in_with_password({
-                    "email": current_user.email,
-                    "password": current_password
-                })
-                if not verify.user:
-                    flash("La contraseña actual es incorrecta", "error")
-                    return redirect(url_for("change_password"))
-
                 supabase_admin.auth.admin.update_user(
                     supabase_id,
                     {"password": new_password}
