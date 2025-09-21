@@ -16,6 +16,8 @@ import base64
 from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
 from supabase import create_client
 from forms import ChangePasswordForm
+from supabase.lib.client_options import ClientOptions
+
 
 
 
@@ -70,14 +72,27 @@ def create_app():
             "font-src 'self' https://fonts.gstatic.com"
         )
         return response
-
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-    supabase_admin = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)  # admin (service role)
-    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)  # cliente público
-    # -----------------------------
+    # Cliente admin (para actualizar usuarios, sin restricciones RLS)
+    supabase_admin = create_client(
+        SUPABASE_URL,
+        SUPABASE_SERVICE_KEY,
+        options=ClientOptions(
+            auto_refresh_token=False,
+            persist_session=False,
+        )
+    )
+
+    # Cliente público (para operaciones normales de usuario)
+    supabase = create_client(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    )
+# -----------------------------
+
     # RUTAS
     # -----------------------------
     @app.route('/')
@@ -382,11 +397,11 @@ def create_app():
                 return redirect(url_for("change_password"))
 
             try:
-                supabase_admin.auth.admin.update_user(
+                # Actualizar la contraseña con el cliente admin
+                supabase.auth.admin.update_user_by_id(
                     supabase_id,
                     {"password": new_password}
                 )
-
 
                 flash("Contraseña actualizada con éxito 🎉", "success")
                 return redirect(url_for("dashboard"))
