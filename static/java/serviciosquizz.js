@@ -19,9 +19,9 @@ function updatePrice(months) {
   const tax = price * taxPercent;
   const total = price + tax;
 
-  priceEl.textContent = `$${price}`;
-  taxEl.textContent = `Tax (21%): $${tax.toFixed(2)}`;
-  totalEl.textContent = `Con impuestos: $${total.toFixed(2)}`;
+  priceEl.textContent = `${price}€`;
+  taxEl.textContent = `Tax (21%): ${tax.toFixed(2)}€`;
+  totalEl.textContent = `Con impuestos: ${total.toFixed(2)}€`;
 }
 
 timeButtons.forEach(btn => {

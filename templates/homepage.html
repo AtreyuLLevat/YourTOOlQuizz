@@ -387,6 +387,12 @@ header {
   margin-bottom: 22px;
   transition: transform 0.3s ease;
 }
+.quiz-icon svg {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
 
 .quiz-card:hover .quiz-icon {
   transform: scale(1.1);
@@ -801,7 +807,7 @@ footer {
   <h2 class="quizzes-title">Explora nuestros quizzes</h2>
   <section class="quizzes-section">
     <div class="quiz-card"style="--i:0">
-      <div class="quiz-icon">🦠</div>
+      <div class="quiz-icon">🔐</div>
       <h3>Quiz seguridad</h3>
       <p>Descubre tu mejor herramienta antivirus para ti.</p>
       <a href="{{ url_for('quizzantivirus') }}" class="quiz-btn">Empezar</a>
@@ -813,17 +819,12 @@ footer {
       <a href="{{ url_for('quizzproductividad') }}" class="quiz-btn">Empezar</a>
     </div>
     <div class="quiz-card"style="--i:2">
-      <div class="quiz-icon">🎨</div>
+      <div class="quiz-icon">🖌️</div>
       <h3>Quiz diseño</h3>
       <p>Descubre la app de diseño que mejor se adapta a tus necesidades.</p>
       <a href="{{ url_for('diseño') }}" class="quiz-btn">Empezar</a>
     </div>
-    <div class="quiz-card"style="--i:3">
-      <div class="quiz-icon">📚</div>
-      <h3>Quizz redes sociales</h3>
-      <p>Encuentra la mejor app para usar las redes sociales a tu beneficio.</p>
-      <a href="{{ url_for('Redes') }}" class="quiz-btn">Empezar</a>
-    </div>
+
     <div class="quiz-card"style="--i:4">
       <div class="quiz-icon">🎯</div>
       <h3>Quiz IA</h3>
@@ -833,19 +834,25 @@ footer {
     <div class="quiz-card" style="--i:5">
       <div class="quiz-icon">⚙️</div>
       <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
+      <p></p>
       <a href="#" class="quiz-btn">Empezar</a>
     </div>
         <div class="quiz-card"style="--i:6">
       <div class="quiz-icon">⚙️</div>
       <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
+      <p></p>
       <a href="#" class="quiz-btn">Empezar</a>
     </div>
-        <div class="quiz-card"style="--i:7">
+    <div class="quiz-card"style="--i:7">
       <div class="quiz-icon">⚙️</div>
       <h3>Quiz 6</h3>
-      <p>Retos técnicos y mecánicos.</p>
+      <p></p>
+      <a href="#" class="quiz-btn">Empezar</a>
+    </div>
+    <div class="quiz-card"style="--i:7">
+      <div class="quiz-icon">⚙️</div>
+      <h3>Quiz 6</h3>
+      <p></p>
       <a href="#" class="quiz-btn">Empezar</a>
     </div>
   </section>
