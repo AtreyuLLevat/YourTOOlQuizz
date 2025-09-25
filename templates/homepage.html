@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>YourToolQuizz</title>
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #fff;
+  color: #111;
+  line-height: 1.6;
+}
+
+a, button, .quiz-card, .ad-slide, header, footer {
+  transition: all 0.3s ease;
+}
+
+/* ------------------ HEADER ------------------ */
+/* ------------------ HEADER ------------------ */
+
+
+/* Left area (menu) */
+.left-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Botón del menú (hamburguesa) */
+.menu {
+  position: relative;
+  display: inline-block;
+  font-size: 1.2rem;
+}
+
+.menu-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #111;
+}
+.menu-btn:hover,
+.menu-btn:focus {
+  background: rgba(0,0,0,0.04);
+  outline: none;
+}
+
+/* Dropdown: oculto por defecto, aparece con :hover o :focus-within */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 8px 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  z-index: 2000;
+}
+
+/* Mostrar dropdown si hover o focus-within (teclado) */
+.menu:hover .dropdown,
+.menu:focus-within .dropdown,
+.dropdown:hover {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Links del dropdown */
+.dropdown a {
+  display: block;
+  padding: 10px 16px;
+  color: #111;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.dropdown a:hover,
+.dropdown a:focus {
+  background: #f6f6f6;
+  color: #D60000;
+  outline: none;
+}
+
+/* ---------------- LOGO CENTRADO ---------------- */
+/* ----------- HEADER BASE ----------- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 28px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+  position: relative;
+  height: 64px;
+}
+
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #9e2121;
+  text-decoration: none;
+  z-index: 1500;
+}
+.logo a {
+  color: #9e2121;
+  text-decoration: none; /* opcional si no quieres subrayado */
+}
+
+
+.left-nav, .right-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* ----------- BUSCAR ----------- */
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  width: 140px;
+}
+
+.search-btn {
+  padding: 6px 10px;
+  background: #D60000;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ----------- LOGIN / LOGOUT ----------- */
+.btn-login, .btn-logout {
+  padding: 6px 14px;
+  background: #D60000;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* ----------- RESPONSIVE ----------- */
+
+/* Desktop: mostrar input y botón grande */
+@media (min-width: 721px) {
+  .search-input, .search-btn.desktop-only {
+    display: inline-flex;
+  }
+  .search-btn.mobile-only {
+    display: none;
+  }
+
+  .btn-login.desktop-only, .btn-logout.desktop-only {
+    display: inline-flex;
+  }
+  .btn-login.mobile-only, .btn-logout.mobile-only {
+    display: none;
+  }
+}
+
+/* Mobile: ocultar input y mostrar solo iconos */
+@media (max-width: 720px) {
+  header {
+    padding: 8px 16px;
+  }
+
+  /* Buscador: solo icono */
+  .search-container {
+    background: transparent;
+    padding: 0;
+  }
+  .search-input {
+    display: none;
+  }
+  .search-btn.desktop-only {
+    display: none;
+  }
+  .search-btn.mobile-only {
+    display: inline-flex;
+  }
+
+  /* Login/Logout: solo icono */
+  .btn-login.desktop-only, .btn-logout.desktop-only {
+    display: none;
+  }
+  .btn-login.mobile-only, .btn-logout.mobile-only {
+    display: inline-flex;
+  }
+
+  /* Alinear todo centrado */
+  .left-nav, .right-nav {
+    gap: 6px;
+  }
+  .right-nav {
+    margin-left: auto;
+  }
+
+  .logo {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+
+/* ------------------ SLIDER ------------------ */
+/* ------------------ SLIDER RESPONSIVE ------------------ */
+.slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-height: 600px;
+  min-height: 400px;
+  margin: 0 auto;
+  border-radius: 0;
+  background: linear-gradient(90deg, #000, #D60000);
+  z-index: 100;
+}
+
+.slider .slide {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden; /* oculta completamente los slides no activos */
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.slider .slide.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.slider .slide picture,
+.slider .slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  line-height: 0; /* elimina espacio extra generado por picture */
+}
+
+/* Botón del slide */
+.slide-button {
+  position: absolute;
+  bottom: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #D60000;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 200;
+}
+
+/* Dots / indicadores */
+.dots {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 200;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: #ff1a1a;
+  transform: scale(1.2);
+}
+
+/* ------------------ TÍTULOS AL ESTILO APPLE ------------------ */
+.main-title {
+  padding: 60px 20px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+}
+
+.title-left {
+  margin-bottom: 30px;
+}
+
+.main-title-top {
+  font-size: 4.5rem;
+  font-weight: 700;
+  color: #000000;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  line-height: 1.05;
+}
+
+.main-title-bottom {
+  font-size: 4.5rem;
+  font-weight: 300;
+  color: #000000;
+  letter-spacing: -0.5px;
+  line-height: 1.05;
+}
+
+.title-separator {
+  width: 120px;
+  height: 1px;
+  background: #d2d2d7;
+  border: none;
+  margin: 30px auto;
+}
+
+/* ------------------ SECCIONES CON TÍTULOS A LA DERECHA ------------------ */
+
+.sections {
+  padding: 60px 20px;
+  text-align: left; /* Cambia de right a left */
+  position: relative;
+  z-index: 1;
+}
+
+.section-title-right {
+  font-size: 3.2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #1d1d1f;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+  text-align: left; /* Cambia de right a left */
+  padding-left: 5%; /* Cambia de padding-right a padding-left */
+  padding-right: 0; /* Añade esto */
+  position: relative;
+}
+
+.section-title-right::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 5%; /* Cambia de right a left */
+  right: auto; /* Añade esto para resetear */
+  width: 120px;
+  height: 3px;
+  background-color: #b10000;
+  border-radius: 2px;
+}
+
+.section {
+  padding: 60px 20px;
+  text-align: left; /* Cambia de right a left */
+  position: relative;
+  z-index: 1;
+}
+
+.section-title {
+  font-size: 3.2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #1d1d1f;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+  text-align: left; /* Cambia de right a left */
+  padding-left: 5%; /* Cambia de padding-right a padding-left */
+  padding-right: 0; /* Añade esto */
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 5%; /* Cambia de right a left */
+  right: auto; /* Añade esto para resetear */
+  width: 120px;
+  height: 3px;
+  background-color: #be0202;
+  border-radius: 2px;
+}
+
+/* También actualiza la parte responsive para móviles */
+@media (max-width: 720px) {
+  .section-title-right, .section-title {
+    font-size: 2.4rem;
+    text-align: center;
+    padding-left: 0; /* Cambia de padding-right a padding-left */
+  }
+  
+  .section-title-right::after, .section-title::after {
+    left: 50%; /* Cambia de right a left */
+    transform: translateX(-50%); /* Cambia de 50% a -50% */
+  }
+}
+
+/* ------------------ CARRUSEL ------------------ */
+.carousel {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.carousel-wrapper {
+  overflow-x: hidden;
+  overflow-y: visible;
+  width: 90%;
+}
+
+.carousel-items {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+/* ------------------ QUIZZ CARDS ------------------ */
+.carousel-item {
+  flex: 0 0 450px;
+  max-width: 450px;
+  margin: 30px 15px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  text-align: center;
+  padding-bottom: 30px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.carousel-item:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  z-index: 5;
+}
+
+.carousel-item img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  display: block;
+}
+
+.carousel-item h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 20px 0 10px;
+  color: #1d1d1f;
+}
+
+.carousel-item p {
+  font-size: 1.1rem;
+  color: #86868b;
+  margin: 0 auto 25px;
+  max-width: 80%;
+  line-height: 1.4;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  background-color: #b10303;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover { 
+  background-color: #b40303; 
+}
+
+/* ------------------ BLOG CARDS ------------------ */
+.blog-card {
+  flex: 0 0 500px;
+  max-width: 500px;
+  margin: 30px 20px;
+  border-radius: 25px;
+  overflow: hidden;
+  display: block;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.blog-card img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  z-index: 5;
+}
+
+.blog-card:hover img { 
+  transform: scale(1.07); 
+}
+
+/* ------------------ FLECHAS CARRUSEL ------------------ */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(184, 184, 184, 0.9);
+  color: #fff;
+  border: none;
+  padding: 16px;
+  font-size: 1.6rem;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.carousel-btn:hover {
+  background-color: #a1a1a1;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev { 
+  left: 10px; 
+}
+
+.carousel-btn.next { 
+  right: 10px; 
+}
+
+/* ------------------ RESPONSIVE ------------------ */
+@media (min-width: 721px) {
+  .search-input, .search-btn.desktop-only {
+    display: inline-flex;
+  }
+  .search-btn.mobile-only {
+    display: none;
+  }
+
+  .btn-login.desktop-only, .btn-logout.desktop-only {
+    display: inline-flex;
+  }
+  .btn-login.mobile-only, .btn-logout.mobile-only {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  header {
+    padding: 8px 16px;
+  }
+
+  .search-container {
+    background: transparent;
+    padding: 0;
+  }
+  
+  .search-input {
+    display: none;
+  }
+  
+  .search-btn.desktop-only {
+    display: none;
+  }
+  
+  .search-btn.mobile-only {
+    display: inline-flex;
+  }
+
+  .btn-login.desktop-only, .btn-logout.desktop-only {
+    display: none;
+  }
+  
+  .btn-login.mobile-only, .btn-logout.mobile-only {
+    display: inline-flex;
+  }
+
+  .left-nav, .right-nav {
+    gap: 6px;
+  }
+  
+  .right-nav {
+    margin-left: auto;
+  }
+
+  .logo {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .main-title-top, .main-title-bottom {
+    font-size: 3.5rem;
+  }
+  
+  .section-title-right, .section-title {
+    font-size: 2.4rem;
+    text-align: center;
+    padding-right: 0;
+  }
+  
+  .section-title-right::after, .section-title::after {
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel-item { 
+    flex: 0 0 300px; 
+    max-width: 300px; 
+  }
+  
+  .blog-card { 
+    flex: 0 0 400px; 
+    max-width: 400px; 
+  }
+  
+  .section-title-right, .section-title { 
+    font-size: 2.8rem; 
+  }
+  
+  .main-title-top, .main-title-bottom { 
+    font-size: 3.5rem; 
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-wrapper { 
+    width: 100%; 
+  }
+  
+  .carousel-item,
+  .blog-card {
+    flex: 0 0 90%;
+    max-width: 90%;
+    margin: 20px 10px;
+  }
+  
+  .section-title-right, .section-title { 
+    font-size: 2.4rem; 
+  }
+  
+  .main-title-top, .main-title-bottom { 
+    font-size: 3rem; 
+  }
+  
+  .carousel-btn { 
+    padding: 12px; 
+    font-size: 1.2rem; 
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-item,
+  .blog-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin: 15px 5px;
+  }
+  
+  .section-title-right, .section-title { 
+    font-size: 2rem; 
+  }
+  
+  .main-title-top, .main-title-bottom { 
+    font-size: 2.5rem; 
+  }
+  
+  .main-title { 
+    padding: 40px 20px 30px; 
+  }
+  
+  .sections, .section {
+    padding: 40px 20px;
+  }
+}
+
+/* ------------------ FOOTER ------------------ */
+footer {
+  background: #f5f5f7;
+  color: #1d1d1f;
+  padding: 60px 24px 20px;
+  font-size: 0.95rem;
+  border-top: 1px solid #d2d2d7;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+}
+
+.footer-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+  color: #1d1d1f;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+  color: #515154;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.footer-section ul li a:hover {
+  color: #0071e3;
+}
+
+.social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.social-links a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #d2d2d7;
+  color: #1d1d1f;
+  font-size: 1.2rem;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.social-links a:hover {
+  background: #0071e3;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 30px;
+  border-top: 1px solid #d2d2d7;
+  margin-top: 40px;
+  font-size: 0.85rem;
+  color: #86868b;
+}
+  </style>
+</head>
+<body>
+<header>
+  <!-- Menú izquierdo -->
+  <div class="left-nav">
+    <div class="menu" tabindex="0">
+      <button class="menu-btn" aria-expanded="false" aria-controls="main-menu" aria-label="Abrir menú">☰</button>
+      <nav id="main-menu" class="dropdown" role="menu" aria-hidden="true">
+        <a role="menuitem" href="{{ url_for('about') }}">Acerca</a>
+        <a role="menuitem" href="{{ url_for('legal') }}">Legal</a>
+        <a role="menuitem" href="{{ url_for('contact') }}">Ayuda</a>
+        <a role="menuitem" href="{{ url_for('Servicio_1') }}">Nuestros servicios</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Logo centrado -->
+  <div class="logo">
+    <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
+  </div>
+
+  <!-- Buscador y autenticación -->
+  <div class="right-nav">
+    <!-- Buscar -->
+    <form class="search-container" method="GET" action="/buscar" role="search">
+      <input class="search-input desktop-only" type="text" name="q" placeholder="Buscar..." aria-label="Buscar">
+      <button class="search-btn desktop-only" type="submit" aria-label="Buscar">Buscar</button>
+      <button class="search-btn mobile-only" type="submit" aria-label="Buscar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M10 2a8 8 0 015.29 13.71l4 4a1 1 0 01-1.42 1.42l-4-4A8 8 0 1110 2zm0 2a6 6 0 100 12 6 6 0 000-12z"/>
+        </svg>
+      </button>
+    </form>
+
+    <!-- Login / Logout -->
+    {% if current_user.is_authenticated %}
+      <a class="btn-logout desktop-only" href="{{ url_for('logout') }}">Cerrar sesión</a>
+      <a class="btn-logout mobile-only" href="{{ url_for('logout') }}" title="Cerrar sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H10a2 2 0 00-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+        </svg>
+      </a>
+    {% else %}
+      <a class="btn-login desktop-only" href="{{ url_for('login') }}">Iniciar sesión</a>
+      <a class="btn-login mobile-only" href="{{ url_for('login') }}" title="Iniciar sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
+        </svg>
+      </a>
+    {% endif %}
+  </div>
+</header>
+
+<main>
+  <!-- Título principal -->
+<section class="slider">
+  <div class="slide active">
+    <picture>
+      <!-- Imagen móvil -->
+      <source srcset="{{ url_for('static', filename='Imagenes/banner1-mobile.png') }}" media="(max-width: 720px)">
+      <!-- Imagen tablet -->
+      <source srcset="{{ url_for('static', filename='Imagenes/banner1-tablet.png') }}" media="(max-width: 1024px)">
+      <!-- Imagen escritorio -->
+      <img src="{{ url_for('static', filename='Imagenes/banner1.png') }}" alt="Banner 1">
+    </picture>
+    <a href="{{ url_for('Servicio_2') }}" target="_blank" class="slide-button">Ver más</a>
+  </div>
+
+  <div class="slide">
+    <picture>
+      <source srcset="{{ url_for('static', filename='Imagenes/banner2-mobile.png') }}" media="(max-width: 720px)">
+      <source srcset="{{ url_for('static', filename='Imagenes/banner2-tablet.png') }}" media="(max-width: 1024px)">
+      <img src="{{ url_for('static', filename='Imagenes/banner2.png') }}" alt="Banner 2">
+    </picture>
+    <a href="{{ url_for('Servicio_2') }}" target="_blank" class="slide-button">Ver más</a>
+  </div>
+
+  <div class="slide">
+    <picture>
+      <source srcset="{{ url_for('static', filename='Imagenes/banner3-mobile.png') }}" media="(max-width: 720px)">
+      <source srcset="{{ url_for('static', filename='Imagenes/banner3-tablet.png') }}" media="(max-width: 1024px)">
+      <img src="{{ url_for('static', filename='Imagenes/banner3.png') }}" alt="Banner 3">
+    </picture>
+    <a href="{{ url_for('Servicio_2') }}" target="_blank" class="slide-button">Ver más</a>
+  </div>
+
+  <div class="dots">
+    <div class="dot active" data-index="0"></div>
+    <div class="dot" data-index="1"></div>
+    <div class="dot" data-index="2"></div>
+  </div>
+</section>
+
+  <!-- Sección de quizzes -->
+  <section class="sections">
+    <h3 class="section-title-right">Encuéntralo con un quiz</h3>
+    <div class="carousel">
+      <div class="carousel-wrapper">
+        <div class="carousel-items">
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='imagenes/seguridad.png') }}" alt="Quiz 1">
+            <h3>Quiz seguridad</h3>
+            <p>Descubre tu mejor herramienta antivirus para ti.</p>
+            <a href="{{ url_for('quizzantivirus') }}" class="btn">Jugar</a>
+          </div>
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='imagenes/productividad.png') }}" alt="Quiz 2">
+            <h3>Quiz productividad</h3>
+            <p>Encuentra la app que mejor organice tus ideas y proyectos.</p>
+            <a href="{{ url_for('quizzproductividad') }}" class="btn">Jugar</a>
+          </div>
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='imagenes/diseño.png') }}" alt="Quiz 3">
+            <h3>Quiz diseño</h3>
+            <p>Descubre la app de diseño que mejor se adapta a tus necesidades.</p>
+            <a href="" class="btn">Jugar</a>
+          </div>
+          <div class="carousel-item">
+            <img src="{{ url_for('static', filename='imagenes/IA.png') }}" alt="Quiz 4">
+            <h3>Quiz IA</h3>
+            <p>Descubre la inteligencia artificial que mejor se adapta a tu situación.</p>
+            <a href="" class="btn">Jugar</a>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-btn prev">&#8592;</button>
+      <button class="carousel-btn next">&#8594;</button>
+    </div>
+  </section>
+
+  <!-- Sección de blogs -->
+  <section class="section">
+    <h3 class="section-title">Encuéntralo e infórmate</h3>
+    <div class="carousel">
+      <div class="carousel-wrapper">
+        <div class="carousel-items">
+          <a href="{{ url_for('blog1antivirus') }}" class="carousel-item blog-card">
+            <img src="" alt="Blog 1">
+          </a>
+          <a href="{{ url_for('blogproductividad') }}" class="carousel-item blog-card">
+            <img src="" alt="Blog 2">
+          </a>
+          <a href="#" class="carousel-item blog-card">
+            <img src="" alt="Blog 3">
+          </a>
+          <a href="#" class="carousel-item blog-card">
+            <img src="" alt="Blog 4">
+          </a>
+        </div>
+      </div>
+      <button class="carousel-btn prev">&#8592;</button>
+      <button class="carousel-btn next">&#8594;</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-content">
+    <div class="footer-section">
+      <h3>Navegación</h3>
+      <ul>
+        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
+        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
+        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
+        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
+        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Contacto</h3>
+      <ul>
+        <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+        <li><a href="tel:+34651830695">Teléfono: +34 651 83 06 95</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h3>Síguenos</h3>
+      <div class="social-links">
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    &copy; 2023 YourToolQuizz. Todos los derechos reservados.
+  </div>
+</footer>
+
+
+<script src="{{ url_for('static', filename='java/productividad.js') }}" defer></script>
+<script src="{{ url_for('static', filename='java/slider.js') }}" defer></script>
+</body>
+</html>

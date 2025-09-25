@@ -165,13 +165,7 @@ def create_app():
     # -----------------------------
     # RUTAS DE BLOG Y CATEGORÍAS
     # -----------------------------
-    @app.route('/diseño')
-    def diseño():
-        return render_template('Diseño.html')
 
-    @app.route('/blogs')
-    def blog():
-        return render_template('Blogs.html')
 
     @app.route('/Blogs1antivirus')
     def blog1antivirus():
@@ -185,21 +179,7 @@ def create_app():
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogproductividad.html', relacionados=relacionados)
 
-    @app.route('/productividad')
-    def productividad():
-        return render_template('productividad.html')
 
-    @app.route('/seguridad')
-    def seguridad():
-        return render_template('Seguridad.html')
-
-    @app.route('/Redes')
-    def Redes():
-        return render_template('Redes.html')
-
-    @app.route('/Inteligenciasartificiales')
-    def Inteligenciasartificiales():
-        return render_template('Inteligenciasartificiales.html')
 
     # -----------------------------
     # FUNCIONALIDADES CORE
