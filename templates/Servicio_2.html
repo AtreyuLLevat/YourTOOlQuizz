@@ -229,6 +229,7 @@ header {
 
   </style>
 </head>
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 <body>
 
   <!-- HEADER -->
@@ -245,16 +246,6 @@ header {
 
   <!-- MAIN -->
   <main class="quizzes-wrapper">
-
-    <h2 class="quizzes-title">Nuestros Servicios</h2>
-    <div class="quizzes-section">
-      <div class="quiz-card">
-        <h3>Banners Publicitarios</h3>
-        <p>Promociona tu marca con anuncios visibles en nuestra web.</p>
-        <p class="price"><span>Hasta 1 més de campaña</span></p>
-<a href="{{ url_for('serviciosbanner') }}" class="btn-choose">Elegir</a>
-
-      </div>
       <div class="quiz-card">
         <h3>Blogs</h3>
         <p>Contenido objetivo optimizado para SEO con alcance a tu público.</p>
@@ -274,7 +265,7 @@ header {
       <h2>Oferta Especial</h2>
       <div class="offer-card">
         <div class="offer-content">
-          <h3>Banner + Quiz</h3>
+          <h3>Blog + Quiz</h3>
           <p>Combina la visibilidad de los banners (2 semanas) con la interacción directa de los quizzes (1 mes). Perfecto para aumentar tu alcance y captar clientes potenciales de forma rápida.</p>
           <span class="offer-price">84,7€</span>
           <button class="btn-offer">Aprovechar Oferta</button>
@@ -290,7 +281,6 @@ header {
           <thead>
             <tr>
               <th>CARACTERÍSTICAS</th>
-              <th>BANNERS</th>
               <th>BLOGS</th>
               <th>QUIZZES</th>
             </tr>
@@ -298,25 +288,21 @@ header {
           <tbody>
             <tr>
               <td>Público Objetivo</td>
-              <td>Usuarios generales</td>
               <td>Usuarios interesados en conocer nuevas opciones</td>
               <td>Usuarios calificados para tu marca</td>
             </tr>
             <tr>
               <td>CTR (Rate de Click)</td>
-              <td>~2-5%</td>
               <td>~5%</td>
               <td>15-35%</td>
             </tr>
             <tr>
               <td>Duracion minima/máxima</td>
-              <td>1 semana/1mes</td>
               <td>Para siempre</td>
               <td>1 mes/3 meses</td>
             </tr>
             <tr>
               <td>Precio minimo/máximo</td>
-              <td>12,10€/30,25€</td>
               <td>30€</td>
               <td>50€/100€</td>
             </tr>
