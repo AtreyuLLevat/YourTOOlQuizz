@@ -81,3 +81,43 @@
                 toggleAuth();
             }
         });
+        // BOCADILLO DE BÚSQUEDA
+document.addEventListener('DOMContentLoaded', function() {
+    const searchToggle = document.getElementById('search-toggle');
+    const searchPopup = document.getElementById('search-popup');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchInput = document.querySelector('.search-popup-input');
+    
+    // Abrir/cerrar bocadillo
+    searchToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        searchPopup.classList.toggle('active');
+        searchOverlay.classList.toggle('active');
+        
+        // Enfocar input cuando se abre
+        if (searchPopup.classList.contains('active')) {
+            setTimeout(() => {
+                searchInput.focus();
+            }, 100);
+        }
+    });
+    
+    // Cerrar al hacer click en overlay
+    searchOverlay.addEventListener('click', function() {
+        searchPopup.classList.remove('active');
+        searchOverlay.classList.remove('active');
+    });
+    
+    // Cerrar al presionar Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && searchPopup.classList.contains('active')) {
+            searchPopup.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        }
+    });
+    
+    // Prevenir que el click dentro del bocadillo lo cierre
+    searchPopup.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+});
