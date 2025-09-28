@@ -104,54 +104,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  /* ===== BOCADILLO DE BÚSQUEDA ===== */
-  const searchToggle = document.getElementById('search-toggle');
-  const searchPopup = document.getElementById('search-popup');
-  const searchOverlay = document.getElementById('search-overlay');
-  const searchInput = (searchPopup && searchPopup.querySelector('.search-popup-input')) || document.querySelector('.search-popup-input');
-
-  if (searchToggle && searchPopup && searchOverlay) {
-    // abrir / cerrar
-    searchToggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const nowOpen = !searchPopup.classList.contains('active');
-      searchPopup.classList.toggle('active', nowOpen);
-      searchOverlay.classList.toggle('active', nowOpen);
-      searchToggle.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-
-      if (nowOpen && searchInput) setTimeout(() => searchInput.focus(), 80);
-    });
-
-    // clic en overlay => cerrar
-    searchOverlay.addEventListener('click', function () {
-      searchPopup.classList.remove('active');
-      searchOverlay.classList.remove('active');
-      searchToggle.setAttribute('aria-expanded', 'false');
-    });
-
-    // ESC => cerrar
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && searchPopup.classList.contains('active')) {
-        searchPopup.classList.remove('active');
-        searchOverlay.classList.remove('active');
-        searchToggle.setAttribute('aria-expanded', 'false');
-      }
-    });
-
-    // clic fuera (por si el overlay no cubre)
-    document.addEventListener('click', function (e) {
-      if (searchPopup.classList.contains('active')) {
-        if (!searchPopup.contains(e.target) && !searchToggle.contains(e.target)) {
-          searchPopup.classList.remove('active');
-          searchOverlay.classList.remove('active');
-          searchToggle.setAttribute('aria-expanded', 'false');
-        }
-      }
-    });
-
-    // evitar que clics dentro cierren por burbujeo
-    searchPopup.addEventListener('click', function (e) { e.stopPropagation(); });
-  } else {
-    console.warn('Elementos del popup de búsqueda no encontrados:', { searchToggle, searchPopup, searchOverlay });
-  }
+// BOCADILLO DE BÚSQUEDA
+document.addEventListener('DOMContentLoaded', function() {
+    const searchToggle = document.getElementById('search-toggle');
+    const searchPopup = document.getElementById('search-popup');
+    const searchOverlay = document.getElementById('search-overlay');
+    const searchInput = document.querySelector('.search-popup-input');
+    
+    if (searchToggle && searchPopup && searchOverlay) {
+        // Abrir/cerrar bocadillo
+        searchToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            searchPopup.classList.toggle('active');
+            searchOverlay.classList.toggle('active');
+            
+            if (searchPopup.classList.contains('active') && searchInput) {
+                setTimeout(() => {
+                    searchInput.focus();
+                }, 100);
+            }
+        });
+        
+        // Cerrar al hacer click en overlay
+        searchOverlay.addEventListener('click', function() {
+            searchPopup.classList.remove('active');
+            searchOverlay.classList.remove('active');
+        });
+        
+        // Cerrar al presionar Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && searchPopup.classList.contains('active')) {
+                searchPopup.classList.remove('active');
+                searchOverlay.classList.remove('active');
+            }
+        });
+        
+        // Prevenir que el click dentro del bocadillo lo cierre
+        searchPopup.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
 });
+
