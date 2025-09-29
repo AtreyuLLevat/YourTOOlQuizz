@@ -1,124 +1,25 @@
-// header.js
-document.addEventListener('DOMContentLoaded', function () {
-  'use strict';
+document.addEventListener("DOMContentLoaded", function () {
+  // MENU HAMBURGUESA
+  const menuBtn = document.querySelector(".menu-toggle");
+  const nav = document.querySelector(".nav");
 
-  /* ===== NOTIFICACIONES ===== */
-  function showNotification(msg) {
-    const id = 'ytq-toast';
-    let toast = document.getElementById(id);
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = id;
-      toast.style.cssText = `
-        position:fixed;bottom:20px;right:20px;
-        background:#111;color:#fff;
-        padding:10px 14px;border-radius:8px;
-        z-index:3000;opacity:0;transition:opacity .2s
-      `;
-      document.body.appendChild(toast);
-    }
-    toast.textContent = msg;
-    requestAnimationFrame(() => toast.style.opacity = '1');
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      setTimeout(() => toast.remove(), 250);
-    }, 2200);
-  }
-
-  /* ===== MENU MÓVIL ===== */
-  const menuBtn = document.querySelector('.menu-btn');
-  if (menuBtn) {
-    menuBtn.addEventListener('click', function () {
-      let mobileMenu = document.querySelector('.mobile-menu');
-
-      if (!mobileMenu) {
-        mobileMenu = document.createElement('div');
-        mobileMenu.className = 'mobile-menu';
-        mobileMenu.style.cssText = `
-          position: fixed;
-          top: 70px; left: 0; width: 100%;
-          background: white;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          padding: 20px;
-          z-index: 999;
-          transform: translateY(-100%);
-          transition: transform 0.3s ease;
-        `;
-        mobileMenu.innerHTML = `
-          <nav style="display:flex;flex-direction:column;gap:15px;text-align:center">
-            <a href="#">Inicio</a>
-            <a href="#">Quizzes</a>
-            <a href="#">Blog</a>
-            <a href="#">Beneficios</a>
-            <a href="#">Contacto</a>
-          </nav>
-        `;
-        document.body.appendChild(mobileMenu);
-      }
-
-      const isOpen = mobileMenu.style.transform === 'translateY(0%)';
-      mobileMenu.style.transform = isOpen ? 'translateY(-100%)' : 'translateY(0%)';
-
-      const icon = menuBtn.querySelector('i');
-      if (icon) icon.className = isOpen ? 'fas fa-bars' : 'fas fa-times';
-    });
-  }
-
-  /* ===== AUTH SIMULADA ===== */
-  const authSection = document.getElementById('auth-section');
-  let isLoggedIn = false;
-
-  function toggleAuth() {
-    isLoggedIn = !isLoggedIn;
-    if (!authSection) return;
-
-    if (isLoggedIn) {
-      authSection.innerHTML = `
-        <a class="btn-logout" href="/logout">Cerrar sesión</a>
-      `;
-      showNotification('¡Bienvenido a YourToolQuizz!');
-    } else {
-      authSection.innerHTML = `
-        <a class="btn-login" href="/login">Iniciar sesión</a>
-      `;
-      showNotification('Sesión cerrada correctamente');
-    }
-  }
-
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('.btn-login') || e.target.closest('.btn-logout')) {
-      e.preventDefault();
-      toggleAuth();
-    }
+  menuBtn.addEventListener("click", () => {
+    nav.classList.toggle("active");
+    menuBtn.classList.toggle("active");
   });
 
-  /* ===== BÚSQUEDA ===== */
-  const searchToggle = document.getElementById('search-toggle');
-  const searchPopup = document.getElementById('search-popup');
-  const searchOverlay = document.getElementById('search-overlay');
-  const searchInput = searchPopup?.querySelector('.search-popup-input');
+  // BUSCADOR
+  const searchBtn = document.querySelector(".search-toggle");
+  const searchPopup = document.querySelector(".search-popup");
+  const searchOverlay = document.querySelector(".search-overlay");
+  const searchClose = document.querySelector(".search-close");
 
-  if (searchToggle && searchPopup && searchOverlay) {
-    searchToggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const nowOpen = !searchPopup.classList.contains('active');
-      searchPopup.classList.toggle('active', nowOpen);
-      searchOverlay.classList.toggle('active', nowOpen);
-      if (nowOpen && searchInput) setTimeout(() => searchInput.focus(), 80);
-    });
-
-    searchOverlay.addEventListener('click', function () {
-      searchPopup.classList.remove('active');
-      searchOverlay.classList.remove('active');
-    });
-
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        searchPopup.classList.remove('active');
-        searchOverlay.classList.remove('active');
-      }
-    });
-  } else {
-    console.warn('Faltan elementos de búsqueda en el HTML');
+  function toggleSearch() {
+    searchPopup.classList.toggle("active");
+    searchOverlay.classList.toggle("active");
   }
+
+  if (searchBtn) searchBtn.addEventListener("click", toggleSearch);
+  if (searchOverlay) searchOverlay.addEventListener("click", toggleSearch);
+  if (searchClose) searchClose.addEventListener("click", toggleSearch)
 });
