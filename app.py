@@ -51,6 +51,16 @@ def create_app():
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
+    def set_csp(response: Response):
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
+        "img-src 'self' data:;"
+    )
+    return response
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
