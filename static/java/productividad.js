@@ -22,4 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (searchBtn) searchBtn.addEventListener("click", toggleSearch);
   if (searchOverlay) searchOverlay.addEventListener("click", toggleSearch);
   if (searchClose) searchClose.addEventListener("click", toggleSearch)
+console.log("JS cargado correctamente");
+
 });
