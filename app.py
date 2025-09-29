@@ -52,7 +52,7 @@ def create_app():
     login_manager.login_view = 'login'
 
     def set_csp(response: Response):
-    response.headers["Content-Security-Policy"] = (
+        response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
             "script-src 'self'; "
             "style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
