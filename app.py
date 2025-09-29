@@ -3,8 +3,7 @@ import json
 import io
 import pyotp
 import qrcode
-import secrets
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file, g, Response
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -52,22 +51,6 @@ def create_app():
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
 
-    @app.before_request
-    def generar_nonce():
-        # Genera un valor aleatorio por request
-        g.nonce = secrets.token_urlsafe(16)
-
-    @app.after_request
-    def set_csp(response: Response):
-        nonce = getattr(g, "nonce", secrets.token_urlsafe(16))  # si no existe, genera uno
-        response.headers["Content-Security-Policy"] = (
-            f"default-src 'self'; "
-            f"script-src 'self' 'nonce-{nonce}'; "
-            f"style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
-            f"font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-            f"img-src 'self' data:;"
-        )
-        return response
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
