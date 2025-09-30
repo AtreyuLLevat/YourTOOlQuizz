@@ -4,24 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>YourToolQuizz</title>
- <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">
-
+  <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { background: #fff; color: #1C1E21; line-height: 1.6; }
 
-    /* ===== HEADER ===== */
+    /* ===== HEADER REORGANIZADO ===== */
     header {
-      position: sticky; top: 0; z-index: 1000;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 24px; background: #fff;
+      position: sticky; 
+      top: 0; 
+      z-index: 1000;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 16px 24px; 
+      background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
     .logo-container {
-      display: flex;
-      align-items: center;
+      flex: 0 0 auto;
     }
     
     .logo-img {
@@ -29,13 +32,13 @@
       width: auto;
     }
     
-    /* MENÚ EN EL CENTRO - SOLO DESKTOP */
+    /* MENÚ CENTRAL - SOLO DESKTOP */
     .nav-menu {
       display: flex;
-      gap: 30px;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      gap: 24px;
+      flex: 1 1 auto;
+      justify-content: center;
+      margin: 0 20px;
     }
     
     .nav-menu a {
@@ -43,152 +46,153 @@
       text-decoration: none;
       font-weight: 500;
       transition: color 0.3s;
+      white-space: nowrap;
     }
     
     .nav-menu a:hover {
       color: #2563eb;
     }
     
-    /* RIGHT NAV - SOLO ICONOS (MOBILE STYLE SIEMPRE) */
+    /* RIGHT NAV - ICONOS Y BOTONES */
     .right-nav {
       display: flex;
       align-items: center;
       gap: 12px;
+      flex: 0 0 auto;
     }
 
-/* ===== BUSCADOR ESTILO APPLE ===== */
-.header-search { position: relative; display:flex; align-items:center; gap:8px; }
-
-/* Botón de lupa (mantiene tamaño móvil-friendly) */
-.search-btn {
-  background: none;
-  border: none;
-  width: 40px;
-  height: 40px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #2563eb;
-  transition: transform .18s ease, background .18s ease;
-}
-.search-btn:focus { outline: 2px solid rgba(37,99,235,.18); outline-offset: 2px; }
-
-/* Barra de búsqueda fija, centrada y con blur */
-.header-searchbar {
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translate(-50%, -10px) scale(.98);
-  width: min(980px, calc(100% - 48px));
-  max-width: 980px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.86);
-  backdrop-filter: blur(10px) saturate(120%);
-  box-shadow: 0 10px 30px rgba(17,24,39,0.12);
-  opacity: 0;
-  visibility: hidden;
-  transition: transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms;
-  z-index: 1200;
-  pointer-events: none;
-}
-
-/* Estado abierto */
-.header-searchbar.active {
-  transform: translate(-50%, 0) scale(1);
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  top: 18px;
-}
-
-/* Icono dentro de la barra (opcional) */
-.header-searchbar .fa-search { font-size: 16px; color: #6b7280; margin-left: 6px; }
-
-/* Input */
-.header-search-input {
-  flex: 1 1 0;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  padding: 10px 8px;
-  outline: none;
-  color: #111827;
-  border-radius: 10px;
-}
-
-/* Focus visual del input */
-.header-searchbar:focus-within {
-  box-shadow: 0 10px 30px rgba(17,24,39,0.16), 0 0 0 3px rgba(37,99,235,0.06);
-}
-
-/* Overlay oscuro/blur que cubre la página */
-.header-search-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.28);
-  backdrop-filter: blur(4px);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 200ms ease;
-  z-index: 1150;
-  pointer-events: none;
-}
-
-/* Overlay visible */
-.header-search-overlay.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
-
-/* Ajustes responsive para móvil */
-@media (max-width: 640px) {
-  .header-searchbar { width: calc(100% - 28px); left: 50%; max-width: calc(100% - 28px); }
-  .header-searchbar { height: 52px; border-radius: 10px; top: 12px; }
-  .search-btn { width: 36px; height: 36px; }
-    /* OCULTAR VERSIÓN DESKTOP DE LOGIN - SOLO ICONO */
-    .btn-login.desktop-only {
-      display: none !important;
+    /* BUSCADOR MEJORADO */
+    .header-search { 
+      position: relative; 
+      display: flex; 
+      align-items: center;
     }
-   }
-    
-    /* MOSTRAR SIEMPRE VERSIÓN ICONO DE LOGIN */
-    .btn-login.mobile-only {
-      display: flex !important;
+
+    /* Botón de lupa */
+    .search-btn {
       background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
       color: #2563eb;
-      padding: 8px;
-      border-radius: 50%;
+      transition: transform .18s ease, background .18s ease;
+    }
+    .search-btn:focus { 
+      outline: 2px solid rgba(37,99,235,.18); 
+      outline-offset: 2px; 
+    }
+    .search-btn:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    /* Barra de búsqueda */
+    .header-searchbar {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translate(-50%, -10px) scale(.98);
+      width: min(980px, calc(100% - 48px));
+      max-width: 980px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.86);
+      backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: 0 10px 30px rgba(17,24,39,0.12);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms;
+      z-index: 1200;
+      pointer-events: none;
+    }
+
+    /* Estado abierto */
+    .header-searchbar.active {
+      transform: translate(-50%, 0) scale(1);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      top: 18px;
+    }
+
+    /* Icono dentro de la barra */
+    .header-searchbar .fa-search { 
+      font-size: 16px; 
+      color: #6b7280; 
+      margin-left: 6px; 
+    }
+
+    /* Input */
+    .header-search-input {
+      flex: 1 1 0;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      padding: 10px 8px;
+      outline: none;
+      color: #111827;
+      border-radius: 10px;
+    }
+
+    /* Focus visual del input */
+    .header-searchbar:focus-within {
+      box-shadow: 0 10px 30px rgba(17,24,39,0.16), 0 0 0 3px rgba(37,99,235,0.06);
+    }
+
+    /* Overlay oscuro/blur que cubre la página */
+    .header-search-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 200ms ease;
+      z-index: 1150;
+      pointer-events: none;
+    }
+
+    /* Overlay visible */
+    .header-search-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* ICONOS DE LOGIN/LOGOUT - SOLO ICONOS */
+    .auth-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
       transition: all 0.3s;
       width: 40px;
       height: 40px;
-      align-items: center;
-      justify-content: center;
+      border-radius: 50%;
+      color: #2563eb;
+      background: none;
     }
     
-    .btn-login.mobile-only:hover {
+    .auth-icon:hover {
       background: rgba(37, 99, 235, 0.1);
       transform: scale(1.1);
     }
     
-    /* ELIMINAR CLASES DE RESPONSIVE - SIEMPRE VISIBLE */
-    .desktop-only {
-      display: none !important;
+    .auth-icon svg {
+      width: 22px;
+      height: 22px;
     }
     
-    .mobile-only {
-      display: flex !important;
-    }
-    
-    /* MENÚ HAMBURGUESA - SOLO EN MÓVIL/TABLET */
+    /* ===== MENÚ MÓVIL MEJORADO ===== */
+    /* Botón del menú hamburguesa - SOLO MOBILE/TABLET */
     .menu-btn { 
       display: none;
       border: none; 
@@ -196,37 +200,156 @@
       font-size: 22px; 
       cursor: pointer; 
       color: #2563eb; 
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      transition: all 0.3s ease;
     }
     
-    .menu-btn:hover { color: #d97706; }
+    .menu-btn:hover { 
+      background: rgba(37, 99, 235, 0.1);
+    }
+    
+    .menu-btn.active {
+      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+    }
+
+    /* Menú móvil activo - SOLO MOBILE/TABLET */
+    .nav-menu.active {
+      display: flex !important;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      z-index: 999;
+      padding: 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-top: 1px solid #f0f0f0;
+      animation: slideDown 0.3s ease;
+      max-height: calc(100vh - 100%);
+      overflow-y: auto;
+    }
+
+    .nav-menu.active a {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      width: 100%;
+      text-align: left;
+      transition: all 0.3s ease;
+      color: #1C1E21;
+      text-decoration: none;
+      display: block;
+    }
+
+    .nav-menu.active a:hover {
+      background: #f8f9fa;
+      color: #2563eb;
+      padding-left: 28px;
+    }
+
+    .nav-menu.active a:last-child {
+      border-bottom: none;
+    }
+
+    /* Animación para el menú */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Overlay para el fondo cuando el menú está abierto */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .menu-overlay.active {
+      display: block;
+    }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width: 1024px) {
-      /* OCULTAR MENÚ EN TABLET/MÓVIL */
+    /* Desktop - Menú normal visible */
+    @media (min-width: 1025px) {
       .nav-menu {
-        display: none;
+        display: flex !important;
       }
       
-      /* MOSTRAR MENÚ HAMBURGUESA EN TABLET/MÓVIL */
       .menu-btn {
-        display: block;
+        display: none !important;
+      }
+      
+      .menu-overlay {
+        display: none !important;
+      }
+    }
+
+    /* Tablet y Mobile - Menú hamburguesa */
+    @media (max-width: 1024px) {
+      .nav-menu:not(.active) {
+        display: none !important;
+      }
+      
+      .menu-btn {
+        display: flex;
+      }
+      
+      .nav-menu.active {
+        display: flex !important;
       }
     }
     
     @media (max-width: 768px) {
+      header {
+        padding: 12px 16px;
+      }
+      
       .right-nav {
         gap: 8px;
+      }
+      
+      .auth-icon,
+      .search-btn,
+      .menu-btn {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .nav-menu.active a {
+        padding: 14px 20px;
+        font-size: 15px;
       }
     }
     
     @media (max-width: 480px) {
       header {
-        padding: 12px 15px;
+        padding: 10px 12px;
       }
       
-    .btn-login.mobile-only {
-        width: 36px;
+      .logo-img {
         height: 36px;
+      }
+      
+      .nav-menu.active a {
+        padding: 12px 16px;
+        font-size: 14px;
       }
     }
 
@@ -581,59 +704,21 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1024px) {
-      .nav-menu {
-        display: none;
-      }
-      
-      .menu-btn {
-        display: block;
-      }
-      
-      .search-input {
-        width: 150px;
-      }
-      
-      .search-input:focus {
-        width: 180px;
-      }
-      
       .quizzes-grid {
         grid-template-columns: repeat(2, 1fr);
       }
     }
     
     @media (max-width: 768px) {
-      .desktop-only {
-        display: none !important;
-      }
-      
-      .mobile-only {
-        display: inline-block !important;
-      }
-      
-      .search-btn.mobile-only, .btn-login.mobile-only, .btn-logout.mobile-only {
-        display: flex;
-      }
-      
       .quizzes-grid {
         grid-template-columns: 1fr;
-      }
-      
-      .right-nav {
-        gap: 10px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      header {
-        padding: 12px 15px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
-<header>
+  <!-- HEADER REORGANIZADO -->
+  <header>
     <div class="logo-container">
       <a href="{{ url_for('homepage') }}">
         <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="YourToolQuizz" class="logo-img">
@@ -649,44 +734,39 @@
     </nav>
     
     <div class="right-nav">
-      <!-- Buscar -->
-<div class="search-container">
-<!-- BUSCADOR (reemplaza el bloque .search-container actual) -->
-<div class="header-search">
-  <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
-    <i class="fas fa-search" aria-hidden="true"></i>
-  </button>
+      <!-- Buscador -->
+      <div class="header-search">
+        <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
+          <i class="fas fa-search" aria-hidden="true"></i>
+        </button>
 
-  <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
-    <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
-      <i class="fas fa-search" aria-hidden="true"></i>
-      <input id="header-search-input"
-             class="header-search-input"
-             name="q"
-             type="search"
-             placeholder="Buscar en YourToolQuizz"
-             aria-label="Buscar"
-             autocomplete="off"
-             />
-    </form>
-  </div>
+        <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
+          <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
+            <i class="fas fa-search" aria-hidden="true"></i>
+            <input id="header-search-input"
+                   class="header-search-input"
+                   name="q"
+                   type="search"
+                   placeholder="Buscar en YourToolQuizz"
+                   aria-label="Buscar"
+                   autocomplete="off"
+                   />
+          </form>
+        </div>
 
-  <div id="header-search-overlay" class="header-search-overlay" tabindex="-1" aria-hidden="true"></div>
-</div>
+        <div id="header-search-overlay" class="header-search-overlay" tabindex="-1" aria-hidden="true"></div>
+      </div>
 
-
-      <!-- Login / Logout -->
+      <!-- Login / Logout - SOLO ICONOS -->
       <div id="auth-section">
         {% if current_user.is_authenticated %}
-          <a class="btn-logout desktop-only" href="{{ url_for('logout') }}">Cerrar sesión</a>
-          <a class="btn-logout mobile-only" href="{{ url_for('logout') }}" title="Cerrar sesión">
+          <a class="auth-icon" href="{{ url_for('logout') }}" title="Cerrar sesión">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
               <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H10a2 2 0 00-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
             </svg>
           </a>
         {% else %}
-          <a class="btn-login desktop-only" href="{{ url_for('login') }}">Iniciar sesión</a>
-          <a class="btn-login mobile-only" href="{{ url_for('login') }}" title="Iniciar sesión">
+          <a class="auth-icon" href="{{ url_for('login') }}" title="Iniciar sesión">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
             </svg>
@@ -696,10 +776,10 @@
       
       <button class="menu-btn"><i class="fas fa-bars"></i></button>
     </div>
-    
-    <!-- Overlay para cerrar al hacer click fuera -->
-    <div class="search-overlay" id="search-overlay"></div>
   </header>
+  
+  <!-- Overlay para el menú móvil -->
+  <div class="menu-overlay" id="menuOverlay"></div>
 
   <!-- HERO SLIDER -->
   <section class="slider">
@@ -888,6 +968,7 @@
     </div>
   </footer>
 
-<script src="{{ url_for('static', filename='java/slider.js') }}" defer></script>
+<script src="{{ url_for('static', filename='java/slider.js') }}"defer> </script>
+
 </body>
 </html>
