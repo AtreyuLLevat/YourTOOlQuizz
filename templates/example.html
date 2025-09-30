@@ -55,124 +55,109 @@
       align-items: center;
       gap: 12px;
     }
-    
-    .search-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    /* OCULTAR INPUT DE BÚSQUEDA - SOLO ICONOS */
-    .search-input.desktop-only {
-      display: none !important;
-    }
-    
-    /* BOTÓN BUSCAR COMO ICONO - SIEMPRE VISIBLE */
-    .search-btn {
-      background: none;
-      color: #2563eb;
-      border: none;
-      padding: 8px;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-    }
-    
-    .search-btn:hover {
-      background: rgba(37, 99, 235, 0.1);
-      transform: scale(1.1);
-    }
-    
-        /* BOCADILLO DE BÚSQUEDA */
-    .search-popup {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      padding: 20px;
-      width: 300px;
-      z-index: 1001;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
-    }
-    
-    .search-popup.active {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    
-    .search-popup::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      right: 20px;
-      width: 16px;
-      height: 16px;
-      background: white;
-      transform: rotate(45deg);
-      box-shadow: -2px -2px 5px rgba(0,0,0,0.05);
-    }
-    
-    .search-popup-input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: border-color 0.3s;
-    }
-    
-    .search-popup-input:focus {
-      outline: none;
-      border-color: #2563eb;
-    }
-    
-    .search-popup-btn {
-      width: 100%;
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s;
-    }
-    
-    .search-popup-btn:hover {
-      background: #1d4ed8;
-    }
-    
-    /* OVERLAY PARA CERRAR AL HACER CLICK FUERA */
-    .search-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: transparent;
-      z-index: 1000;
-      display: none;
-    }
-    
-    .search-overlay.active {
-      display: block;
-    }
+
+/* ===== BUSCADOR ESTILO APPLE ===== */
+.header-search { position: relative; display:flex; align-items:center; gap:8px; }
+
+/* Botón de lupa (mantiene tamaño móvil-friendly) */
+.search-btn {
+  background: none;
+  border: none;
+  width: 40px;
+  height: 40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #2563eb;
+  transition: transform .18s ease, background .18s ease;
+}
+.search-btn:focus { outline: 2px solid rgba(37,99,235,.18); outline-offset: 2px; }
+
+/* Barra de búsqueda fija, centrada y con blur */
+.header-searchbar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translate(-50%, -10px) scale(.98);
+  width: min(980px, calc(100% - 48px));
+  max-width: 980px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(10px) saturate(120%);
+  box-shadow: 0 10px 30px rgba(17,24,39,0.12);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms;
+  z-index: 1200;
+  pointer-events: none;
+}
+
+/* Estado abierto */
+.header-searchbar.active {
+  transform: translate(-50%, 0) scale(1);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  top: 18px;
+}
+
+/* Icono dentro de la barra (opcional) */
+.header-searchbar .fa-search { font-size: 16px; color: #6b7280; margin-left: 6px; }
+
+/* Input */
+.header-search-input {
+  flex: 1 1 0;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  padding: 10px 8px;
+  outline: none;
+  color: #111827;
+  border-radius: 10px;
+}
+
+/* Focus visual del input */
+.header-searchbar:focus-within {
+  box-shadow: 0 10px 30px rgba(17,24,39,0.16), 0 0 0 3px rgba(37,99,235,0.06);
+}
+
+/* Overlay oscuro/blur que cubre la página */
+.header-search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.28);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease;
+  z-index: 1150;
+  pointer-events: none;
+}
+
+/* Overlay visible */
+.header-search-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Ajustes responsive para móvil */
+@media (max-width: 640px) {
+  .header-searchbar { width: calc(100% - 28px); left: 50%; max-width: calc(100% - 28px); }
+  .header-searchbar { height: 52px; border-radius: 10px; top: 12px; }
+  .search-btn { width: 36px; height: 36px; }
     /* OCULTAR VERSIÓN DESKTOP DE LOGIN - SOLO ICONO */
     .btn-login.desktop-only {
       display: none !important;
     }
+   }
     
     /* MOSTRAR SIEMPRE VERSIÓN ICONO DE LOGIN */
     .btn-login.mobile-only {
@@ -239,33 +224,12 @@
         padding: 12px 15px;
       }
       
-      .search-btn, .btn-login.mobile-only {
+    .btn-login.mobile-only {
         width: 36px;
         height: 36px;
       }
     }
-        /* RESPONSIVE PARA BOCADILLO */
-    @media (max-width: 768px) {
-      .search-popup {
-        right: -50px;
-        width: 280px;
-      }
-      
-      .search-popup::before {
-        right: 60px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .search-popup {
-        right: -80px;
-        width: 260px;
-      }
-      
-      .search-popup::before {
-        right: 80px;
-      }
-    }
+
     /* ===== HERO SLIDER ===== */
     .slider { 
       position: relative; 
@@ -686,19 +650,30 @@
     
     <div class="right-nav">
       <!-- Buscar -->
-      <div class="search-container" style="position: relative;">
-        <button class="search-btn" type="button" aria-label="Buscar" id="search-toggle">
-          <span class="material-icons">search</span>
-        </button>
-        
-        <!-- Bocadillo de búsqueda -->
-        <div class="search-popup" id="search-popup">
-          <form method="GET" action="/buscar" role="search">
-            <input class="search-popup-input" type="text" name="q" placeholder="¿Qué estás buscando?" aria-label="Buscar">
-            <button class="search-popup-btn" type="submit">Buscar</button>
-          </form>
-        </div>
-      </div>
+<div class="search-container">
+<!-- BUSCADOR (reemplaza el bloque .search-container actual) -->
+<div class="header-search">
+  <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
+    <i class="fas fa-search" aria-hidden="true"></i>
+  </button>
+
+  <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
+    <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input id="header-search-input"
+             class="header-search-input"
+             name="q"
+             type="search"
+             placeholder="Buscar en YourToolQuizz"
+             aria-label="Buscar"
+             autocomplete="off"
+             />
+    </form>
+  </div>
+
+  <div id="header-search-overlay" class="header-search-overlay" tabindex="-1" aria-hidden="true"></div>
+</div>
+
 
       <!-- Login / Logout -->
       <div id="auth-section">
