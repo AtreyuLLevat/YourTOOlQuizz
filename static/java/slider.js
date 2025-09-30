@@ -101,26 +101,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    const authSection = document.getElementById('auth-section');
-    let isLoggedIn = false;
-
-    function toggleAuth() {
-        isLoggedIn = !isLoggedIn;
-        if (!authSection) return;
-        if (isLoggedIn) {
-            authSection.innerHTML = `<a class="btn-logout" href="/logout">Cerrar sesión</a>`;
-            showNotification('¡Bienvenido a YourToolQuizz!');
-        } else {
-            authSection.innerHTML = `<a class="btn-login" href="/login">Iniciar sesión</a>`;
-            showNotification('Sesión cerrada correctamente');
-        }
-    }
-
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.btn-login') || e.target.closest('.btn-logout')) {
-            e.preventDefault();
-            toggleAuth();
-        }
     });
 
     const searchToggle = document.getElementById('search-toggle');
@@ -150,3 +130,4 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
