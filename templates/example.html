@@ -4,16 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>YourToolQuizz</title>
-<meta http-equiv="Content-Security-Policy" 
-      content="
-        default-src 'self';
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
-        font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;
-      ">
+  <meta http-equiv="Content-Security-Policy" 
+        content="
+          default-src 'self';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
+          font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;
+        ">
 
-
-
-
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
   <style>
@@ -134,8 +132,8 @@
     }
 
     /* Icono dentro de la barra */
-    .header-searchbar .fa-search { 
-      font-size: 16px; 
+    .header-searchbar .material-icons { 
+      font-size: 20px; 
       color: #6b7280; 
       margin-left: 6px; 
     }
@@ -747,12 +745,12 @@
       <!-- Buscador -->
       <div class="header-search">
         <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
-          <i class="fas fa-search" aria-hidden="true"></i>
+          <span class="material-icons">search</span>
         </button>
 
         <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
           <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
-            <i class="fas fa-search" aria-hidden="true"></i>
+            <span class="material-icons">search</span>
             <input id="header-search-input"
                    class="header-search-input"
                    name="q"
@@ -784,7 +782,7 @@
         {% endif %}
       </div>
       
-      <button class="menu-btn"><i class="fas fa-bars"></i></button>
+      <button class="menu-btn"><span class="material-icons">menu</span></button>
     </div>
   </header>
   
