@@ -200,29 +200,40 @@
     }
     
     /* ===== MENÚ MÓVIL MEJORADO ===== */
-    /* Botón del menú hamburguesa - SOLO MOBILE/TABLET */
+    /* Botón del menú hamburguesa - ESTILO MINIMALISTA Y TRANSPARENTE */
     .menu-btn { 
       display: none;
       border: none; 
-      background: none; 
-      font-size: 22px; 
+      background: transparent;
       cursor: pointer; 
-      color: #2563eb; 
-      width: 40px;
-      height: 40px;
+      color: #1C1E21; 
+      width: 32px;
+      height: 32px;
       align-items: center;
       justify-content: center;
-      border-radius: 8px;
+      border-radius: 6px;
       transition: all 0.3s ease;
+      position: relative;
+      padding: 0;
     }
     
     .menu-btn:hover { 
-      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.05);
     }
     
     .menu-btn.active {
-      background: rgba(37, 99, 235, 0.1);
       color: #2563eb;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .menu-btn .material-icons {
+      font-size: 22px;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-btn.active .material-icons {
+      transform: rotate(90deg);
     }
 
     /* Menú móvil activo - SOLO MOBILE/TABLET */
@@ -287,10 +298,18 @@
       background: rgba(0,0,0,0.5);
       z-index: 998;
       display: none;
+      backdrop-filter: blur(2px);
+      transition: opacity 0.3s ease;
     }
 
     .menu-overlay.active {
       display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* ===== RESPONSIVE ===== */
@@ -334,10 +353,18 @@
       }
       
       .auth-icon,
-      .search-btn,
-      .menu-btn {
+      .search-btn {
         width: 36px;
         height: 36px;
+      }
+      
+      .menu-btn {
+        width: 30px;
+        height: 30px;
+      }
+      
+      .menu-btn .material-icons {
+        font-size: 20px;
       }
       
       .nav-menu.active a {
@@ -353,6 +380,15 @@
       
       .logo-img {
         height: 36px;
+      }
+      
+      .menu-btn {
+        width: 28px;
+        height: 28px;
+      }
+      
+      .menu-btn .material-icons {
+        font-size: 18px;
       }
       
       .nav-menu.active a {
@@ -977,5 +1013,7 @@
   </footer>
 
 <script src="{{ url_for('static', filename='java/slider.js') }}"defer> </script>
+
+
 </body>
 </html>
