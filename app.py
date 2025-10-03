@@ -99,10 +99,7 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
-    @app.route('/example')
-    def example():
-        return render_template('example.html')
-    
+  
     @app.route('/Servicio_2')
     def Servicio_2():
         return render_template('Servicio_2.html')
