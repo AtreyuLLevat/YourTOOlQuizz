@@ -121,7 +121,9 @@
       z-index: 1200;
       pointer-events: none;
     }
-
+    .header-searchbar .material-icons {
+      flex: 0 0 auto; /* Icono fijo */
+    }
     /* Estado abierto */
     .header-searchbar.active {
       transform: translate(-50%, 0) scale(1);
@@ -140,7 +142,7 @@
 
     /* Input */
     .header-search-input {
-      flex: 1 1 0;
+      flex: 1;
       border: none;
       background: transparent;
       font-size: 16px;
