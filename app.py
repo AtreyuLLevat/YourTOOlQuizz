@@ -108,9 +108,7 @@ def create_app():
     def Servicio_1():
         return render_template('Servicio_1.html')
 
-    @app.route('/serviciosbanner')
-    def serviciosbanner():
-        return render_template('serviciosbanner.html')
+
     @app.route('/serviciosblogs')
     def serviciosblogs():
         return render_template('serviciosblogs.html')

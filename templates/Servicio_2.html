@@ -1,14 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nuestros servicios - YourToolQuizz</title>
-  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+{% extends "base.html" %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% block title %}Servicio | YourToolQuizz{% endblock %}
 
-  <style>
+{% block extra_css %}
+<style>
     /* ------------------ GLOBAL ------------------ */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -103,148 +98,11 @@ header {
     .comparison-table th:first-child, .comparison-table td:first-child { text-align: left; font-weight: 600; background: #f9f9f9; }
     .comparison-table tr:last-child td { border-bottom: none; }
 
-    /* ------------------ FOOTER ------------------ */
-    footer { background: #ffffff; color: #000000; padding: 60px 24px 20px; font-size: 0.95rem; border-top: 4px solid #242424; }
-    .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 40px; }
-    .footer-section h3 { font-size: 1.2rem; margin-bottom: 20px; position: relative; color: #000000; }
-    .footer-section h3::after { content: ""; display: block; width: 40px; height: 3px; background: #D60000; margin-top: 6px; border-radius: 2px; }
-    .footer-section ul { list-style: none; }
-    .footer-section ul li { margin-bottom: 12px; }
-    .footer-section ul li a { color: #000000; text-decoration: none; transition: color 0.3s ease; }
-    .footer-section ul li a:hover { color: #D60000; }
-    .social-links { display: flex; gap: 12px; }
-    .social-links a { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #000000; font-size: 1.2rem; transition: background 0.3s ease, transform 0.3s ease; }
-    .social-links a:hover { background: #D60000; transform: scale(1.1); }
-    .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; font-size: 0.85rem; color: #000000; }
-/* ==========================
-   RESPONSIVE AJUSTES
-========================== */
-
-/* Tablets (≤1024px) */
-@media (max-width: 1024px) {
-  header {
-    padding: 12px 18px;
-    height: 56px;
-  }
-
-  .quizzes-wrapper {
-    padding: 50px 16px;
-  }
-
-  .quizzes-title {
-    font-size: 2rem;
-    margin-bottom: 30px;
-  }
-
-  .quiz-card {
-    padding: 24px 18px;
-  }
-
-  .offer-card {
-    flex-direction: column;
-    padding: 36px 24px;
-    text-align: center;
-  }
-
-  .offer-content h3 { font-size: 1.6rem; }
-  .offer-content p { font-size: 1rem; }
-  .offer-price { font-size: 1.6rem; }
-}
-
-/* Móviles (≤768px) */
-@media (max-width: 768px) {
-  header {
-    padding: 10px 14px;
-    height: auto;
-    justify-content: center;
-  }
-
-  .logo {
-    font-size: 1.4rem;
-    margin: 0 auto;
-    text-align: center;
-  }
-
-  .quizzes-wrapper {
-    padding: 40px 14px;
-  }
-
-  .quizzes-title {
-    font-size: 1.6rem;
-    margin-bottom: 24px;
-  }
-
-  .quizzes-section {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .quiz-card {
-    padding: 20px 16px;
-  }
-
-  .quiz-card h3 { font-size: 1.1rem; }
-  .quiz-card p { font-size: 0.9rem; }
-
-  .btn-choose, .quiz-btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-  }
-
-  .offer-highlight {
-    margin: 50px auto;
-    padding: 0 10px;
-  }
-
-  .offer-content h3 { font-size: 1.4rem; }
-  .offer-content p { font-size: 0.9rem; }
-  .offer-price { font-size: 1.4rem; }
-
-  .comparison {
-    margin: 50px auto;
-    padding: 0 10px;
-  }
-
-  .comparison h2 {
-    font-size: 1.5rem;
-  }
-
-  .comparison-table th, .comparison-table td {
-    padding: 12px 10px;
-    font-size: 0.8rem;
-  }
-
-  footer {
-    padding: 40px 16px 20px;
-  }
-
-  .footer-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .footer-section h3 { font-size: 1rem; }
-  .footer-section ul li a { font-size: 0.9rem; }
-}
 
   </style>
-</head>
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<body>
+{% endblock %}
+{% block content %}
 
-  <!-- HEADER -->
-
-
-<!-- HEADER -->
-<header>
-  <div class="logo">
-    <a href="{{ url_for('homepage') }}">YourToolQuizz</a>
-  </div>
-</header>
-
-  </header>
-
-  <!-- MAIN -->
   <main class="quizzes-wrapper">
       <div class="quiz-card">
         <h3>Blogs</h3>
@@ -313,43 +171,4 @@ header {
     </section>
 
   </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-content">
-    <div class="footer-section">
-      <h3>Navegación</h3>
-      <ul>
-        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
-      </ul>
-    </div>
-
-      <div class="footer-section">
-        <h3>Contacto</h3>
-        <ul>
-          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
-          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
-        </ul>
-      </div>
-      <div class="footer-section">
-        <h3>Síguenos</h3>
-        <div class="social-links">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      &copy; 2023 YourToolQuizz. Todos los derechos reservados.
-    </div>
-  </footer>
-
-</body>
-</html>
+{%endblock%}
