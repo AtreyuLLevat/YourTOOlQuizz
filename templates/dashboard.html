@@ -49,26 +49,47 @@
 .change-password-btn {
   display: inline-flex;
   padding: 10px 16px;
-  background-color: #D60000;
+  background-color: #2563eb; /* Azul principal */
   color: #fff;
   border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
 .change-password-btn:hover {
-  background-color: #9e2121;
+  background-color: #d97706; /* Naranja hover */
+  transform: translateY(-2px);
 }
+
 
 /* ------------------ INFO CONTRATO ------------------ */
 .contract-info p { margin-bottom:10px; font-size:0.95rem; color:#000; }
-.contract-info span { font-weight:600; color:#D60000; }
+.contract-info span { 
+  font-weight:600; 
+  color:#2563eb; /* Azul principal */
+}
 
 
-/* ------------------ QUIZZES ------------------ */
-.quizzes-title { font-size:2.4rem; font-weight:800; margin-bottom:32px; text-align:center; color:#000; }
-.quizzes-title::after { content:""; display:block; width:60px; height:4px; background:#D60000; margin:12px auto 0; border-radius:2px; }
+
+.quizzes-title { 
+  font-size:2.4rem; 
+  font-weight:800; 
+  margin-bottom:32px; 
+  text-align:center; 
+  color:#000; 
+}
+
+.quizzes-title::after { 
+  content:""; 
+  display:block; 
+  width:60px; 
+  height:4px; 
+  background:#2563eb; /* Azul principal */
+  margin:12px auto 0; 
+  border-radius:2px; 
+}
+
 
 .quiz-card { display:flex; flex-direction:column; background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,0.06); overflow:hidden; cursor:pointer; transition: transform 0.3s, box-shadow 0.3s; }
 .quiz-card:hover { transform: translateY(-6px); box-shadow:0 18px 40px rgba(0,0,0,0.12); }

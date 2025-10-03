@@ -1,231 +1,104 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Error interno - 500 | YourToolQuizz</title>
+{% extends "base.html" %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background: #f5f7fa;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+{% block title %}Página no encontrada - 404 | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos específicos para la página 404 */
+    .error-container {
+        max-width: 800px;
+        margin: 60px auto 40px;
+        background: white;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
     }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 28px;
-  background: #fff;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-  position: relative;
-  height: 64px;
-}
-
-.logo {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #9e2121;
-  text-decoration: none;
-  z-index: 1500;
-}
-.logo a {
-  color: #9e2121;
-  text-decoration: none; /* opcional si no quieres subrayado */
-}
-
-    main {
-      max-width: 800px;
-      margin: 60px auto 40px;
-      background: white;
-      padding: 40px 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      flex: 1;
-      text-align: center;
+    
+    .error-code {
+        font-size: 6rem;
+        color: #dc3545;
+        margin: 0 0 20px;
+        font-weight: 700;
     }
-    main h1 {
-      font-size: 6rem;
-      color: #dc3545;
-      margin: 0 0 20px;
-    }
-    main h2 {
-      font-size: 2rem;
-      margin: 0 0 15px;
-    }
-    main p {
-      font-size: 1.2rem;
-      margin: 0 0 30px;
-      color: #666;
-    }
-    main a.button {
-      display: inline-block;
-      background-color: #ff6f61;
-      color: white;
-      padding: 14px 30px;
-      font-size: 1.1rem;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background-color 0.3s ease;
-    }
-    main a.button:hover {
-      background-color: #e65a4e;
-    }
-   footer {
-  background: #ffffff;
-  color: #000000;
-  padding: 60px 24px 20px;
-  font-size: 0.95rem;
-  border-top: 4px solid #242424; /* Línea roja principal */
-  box-shadow:  1px solid rgba(78, 78, 78, 0.1); /* Línea sutil gris */
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
-}
-
-.footer-section h3 {
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  position: relative;
-  color: #000000;
-}
-
-.footer-section h3::after {
-  content: "";
-  display: block;
-  width: 40px;
-  height: 3px;
-  background: #D60000;
-  margin-top: 6px;
-  border-radius: 2px;
-}
-
-.footer-section ul {
-  list-style: none;
-}
-
-.footer-section ul li {
-  margin-bottom: 12px;
-}
-
-.footer-section ul li a {
-  color: #000000;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-section ul li a:hover {
-  color: #D60000;
-}
-
-.social-links {
-  display: flex;
-  gap: 12px;
-}
-
-.social-links a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: #000000;
-  font-size: 1.2rem;
-  transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.social-links a:hover {
-  background: #D60000;
-  transform: scale(1.1);
-}
-
-.footer-bottom {
-  text-align: center;
-  padding-top: 30px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: 40px;
-  font-size: 0.85rem;
-  color: #000000;
-}
-
-    @media (max-width: 600px) {
-      .logo {
+    
+    .error-title {
         font-size: 2rem;
-      }
-      main {
-        margin: 40px 15px 30px;
-        padding: 30px 20px;
-      }
+        margin: 0 0 15px;
+        color: #1C1E21;
+        font-weight: 600;
     }
-  </style>
-</head>
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-<body>
-  <header>
-    <div class="logo">
-      <a href="{{ url_for('homepage') }}" style="text-decoration:none; color:inherit;">YourToolQuizz</a>
-    </div>
-  </header>
-  <main>
-    <h1>500</h1>
-    <h2>Error interno del servidor</h2>
-    <p>Estamos trabajando para resolver el problema. Por favor, intenta de nuevo más tarde.</p>
-    <a href="{{ url_for('homepage') }}" class="button">Volver al inicio</a>
-  </main>
-  
-  <footer>
-    <div class="footer-content">
-    <div class="footer-section">
-      <h3>Navegación</h3>
-      <ul>
-        <li><a href="{{ url_for('homepage') }}">Inicio</a></li>
-        <li><a href="{{ url_for('about') }}">Sobre Nosotros</a></li>
-        <li><a href="{{ url_for('legal') }}">Aviso legal</a></li>
-        <li><a href="{{ url_for('contact') }}">Contáctanos</a></li>
-        <li><a href="{{ url_for('Servicio_1') }}">Nuestros servicios</a></li>
-        <li><a href="{{ url_for('dashboard') }}">Perfil</a></li>
-      </ul>
-    </div>
     
-      
-      <div class="footer-section">
-        <h3>Contacto</h3>
-        <ul>
-          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
-          <li><a href="Telefono">Teléfono: +34 651 83 06 95</a></li>
-        </ul>
-      </div>
-      
-      <div class="footer-section">
-        <h3>Síguenos</h3>
-        <div class="social-links">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="TikTok"><i class="fab fa-TikTok"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-        </div>
-      </div>
-    </div>
+    .error-message {
+        font-size: 1.2rem;
+        margin: 0 0 30px;
+        color: #666;
+        line-height: 1.6;
+    }
     
-    <div class="footer-bottom">
-      &copy; © 2023 YourToolQuizz. Todos los derechos reservados.
-    </div>
-  </footer>
-  
-</body>
-</html>
+    .error-button {
+        display: inline-block;
+        background-color: #2563eb;
+        color: white;
+        padding: 14px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    
+    .error-button:hover {
+        background-color: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .error-container {
+            margin: 40px 15px 30px;
+            padding: 30px 20px;
+        }
+        
+        .error-code {
+            font-size: 4rem;
+        }
+        
+        .error-title {
+            font-size: 1.5rem;
+        }
+        
+        .error-message {
+            font-size: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .error-code {
+            font-size: 3rem;
+        }
+        
+        .error-title {
+            font-size: 1.3rem;
+        }
+        
+        .error-button {
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">500</div>
+    <h2 class="error-title">Error</h2>
+    <p class="error-message">Nuestro equipo lo resolverá lo antes posible, gracias.</p>
+    <a href="{{ url_for('homepage') }}" class="error-button">Volver al inicio</a>
+</div>
+{% endblock %}

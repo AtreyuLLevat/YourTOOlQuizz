@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Servicios | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ------------------ VIDEO PRESENTATION ------------------ */
+.video-presentation {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* título arriba, botón abajo */
+  align-items: center;
+  height: 40vh; /* altura reducida */
+  background: #f9f9f9;
+  text-align: center;
+  padding: 20px; /* evita que el contenido se pegue al borde */
+}
+
+.presentation-title {
+  font-size: 4.00rem; /* un poco más compacto para 40vh */
+  font-weight: 900;
+  color: #111;
+  max-width: 900px;
+  line-height: 1.2;
+}
+
+.btn-start {
+  padding: 12px 32px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background: #D60000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+  margin-bottom: 10px; /* pequeño espacio antes del borde */
+}
+
+.btn-start:hover {
+  background: #ff1a1a;
+  transform: scale(1.08);
+}
+
+
+/* ------------------ TEXT BLOCKS ------------------ */
+.text-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  padding: 0 24px;
+  max-width: 1200px;
+  margin: 60px auto;
+}
+
+.text-block {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  text-align: center;
+}
+
+.text-block .text-content h3 {
+  font-size: 2rem;
+  color: #222;
+  margin-bottom: 15px;
+}
+
+.text-block .text-content p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.8;
+}
+
+/* ------------------ SECTION TITLE ------------------ */
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000;
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: #D60000;
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+
+  </style>
+  
+{% endblock %}
+{% block content %}
+
+
+<main>
+
+  <!-- === VIDEO DE PRESENTACIÓN === -->
+<!-- === VIDEO DE PRESENTACIÓN === -->
+<section class="video-presentation">
+  <h1 class="presentation-title">Descubre nuestros mejores servicios para promocionar tu marca.</h1>
+  <a href="{{ url_for('Servicio_2') }}" class="btn-start">Empezar</a>
+</section>
+
+  <!-- === SERVICIOS === -->
+  <h2 class="section-title">Nuestros Servicios</h2>
+
+  <section class="text-sections">
+    <div class="text-block">
+      <div class="text-content">
+        <h3>Quizzes Personalizados: Conecta con tu Cliente Ideal</h3>
+        <p>Los quizzes de YourToolQuizz representan una herramienta de publicidad altamente efectiva, diseñada para conectar empresas con compradores potenciales cualificados. Cada cuestionario se adapta a la situación del usuario, ofreciendo resultados personalizados que reflejan sus necesidades y preferencias específicas. A partir de estos resultados, los clientes reciben una vista ampliada de las características principales de su empresa, destacando fortalezas y proporcionando una visión equilibrada con uno o dos puntos de mejora, lo que aporta credibilidad y transparencia.</p>
+        <p>Se estima que entre un 15% y un 35% de los usuarios que completan el quiz hacen clic en el enlace directo a la web de la empresa, un porcentaje significativamente superior al promedio del 5% que suelen generar los blogs. Esta metodología genera confianza en los compradores y aumenta notablemente la probabilidad de conversión, convirtiéndose en la opción ideal para empresas que desean alcanzar clientes que realmente se ajustan a su oferta y maximizar resultados.</p>
+      </div>
+    </div>
+
+    <div class="text-block">
+      <div class="text-content">
+        <h3>Blog con Recomendaciones: Posiciona tu Marca</h3>
+        <p>Ser protagonista en uno de nuestros blogs te permite mostrar tu empresa de manera natural y confiable ante nuestra audiencia. Cada artículo se centra en ofrecer recomendaciones útiles a los compradores, destacando tu negocio junto con un máximo de tres empresas más. Esta forma de promoción combina contenido editorial de valor con visibilidad estratégica, ayudando a que los usuarios identifiquen tu empresa como una opción confiable y recomendada. Además, el blog proporciona un entorno donde los visitantes interactúan con información útil, lo que aumenta el tiempo de exposición a tu marca. Es ideal para empresas que buscan mejorar su posicionamiento y autoridad dentro de su sector.</p>
+      </div>
+    </div>
+
+
+  </section>
+
+</main>
+{% endblock %}
+
