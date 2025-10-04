@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // ===== HEADER.JS CON PROTECCIÓN DE ESTILOS =====
+    // ===== HEADER.JS CON PROTECCIÓN COMPLETA DE ESTILOS =====
     function showNotification(msg) {
         const id = 'ytq-toast';
         let toast = document.getElementById(id);
@@ -26,17 +26,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchBar = document.getElementById('header-searchbar');
     const searchOverlay = document.getElementById('header-search-overlay');
     const searchInput = document.getElementById('header-search-input');
+    const searchForm = document.querySelector('.header-search-form');
     
-    // ===== FUNCIÓN DE PROTECCIÓN DE ESTILOS =====
+    // ===== FUNCIÓN DE PROTECCIÓN COMPLETA =====
     function protegerEstilosBuscador() {
-        if (!searchBar || !searchOverlay) return;
+        if (!searchBar || !searchOverlay || !searchInput) return;
         
         // Estilos inmutables para la barra de búsqueda
         const estilosSearchBar = {
             position: 'fixed',
             top: '14px',
             left: '50%',
-            transform: 'translate(-50%, -10px) scale(.98)',
+            transform: searchBar.classList.contains('active') 
+                ? 'translate(-50%, 0) scale(1)' 
+                : 'translate(-50%, -10px) scale(.98)',
             width: 'min(980px, calc(100% - 48px))',
             maxWidth: '980px',
             height: '56px',
@@ -45,14 +48,17 @@ document.addEventListener('DOMContentLoaded', function () {
             gap: '10px',
             padding: '8px 14px',
             borderRadius: '14px',
-            background: 'rgba(255,255,255,0.86)',
+            background: 'rgba(255,255,255,0.96)',
             backdropFilter: 'blur(10px) saturate(120%)',
-            boxShadow: '0 10px 30px rgba(17,24,39,0.12)',
-            opacity: '0',
-            visibility: 'hidden',
-            transition: 'transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms',
+            WebkitBackdropFilter: 'blur(10px) saturate(120%)',
+            boxShadow: searchBar.classList.contains('active')
+                ? '0 10px 30px rgba(17,24,39,0.16), 0 0 0 3px rgba(37,99,235,0.06)'
+                : '0 10px 30px rgba(17,24,39,0.12)',
+            opacity: searchBar.classList.contains('active') ? '1' : '0',
+            visibility: searchBar.classList.contains('active') ? 'visible' : 'hidden',
+            transition: 'transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms, box-shadow 200ms',
             zIndex: '1200',
-            pointerEvents: 'none'
+            pointerEvents: searchBar.classList.contains('active') ? 'auto' : 'none'
         };
         
         // Estilos inmutables para el overlay
@@ -64,71 +70,140 @@ document.addEventListener('DOMContentLoaded', function () {
             bottom: '0',
             background: 'rgba(0,0,0,0.28)',
             backdropFilter: 'blur(4px)',
-            opacity: '0',
-            visibility: 'hidden',
+            WebkitBackdropFilter: 'blur(4px)',
+            opacity: searchOverlay.classList.contains('active') ? '1' : '0',
+            visibility: searchOverlay.classList.contains('active') ? 'visible' : 'hidden',
             transition: 'opacity 200ms ease',
             zIndex: '1150',
-            pointerEvents: 'none'
+            pointerEvents: searchOverlay.classList.contains('active') ? 'auto' : 'none'
         };
         
-        // Aplicar estilos protegidos
+        // Estilos inmutables para el INPUT (CRÍTICO)
+        const estilosInput = {
+            flex: '1 1 0',
+            border: 'none',
+            background: 'transparent',
+            fontSize: '16px',
+            padding: '10px 8px',
+            outline: 'none',
+            color: '#111827',
+            borderRadius: '10px',
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: '400',
+            lineHeight: '1.5',
+            width: '100%',
+            minWidth: '0',
+            margin: '0',
+            boxShadow: 'none',
+            appearance: 'none',
+            WebkitAppearance: 'none'
+        };
+        
+        // Estilos para el formulario
+        const estilosForm = {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            width: '100%',
+            margin: '0',
+            padding: '0'
+        };
+        
+        // Estilos para el ícono de búsqueda dentro del popup
+        const searchIcon = searchBar.querySelector('.material-icons');
+        if (searchIcon) {
+            searchIcon.style.fontSize = '20px';
+            searchIcon.style.color = '#6b7280';
+            searchIcon.style.marginLeft = '6px';
+            searchIcon.style.flexShrink = '0';
+        }
+        
+        // Aplicar todos los estilos protegidos
         Object.assign(searchBar.style, estilosSearchBar);
         Object.assign(searchOverlay.style, estilosOverlay);
+        Object.assign(searchInput.style, estilosInput);
         
-        // Estilos específicos cuando está activo
+        if (searchForm) {
+            Object.assign(searchForm.style, estilosForm);
+        }
+        
+        // Posición superior cuando está activo
         if (searchBar.classList.contains('active')) {
-            searchBar.style.transform = 'translate(-50%, 0) scale(1)';
-            searchBar.style.opacity = '1';
-            searchBar.style.visibility = 'visible';
-            searchBar.style.pointerEvents = 'auto';
             searchBar.style.top = '18px';
-            
-            searchOverlay.style.opacity = '1';
-            searchOverlay.style.visibility = 'visible';
-            searchOverlay.style.pointerEvents = 'auto';
         }
     }
     
     function openSearch() {
         searchBar.classList.add('active');
         searchOverlay.classList.add('active');
-        searchInput.focus();
         document.body.style.overflow = 'hidden';
-        protegerEstilosBuscador(); // Reforzar estilos al abrir
+        
+        // Pequeño delay para asegurar que los estilos se aplican antes del focus
+        setTimeout(() => {
+            protegerEstilosBuscador();
+            searchInput.focus();
+        }, 10);
     }
     
     function closeSearch() {
         searchBar.classList.remove('active');
         searchOverlay.classList.remove('active');
         document.body.style.overflow = '';
-        protegerEstilosBuscador(); // Reforzar estilos al cerrar
+        protegerEstilosBuscador();
     }
     
-    // Aplicar protección inicial
+    // Aplicar protección inicial inmediatamente
     protegerEstilosBuscador();
     
-    // Observador de mutaciones para proteger contra cambios dinámicos
+    // Observador de mutaciones MÁS AGRESIVO
     const observer = new MutationObserver(function(mutations) {
         let necesitaProteccion = false;
         
         mutations.forEach(function(mutation) {
-            if (mutation.type === 'attributes' && 
-                (mutation.target === searchBar || mutation.target === searchOverlay) &&
-                mutation.attributeName === 'style') {
-                necesitaProteccion = true;
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                if (mutation.target === searchBar || 
+                    mutation.target === searchOverlay || 
+                    mutation.target === searchInput ||
+                    mutation.target === searchForm) {
+                    necesitaProteccion = true;
+                }
+            }
+            
+            // También proteger si se añaden clases de Conflictance
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const target = mutation.target;
+                if (target.classList.contains('conflictance') || 
+                    target.classList.contains('ctc') ||
+                    target.getAttribute('class')?.includes('conflictance')) {
+                    target.className = target.className.replace(/conflictance|ctc/g, '').trim();
+                    necesitaProteccion = true;
+                }
             }
         });
         
         if (necesitaProteccion) {
-            protegerEstilosBuscador();
+            setTimeout(protegerEstilosBuscador, 0);
         }
     });
     
-    // Iniciar observación
-    if (searchBar && searchOverlay) {
-        observer.observe(searchBar, { attributes: true, attributeFilter: ['style'] });
-        observer.observe(searchOverlay, { attributes: true, attributeFilter: ['style'] });
+    // Configuración completa del observador
+    const observerConfig = {
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+        attributeOldValue: true,
+        subtree: true
+    };
+    
+    // Observar el contenedor completo del header
+    const header = document.querySelector('header');
+    if (header) {
+        observer.observe(header, observerConfig);
     }
+    
+    // También observar elementos específicos
+    [searchBar, searchOverlay, searchInput, searchForm].forEach(el => {
+        if (el) observer.observe(el, observerConfig);
+    });
     
     // Event listeners
     searchToggle.addEventListener('click', openSearch);
@@ -141,33 +216,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     
-    // Proteger en resize y scroll
-    window.addEventListener('resize', protegerEstilosBuscador);
-    window.addEventListener('scroll', protegerEstilosBuscador);
+    // Protección en múltiples eventos
+    ['resize', 'scroll', 'focus', 'blur'].forEach(event => {
+        window.addEventListener(event, protegerEstilosBuscador);
+    });
     
-    // Protección periódica (fallback)
-    setInterval(protegerEstilosBuscador, 1000);
+    // Protección periódica más frecuente
+    setInterval(protegerEstilosBuscador, 300);
+    
+    // Protección adicional en el input
+    searchInput.addEventListener('input', protegerEstilosBuscador);
+    searchInput.addEventListener('focus', protegerEstilosBuscador);
+    searchInput.addEventListener('blur', protegerEstilosBuscador);
+
+    // ===== PROTECCIÓN CONTRA ESTILOS INLINE DE CONFLICTANCE =====
+    function limpiarEstilosConflictance() {
+        // Remover estilos inline problemáticos
+        document.querySelectorAll('*').forEach(el => {
+            if (el.style && (el.style.fontFamily?.includes('Conflictance') || 
+                             el.style.background?.includes('gradient') ||
+                             el.style.borderRadius === '20px')) {
+                el.style.fontFamily = 'Inter, sans-serif !important';
+                el.style.background = '';
+                el.style.borderRadius = '';
+            }
+        });
+    }
+    
+    // Ejecutar limpieza periódica
+    setInterval(limpiarEstilosConflictance, 500);
 });
 
-// menu.js - Script para el menú hamburguesa
+// menu.js - Script para el menú hamburguesa (sin cambios)
 document.addEventListener('DOMContentLoaded', function() {
     const menuBtn = document.querySelector('.menu-btn');
     const navMenu = document.querySelector('.nav-menu');
     const menuOverlay = document.getElementById('menuOverlay');
     const body = document.body;
 
-    // Función para abrir/cerrar el menú
     function toggleMenu() {
         const isMenuOpen = navMenu.classList.contains('active');
-        
-        if (isMenuOpen) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
+        isMenuOpen ? closeMenu() : openMenu();
     }
 
-    // Función para abrir el menú
     function openMenu() {
         navMenu.classList.add('active');
         menuBtn.classList.add('active');
@@ -175,7 +266,6 @@ document.addEventListener('DOMContentLoaded', function() {
         body.style.overflow = 'hidden';
     }
 
-    // Función para cerrar el menú
     function closeMenu() {
         navMenu.classList.remove('active');
         menuBtn.classList.remove('active');
@@ -183,29 +273,24 @@ document.addEventListener('DOMContentLoaded', function() {
         body.style.overflow = '';
     }
 
-    // Event listener para el botón del menú
     menuBtn.addEventListener('click', function(event) {
         event.stopPropagation();
         toggleMenu();
     });
 
-    // Cerrar menú al hacer clic en el overlay
     menuOverlay.addEventListener('click', closeMenu);
-
-    // Cerrar menú al hacer clic en un enlace
+    
     const menuLinks = navMenu.querySelectorAll('a');
     menuLinks.forEach(link => {
         link.addEventListener('click', closeMenu);
     });
 
-    // Cerrar menú con tecla Escape
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape' && navMenu.classList.contains('active')) {
             closeMenu();
         }
     });
 
-    // Cerrar menú al cambiar tamaño de ventana a desktop
     window.addEventListener('resize', function() {
         if (window.innerWidth > 1024 && navMenu.classList.contains('active')) {
             closeMenu();
