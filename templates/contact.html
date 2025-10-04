@@ -556,9 +556,70 @@ button[type="submit"]:hover {
 
   </style>
 </head>
-<h1>Contáctanos</h1>
 <body>
-<main>
+  <header>
+    <div class="logo-container">
+      <a href="{{ url_for('homepage') }}">
+        <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="YourToolQuizz" class="logo-img">
+      </a>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="{{ url_for('about') }}">Sobre nosotros</a>
+      <a href="{{ url_for('legal') }}">Legal</a>
+      <a href="{{ url_for('contact') }}">Ayuda</a>
+      <a href="{{ url_for('Servicio_1') }}">Servicios publicidad</a>
+      <a href="{{ url_for('dashboard') }}">Perfil</a>
+    </nav>
+    
+    <div class="right-nav">
+      <!-- Buscador -->
+      <div class="header-search">
+        <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
+          <span class="material-icons">search</span>
+        </button>
+
+        <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
+          <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
+            <span class="material-icons">search</span>
+            <input id="header-search-input"
+                   class="header-search-input"
+                   name="q"
+                   type="search"
+                   placeholder="Buscar en YourToolQuizz"
+                   aria-label="Buscar"
+                   autocomplete="off"
+                   />
+          </form>
+        </div>
+
+        <div id="header-search-overlay" class="header-search-overlay" tabindex="-1" aria-hidden="true"></div>
+      </div>
+
+      <!-- Login / Logout - SOLO ICONOS -->
+      <div id="auth-section">
+        {% if current_user.is_authenticated %}
+          <a class="auth-icon" href="{{ url_for('logout') }}" title="Cerrar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H10a2 2 0 00-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+            </svg>
+          </a>
+        {% else %}
+          <a class="auth-icon" href="{{ url_for('login') }}" title="Iniciar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+      
+      <button class="menu-btn"><span class="material-icons">menu</span></button>
+    </div>
+  </header>
+  <main>
+<h1>Contáctanos</h1>
+
+
 {% with messages = get_flashed_messages() %}
   {% if messages %}
     <div class="flash">
