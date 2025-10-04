@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}¿Tu ordenador está protegido? Haz nuestro quiz de seguridad informática - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+ /* ESTILO UNIFICADO PARA BLOGS */
+    main {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 40px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    
+    main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 30px;
+      text-align: center;
+      line-height: 1.3;
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #000;
+      margin-top: 48px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    h2::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: #2563eb;
+      margin-top: 12px;
+      border-radius: 2px;
+    }
+    
+    p {
+      font-size: 1.05rem;
+      color: #585858;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+    
+    ul { 
+      margin-bottom: 24px; 
+      padding-left: 24px; 
+    }
+    
+    li { 
+      margin-bottom: 12px; 
+      color: #585858;
+      line-height: 1.6;
+    }
+    
+    strong { 
+      color: #000; 
+      font-weight: 600;
+    }
+    
+    a { 
+      color: #2563eb; 
+      text-decoration: none; 
+      font-weight: 600; 
+      transition: color 0.3s;
+    }
+    
+    a:hover { 
+      color: #d97706; 
+    }
+
+    blockquote { 
+      background: #f8fafc; 
+      border-left: 4px solid #2563eb; 
+      padding: 24px; 
+      margin: 32px 0; 
+      font-style: italic; 
+      color: #585858; 
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    @media (max-width: 768px) {
+      main {
+        margin: 40px 16px;
+        padding: 28px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 36px;
+      }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <h1>Mejora tu productividad: Notion, ClickUp y Todoist</h1>
+
+  <p>En un mundo donde el tiempo es uno de nuestros recursos más valiosos, contar con una <strong>app de productividad</strong> puede marcar la diferencia entre sentirse abrumado y lograr un flujo de trabajo eficiente. Estas herramientas permiten <strong>gestionar tareas, planificar proyectos y organizar ideas</strong> de manera centralizada.</p>
+
+  <h2>¿Por qué es importante usar una app de productividad?</h2>
+  <ul>
+    <li><strong>Organización centralizada:</strong> todo en un solo lugar, desde tareas hasta documentos.</li>
+    <li><strong>Seguimiento de tareas y proyectos:</strong> evita olvidos y retrasos.</li>
+    <li><strong>Automatización y eficiencia:</strong> recordatorios y flujos automáticos que ahorran tiempo.</li>
+    <li><strong>Colaboración en equipo:</strong> coordina tareas y proyectos sin perder información.</li>
+    <li><strong>Mejor gestión del tiempo:</strong> prioriza y enfócate en lo que realmente importa.</li>
+  </ul>
+
+  <h2>Notion: versatilidad y personalización ilimitada</h2>
+  <p><strong>Notion</strong> es ideal para quienes buscan <strong>flexibilidad y personalización</strong> en su flujo de trabajo.</p>
+  <ul>
+    <li><strong>Bases de datos personalizables:</strong> tablas, tableros Kanban, listas y calendarios adaptados a tus necesidades.</li>
+    <li><strong>Documentos y wikis:</strong> redacta notas, manuales o protocolos dentro de la misma app.</li>
+    <li><strong>Plantillas adaptables:</strong> desde gestión de proyectos hasta seguimiento de hábitos.</li>
+    <li><strong>Integraciones:</strong> Google Drive, Slack, Trello y más, además de incrustar videos o PDFs.</li>
+    <li><strong>Colaboración en tiempo real:</strong> comentarios y ediciones compartidas con tu equipo.</li>
+  </ul>
+
+  <h2>ClickUp: gestión integral de proyectos y equipos</h2>
+  <ul>
+    <li><strong>Gestión avanzada de tareas:</strong> subtareas, listas de control y asignaciones de equipo.</li>
+    <li><strong>Vistas múltiples:</strong> Kanban, listas, calendarios, Gantt y diagramas de carga.</li>
+    <li><strong>Automatizaciones:</strong> reglas automáticas para reducir trabajo repetitivo.</li>
+    <li><strong>Informes y analítica:</strong> supervisa progreso y optimiza recursos.</li>
+    <li><strong>Colaboración y comunicación:</strong> comentarios y chats dentro de cada tarea.</li>
+  </ul>
+
+  <h2>Todoist: simplicidad y eficiencia para tareas diarias</h2>
+  <ul>
+    <li><strong>Listas de tareas y proyectos:</strong> tareas y subtareas con fechas de vencimiento.</li>
+    <li><strong>Prioridades y etiquetas:</strong> organiza tareas según importancia y contexto.</li>
+    <li><strong>Recordatorios:</strong> nunca olvides tus tareas importantes.</li>
+    <li><strong>Integraciones:</strong> Google Calendar, Outlook, Slack y más.</li>
+    <li><strong>Panel de productividad:</strong> estadísticas y hábitos para mantener constancia.</li>
+  </ul>
+
+  <h2>Comparación resumida</h2>
+  <ul>
+    <li><strong>Notion:</strong> creatividad y documentación, flexible pero requiere configuración.</li>
+    <li><strong>ClickUp:</strong> gestión de proyectos y equipos, ideal para proyectos complejos.</li>
+    <li><strong>Todoist:</strong> tareas diarias, rápido y sencillo, perfecto para gestión personal.</li>
+  </ul>
+
+  <h2>Descubre la herramienta adecuada con nuestro quiz</h2>
+  <p>Elegir la app correcta puede marcar la diferencia entre sentirse <strong>organizado o abrumado</strong>. Nuestro <strong>quiz interactivo</strong> te ayuda a:</p>
+  <ul>
+    <li>Identificar la app que mejor se adapta a tu estilo de trabajo.</li>
+    <li>Comparar funcionalidades clave sin perder tiempo investigando.</li>
+    <li>Recibir recomendaciones personalizadas al instante.</li>
+  </ul>
+  <p>💡 En solo 1 minuto podrás <strong>descubrir la herramienta de productividad que más se ajusta a ti</strong> y comenzar a optimizar tu tiempo desde hoy. <strong>Haz el quiz ahora</strong>.</p>
+{% endblock %}

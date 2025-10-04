@@ -1,0 +1,96 @@
+
+{% extends "base.html" %}
+
+{% block title %}Sobre Nosotros - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+    main {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 40px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      flex: 1;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    
+    main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+    
+    h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #000;
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    
+    h1::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: #2563eb;
+      margin: 16px auto 0;
+      border-radius: 2px;
+    }
+    
+    p {
+      font-size: 1.05rem;
+      color: #585858;
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+    
+    strong { 
+      font-weight: 600; 
+      color: #000; 
+    }
+    
+    .highlight {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 28px;
+      border-radius: 12px;
+      margin: 40px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    
+    .highlight p {
+      margin-bottom: 16px;
+    }
+    
+    .highlight p:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        margin: 40px 16px;
+        padding: 28px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+
+  </style>
+{% endblock %}
+{% block content %}
+    <h1>Sobre Nosotros</h1>
+    <p>En <strong>YourToolQuizz</strong> hemos creado un espacio pensado para generar un ciclo beneficioso tanto para ti como para tu marca.</p>
+    
+    <div class="highlight">
+      <p>Nuestra plataforma te permite encontrar la herramienta perfecta para tus necesidades mediante quizzes personalizados o descubrir nuevas marcas y empresas útiles a través de nuestros blogs especializados. Sea cual sea tu objetivo, te ayudamos a encontrar lo que necesitas para potenciar tus proyectos digitales.</p>
+      <p>Si tu meta es ampliar tu público y darte a conocer, YourToolQuizz ofrece diversas herramientas de publicidad, incluyendo quizzes, blogs y espacios publicitarios, para que logres conectar con tus clientes ideales.</p>
+    </div>
+
+    <p>En YourToolQuizz, creemos que las empresas merecen un espacio donde presentarse directamente a sus clientes potenciales, descubriendo y compartiendo herramientas digitales de todo tipo en un entorno pensado para crecer juntos!.</p>
+{% endblock %}
+
