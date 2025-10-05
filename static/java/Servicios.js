@@ -2,7 +2,7 @@
     document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("algo").textContent = "valor";
 
-document.getElementById('year').textContent = new Date().getFullYear();
+
 
     // Funcionalidad del acordeón FAQ
     document.querySelectorAll('.faq-question').forEach(question => {
