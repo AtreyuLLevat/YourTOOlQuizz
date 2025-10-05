@@ -1,6 +1,4 @@
-    
-    document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("algo").textContent = "valor";
+document.addEventListener('DOMContentLoaded', function () {
 
 
 
