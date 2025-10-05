@@ -1,4 +1,8 @@
-    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("algo").textContent = "valor";
+
+document.getElementById('year').textContent = new Date().getFullYear();
 
     // Funcionalidad del acordeón FAQ
     document.querySelectorAll('.faq-question').forEach(question => {
@@ -39,4 +43,5 @@
         // Mostrar la tabla correspondiente
         document.getElementById(`${tab}-table`).classList.add('active');
       });
+    });
     });
