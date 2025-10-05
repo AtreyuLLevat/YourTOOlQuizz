@@ -1,174 +1,353 @@
-{% extends "base.html" %}
-
-{% block title %}Servicio | YourToolQuizz{% endblock %}
-
-{% block extra_css %}
-<style>
-    /* ------------------ GLOBAL ------------------ */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #fff;
-      color: #111;
-      line-height: 1.6;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    a, button, .quiz-card, .ad-slide, header, footer { transition: all 0.3s ease; }
-
-    /* ------------------ HEADER ------------------ */
-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 14px 28px;
-      background: #fff;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 64px;
-      position: relative;
-    }
-
-    .logo {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: #9e2121;
-      text-decoration: none;
-      line-height: 1;
-      z-index: 1500;
-    }
-
-    .logo a { color: inherit; text-decoration: none; }
-
-    /* ------------------ SERVICES (adapted to quiz-card style) ------------------ */
-    .quizzes-wrapper { padding: 80px 24px; max-width: 1200px; margin: 0 auto; text-align: center; background: #fff; }
-    .quizzes-title {
-      font-size: 2.4rem; font-weight: 800; color: #000; margin-bottom: 50px; position: relative;
-    }
-    .quizzes-title::after {
-      content: ""; display: block; width: 60px; height: 4px; background: #D60000; margin: 12px auto 0; border-radius: 2px;
-    }
-    .quizzes-section {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 36px;
-    }
-    .quiz-card {
-      background: #fff; padding: 36px 24px; border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-      display: flex; flex-direction: column; align-items: center;
-      transform: scale(0.98); opacity: 0; animation: quizFadeIn 0.8s ease forwards;
-    }
-    .quiz-card:hover { transform: scale(1.03); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
-    .quiz-card h3 { font-size: 1.2rem; font-weight: 700; color: #000; margin-bottom: 10px; }
-    .quiz-card p { font-size: 0.95rem; color: #333; margin-bottom: 20px; text-align: center; }
-    .quiz-btn, .btn-choose { padding: 10px 22px; border-radius: 8px; background: #D60000; color: #fff; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; }
-    .quiz-btn:hover, .btn-choose:hover { background: #ff1a1a; transform: scale(1.05); }
-
-    @keyframes quizFadeIn { to { opacity: 1; transform: scale(1); } }
-
-    /* ------------------ OFFER ------------------ */
-    .offer-highlight { margin: 80px auto; max-width: 900px; text-align: center; padding: 0 20px; }
-    .offer-card {
-      background: linear-gradient(90deg,#000,#D60000); border-radius: 16px; padding: 50px 30px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: #fff; display: flex; justify-content: center; align-items: center;
-    }
-    .offer-content { max-width: 600px; }
-    .offer-content h3 { font-size: 2rem; margin-bottom: 15px; font-weight: 700; }
-    .offer-content p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; }
-    .offer-price { display: inline-block; font-size: 2rem; font-weight: 700; background: #fff; color: #D60000; padding: 10px 20px; border-radius: 8px; margin-bottom: 25px; }
-    .btn-offer { display: inline-block; padding: 14px 36px; background: #fff; color: #D60000; font-weight: 600; font-size: 1.1rem; border-radius: 10px; border: none; cursor: pointer; }
-    .btn-offer:hover { background: #f5f5f5; transform: scale(1.05); }
-
-    /* ------------------ COMPARISON ------------------ */
-    .comparison { margin: 80px auto; padding: 0 20px; max-width: 1200px; }
-    .comparison h2 { text-align: center; font-size: 2rem; margin-bottom: 30px; }
-    .comparison-table-wrapper { overflow-x: auto; }
-    .comparison-table {
-      width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden;
-      background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-    }
-    .comparison-table thead { background: #D60000; color: #fff; }
-    .comparison-table th, .comparison-table td { padding: 18px 20px; text-align: center; border-bottom: 1px solid #817f7f; font-size: 0.95rem; }
-    .comparison-table th:first-child, .comparison-table td:first-child { text-align: left; font-weight: 600; background: #f9f9f9; }
-    .comparison-table tr:last-child td { border-bottom: none; }
-
-
-  </style>
-{% endblock %}
-{% block content %}
-
-  <main class="quizzes-wrapper">
-      <div class="quiz-card">
-        <h3>Blogs</h3>
-        <p>Contenido objetivo optimizado para SEO con alcance a tu público.</p>
-        <p class="price"><span>30€ por blog</span>/mes</p>
-<a href="{{ url_for('serviciosblogs') }}" class="btn-choose">Elegir</a>
-      </div>
-      <div class="quiz-card">
-        <h3>Quizzes</h3>
-        <p>Interacción directa con los usuarios para captar leads.</p>
-        <p class="price"><span>Hasta 3 meses</span>/mes</p>
-<a href="{{ url_for('serviciosquizz') }}" class="btn-choose">Elegir</a>
-      </div>
-    </div>
-
-    <!-- Oferta -->
-    <section class="offer-highlight">
-      <h2>Oferta Especial</h2>
-      <div class="offer-card">
-        <div class="offer-content">
-          <h3>Blog + Quiz</h3>
-          <p>Combina la visibilidad de los banners (2 semanas) con la interacción directa de los quizzes (1 mes). Perfecto para aumentar tu alcance y captar clientes potenciales de forma rápida.</p>
-          <span class="offer-price">84,7€</span>
-          <button class="btn-offer">Aprovechar Oferta</button>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolQuizz - Proceso de Marca</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+            padding: 50px 20px;
+            background: #ffffff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 70px;
+            padding: 30px 0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 3rem;
+            margin-bottom: 25px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #5a6c7d;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+            margin-bottom: 80px;
+        }
+        
+        .process-card {
+            background: #ffffff;
+            border-radius: 0;
+            padding: 35px 30px;
+            box-shadow: 
+                0 8px 25px rgba(200, 220, 240, 0.6),
+                0 2px 8px rgba(200, 220, 240, 0.4);
+            border: 1px solid #e8f1f8;
+            position: relative;
+            transition: all 0.3s ease;
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .process-card:hover {
+            box-shadow: 
+                0 12px 35px rgba(200, 220, 240, 0.8),
+                0 4px 12px rgba(200, 220, 240, 0.5);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.2;
+            flex: 1;
+            padding-right: 20px;
+        }
+        
+        .card-image-container {
+            width: 200px;
+            height: 140px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 6px 18px rgba(180, 210, 235, 0.5);
+            border: 2px solid #ffffff;
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .card-image:hover {
+            transform: scale(1.08);
+        }
+        
+        .card-content {
+            color: #5a6c7d;
+            font-size: 1.1rem;
+            line-height: 1.65;
+            flex: 1;
+            text-align: justify;
+            hyphens: auto;
+            margin: 0;
+            padding-top: 10px;
+        }
+        
+        .highlight {
+            color: #2c3e50;
+            font-weight: 700;
+            background: #f0f7fc;
+            padding: 2px 6px;
+        }
+        
+        .cta-section {
+            background: #ffffff;
+            padding: 70px 50px;
+            text-align: center;
+            margin-bottom: 60px;
+            box-shadow: 
+                0 10px 30px rgba(200, 220, 240, 0.6),
+                0 2px 8px rgba(200, 220, 240, 0.4);
+            border: 1px solid #e8f1f8;
+        }
+        
+        .cta-title {
+            font-size: 2.4rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+        
+        .cta-text {
+            font-size: 1.3rem;
+            color: #5a6c7d;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #2c3e50;
+            color: white;
+            padding: 18px 50px;
+            border-radius: 0;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 
+                0 6px 20px rgba(44, 62, 80, 0.2);
+            transition: all 0.3s ease;
+            border: 2px solid #2c3e50;
+        }
+        
+        .cta-button:hover {
+            background: transparent;
+            color: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(44, 62, 80, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #7f8c8d;
+            font-style: italic;
+            border-top: 1px solid #e8f1f8;
+            margin-top: 50px;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 1100px) {
+            .process-grid {
+                gap: 30px;
+            }
+            
+            .process-card {
+                padding: 30px 25px;
+                height: 460px;
+            }
+            
+            .card-image-container {
+                width: 180px;
+                height: 120px;
+            }
+            
+            .card-title {
+                font-size: 1.7rem;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .process-grid {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+            
+            .process-card {
+                height: auto;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.4rem;
+            }
+            
+            .cta-section {
+                padding: 50px 30px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                gap: 20px;
+                margin-bottom: 25px;
+            }
+            
+            .card-image-container {
+                width: 100%;
+                height: 180px;
+                order: -1;
+            }
+            
+            .card-title {
+                font-size: 1.6rem;
+                padding-right: 0;
+                text-align: center;
+            }
+            
+            .card-content {
+                text-align: left;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 30px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .process-card {
+                padding: 25px 20px;
+                height: auto;
+                min-height: 380px;
+            }
+            
+            .card-image-container {
+                height: 150px;
+            }
+            
+            .cta-title {
+                font-size: 1.9rem;
+            }
+            
+            .cta-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>En ToolQuizz hemos diseñado un proceso sencillo pero poderoso</h1>
+            <p class="subtitle">Para ayudarte a reflejar la esencia de tu marca, atraer clientes y potenciar tu crecimiento online.</p>
+        </header>
+        
+        <div class="process-grid">
+            <div class="process-card">
+                <div class="card-header">
+                    <h2 class="card-title">Elige la herramienta</h2>
+                    <div class="card-image-container">
+                        <img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Herramientas" class="card-image">
+                    </div>
+                </div>
+                <p class="card-content">Explora nuestras soluciones diseñadas para adaptarse a tu negocio. Desde quizzes interactivos que generan engagement hasta <span class="highlight">blogs estratégicos</span> que posicionan tu marca. Escoge la herramienta que mejor encaje con tus necesidades y objetivos específicos de crecimiento y visibilidad online. Nuestro equipo te asesorará para seleccionar la opción más adecuada.</p>
+            </div>
+            
+            <div class="process-card">
+                <div class="card-header">
+                    <h2 class="card-title">1.Elige tu plan</h2>
+                    <div class="card-image-container">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Planes" class="card-image">
+                    </div>
+                </div>
+                <p class="card-content">Ofrecemos planes flexibles pensados para startups, emprendedores y empresas pequeñas o medianas. Tú eliges lo que necesitas, nosotros nos ocupamos del resto. Cada plan está diseñado para maximizar resultados, adaptándose a tu presupuesto y ritmo de crecimiento particular. Sin contratos largos ni compromisos ocultos.</p>
+            </div>
+            
+            <div class="process-card">
+                <div class="card-header">
+                    <h2 class="card-title">2.Cuéntanos tu historia</h2>
+                    <div class="card-image-container">
+                        <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Historia" class="card-image">
+                    </div>
+                </div>
+                <p class="card-content">Queremos conocer tu negocio a fondo. Envíanos la URL de tu web y cuéntanos quién eres, cuál es tu propósito y qué quieres lograr. Nos encargaremos de transformar tu historia en contenidos que conecten con tu audiencia, especialmente en blogs. Así reflejamos tu esencia de forma auténtica y genuina, manteniendo la coherencia de tu marca.</p>
+            </div>
+            
+            <div class="process-card">
+                <div class="card-header">
+                    <h2 class="card-title">3.Observa tus resultados</h2>
+                    <div class="card-image-container">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Resultados" class="card-image">
+                    </div>
+                </div>
+                <p class="card-content">Con nuestra herramienta tendrás acceso a métricas claras y detalladas para seguir el rendimiento de tus quizzes y blogs. Comprenderás qué funciona, qué atrae a tu audiencia y cómo optimizar tu estrategia de marketing digital para obtener mejores resultados continuamente. Datos en tiempo real para decisiones informadas.</p>
+            </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Comparación -->
-    <section class="comparison">
-      <h2>Comparación de Servicios</h2>
-      <div class="comparison-table-wrapper">
-        <table class="comparison-table">
-          <thead>
-            <tr>
-              <th>CARACTERÍSTICAS</th>
-              <th>BLOGS</th>
-              <th>QUIZZES</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Público Objetivo</td>
-              <td>Usuarios interesados en conocer nuevas opciones</td>
-              <td>Usuarios calificados para tu marca</td>
-            </tr>
-            <tr>
-              <td>CTR (Rate de Click)</td>
-              <td>~5%</td>
-              <td>15-35%</td>
-            </tr>
-            <tr>
-              <td>Duracion minima/máxima</td>
-              <td>Para siempre</td>
-              <td>1 mes/3 meses</td>
-            </tr>
-            <tr>
-              <td>Precio minimo/máximo</td>
-              <td>30€</td>
-              <td>50€/100€</td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-{%endblock%}
+        
+        <div class="cta-section">
+            <h2 class="cta-title">4.Empieza hoy y deja que transformemos tu visión en resultados reales</h2>
+            <p class="cta-text">Juntos haremos que tu marca no solo se vea, sino que destaque.</p>
+            <a href="#" class="cta-button">Comenzar Ahora</a>
+        </div>
+        
+        <footer>
+            <p>Because finding the right tool should be simple, and sharing it should be powerful.</p>
+        </footer>
+    </div>
+</body>
+</html>
