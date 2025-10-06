@@ -176,6 +176,30 @@
       box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
     }
 
+    /* ENLACE CÓMO FUNCIONA */
+    .how-it-works-link {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .how-it-works-link a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      padding: 12px 24px;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+    }
+    .how-it-works-link a:hover {
+      background-color: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
     /* RESEÑAS MINIMALISTAS */
     .testimonials-section {
       margin: 100px 0;
@@ -476,6 +500,13 @@
         min-height:auto;
         padding:28px;
       }
+      .how-it-works-link {
+        margin-top: 30px;
+      }
+      .how-it-works-link a {
+        font-size: 1rem;
+        padding: 10px 20px;
+      }
       .testimonials-section {
         margin: 80px 0;
       }
@@ -610,6 +641,14 @@
           <a href="#contacto" class="btn">Máximo impacto</a>
         </div>
       </div>
+
+      <!-- ENLACE CÓMO FUNCIONA QUIZZES -->
+      <div class="how-it-works-link">
+        <a href="{{ url_for('Servicio_2') }}">
+          <span>¿Cómo funciona?</span>
+          <span>→</span>
+        </a>
+      </div>
     </div>
 
     <!-- SEPARADOR -->
@@ -662,6 +701,14 @@
           <span class="badge">Experiencia completa</span>
           <a href="#contacto" class="btn">Colaborar ahora</a>
         </div>
+      </div>
+
+      <!-- ENLACE CÓMO FUNCIONA BLOGS -->
+      <div class="how-it-works-link">
+        <a href="{{ url_for('Servicio_2') }}">
+          <span>¿Cómo funciona?</span>
+          <span>→</span>
+        </a>
       </div>
     </div>
 
@@ -915,4 +962,3 @@
 <script src="{{ url_for('static', filename='java/Servicios.js') }}"defer> </script>
 
 {% endblock %}
-
