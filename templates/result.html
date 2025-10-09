@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Result | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+main {
+  flex: 1;
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+/* TITULO */
+h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #000;
+  margin-bottom: 30px;
+}
+h1 strong { 
+  color: #2563eb; /* Azul principal */
+}
+
+/* SUBTITULO */
+h2 {
+  font-size: 1.8rem;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+/* BOTÓN */
+.btn, .quiz-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  background: #2563eb; /* Azul principal */
+  color: #fff;
+  font-weight: 600;
+  display: inline-block;
+  margin: 20px 0;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  transition: all 0.3s ease;
+}
+.btn:hover, .quiz-btn:hover {
+  background: #d97706; /* Naranja hover */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+/* LISTA DE FEATURES */
+.features {
+  list-style: none;
+  padding: 0;
+  max-width: 600px;
+  margin: 30px auto;
+  text-align: left;
+}
+.features li {
+  background: #f9f9f9;
+  margin-bottom: 12px;
+  padding: 16px 20px;
+  border-left: 4px solid #2563eb; /* Azul principal */
+  border-radius: 8px;
+  font-size: 1.05rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+.features li:hover { 
+  background: #fff; 
+  transform: translateX(5px); 
+  border-left-color: #d97706; /* Hover naranja */
+}
+.features li::before {
+  content: "✓";
+  color: #2563eb; /* Azul principal */
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+  </style>
+{% endblock %}
+{% block content %}
+
+<main>
+  <h1>Tu herramienta ideal es: <strong>{{ tool.name }}</strong></h1>
+  <a href="{{ tool.url }}" class="btn" target="_blank">Ir a la herramienta</a>
+
+  <h2>Características destacadas:</h2>
+  <ul class="features">
+    {% for feature in tool.features %}
+      <li>{{ feature }}</li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}
