@@ -259,11 +259,15 @@
       box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
 
-    .blog-card img {
-      height: 250px;
-      object-fit: cover;
-      display: block;
-    }
+.blog-card img {
+  width: 500px;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
 
     .blog-content {
       padding: 20px;
@@ -349,6 +353,13 @@
         grid-template-columns: 1fr;
       }
     }
+    @media (max-width: 600px) {
+  .blog-card img {
+    width: 100%;
+    height: auto;
+  }
+}
+
   </style>
 {% endblock %}
 {% block content%}
@@ -449,24 +460,26 @@
       <h2 class="section-title">Blog</h2>
       <div class="blog-grid">
         <div class="blog-card">
-          <img src="static/imagenes/blog1.png" alt="Blog 1">
+          <img src="{{ url_for('static', filename='Imagenes/Blogejemplo.js') }}" alt="Blog 1">
           <div class="blog-content">
-            <h3>Contrata un blogg</h3>
-            <a href="#" class="read-more">Leer más</a>
+            <h3>Haz crecer tu empresa con publicaciones en blogs estratégicos</h3>
+            <a href="{{ url_for('Blogejemplo') }}" class="read-more">Leer más</a>
           </div>
         </div>
+
         <div class="blog-card">
-          <img src="static/imagenes/blog2.png" alt="Blog 2">
+          <img src="{{ url_for('static', filename='Imagenes/Blogejemplo.js') }}" alt="Blog 1">
           <div class="blog-content">
-            <h3>Contrata un blogg</h3>
-            <a href="#" class="read-more">Leer más</a>
+            <h3>Haz crecer tu empresa con publicaciones en blogs estratégicos</h3>
+            <a href="{{ url_for('Blogejemplo') }}" class="read-more">Leer más</a>
           </div>
         </div>
+
         <div class="blog-card">
-          <img src="static/imagenes/blog3.png" alt="Blog 3">
+          <img src="{{ url_for('static', filename='Imagenes/Blogejemplo.js') }}" alt="Blog 1">
           <div class="blog-content">
-            <h3>Contrata un blogg</h3>
-            <a href="#" class="read-more">Leer más</a>
+            <h3>Haz crecer tu empresa con publicaciones en blogs estratégicos</h3>
+            <a href="{{ url_for('Blogejemplo') }}" class="read-more">Leer más</a>
           </div>
         </div>
       </div>
