@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+
+{% block title %}Gracias por tu mensaje | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+
+
+    /* ---------------- MAIN ---------------- */
+    main {
+      max-width: 800px;
+      margin: 60px auto;
+      background: #fff;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      flex: 1;
+      text-align: center;
+      animation: quizFadeIn 0.8s ease forwards;
+    }
+    main h1 {
+      color: #2563eb;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    main p {
+      font-size: 1.2rem;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 30px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .btn:hover { background: #d97706; transform: scale(1.05); }
+
+    @keyframes quizFadeIn { to { opacity: 1; transform: scale(1); } }
+
+  
+  </style>
+{% endblock %}
+{% block content %}
+
+<main>
+  <h1>¡Gracias por tu mensaje!</h1>
+  <p>Tu mensaje ha sido enviado correctamente. Nos pondremos en contacto contigo lo antes posible.</p>
+  <a href="{{ url_for('homepage') }}" class="btn">Volver a la página principal</a>
+</main>
+
+{% endblock %}

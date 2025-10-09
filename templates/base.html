@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}YourToolQuizz{% endblock %}</title>
+  <meta http-equiv="Content-Security-Policy" 
+        content="
+          default-src 'self';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
+          font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;
+        ">
+
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <style>
+   * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: #fff; color: #1C1E21; line-height: 1.6; }
+
+    /* ===== HEADER REORGANIZADO ===== */
+    header {
+      position: sticky; 
+      top: 0; 
+      z-index: 1000;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      padding: 16px 24px; 
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .logo-container {
+      flex: 0 0 auto;
+    }
+    
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+    
+    /* MENÚ CENTRAL - SOLO DESKTOP */
+    .nav-menu {
+      display: flex;
+      gap: 24px;
+      flex: 1 1 auto;
+      justify-content: center;
+      margin: 0 20px;
+    }
+    
+    .nav-menu a {
+      color: #1C1E21;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      white-space: nowrap;
+    }
+    
+    .nav-menu a:hover {
+      color: #2563eb;
+    }
+    
+    /* RIGHT NAV - ICONOS Y BOTONES */
+    .right-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
+
+    /* BUSCADOR MEJORADO */
+    .header-search { 
+      position: relative; 
+      display: flex; 
+      align-items: center;
+    }
+
+    /* Botón de lupa */
+    .search-btn {
+      background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #2563eb;
+      transition: transform .18s ease, background .18s ease;
+    }
+    .search-btn:focus { 
+      outline: 2px solid rgba(37,99,235,.18); 
+      outline-offset: 2px; 
+    }
+    .search-btn:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    /* Barra de búsqueda */
+    .header-searchbar {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translate(-50%, -10px) scale(.98);
+      width: min(980px, calc(100% - 48px));
+      max-width: 980px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.86);
+      backdrop-filter: blur(10px) saturate(120%);
+      box-shadow: 0 10px 30px rgba(17,24,39,0.12);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms;
+      z-index: 1200;
+      pointer-events: none;
+    }
+
+    /* Estado abierto */
+    .header-searchbar.active {
+      transform: translate(-50%, 0) scale(1);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      top: 18px;
+    }
+
+    /* Icono dentro de la barra */
+    .header-searchbar .material-icons { 
+      font-size: 20px; 
+      color: #6b7280; 
+      margin-left: 6px; 
+    }
+
+    /* Input */
+    .header-search-input {
+      flex: 1 1 0;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      padding: 10px 8px;
+      outline: none;
+      color: #111827;
+      border-radius: 10px;
+    }
+
+    /* Focus visual del input */
+    .header-searchbar:focus-within {
+      box-shadow: 0 10px 30px rgba(17,24,39,0.16), 0 0 0 3px rgba(37,99,235,0.06);
+    }
+
+    /* Overlay oscuro/blur que cubre la página */
+    .header-search-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 200ms ease;
+      z-index: 1150;
+      pointer-events: none;
+    }
+
+    /* Overlay visible */
+    .header-search-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    /* ICONOS DE LOGIN/LOGOUT - SOLO ICONOS */
+    .auth-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.3s;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: #2563eb;
+      background: none;
+    }
+    
+    .auth-icon:hover {
+      background: rgba(37, 99, 235, 0.1);
+      transform: scale(1.1);
+    }
+    
+    .auth-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    
+    /* ===== MENÚ MÓVIL MEJORADO ===== */
+    /* Botón del menú hamburguesa - ESTILO MINIMALISTA Y TRANSPARENTE */
+    .menu-btn { 
+      display: none;
+      border: none; 
+      background: transparent;
+      cursor: pointer; 
+      color: #1C1E21; 
+      width: 32px;
+      height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 0;
+    }
+    
+    .menu-btn:hover { 
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.05);
+    }
+    
+    .menu-btn.active {
+      color: #2563eb;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .menu-btn .material-icons {
+      font-size: 22px;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-btn.active .material-icons {
+      transform: rotate(90deg);
+    }
+
+    /* Menú móvil activo - SOLO MOBILE/TABLET */
+    .nav-menu.active {
+      display: flex !important;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      z-index: 999;
+      padding: 0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-top: 1px solid #f0f0f0;
+      animation: slideDown 0.3s ease;
+      max-height: calc(100vh - 100%);
+      overflow-y: auto;
+    }
+
+    .nav-menu.active a {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      width: 100%;
+      text-align: left;
+      transition: all 0.3s ease;
+      color: #1C1E21;
+      text-decoration: none;
+      display: block;
+    }
+
+    .nav-menu.active a:hover {
+      background: #f8f9fa;
+      color: #2563eb;
+      padding-left: 28px;
+    }
+
+    .nav-menu.active a:last-child {
+      border-bottom: none;
+    }
+
+    /* Animación para el menú */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Overlay para el fondo cuando el menú está abierto */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 998;
+      display: none;
+      backdrop-filter: blur(2px);
+      transition: opacity 0.3s ease;
+    }
+
+    .menu-overlay.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    /* Desktop - Menú normal visible */
+    @media (min-width: 1025px) {
+      .nav-menu {
+        display: flex !important;
+      }
+      
+      .menu-btn {
+        display: none !important;
+      }
+      
+      .menu-overlay {
+        display: none !important;
+      }
+    }
+
+    /* Tablet y Mobile - Menú hamburguesa */
+    @media (max-width: 1024px) {
+      .nav-menu:not(.active) {
+        display: none !important;
+      }
+      
+      .menu-btn {
+        display: flex;
+      }
+      
+      .nav-menu.active {
+        display: flex !important;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        padding: 12px 16px;
+      }
+      
+      .right-nav {
+        gap: 8px;
+      }
+      
+      .auth-icon,
+      .search-btn {
+        width: 36px;
+        height: 36px;
+      }
+      
+      .menu-btn {
+        width: 30px;
+        height: 30px;
+      }
+      
+      .menu-btn .material-icons {
+        font-size: 20px;
+      }
+      
+      .nav-menu.active a {
+        padding: 14px 20px;
+        font-size: 15px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      header {
+        padding: 10px 12px;
+      }
+      
+      .logo-img {
+        height: 36px;
+      }
+      
+      .menu-btn {
+        width: 28px;
+        height: 28px;
+      }
+      
+      .menu-btn .material-icons {
+        font-size: 18px;
+      }
+      
+      .nav-menu.active a {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+    }
+
+    /* ===== SECCIONES ===== */
+    .section { 
+      padding: 80px 0; 
+      width: 100%; 
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .section-content {
+      padding: 0 24px;
+    }
+    
+    .section-title {
+      font-size: 38px;
+      font-weight: 700;
+      text-align: left;
+      margin-bottom: 50px;
+      color: #000;
+      padding-left: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 28px;
+        padding-left: 16px;
+      }
+    }
+
+    /* ===== FOOTER ===== */
+    footer { background: #ecf1f7; color: #000000; padding: 40px 24px; margin-top: 40px; }
+    .footer-content {
+      max-width: 1200px; margin: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px;
+    }
+    .footer-section h3 { font-size: 18px; margin-bottom: 12px; text-decoration: none;}
+    .footer-section a { color: #000000; font-size: 14px; text-decoration: none; }
+    .footer-section a:hover { color: #f59e0b; }
+    .social-links { display: flex; gap: 12px; margin-top: 12px; text-decoration: none;}
+    .social-links a {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #2563eb; color: #ffffff; transition: all 0.3s; text-decoration: none;
+    }
+    .social-links a:hover { background: #f59e0b; color: #000; }
+    .footer-bottom { text-align: center; margin-top: 30px; font-size: 14px; color: #a8bbf8; text-decoration: none;}
+
+    /* ===== CONTENIDO PRINCIPAL ===== */
+    main {
+      min-height: calc(100vh - 200px); /* Ajusta según la altura de tu header y footer */
+    }
+  </style>
+  
+  {% block extra_css %}{% endblock %}
+
+</head>
+<body>
+  <!-- HEADER REORGANIZADO -->
+  <header>
+    <div class="logo-container">
+      <a href="{{ url_for('homepage') }}">
+        <img src="{{ url_for('static', filename='imagenes/logo.png') }}" alt="YourToolQuizz" class="logo-img">
+      </a>
+    </div>
+
+    <nav class="nav-menu">
+      <a href="{{ url_for('about') }}">Sobre nosotros</a>
+      <a href="{{ url_for('legal') }}">Legal</a>
+      <a href="{{ url_for('contact') }}">Ayuda</a>
+      <a href="{{ url_for('Servicio_1') }}">Servicios publicidad</a>
+      <a href="{{ url_for('dashboard') }}">Perfil</a>
+    </nav>
+    
+    <div class="right-nav">
+      <!-- Buscador -->
+      <div class="header-search">
+        <button id="search-toggle" class="search-btn" aria-expanded="false" aria-controls="header-searchbar" aria-label="Abrir búsqueda">
+          <span class="material-icons">search</span>
+        </button>
+
+        <div id="header-searchbar" class="header-searchbar" role="dialog" aria-modal="true" aria-hidden="true">
+          <form class="header-search-form" action="/buscar" method="GET" role="search" novalidate>
+            <span class="material-icons">search</span>
+            <input id="header-search-input"
+                   class="header-search-input"
+                   name="q"
+                   type="search"
+                   placeholder="Buscar en YourToolQuizz"
+                   aria-label="Buscar"
+                   autocomplete="off"
+                   />
+          </form>
+        </div>
+
+        <div id="header-search-overlay" class="header-search-overlay" tabindex="-1" aria-hidden="true"></div>
+      </div>
+
+      <!-- Login / Logout - SOLO ICONOS -->
+      <div id="auth-section">
+        {% if current_user.is_authenticated %}
+          <a class="auth-icon" href="{{ url_for('logout') }}" title="Cerrar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 13v-2H7V8l-5 4 5 4v-3h9zM20 3H10a2 2 0 00-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+            </svg>
+          </a>
+        {% else %}
+          <a class="auth-icon" href="{{ url_for('login') }}" title="Iniciar sesión">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 12c2.67 0 8 1.34 8 4v2H4v-2c0-2.66 5.33-4 8-4zm0-2a4 4 0 110-8 4 4 0 010 8z"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+      
+      <button class="menu-btn"><span class="material-icons">menu</span></button>
+    </div>
+  </header>
+  
+  <!-- Overlay para el menú móvil -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Navegación</h3>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#">Sobre Nosotros</a></li>
+          <li><a href="#">Aviso legal</a></li>
+          <li><a href="#">Contáctanos</a></li>
+          <li><a href="#">Nuestros servicios</a></li>
+          <li><a href="#">Perfil</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Contacto</h3>
+        <ul>
+          <li><a href="mailto:atreyu@yourtoolquizz.site">atreyu@yourtoolquizz.site</a></li>
+          <li><a href="tel:+34651830695">Teléfono: +34 651 83 06 95</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h3>Síguenos</h3>
+        <div class="social-links">
+          <a href="#"><span class="material-icons">facebook</span></a>
+          <a href="#"><span class="material-icons">tiktok</span></a>
+          <a href="#"><span class="material-icons">instagram</span></a>
+          <a href="#"><span class="material-icons">youtube</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 YourToolQuizz. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <!-- SCRIPTS BASE -->
+
+<script src="{{ url_for('static', filename='java/header.js') }}"defer> </script>
+
+  
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
