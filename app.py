@@ -13,7 +13,7 @@ from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
 import base64
-from tu_modulo_de_formularios import Quizantivirus, Quizzproductividad
+from tu_modulo_de_formularios import Quizzproductividad
 from supabase import create_client
 from forms import ChangePasswordForm
 from supabase.lib.client_options import ClientOptions
@@ -145,7 +145,7 @@ def create_app():
 
     @app.route('/Blogejemplo')
     def blogejemplo():
-        keywords = ["productividad", "gestión del tiempo", "hábitos", "organización", "eficiencia", "tareas", "planificación", "blog"]
+        keywords = ["blog, blogdeejemplo, ejemplo, contratarblog, blog de ejemplo, contratar blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
         return render_template('Blogejemplo.html', relacionados=relacionados)
 
