@@ -82,11 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 document.getElementById("submitBtn").addEventListener("click", function () {
-  window.location.href = "{{ url_for('pricing') }}";
+  window.location.href = "{{ url_for('Servicio_1') }}";
 });
 
   // === INICIALIZACIÓN ===
   showQuestion(0);
   updateProgressBars();
 });
+
 
