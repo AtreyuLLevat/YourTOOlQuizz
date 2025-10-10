@@ -159,26 +159,46 @@
     cursor: not-allowed;
   }
 
-  button#submitBtn {
-    display: none;
-    width: 100%;
-    max-width: 750px;
-    padding: 18px;
-    margin: 60px auto 0;
-    border-radius: 10px;
-    background: var(--primary);
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 700;
-    border: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+/* Centrado del botón Enviar */
+.submit-container {
+  display: flex;
+  justify-content: flex-start; /* mismo alineamiento que el botón Anterior */
+  max-width: 750px;
+  margin: 0 auto 80px; /* mismo espacio que las preguntas */
+}
+
+/* Ajuste del botón Enviar */
+.submit-btn {
+  display: none;
+  width: 48%; /* mismo ancho que los botones Anterior/Siguiente */
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.submit-btn:hover {
+  background: #1e3a8a;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+/* Vista móvil: centrar completamente el botón Enviar */
+@media (max-width: 700px) {
+  .submit-container {
+    justify-content: center;
   }
 
-  button#submitBtn:hover {
-    background: #1e3a8a;
-    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  .submit-btn {
+    width: 100%;
   }
+}
+
 
   @media (max-width: 700px) {
     .Introducción {
@@ -268,18 +288,21 @@
     </div>
 
 
-    <div class="navigation-buttons">
-      <button type="button" id="prevBtn" class="nav-btn" disabled>Anterior</button>
-      <button type="button" id="nextBtn" class="nav-btn" disabled>Siguiente</button>
-    </div>
+<div class="navigation-buttons">
+  <button type="button" id="prevBtn" class="nav-btn" disabled>Anterior</button>
+  <button type="button" id="nextBtn" class="nav-btn" disabled>Siguiente</button>
+</div>
 
-    <input type="hidden" name="quiz_type" value="productividad">
-    <button type="submit" id="submitBtn">Enviar</button>
-  </form>
+<!-- Botón de enviar -->
+<div class="submit-container">
+  <button type="submit" id="submitBtn" class="nav-btn submit-btn">Enviar</button>
+</div>
+
 </main>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
 {% endblock %}
+
 
