@@ -63,11 +63,13 @@
   left: 0;
   height: 5px;
   width: 0%;
-  background: linear-gradient(90deg, #2563eb, #1e40af);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
   z-index: 1000;
-  transition: width 0.4s ease;
+  transition: width 0.3s ease-in-out;
 }
+
 
 
   .progress-bar {
@@ -317,6 +319,7 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
 {% endblock %}
+
 
 
 
