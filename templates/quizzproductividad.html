@@ -1,21 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Quizz Productividad | YourToolQuizz{% endblock %}
+{% block title %}Quiz de Productividad | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
 <style>
   :root {
-    --primary: #2563eb; /* azul principal */
-    --accent: #facc15; /* amarillo */
+    --primary: #2563eb;
+    --accent: #facc15;
     --text-dark: #111827;
     --text-light: #4b5563;
     --border-light: #e5e7eb;
-    --black: #000000;
   }
 
   body {
     background: #ffffff;
-    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    font-family: "Inter", "Helvetica Neue", sans-serif;
     color: var(--text-dark);
     margin: 0;
     padding: 0;
@@ -29,25 +28,24 @@
 
   .Introducción {
     text-align: center;
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 700;
-    color: var(--text-dark);
     margin-bottom: 10px;
   }
 
   .Subtitulointroducción {
     text-align: center;
+    font-size: 1.2rem;
     color: var(--text-light);
-    font-size: 1.3rem;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
   }
 
   .accent-line {
     height: 4px;
-    width: 80px;
+    width: 70px;
     background: var(--accent);
-    margin: 0 auto 50px;
     border-radius: 2px;
+    margin: 0 auto 50px;
   }
 
   .progress-container {
@@ -69,43 +67,47 @@
   .question {
     margin-bottom: 70px;
     display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }
 
   .question.active {
     display: block;
+    opacity: 1;
   }
 
   .question h3 {
-    font-size: 1.8rem;
-    color: var(--text-dark);
+    font-size: 2rem;
     text-align: center;
-    margin-bottom: 35px;
-    font-weight: 600;
-    line-height: 1.4;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 40px;
   }
 
   ul.answers {
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 20px;
+    gap: 18px;
     margin: 0 auto;
     max-width: 750px;
   }
 
   ul.answers li {
-    border: 2px solid var(--border-light);
+    border: 1.8px solid var(--border-light);
     border-radius: 10px;
-    padding: 22px 26px;
+    padding: 18px 22px;
     background-color: #f9fafb;
+    font-size: 1.15rem;
     cursor: pointer;
     transition: all 0.25s ease;
-    font-size: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 
   ul.answers li:hover {
-    border-color: var(--primary);
     background: #eef2ff;
+    border-color: var(--primary);
+    box-shadow: 0 3px 6px rgba(37, 99, 235, 0.15);
   }
 
   ul.answers li.selected {
@@ -113,48 +115,46 @@
     border-color: var(--primary);
     color: var(--primary);
     font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
   }
 
   label {
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 14px;
-    font-size: 1.25rem;
+    gap: 10px;
   }
 
   .navigation-buttons {
     display: flex;
     justify-content: space-between;
-    margin: 70px auto;
+    margin: 60px auto;
     max-width: 750px;
-    gap: 16px;
+    gap: 14px;
   }
 
-  /* === BOTONES CON SOMBRA === */
   .nav-btn {
     flex: 1;
-    text-align: center;
-    padding: 18px 0;
-    border: 1px solid var(--primary);
+    padding: 16px 0;
+    border: none;
     border-radius: 10px;
     background: var(--primary);
-    color: #ffffff;
-    font-size: 1.2rem;
+    color: #fff;
+    font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* sombra sutil azul */
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
   }
 
   .nav-btn:hover {
     background: #1d4ed8;
-    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35); /* sombra más fuerte en hover */
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
   }
 
   .nav-btn:disabled {
     background: #cbd5e1;
-    border-color: #cbd5e1;
+    color: #f9fafb;
     box-shadow: none;
     cursor: not-allowed;
   }
@@ -163,18 +163,16 @@
     display: none;
     width: 100%;
     max-width: 750px;
-    padding: 22px;
-    margin: 70px auto 0;
+    padding: 18px;
+    margin: 60px auto 0;
     border-radius: 10px;
     background: var(--primary);
-    color: #fff;
-    font-size: 1.3rem;
+    color: white;
+    font-size: 1.2rem;
     font-weight: 700;
-    border: 1px solid var(--primary);
-    cursor: pointer;
+    border: none;
     transition: all 0.3s ease;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* sombra igual que los botones */
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
   }
 
   button#submitBtn:hover {
@@ -182,52 +180,24 @@
     box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
   }
 
-  /* Botón alternativo amarillo */
-  .nav-btn.secondary {
-    background: var(--accent);
-    color: var(--black);
-    border: 1px solid var(--accent);
-    box-shadow: 0 4px 10px rgba(250, 204, 21, 0.25);
-  }
-
-  .nav-btn.secondary:hover {
-    background: #eab308;
-    box-shadow: 0 6px 14px rgba(250, 204, 21, 0.35);
-  }
-
-  /* Adaptabilidad */
   @media (max-width: 700px) {
-    main {
-      margin: 50px auto;
-      padding: 0 16px;
-    }
-
     .Introducción {
-      font-size: 1.8rem;
-    }
-
-    .Subtitulointroducción {
-      font-size: 1.1rem;
+      font-size: 1.9rem;
     }
 
     .question h3 {
-      font-size: 1.4rem;
+      font-size: 1.5rem;
     }
 
-    label,
     ul.answers li {
-      font-size: 1.1rem;
-      padding: 18px;
+      font-size: 1rem;
+      padding: 16px;
     }
 
-    .nav-btn {
-      font-size: 1.05rem;
-      padding: 16px 0;
-    }
-
+    .nav-btn,
     button#submitBtn {
-      font-size: 1.1rem;
-      padding: 18px;
+      font-size: 1rem;
+      padding: 14px 0;
     }
 
     .navigation-buttons {
@@ -247,55 +217,21 @@
   <form id="quizForm" method="POST" action="{{ url_for('quizzproductividad') }}">
     {{ form.hidden_tag() }}
 
-    <div class="question active">
-      <h3>{{ form.q1.label }}</h3>
-      <div class="progress-container"><div class="progress-bar"></div></div>
+    {% for i in range(1, 6) %}
+    <div class="question{% if i == 1 %} active{% endif %}">
+      <h3>{{ getattr(form, 'q' ~ i).label }}</h3>
+      <div class="progress-container">
+        <div class="progress-bar"></div>
+      </div>
       <ul class="answers">
-        {% for subfield in form.q1 %}
-        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% for subfield in getattr(form, 'q' ~ i) %}
+        <li>
+          <label>{{ subfield() }} {{ subfield.label.text }}</label>
+        </li>
         {% endfor %}
       </ul>
     </div>
-
-    <div class="question">
-      <h3>{{ form.q2.label }}</h3>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-      <ul class="answers">
-        {% for subfield in form.q2 %}
-        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="question">
-      <h3>{{ form.q3.label }}</h3>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-      <ul class="answers">
-        {% for subfield in form.q3 %}
-        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="question">
-      <h3>{{ form.q4.label }}</h3>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-      <ul class="answers">
-        {% for subfield in form.q4 %}
-        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
-        {% endfor %}
-      </ul>
-    </div>
-
-    <div class="question">
-      <h3>{{ form.q5.label }}</h3>
-      <div class="progress-container"><div class="progress-bar"></div></div>
-      <ul class="answers">
-        {% for subfield in form.q5 %}
-        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
-        {% endfor %}
-      </ul>
-    </div>
+    {% endfor %}
 
     <div class="navigation-buttons">
       <button type="button" id="prevBtn" class="nav-btn" disabled>Anterior</button>
