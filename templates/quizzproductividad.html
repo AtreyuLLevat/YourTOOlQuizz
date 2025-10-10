@@ -5,8 +5,8 @@
 {% block extra_css %}
 <style>
   :root {
-    --primary: #2563eb; /* Azul principal */
-    --accent: #facc15; /* Amarillo */
+    --primary: #2563eb; /* azul principal */
+    --accent: #facc15; /* amarillo */
     --text-dark: #111827;
     --text-light: #4b5563;
     --border-light: #e5e7eb;
@@ -29,7 +29,7 @@
 
   .Introducción {
     text-align: center;
-    font-size: 2.3rem;
+    font-size: 2.2rem;
     font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 10px;
@@ -38,7 +38,7 @@
   .Subtitulointroducción {
     text-align: center;
     color: var(--text-light);
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     margin-bottom: 50px;
   }
 
@@ -76,11 +76,11 @@
   }
 
   .question h3 {
-    font-size: 2rem; /* 🔹 Aumentado */
+    font-size: 1.8rem;
     color: var(--text-dark);
     text-align: center;
-    margin-bottom: 40px;
-    font-weight: 700;
+    margin-bottom: 35px;
+    font-weight: 600;
     line-height: 1.4;
   }
 
@@ -88,7 +88,7 @@
     list-style: none;
     padding: 0;
     display: grid;
-    gap: 18px;
+    gap: 20px;
     margin: 0 auto;
     max-width: 750px;
   }
@@ -96,11 +96,11 @@
   ul.answers li {
     border: 2px solid var(--border-light);
     border-radius: 10px;
-    padding: 18px 22px;
+    padding: 22px 26px;
     background-color: #f9fafb;
     cursor: pointer;
     transition: all 0.25s ease;
-    font-size: 1.1rem; /* 🔹 Levemente reducido */
+    font-size: 1.25rem;
   }
 
   ul.answers li:hover {
@@ -120,7 +120,7 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: 1.1rem; /* 🔹 Ajustado */
+    font-size: 1.25rem;
   }
 
   .navigation-buttons {
@@ -131,28 +131,30 @@
     gap: 16px;
   }
 
+  /* === BOTONES CON SOMBRA === */
   .nav-btn {
     flex: 1;
     text-align: center;
-    padding: 14px 0; /* 🔹 Reducido */
-    border: none;
+    padding: 18px 0;
+    border: 1px solid var(--primary);
     border-radius: 10px;
     background: var(--primary);
     color: #ffffff;
-    font-size: 1.05rem; /* 🔹 Reducido */
+    font-size: 1.2rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* 🔹 Nueva sombra sutil */
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* sombra sutil azul */
   }
 
   .nav-btn:hover {
     background: #1d4ed8;
-    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35); /* sombra más fuerte en hover */
   }
 
   .nav-btn:disabled {
     background: #cbd5e1;
+    border-color: #cbd5e1;
     box-shadow: none;
     cursor: not-allowed;
   }
@@ -161,18 +163,18 @@
     display: none;
     width: 100%;
     max-width: 750px;
-    padding: 18px; /* 🔹 Reducido */
+    padding: 22px;
     margin: 70px auto 0;
     border-radius: 10px;
     background: var(--primary);
     color: #fff;
-    font-size: 1.1rem; /* 🔹 Ligeramente más pequeño */
+    font-size: 1.3rem;
     font-weight: 700;
-    border: none;
+    border: 1px solid var(--primary);
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25); /* sombra igual que los botones */
   }
 
   button#submitBtn:hover {
@@ -180,6 +182,7 @@
     box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
   }
 
+  /* Botón alternativo amarillo */
   .nav-btn.secondary {
     background: var(--accent);
     color: var(--black);
@@ -200,7 +203,7 @@
     }
 
     .Introducción {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
 
     .Subtitulointroducción {
@@ -208,23 +211,23 @@
     }
 
     .question h3 {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
     }
 
     label,
     ul.answers li {
-      font-size: 1rem;
-      padding: 16px;
+      font-size: 1.1rem;
+      padding: 18px;
     }
 
     .nav-btn {
-      font-size: 1rem;
-      padding: 14px 0;
+      font-size: 1.05rem;
+      padding: 16px 0;
     }
 
     button#submitBtn {
-      font-size: 1.05rem;
-      padding: 16px;
+      font-size: 1.1rem;
+      padding: 18px;
     }
 
     .navigation-buttons {
