@@ -16,19 +16,22 @@ document.addEventListener("DOMContentLoaded", function () {
     updateButtons();
   }
 
-  function updateButtons() {
-    prevBtn.disabled = currentQuestion === 0;
+function updateButtons() {
+  prevBtn.disabled = currentQuestion === 0;
 
-    if (currentQuestion === totalQuestions - 1) {
-      nextBtn.style.display = "none";
-      submitBtn.style.display = "inline-block";
-    } else {
-      nextBtn.style.display = "inline-block";
-      submitBtn.style.display = "none";
-    }
-
-    updateNextBtnState();
+  if (currentQuestion === totalQuestions - 1) {
+    nextBtn.style.display = "none";
+    document.querySelector(".submit-container").style.display = "flex";
+    submitBtn.style.display = "inline-block";
+  } else {
+    nextBtn.style.display = "inline-block";
+    document.querySelector(".submit-container").style.display = "none";
+    submitBtn.style.display = "none";
   }
+
+  updateNextBtnState();
+}
+
 
   function validateCurrentQuestion() {
     const currentQ = questions[currentQuestion];
@@ -74,3 +77,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
   showQuestion(0);
 });
+
