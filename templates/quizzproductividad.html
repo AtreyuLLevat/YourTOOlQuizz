@@ -232,8 +232,7 @@
 
 {% block content %}
 <main>
-  <div class="Introducción">Quiz de Productividad</div>
-  <div class="Subtitulointroducción">Evalúa tu nivel de enfoque, organización y gestión del tiempo</div>
+  <div class="Introducción">Quiz de ejemplo</div>
   <div class="accent-line"></div>
 
   <form id="quizForm" method="POST" action="{{ url_for('quizzproductividad') }}">
@@ -303,4 +302,5 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
 {% endblock %}
+
 
