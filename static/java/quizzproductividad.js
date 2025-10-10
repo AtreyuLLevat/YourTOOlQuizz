@@ -1,84 +1,108 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const questions = document.querySelectorAll(".question");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const form = document.getElementById("quizForm");
-  const progressBars = document.querySelectorAll(".progress-bar");
+  try {
+    const questions = Array.from(document.querySelectorAll(".question"));
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const form = document.getElementById("quizForm");
+    const progressBars = Array.from(document.querySelectorAll(".progress-bar"));
 
-  let currentQuestion = 0;
-  const totalQuestions = questions.length;
-
-  function showQuestion(index) {
-    questions[currentQuestion].classList.remove("active");
-    currentQuestion = index;
-    questions[currentQuestion].classList.add("active");
-    updateProgressBar();
-    updateButtons();
-  }
-
-  function updateButtons() {
-    // Botón anterior
-    prevBtn.disabled = currentQuestion === 0;
-
-    // Cambiar texto del botón siguiente → “Enviar” en la última pregunta
-    if (currentQuestion === totalQuestions - 1) {
-      nextBtn.textContent = "Enviar";
-    } else {
-      nextBtn.textContent = "Siguiente";
+    if (!questions.length) {
+      console.error("No se encontraron elementos .question. Revisa el HTML.");
+      return;
     }
-
-    updateNextBtnState();
-  }
-
-  function validateCurrentQuestion() {
-    const currentQ = questions[currentQuestion];
-    return currentQ.querySelector('input[type="radio"]:checked') !== null;
-  }
-
-  function updateNextBtnState() {
-    nextBtn.disabled = !validateCurrentQuestion();
-  }
-
-  function updateProgressBar() {
-    const progress = ((currentQuestion + 1) / totalQuestions) * 100;
-    progressBars.forEach((bar, i) => {
-      bar.style.width = i <= currentQuestion ? progress + "%" : "0%";
-    });
-  }
-
-  // Selección de respuestas
-  document.querySelectorAll("ul.answers li").forEach((li) => {
-    li.addEventListener("click", () => {
-      const radio = li.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
-
-      li.parentNode.querySelectorAll("li").forEach((item) =>
-        item.classList.remove("selected")
-      );
-      li.classList.add("selected");
-      updateNextBtnState();
-    });
-  });
-
-  // Botón anterior
-  prevBtn.addEventListener("click", () => {
-    if (currentQuestion > 0) showQuestion(currentQuestion - 1);
-  });
-
-  // Botón siguiente / enviar
-  nextBtn.addEventListener("click", () => {
-    if (!validateCurrentQuestion()) {
-      alert("Por favor selecciona una respuesta.");
+    if (!prevBtn || !nextBtn || !form) {
+      console.error("Faltan #prevBtn, #nextBtn o #quizForm en el HTML.");
       return;
     }
 
-    // Si está en la última pregunta → enviar formulario
-    if (currentQuestion === totalQuestions - 1) {
-      form.submit();
-    } else {
-      showQuestion(currentQuestion + 1);
-    }
-  });
+    let currentQuestion = 0;
+    const totalQuestions = questions.length;
 
-  showQuestion(0);
+    function showQuestion(index) {
+      if (index < 0 || index >= totalQuestions) return;
+      questions.forEach((q) => q.classList.remove("active"));
+      questions[index].classList.add("active");
+      currentQuestion = index;
+      updateProgressBar();
+      updateButtons();
+      // focus primera opción para accesibilidad (si existe)
+      const firstInput = questions[currentQuestion].querySelector("input");
+      if (firstInput) firstInput.focus();
+    }
+
+    function updateButtons() {
+      prevBtn.disabled = currentQuestion === 0;
+      nextBtn.textContent = currentQuestion === totalQuestions - 1 ? "Enviar" : "Siguiente";
+      nextBtn.disabled = !validateCurrentQuestion();
+    }
+
+    function validateCurrentQuestion() {
+      const currentQ = questions[currentQuestion];
+      const checked = currentQ.querySelector('input[type="radio"]:checked, input[type="checkbox"]:checked');
+      const selected = currentQ.querySelector("li.selected");
+      return Boolean(checked || selected);
+    }
+
+    function updateProgressBar() {
+      const percent = Math.round(((currentQuestion + 1) / totalQuestions) * 100);
+      // mostramos el progreso solo en la barra de la pregunta activa
+      progressBars.forEach((bar, i) => {
+        bar.style.width = i === currentQuestion ? percent + "%" : "0%";
+      });
+    }
+
+    // manejo de selección por clic y por teclado
+    document.querySelectorAll("ul.answers").forEach((ul) => {
+      ul.addEventListener("click", (e) => {
+        const li = e.target.closest("li");
+        if (!li) return;
+        const input = li.querySelector('input[type="radio"], input[type="checkbox"]');
+        if (input) input.checked = true;
+
+        // marcar visualmente
+        ul.querySelectorAll("li").forEach((item) => item.classList.remove("selected"));
+        li.classList.add("selected");
+
+        updateButtons();
+      });
+
+      // capturar cambios directos en inputs (teclado)
+      ul.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach((input) => {
+        input.addEventListener("change", () => {
+          const li = input.closest("li");
+          ul.querySelectorAll("li").forEach((item) => item.classList.remove("selected"));
+          if (li) li.classList.add("selected");
+          updateButtons();
+        });
+      });
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (!validateCurrentQuestion()) {
+        alert("Por favor selecciona una respuesta.");
+        return;
+      }
+      // si estamos en la última pregunta, enviar
+      if (currentQuestion === totalQuestions - 1) {
+        // opción: mostrar texto "Enviando..." visualmente antes del submit
+        nextBtn.disabled = true;
+        const originalText = nextBtn.textContent;
+        nextBtn.textContent = "Enviando…";
+        // pequeño timeout para que el usuario vea el cambio en interfaces lentas
+        setTimeout(() => form.submit(), 200);
+        return;
+      }
+      showQuestion(currentQuestion + 1);
+    });
+
+    // inicializar
+    showQuestion(0);
+    console.log("Quiz inicializado: preguntas =", totalQuestions);
+  } catch (err) {
+    console.error("Error inicializando quiz:", err);
+  }
 });
