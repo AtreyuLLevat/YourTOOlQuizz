@@ -310,7 +310,7 @@
 
 <!-- Botón de enviar -->
 <div class="submit-container">
-  <button type="submit" id="submitBtn" class="nav-btn submit-btn">Enviar</button>
+  <a href="{{ url_for('Servicio_1') }}" class="nav-btn submit-btn">Contratar</a>
 </div>
 
 </main>
@@ -319,6 +319,7 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
 {% endblock %}
+
 
 
 
