@@ -81,8 +81,12 @@ document.addEventListener("DOMContentLoaded", function () {
       showQuestion(currentQuestion + 1);
     }
   });
+document.getElementById("submitBtn").addEventListener("click", function () {
+  window.location.href = "{{ url_for('pricing') }}";
+});
 
   // === INICIALIZACIÓN ===
   showQuestion(0);
   updateProgressBars();
 });
+
