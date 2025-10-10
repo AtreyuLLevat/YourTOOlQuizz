@@ -1,234 +1,263 @@
 {% extends "base.html" %}
 
-{% block title %}Quizz productividad | YourToolQuizz{% endblock %}
+{% block title %}Quizz Productividad | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
 <style>
+  :root {
+    --primary: #2563eb; /* azul principal */
+    --accent: #facc15; /* amarillo */
+    --text-dark: #111827;
+    --text-light: #4b5563;
+    --bg-light: #ffffff;
+    --border-light: #e5e7eb;
+  }
 
+  body {
+    background: var(--bg-light);
+    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    color: var(--text-dark);
+  }
 
+  main {
+    max-width: 800px;
+    margin: 60px auto;
+    background: var(--bg-light);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+  }
+
+  .Introducción {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+  }
+
+  .Subtitulointroducción {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+  }
+
+  .progress-container {
+    width: 100%;
+    background-color: var(--border-light);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 10px;
+    transition: width 0.3s ease-in-out;
+  }
+
+  .question {
+    margin-bottom: 40px;
+    display: none;
+  }
+
+  .question.active {
+    display: block;
+  }
+
+  .question h3 {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  ul.answers {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 14px;
+  }
+
+  ul.answers li {
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    padding: 14px 20px;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  ul.answers li:hover {
+    border-color: var(--primary);
+    background: #eef2ff;
+  }
+
+  ul.answers li.selected {
+    background: #dbeafe;
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+
+  .nav-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .nav-btn:hover {
+    background: #1d4ed8;
+  }
+
+  .nav-btn:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+  }
+
+  button#submitBtn {
+    display: none;
+    width: 100%;
+    padding: 16px;
+    margin-top: 40px;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  button#submitBtn:hover {
+    background: #1e3a8a;
+  }
+
+  /* Pequeños toques en negro o amarillo */
+  .nav-btn.secondary {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .nav-btn.secondary:hover {
+    background: #eab308;
+  }
+
+  /* Adaptabilidad */
+  @media (max-width: 600px) {
     main {
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      flex: 1;
-    }
-    .Introducción {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 1.6rem;
-    }
-    .Subtitulointroducción {
-      margin-bottom: 20px;
-      font-size: 1.2rem;
-      color: #666;
-      text-align: center;
-    }
-    .progress-container {
-      width: 100%;
-      background-color: #eee;
-      border-radius: 8px;
-      margin: 10px 0 20px 0; /* margen arriba y abajo */
-      padding: 10px;
-      height: 20px;
-      overflow: hidden;
+      padding: 24px;
+      margin: 30px 16px;
     }
 
-    .progress-bar {
-      height: 100%;
-      width: 0%;
-      background-color: #ff6f61; /* color progresivo */
-      border-radius: 8px;
-      transition: width 0.3s ease-in-out;
-    }
-
-    
-    .question {
-      margin-bottom: 30px;
-      display: none; /* Ocultar todas las preguntas inicialmente */
-    }
-    .question.active {
-      display: block; /* Mostrar solo la pregunta activa */
-    }
     .question h3 {
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      color: #333;
-      line-height: 1.4;
-      text-align: center;
+      font-size: 1.15rem;
     }
-    ul.answers {
-      list-style: none;
-      padding: 0;
-      display: grid;
-      gap: 15px;
-      margin-bottom: 30px;
-    }
-    ul.answers li {
-      background: #f8f9fa;
-      padding: 16px 20px;
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all .2s;
-      font-size: 1.1rem;
-    }
-    ul.answers li:hover {
-      background: #fff3f2;
-      border-color: #ff6f61;
-    }
-    ul.answers li.selected {
-      background: #ffebe9;
-      border-color: #ff6f61;
-    }
-    .navigation-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-    }
+
     .nav-btn {
-      padding: 12px 24px;
-      background: #ff6f61;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: background .3s;
+      flex: 1;
+      margin: 0 4px;
+      padding: 10px 0;
+      font-size: 0.95rem;
     }
-    .nav-btn:hover {
-      background: #e65a4e;
-    }
-    .nav-btn:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-    }
-    button#submitBtn {
-      width: 100%;
-      padding: 16px;
-      margin-top: 30px;
-      background: #ff6f61;
-      color: white;
-      font-size: 1.2rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background .3s;
-      font-weight: bold;
-      display: none; /* Ocultar inicialmente */
-    }
-    button#submitBtn:hover {
-      background: #e65a4e;
-    }
-    
-  </style>
-  {% endblock %}
-  {% block content %}
-
- <main>
-    <form
-      id="quizForm"
-      method="POST"
-      action="{{ url_for('quizzproductividad') }}"
-    >
-      {{ form.hidden_tag() }}
-
-          <div class="question active">
-        <h3>{{ form.q1.label }}</h3>
-        <div class="progress-bar">
-          <div class="progress-bar-inner"></div>
-        </div>
-        <ul class="answers">
-          {% for subfield in form.q1 %}
-          <li>
-            <label>{{ subfield() }} {{ subfield.label.text }}</label>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="question">
-        <h3>{{ form.q2.label }}</h3>
-        <div class="progress-bar">
-          <div class="progress-bar-inner"></div>
-        </div>
-        <ul class="answers">
-          {% for subfield in form.q2 %}
-          <li>
-            <label>{{ subfield() }} {{ subfield.label.text }}</label>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="question">
-        <h3>{{ form.q3.label }}</h3>
-        <div class="progress-bar">
-          <div class="progress-bar-inner"></div>
-        </div>
-        <ul class="answers">
-          {% for subfield in form.q3 %}
-          <li>
-            <label>{{ subfield() }} {{ subfield.label.text }}</label>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="question">
-        <h3>{{ form.q4.label }}</h3>
-        <div class="progress-bar">
-          <div class="progress-bar-inner"></div>
-        </div>
-        <ul class="answers">
-          {% for subfield in form.q4 %}
-          <li>
-            <label>{{ subfield() }} {{ subfield.label.text }}</label>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="question">
-        <h3>{{ form.q5.label }}</h3>
-        <div class="progress-bar">
-          <div class="progress-bar-inner"></div>
-        </div>
-        <ul class="answers">
-          {% for subfield in form.q5 %}
-          <li>
-            <label>{{ subfield() }} {{ subfield.label.text }}</label>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <div class="navigation-buttons">
-        <button type="button" id="prevBtn" class="nav-btn" disabled>
-          Anterior
-        </button>
-        <button type="button" id="nextBtn" class="nav-btn" disabled>
-          Siguiente
-        </button>
-      </div>
-      <input type="hidden" name="quiz_type" value="productividad">
-      <button type="submit" id="submitBtn" class="nav-btn" style="display: none;">
-        Enviar
-      </button>
-
-      
-    </form>
-  </main>
+  }
+</style>
 {% endblock %}
-  
+
+{% block content %}
+<main>
+  <form id="quizForm" method="POST" action="{{ url_for('quizzproductividad') }}">
+    {{ form.hidden_tag() }}
+
+    <div class="question active">
+      <h3>{{ form.q1.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q1 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q2.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q2 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q3.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q3 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q4.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q4 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q5.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q5 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="navigation-buttons">
+      <button type="button" id="prevBtn" class="nav-btn" disabled>Anterior</button>
+      <button type="button" id="nextBtn" class="nav-btn" disabled>Siguiente</button>
+    </div>
+
+    <input type="hidden" name="quiz_type" value="productividad">
+    <button type="submit" id="submitBtn">Enviar</button>
+  </form>
+</main>
+{% endblock %}
+
 {% block extra_js %}
-  
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
-  <form method="POST">
-    {{ form.hidden_tag() }}  <!-- Token CSRF -->
-    <!-- Campos del formulario -->
-</form>
 {% endblock %}
-
