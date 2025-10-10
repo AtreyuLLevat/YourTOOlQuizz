@@ -1,109 +1,88 @@
 document.addEventListener("DOMContentLoaded", function () {
-  try {
-    const questions = Array.from(document.querySelectorAll(".question"));
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const form = document.getElementById("quizForm");
-    const mainProgressBar = document.createElement("div");
+  const questions = Array.from(document.querySelectorAll(".question"));
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const form = document.getElementById("quizForm");
 
-    // Crear una barra de progreso superior global
-    mainProgressBar.classList.add("main-progress-bar");
-    document.body.prepend(mainProgressBar);
+  // Crear la barra superior de progreso
+  const topProgress = document.createElement("div");
+  topProgress.classList.add("main-progress-bar");
+  document.body.prepend(topProgress);
 
-    if (!questions.length || !form || !nextBtn || !prevBtn) {
-      console.error("❌ Faltan elementos esenciales en el HTML del quiz.");
-      return;
-    }
+  let currentQuestion = 0;
+  const totalQuestions = questions.length;
 
-    let currentQuestion = 0;
-    const totalQuestions = questions.length;
-
-    // Mostrar la pregunta actual
-    function showQuestion(index) {
-      if (index < 0 || index >= totalQuestions) return;
-      questions.forEach((q) => q.classList.remove("active"));
-      questions[index].classList.add("active");
-      currentQuestion = index;
-      updateButtons();
-      updateProgressBars();
-    }
-
-    // Actualiza el estado de los botones
-    function updateButtons() {
-      prevBtn.disabled = currentQuestion === 0;
-      nextBtn.textContent =
-        currentQuestion === totalQuestions - 1 ? "Enviar" : "Siguiente";
-      updateNextBtnState();
-    }
-
-    // Verifica si hay una respuesta seleccionada en la pregunta actual
-    function validateCurrentQuestion() {
-      const currentQ = questions[currentQuestion];
-      return currentQ.querySelector('input[type="radio"]:checked') !== null;
-    }
-
-    // Habilita/deshabilita el botón siguiente
-    function updateNextBtnState() {
-      nextBtn.disabled = !validateCurrentQuestion();
-    }
-
-    // Actualiza tanto la barra global como la de cada pregunta
-    function updateProgressBars() {
-      // Barra global superior
-      const globalProgress = ((currentQuestion + 1) / totalQuestions) * 100;
-      mainProgressBar.style.width = globalProgress + "%";
-
-      // Barra dentro de cada pregunta
-      questions.forEach((q, i) => {
-        const bar = q.querySelector(".progress-bar");
-        if (bar) {
-          bar.style.width = i === currentQuestion ? globalProgress + "%" : "0%";
-        }
-      });
-    }
-
-    // Manejo de selección de respuestas
-    document.querySelectorAll("ul.answers li").forEach((li) => {
-      li.addEventListener("click", () => {
-        const radio = li.querySelector('input[type="radio"]');
-        if (radio) radio.checked = true;
-
-        li.parentNode.querySelectorAll("li").forEach((item) =>
-          item.classList.remove("selected")
-        );
-        li.classList.add("selected");
-
-        updateNextBtnState();
-      });
+  // === FUNCIONES ===
+  function showQuestion(index) {
+    questions.forEach((q, i) => {
+      q.classList.toggle("active", i === index);
     });
-
-    // Botón anterior
-    prevBtn.addEventListener("click", () => {
-      if (currentQuestion > 0) {
-        showQuestion(currentQuestion - 1);
-      }
-    });
-
-    // Botón siguiente / enviar
-    nextBtn.addEventListener("click", () => {
-      if (!validateCurrentQuestion()) return;
-
-      if (currentQuestion === totalQuestions - 1) {
-        // Enviar formulario al final
-        nextBtn.textContent = "Enviando...";
-        nextBtn.disabled = true;
-        setTimeout(() => form.submit(), 300);
-      } else {
-        showQuestion(currentQuestion + 1);
-      }
-    });
-
-    // Inicialización
-    showQuestion(0);
+    currentQuestion = index;
+    updateButtons();
     updateProgressBars();
-
-    console.log("✅ Quiz de productividad inicializado correctamente");
-  } catch (err) {
-    console.error("Error inicializando el quiz:", err);
   }
+
+  function updateButtons() {
+    prevBtn.disabled = currentQuestion === 0;
+    nextBtn.textContent = currentQuestion === totalQuestions - 1 ? "Enviar" : "Siguiente";
+    updateNextBtnState();
+  }
+
+  function validateCurrentQuestion() {
+    const currentQ = questions[currentQuestion];
+    return currentQ.querySelector('input[type="radio"]:checked') !== null;
+  }
+
+  function updateNextBtnState() {
+    nextBtn.disabled = !validateCurrentQuestion();
+  }
+
+  function updateProgressBars() {
+    // Porcentaje global
+    const progress = ((currentQuestion + 1) / totalQuestions) * 100;
+    topProgress.style.width = progress + "%";
+
+    // Barras internas de cada pregunta
+    questions.forEach((q, i) => {
+      const bar = q.querySelector(".progress-bar");
+      if (bar) {
+        const localProgress = ((i + 1) / totalQuestions) * 100;
+        bar.style.width = i <= currentQuestion ? localProgress + "%" : "0%";
+      }
+    });
+  }
+
+  // === EVENTOS ===
+  document.querySelectorAll("ul.answers li").forEach((li) => {
+    li.addEventListener("click", () => {
+      const input = li.querySelector("input");
+      if (input) input.checked = true;
+
+      const ul = li.closest("ul");
+      ul.querySelectorAll("li").forEach((item) => item.classList.remove("selected"));
+      li.classList.add("selected");
+
+      updateNextBtnState();
+    });
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (!validateCurrentQuestion()) return;
+
+    if (currentQuestion === totalQuestions - 1) {
+      nextBtn.textContent = "Enviando...";
+      nextBtn.disabled = true;
+      setTimeout(() => form.submit(), 300);
+    } else {
+      showQuestion(currentQuestion + 1);
+    }
+  });
+
+  // === INICIALIZACIÓN ===
+  showQuestion(0);
+  updateProgressBars();
 });
