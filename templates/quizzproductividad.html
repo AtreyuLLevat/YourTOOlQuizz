@@ -9,24 +9,22 @@
     --accent: #facc15; /* amarillo */
     --text-dark: #111827;
     --text-light: #4b5563;
-    --bg-light: #ffffff;
     --border-light: #e5e7eb;
+    --black: #000000;
   }
 
   body {
-    background: var(--bg-light);
+    background: var(--bg-light, #ffffff);
     font-family: 'Inter', 'Helvetica Neue', sans-serif;
     color: var(--text-dark);
+    margin: 0;
+    padding: 0;
   }
 
   main {
-    max-width: 800px;
+    max-width: 850px;
     margin: 60px auto;
-    background: var(--bg-light);
-    padding: 40px;
-    border-radius: 16px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+    padding: 0 20px;
   }
 
   .Introducción {
@@ -41,28 +39,27 @@
     text-align: center;
     color: var(--text-light);
     font-size: 1.1rem;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
 
   .progress-container {
     width: 100%;
     background-color: var(--border-light);
     border-radius: 10px;
-    height: 8px;
+    height: 6px;
     overflow: hidden;
-    margin-bottom: 25px;
+    margin: 0 auto 30px;
   }
 
   .progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--primary), var(--accent));
-    border-radius: 10px;
+    background: var(--primary);
     transition: width 0.3s ease-in-out;
   }
 
   .question {
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     display: none;
   }
 
@@ -71,26 +68,27 @@
   }
 
   .question h3 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     color: var(--text-dark);
     text-align: center;
     margin-bottom: 25px;
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.4;
   }
 
   ul.answers {
     list-style: none;
     padding: 0;
-    margin: 0;
     display: grid;
     gap: 14px;
+    margin: 0 auto;
+    max-width: 700px;
   }
 
   ul.answers li {
     border: 1.5px solid var(--border-light);
-    border-radius: 10px;
-    padding: 14px 20px;
+    border-radius: 8px;
+    padding: 14px 18px;
     background-color: #f9fafb;
     cursor: pointer;
     transition: all 0.25s ease;
@@ -118,19 +116,23 @@
   .navigation-buttons {
     display: flex;
     justify-content: space-between;
-    margin-top: 40px;
+    margin: 50px auto;
+    max-width: 700px;
   }
 
   .nav-btn {
-    padding: 12px 28px;
-    border: none;
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    border: 1px solid var(--primary);
     border-radius: 8px;
     background: var(--primary);
-    color: white;
+    color: #ffffff;
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin: 0 6px;
   }
 
   .nav-btn:hover {
@@ -139,32 +141,44 @@
 
   .nav-btn:disabled {
     background: #cbd5e1;
+    border-color: #cbd5e1;
     cursor: not-allowed;
   }
 
   button#submitBtn {
     display: none;
     width: 100%;
+    max-width: 700px;
     padding: 16px;
-    margin-top: 40px;
-    border-radius: 10px;
+    margin: 60px auto 0;
+    border-radius: 8px;
     background: var(--primary);
     color: #fff;
     font-size: 1.1rem;
     font-weight: 600;
-    border: none;
+    border: 1px solid var(--primary);
     cursor: pointer;
     transition: all 0.3s ease;
+    text-align: center;
   }
 
   button#submitBtn:hover {
     background: #1e3a8a;
   }
 
-  /* Pequeños toques en negro o amarillo */
+  /* Pequeños detalles amarillos y negros */
+  .accent-line {
+    height: 4px;
+    width: 60px;
+    background: var(--accent);
+    margin: 10px auto 40px;
+    border-radius: 2px;
+  }
+
   .nav-btn.secondary {
     background: var(--accent);
-    color: #000;
+    color: var(--black);
+    border: 1px solid var(--accent);
   }
 
   .nav-btn.secondary:hover {
@@ -174,19 +188,22 @@
   /* Adaptabilidad */
   @media (max-width: 600px) {
     main {
-      padding: 24px;
-      margin: 30px 16px;
+      padding: 0 16px;
+      margin: 40px auto;
     }
 
     .question h3 {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
     }
 
     .nav-btn {
-      flex: 1;
-      margin: 0 4px;
-      padding: 10px 0;
       font-size: 0.95rem;
+      padding: 12px 0;
+    }
+
+    .navigation-buttons {
+      flex-direction: column;
+      gap: 12px;
     }
   }
 </style>
@@ -194,6 +211,10 @@
 
 {% block content %}
 <main>
+  <div class="Introducción">Quiz de Productividad</div>
+  <div class="Subtitulointroducción">Evalúa tu nivel de enfoque, organización y gestión del tiempo</div>
+  <div class="accent-line"></div>
+
   <form id="quizForm" method="POST" action="{{ url_for('quizzproductividad') }}">
     {{ form.hidden_tag() }}
 
