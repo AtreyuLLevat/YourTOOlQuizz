@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const questions = document.querySelectorAll(".question");
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
-  const submitBtn = document.getElementById("submitBtn");
+  const form = document.getElementById("quizForm");
   const progressBars = document.querySelectorAll(".progress-bar");
 
   let currentQuestion = 0;
@@ -16,22 +16,19 @@ document.addEventListener("DOMContentLoaded", function () {
     updateButtons();
   }
 
-function updateButtons() {
-  prevBtn.disabled = currentQuestion === 0;
+  function updateButtons() {
+    // Botón anterior
+    prevBtn.disabled = currentQuestion === 0;
 
-  if (currentQuestion === totalQuestions - 1) {
-    nextBtn.style.display = "none";
-    document.querySelector(".submit-container").style.display = "flex";
-    submitBtn.style.display = "inline-block";
-  } else {
-    nextBtn.style.display = "inline-block";
-    document.querySelector(".submit-container").style.display = "none";
-    submitBtn.style.display = "none";
+    // Cambiar texto del botón siguiente → “Enviar” en la última pregunta
+    if (currentQuestion === totalQuestions - 1) {
+      nextBtn.textContent = "Enviar";
+    } else {
+      nextBtn.textContent = "Siguiente";
+    }
+
+    updateNextBtnState();
   }
-
-  updateNextBtnState();
-}
-
 
   function validateCurrentQuestion() {
     const currentQ = questions[currentQuestion];
@@ -49,6 +46,7 @@ function updateButtons() {
     });
   }
 
+  // Selección de respuestas
   document.querySelectorAll("ul.answers li").forEach((li) => {
     li.addEventListener("click", () => {
       const radio = li.querySelector('input[type="radio"]');
@@ -62,19 +60,25 @@ function updateButtons() {
     });
   });
 
+  // Botón anterior
   prevBtn.addEventListener("click", () => {
     if (currentQuestion > 0) showQuestion(currentQuestion - 1);
   });
 
+  // Botón siguiente / enviar
   nextBtn.addEventListener("click", () => {
-    if (validateCurrentQuestion()) {
-      if (currentQuestion < totalQuestions - 1)
-        showQuestion(currentQuestion + 1);
-    } else {
+    if (!validateCurrentQuestion()) {
       alert("Por favor selecciona una respuesta.");
+      return;
+    }
+
+    // Si está en la última pregunta → enviar formulario
+    if (currentQuestion === totalQuestions - 1) {
+      form.submit();
+    } else {
+      showQuestion(currentQuestion + 1);
     }
   });
 
   showQuestion(0);
 });
-
