@@ -56,6 +56,19 @@
     overflow: hidden;
     margin: 0 auto 40px;
   }
+  /* === BARRA DE PROGRESO SUPERIOR GLOBAL === */
+.main-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  z-index: 1000;
+  transition: width 0.4s ease;
+}
+
 
   .progress-bar {
     height: 100%;
@@ -304,5 +317,6 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
 {% endblock %}
+
 
 
