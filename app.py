@@ -12,6 +12,7 @@ from models import db, User, Quiz, Question, Blog, Page
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
+from sqlalchemy import or_
 import base64
 from tu_modulo_de_formularios import Quizzproductividad
 from supabase import create_client
@@ -92,13 +93,15 @@ def create_app():
         SUPABASE_ANON_KEY
     )
 
-    @app.context_processor
-    def inject_pages():
-        try:
-            pages = Page.query.order_by(Page.created_at).all()
-        except Exception:
-            pages = []
-        return {"site_pages": pages}
+    @app.route('/<slug>')
+    def page_por_slug(slug):
+        # Buscar la página en la base de datos por su slug
+        page = Page.query.filter_by(slug=slug).first()
+
+        if not page:
+            abort(404)  # si no existe, muestra error 404
+
+        return render_template('page.html', page=page)
 
 # -----------------------------
 
@@ -191,38 +194,45 @@ def create_app():
 
     @app.route('/buscar')
     def buscar():
-        query = request.args.get('q', '')
+        query = request.args.get('q', '').strip()
+
         resultados_quiz = []
         resultados_blog = []
+        resultados_page = []  # 🔹 Inicializamos la lista
 
         if query:
+            like = f"%{query}%"
+
             # Buscar en Quizzes: titulo, descripcion y keywords
             resultados_quiz = Quiz.query.filter(
-                (Quiz.titulo.ilike(f'%{query}%')) |
-                (Quiz.contenido.ilike(f'%{query}%')) |
-                (Quiz.keywords.ilike(f'%{query}%'))
+                (Quiz.titulo.ilike(like)) |
+                (Quiz.contenido.ilike(like)) |
+                (Quiz.keywords.ilike(like))
             ).all()
 
             # Buscar en Blogs: titulo, contenido y keywords
             resultados_blog = Blog.query.filter(
-                (Blog.titulo.ilike(f'%{query}%')) |
-                (Blog.contenido.ilike(f'%{query}%')) |
-                (Blog.keywords.ilike(f'%{query}%'))
-            ).all()
-            
-            # Buscar en Pages: title, description y content
-            resultados_page = Page.query.filter(
-                (Page.title.ilike(f'%{query}%')) | 
-                (Page.description.ilike(f'%{query}%')) |
-                (Page.content.ilike(f'%{query}%'))
+                (Blog.titulo.ilike(like)) |
+                (Blog.contenido.ilike(like)) |
+                (Blog.keywords.ilike(like))
             ).all()
 
+            # Buscar en Pages: title, description y content
+            resultados_page = Page.query.filter(
+                (Page.title.ilike(like)) |
+                (Page.description.ilike(like)) |
+                (Page.content.ilike(like))
+            ).all()
+
+        # 🔹 Ahora sí, pasamos TODOS los resultados al template
         return render_template(
             'buscar.html',
             resultados_quiz=resultados_quiz,
             resultados_blog=resultados_blog,
+            resultados_page=resultados_page,
             q=query
         )
+
 
     # -----------------------------
     # FORMULARIOS Y CONTACTO
