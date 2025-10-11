@@ -105,7 +105,7 @@ def create_app():
         return render_template('Servicio_2.html')
     
     @app.route('/Servicio_1')
-    def Servicio_1():
+    def servicio():
         return render_template('Servicio_1.html')
 
 
@@ -120,7 +120,7 @@ def create_app():
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
     def quizzproductividad():
         form = Quizzproductividad()
-        keywords = ["productividad", "organización", "tiempo", "eficiencia", "hábitos", "concentración", "gestión", "quiz"]
+        keywords = ["Quiz, Quizdeejemplo, ejemplo, contratarQuiz, Quiz de ejemplo, contratar Quiz"]
         resultados = Quiz.query.filter(db.or_(*[Quiz.keywords.ilike(f"%{k}%") for k in keywords])).all()
 
         with open(os.path.join(app.root_path, 'data/productividad.json'), 'r', encoding='utf-8') as f:
