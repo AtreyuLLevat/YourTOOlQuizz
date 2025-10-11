@@ -154,11 +154,11 @@ def create_app():
     # RUTAS DE BLOG Y CATEGORÍAS
     # -----------------------------
 
-    @app.route('/blogproductividad')
-    def blogproductividad():
+    @app.route('/Blogejemplo')
+    def Blogejemplo():
         keywords = ["blog, blogdeejemplo, ejemplo, contratarblog, blog de ejemplo, contratar blog"]
         relacionados = Blog.query.filter(db.or_(*[Blog.keywords.ilike(f"%{k}%") for k in keywords])).all()
-        return render_template('blogproductividad.html', relacionados=relacionados)
+        return render_template('Blogejemplo.html', relacionados=relacionados)
 
 
 
@@ -421,8 +421,7 @@ def create_app():
     @app.route("/blog/<slug>")
     def blog_por_slug(slug):
         rutas_blog = {
-            "encuentra-la-herramienta-de-seguridad-adecuada-con-este-blog": "blog1antivirus",
-            "mejora-tu-productividad-notion-clickup-y-todoist": "blogproductividad",
+            "Tu marca tiene algo que contar. ": "Blogejemplo",
             # Añade aquí todos tus blogs con su slug y nombre de función real
         }
         if slug in rutas_blog:
