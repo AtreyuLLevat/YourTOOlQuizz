@@ -49,6 +49,7 @@ h1::after {
   padding: 40px 0;
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.25s ease, transform 0.25s ease;
+  text-align: center; /* centra el contenido interno */
 }
 .result-item:hover {
   background-color: #f9fafb;
@@ -58,14 +59,12 @@ h1::after {
 /* ---------------- ENLACE PRINCIPAL ---------------- */
 .result-link {
   color: #1e40af;
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
   text-decoration: none;
-  display: inline-block;
+  display: block;
   margin-bottom: 10px;
   transition: color 0.2s ease;
-  text-align: center;
-  width: 100%;
 }
 .result-link:hover { 
   color: #facc15; /* amarillo acento */
@@ -77,9 +76,9 @@ h1::after {
   color: #334155; 
   font-size: 1.05rem;
   line-height: 1.7; 
-  text-align: center;
   max-width: 640px;
   margin: 0 auto;
+  text-align: center; /* centra el texto */
 }
 
 /* ---------------- SIN RESULTADOS ---------------- */
@@ -97,7 +96,7 @@ h1::after {
 
 /* ---------------- BOTÓN VOLVER ---------------- */
 .back-link {
-  display: block; /* para que ocupe toda la línea */
+  display: block;
   width: 90%;
   max-width: 720px;
   margin: 60px auto 0;
@@ -117,6 +116,7 @@ h1::after {
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
+
   </style>
 {% endblock %}
 {% block content %}
