@@ -203,23 +203,23 @@ def create_app():
         if query:
             like = f"%{query}%"
 
-            # Buscar en Quizzes: titulo, descripcion y keywords
+            # Buscar en Quizzes: titulo, contenido, keywords y image_url
             resultados_quiz = Quiz.query.filter(
                 (Quiz.titulo.ilike(like)) |
                 (Quiz.contenido.ilike(like)) |
-                (Quiz.keywords.ilike(like))
+                (Quiz.keywords.ilike(like)) |
                 (Quiz.image_url.ilike(like))
             ).all()
 
-            # Buscar en Blogs: titulo, contenido y keywords
+            # Buscar en Blogs: titulo, contenido, keywords y image_url
             resultados_blog = Blog.query.filter(
                 (Blog.titulo.ilike(like)) |
                 (Blog.contenido.ilike(like)) |
-                (Blog.keywords.ilike(like))
+                (Blog.keywords.ilike(like)) |
                 (Blog.image_url.ilike(like))
             ).all()
 
-            # Buscar en Pages: title, description y content
+            # Buscar en Pages: title, description y content (sin imagen)
             resultados_page = Page.query.filter(
                 (Page.title.ilike(like)) |
                 (Page.description.ilike(like)) |
