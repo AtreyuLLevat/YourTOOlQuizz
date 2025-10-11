@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block title %}legal | YourToolQuizz{% endblock %}
@@ -77,3 +78,84 @@
   <p>Para cualquier duda o solicitud relacionada con este aviso legal, puedes escribirnos desde la sección <a href="{{ url_for('contact') }}">Contáctanos</a>.</p>
 </main>
 {% endblock %}
+=======
+{% extends "base.html" %}
+
+{% block title %}legal | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+  <style>
+
+
+/* ------------------ MAIN CONTENT ------------------ */
+.main-wrapper {
+  padding: 80px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.main-wrapper h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #000;
+  margin-bottom: 30px;
+  text-align: center;
+  position: relative;
+}
+.main-wrapper h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: #D60000;
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+.main-wrapper h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #000;
+  margin-top: 40px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #D60000;
+  padding-bottom: 8px;
+}
+
+.main-wrapper p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.main-wrapper a {
+  color: #D60000;
+  text-decoration: none;
+}
+.main-wrapper a:hover {
+  color: #ff1a1a;
+  text-decoration: underline;
+}
+  </style>
+{% endblock %}
+{% block content %}
+
+<main class="main-wrapper">
+  <h1>Aviso Legal</h1>
+
+  <p>El presente aviso legal regula el uso del sitio web <strong>YourToolQuizz</strong>.</p>
+
+  <h2>Responsabilidad</h2>
+  <p>No garantizamos resultados ni nos responsabilizamos por el uso que cada usuario haga de las herramientas recomendadas. Las decisiones finales de contratación y uso dependen exclusivamente del visitante.</p>
+
+  <h2>Propiedad intelectual</h2>
+  <p>Todos los contenidos, textos y elementos gráficos de esta web son propiedad de YourToolQuizz o de terceros con licencia, y están protegidos por los derechos de autor.</p>
+
+  <h2>Contacto</h2>
+  <p>Para cualquier duda o solicitud relacionada con este aviso legal, puedes escribirnos desde la sección <a href="{{ url_for('contact') }}">Contáctanos</a>.</p>
+</main>
+{% endblock %}
+>>>>>>> ec1e43cfb7f709d6f69ef6f58ce66c05937cf404

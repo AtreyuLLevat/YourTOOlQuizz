@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block title %}Página no encontrada - 404 | YourToolQuizz{% endblock %}
@@ -73,3 +74,80 @@ p {
     <div class="error-email">yourtoolfindersuport@gmail.com</div>
     <a href="{{ url_for('homepage') }}" class="btn">Volver a la página principal</a>
 {% endblock %}
+=======
+{% extends "base.html" %}
+
+{% block title %}Página no encontrada - 404 | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+ <style>
+
+main {
+  flex: 1;
+  max-width: 800px;
+  margin: 60px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 4rem;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.error-email {
+  display: inline-block;
+  background: #fff3f2;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+  margin-bottom: 20px;
+  font-family: monospace;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background: #d97706;
+  transform: scale(1.05);
+}
+
+  </style>
+{% endblock %}
+{% block content %}
+
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <h1>Lo sentimos, el mensaje no se pudo enviar</h1>
+    <p>Hubo un problema al procesar tu mensaje. Por favor, inténtalo de nuevo en unos minutos.</p>
+    <p>Si el error persiste, puedes contactarnos directamente a:</p>
+    <div class="error-email">yourtoolfindersuport@gmail.com</div>
+    <a href="{{ url_for('homepage') }}" class="btn">Volver a la página principal</a>
+{% endblock %}
+>>>>>>> ec1e43cfb7f709d6f69ef6f58ce66c05937cf404

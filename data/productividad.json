@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "herramientasproductivas": {
     "notion": {
@@ -34,4 +35,42 @@
       ]
     }
   }
+=======
+{
+  "herramientasproductivas": {
+    "notion": {
+      "name": "Notion",
+      "url": "https://www.notion.com/pricing",
+      "features": [
+        "Notas, bases de datos y gestión de proyectos en un solo lugar",
+        "Plantillas personalizables para todo tipo de usos",
+        "Vista de calendario, tablero Kanban y listas",
+        "Enlaces entre páginas y gestión de conocimiento",
+        "Colaboración en tiempo real"
+      ]
+    },
+    "clickup": {
+      "name": "ClickUp",
+      "url": "https://clickup.com/lp/pricing",
+      "features": [
+        "Gestión avanzada de proyectos y tareas",
+        "Vistas múltiples: lista, tablero, calendario, Gantt",
+        "Asignación de tareas a múltiples usuarios",
+        "Objetivos, recordatorios y seguimiento de progreso",
+        "Automatizaciones integradas"
+      ]
+    },
+    "todoist": {
+      "name": "Todoist",
+      "url": "https://www.todoist.com/pricing",
+      "features": [
+        "Listas simples de tareas con fechas y recordatorios",
+        "Organización por proyectos, etiquetas y prioridades",
+        "Modo offline y sincronización en todos los dispositivos",
+        "Integración con Google Calendar, Slack y más",
+        "Muy ligero y fácil de usar"
+      ]
+    }
+  }
+>>>>>>> ec1e43cfb7f709d6f69ef6f58ce66c05937cf404
 }

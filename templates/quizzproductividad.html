@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block title %}Quiz de Productividad | YourToolQuizz{% endblock %}
@@ -323,3 +324,330 @@
 
 
 
+=======
+{% extends "base.html" %}
+
+{% block title %}Quiz de Productividad | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary: #2563eb;
+    --accent: #facc15;
+    --text-dark: #111827;
+    --text-light: #4b5563;
+    --border-light: #e5e7eb;
+  }
+
+  body {
+    background: #ffffff;
+    font-family: "Inter", "Helvetica Neue", sans-serif;
+    color: var(--text-dark);
+    margin: 0;
+    padding: 0;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 80px auto;
+    padding: 0 24px;
+  }
+
+  .Introducción {
+    text-align: center;
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .Subtitulointroducción {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-bottom: 40px;
+  }
+
+  .accent-line {
+    height: 4px;
+    width: 70px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 0 auto 50px;
+  }
+
+  .progress-container {
+    width: 100%;
+    background-color: var(--border-light);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+    margin: 0 auto 40px;
+  }
+  /* === BARRA DE PROGRESO SUPERIOR GLOBAL === */
+.main-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 5px;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+  z-index: 1000;
+  transition: width 0.3s ease-in-out;
+}
+
+
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    transition: width 0.3s ease-in-out;
+  }
+
+  .question {
+    margin-bottom: 70px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .question.active {
+    display: block;
+    opacity: 1;
+  }
+
+  .question h3 {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 40px;
+  }
+
+  ul.answers {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 18px;
+    margin: 0 auto;
+    max-width: 750px;
+  }
+
+  ul.answers li {
+    border: 1.8px solid var(--border-light);
+    border-radius: 10px;
+    padding: 18px 22px;
+    background-color: #f9fafb;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  }
+
+  ul.answers li:hover {
+    background: #eef2ff;
+    border-color: var(--primary);
+    box-shadow: 0 3px 6px rgba(37, 99, 235, 0.15);
+  }
+
+  ul.answers li.selected {
+    background: #dbeafe;
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  }
+
+  label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin: 60px auto;
+    max-width: 750px;
+    gap: 14px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 16px 0;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+  }
+
+  .nav-btn:hover {
+    background: #1d4ed8;
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  }
+
+  .nav-btn:disabled {
+    background: #cbd5e1;
+    color: #f9fafb;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+/* Centrado del botón Enviar */
+.submit-container {
+  display: flex;
+  justify-content: flex-start; /* mismo alineamiento que el botón Anterior */
+  max-width: 750px;
+  margin: 0 auto 80px; /* mismo espacio que las preguntas */
+}
+
+/* Ajuste del botón Enviar */
+.submit-btn {
+  display: none;
+  width: 48%; /* mismo ancho que los botones Anterior/Siguiente */
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.submit-btn:hover {
+  background: #1e3a8a;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+/* Vista móvil: centrar completamente el botón Enviar */
+@media (max-width: 700px) {
+  .submit-container {
+    justify-content: center;
+  }
+
+  .submit-btn {
+    width: 100%;
+  }
+}
+
+
+  @media (max-width: 700px) {
+    .Introducción {
+      font-size: 1.9rem;
+    }
+
+    .question h3 {
+      font-size: 1.5rem;
+    }
+
+    ul.answers li {
+      font-size: 1rem;
+      padding: 16px;
+    }
+
+    .nav-btn,
+    button#submitBtn {
+      font-size: 1rem;
+      padding: 14px 0;
+    }
+
+    .navigation-buttons {
+      flex-direction: column;
+      gap: 12px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+  <div class="Introducción">Quiz de ejemplo</div>
+  <div class="Subtitulointroducción">¡Evalúa nuestro producto estrella y contratalo!</div>
+  <div class="accent-line"></div>
+
+    <form id="quizForm" method="POST" action="{{ url_for('quizzproductividad') }}">
+    {{ form.hidden_tag() }}
+
+    <div class="question active">
+      <h3>{{ form.q1.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q1 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q2.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q2 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q3.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q3 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q4.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q4 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="question">
+      <h3>{{ form.q5.label }}</h3>
+      <div class="progress-container"><div class="progress-bar"></div></div>
+      <ul class="answers">
+        {% for subfield in form.q5 %}
+        <li><label>{{ subfield() }} {{ subfield.label.text }}</label></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+
+<div class="navigation-buttons">
+  <button type="button" id="prevBtn" class="nav-btn" disabled>Anterior</button>
+  <button type="button" id="nextBtn" class="nav-btn" disabled>Siguiente</button>
+</div>
+
+<!-- Botón de enviar -->
+<div class="submit-container">
+  <a href="/Servicio_1" class="nav-btn submit-btn">Contratar</a>
+</div>
+
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='java/quizzproductividad.js') }}" defer></script>
+{% endblock %}
+
+
+
+
+>>>>>>> ec1e43cfb7f709d6f69ef6f58ce66c05937cf404
