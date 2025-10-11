@@ -1,9 +1,9 @@
- {% extends "base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Resultados de la búsqueda| YourToolQuizz{% endblock %}
+{% block title %}Resultados de la búsqueda | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
- <style>
+<style>
 /* ---------------- MAIN ---------------- */
 main {
   max-width: 960px;
@@ -27,7 +27,7 @@ h1::after {
   display: block;
   width: 90px;
   height: 4px;
-  background: #2563eb; /* azul principal */
+  background: #2563eb;
   margin: 18px auto 0;
   border-radius: 2px;
 }
@@ -40,7 +40,7 @@ h1::after {
   flex-direction: column; 
   gap: 50px;
   border-top: 1px solid #e5e7eb;
-  align-items: center; /* centra los resultados */
+  align-items: center;
 }
 
 .result-item { 
@@ -49,11 +49,20 @@ h1::after {
   padding: 40px 0;
   border-bottom: 1px solid #e5e7eb;
   transition: background-color 0.25s ease, transform 0.25s ease;
-  text-align: center; /* centra el contenido interno */
+  text-align: center;
 }
 .result-item:hover {
   background-color: #f9fafb;
   transform: translateY(-2px);
+}
+
+/* ---------------- IMÁGENES ---------------- */
+.result-item img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
 }
 
 /* ---------------- ENLACE PRINCIPAL ---------------- */
@@ -67,7 +76,7 @@ h1::after {
   transition: color 0.2s ease;
 }
 .result-link:hover { 
-  color: #facc15; /* amarillo acento */
+  color: #facc15;
   text-decoration: underline; 
 }
 
@@ -78,7 +87,7 @@ h1::after {
   line-height: 1.7; 
   max-width: 640px;
   margin: 0 auto;
-  text-align: center; /* centra el texto */
+  text-align: center;
 }
 
 /* ---------------- SIN RESULTADOS ---------------- */
@@ -116,50 +125,59 @@ h1::after {
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(0,0,0,0.08);
 }
-
-  </style>
+</style>
 {% endblock %}
+
 {% block content %}
+<h1>Resultados para "{{ q }}"</h1>
 
+<div class="results-container">
+  {% if resultados_quiz or resultados_blog or resultados_page %}
+    <ul class="results-list">
 
-    <h1>Resultados para "{{ q }}"</h1>
-    
-    <div class="results-container">
-      {% if resultados_quiz or resultados_blog or resultados_page %}
-        <ul class="results-list">
-          {% for item in resultados_quiz %}
-            <li class="result-item">
-              <a class="result-link" href="{{ url_for('quiz_por_slug', slug=item.slug) }}">
-                {{ item.titulo }}
-              </a>
-              <p>{{ item.contenido }}</p>
-            </li>
-          {% endfor %}
-
-          {% for item in resultados_blog %}
-            <li class="result-item">
-              <a class="result-link" href="{{ url_for('blog_por_slug', slug=item.slug) }}">
-                {{ item.titulo }}
-              </a>
-              <p>{{ item.contenido }}</p>
-            </li>
-          {% endfor %}
-        
-            {% for item in resultados_page %}
-        <li class="result-item">
-          <a class="result-link" href="/{{ item.slug }}">
-            📄 {{ item.title }}
-          </a>
-          <p class="result-content">{{ item.description }}</p>
-        </li>
-        </ul>
+      {# --- QUIZZES --- #}
+      {% for item in resultados_quiz %}
+      <li class="result-item">
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.titulo }}">
+        {% endif %}
+        <a class="result-link" href="{{ url_for('quiz_por_slug', slug=item.slug) }}">
+           {{ item.titulo }}
+        </a>
+        <p class="result-content">{{ item.contenido }}</p>
+      </li>
       {% endfor %}
-      {% else %}
-        <p class="no-results">No se encontraron resultados para "{{ q }}"</p>
-      {% endif %}
-    </div>
-    <a href="/" class="back-link">
-      <i class="fas fa-arrow-left"></i> Volver al inicio
-    </a>
+
+      {# --- BLOGS --- #}
+      {% for item in resultados_blog %}
+      <li class="result-item">
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.titulo }}">
+        {% endif %}
+        <a class="result-link" href="{{ url_for('blog_por_slug', slug=item.slug) }}">
+           {{ item.titulo }}
+        </a>
+        <p class="result-content">{{ item.contenido }}</p>
+      </li>
+      {% endfor %}
+
+      {# --- PÁGINAS (sin imagen) --- #}
+      {% for item in resultados_page %}
+      <li class="result-item">
+        <a class="result-link" href="/{{ item.slug }}">
+          📄 {{ item.title or item.name }}
+        </a>
+        <p class="result-content">{{ item.description }}</p>
+      </li>
+      {% endfor %}
+
+    </ul>
+  {% else %}
+    <p class="no-results">No se encontraron resultados para "{{ q }}"</p>
+  {% endif %}
+</div>
+
+<a href="/" class="back-link">
+  <i class="fas fa-arrow-left"></i> Volver al inicio
+</a>
 {% endblock %}
-  

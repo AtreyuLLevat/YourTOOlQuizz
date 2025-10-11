@@ -70,7 +70,7 @@ class Quiz(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     keywords = db.Column(db.String(300), nullable=True)
     slug = db.Column(db.String(200), unique=True, index=True, nullable=True)  # Nuevo campo slug
-
+    image_url = db.Column(db.String(300), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     questions = db.relationship("Question", backref="quiz", lazy=True)
     results = db.relationship("Result", backref="quiz", lazy=True)
@@ -122,7 +122,7 @@ class Blog(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     slug = db.Column(db.String(200), unique=True, index=True, nullable=True)  # Nuevo campo slug
-
+    image_url = db.Column(db.String(300), nullable=True)
     
     autor = db.relationship('User', backref=db.backref('blogst', lazy=True))
     

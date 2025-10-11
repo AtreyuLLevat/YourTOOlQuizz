@@ -208,6 +208,7 @@ def create_app():
                 (Quiz.titulo.ilike(like)) |
                 (Quiz.contenido.ilike(like)) |
                 (Quiz.keywords.ilike(like))
+                (Quiz.image_url.ilike(like))
             ).all()
 
             # Buscar en Blogs: titulo, contenido y keywords
@@ -215,6 +216,7 @@ def create_app():
                 (Blog.titulo.ilike(like)) |
                 (Blog.contenido.ilike(like)) |
                 (Blog.keywords.ilike(like))
+                (Blog.image_url.ilike(like))
             ).all()
 
             # Buscar en Pages: title, description y content
