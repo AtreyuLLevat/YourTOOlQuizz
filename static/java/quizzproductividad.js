@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentQuestion === totalQuestions - 1) {
       nextBtn.textContent = "Enviando...";
       nextBtn.disabled = true;
-setTimeout(() => window.location.href = "{{ url_for('servicio') }}", 300);
+setTimeout(() => window.location.href = "/Servicio_1", 300);
 
     } else {
       showQuestion(currentQuestion + 1);
