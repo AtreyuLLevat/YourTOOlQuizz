@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateButtons() {
     prevBtn.disabled = currentQuestion === 0;
-    nextBtn.textContent = currentQuestion === totalQuestions - 1 ? "Enviar" : "Siguiente";
+    nextBtn.textContent = currentQuestion === totalQuestions - 1 ? "Contratar" : "Siguiente";
     updateNextBtnState();
   }
 
@@ -88,6 +88,7 @@ setTimeout(() => window.location.href = "{{ url_for('Servicio_1') }}", 300);
   showQuestion(0);
   updateProgressBars();
 });
+
 
 
 
