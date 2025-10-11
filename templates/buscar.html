@@ -105,7 +105,7 @@ h1::after {
     <h1>Resultados para "{{ q }}"</h1>
     
     <div class="results-container">
-      {% if resultados_quiz or resultados_blog %}
+      {% if resultados_quiz or resultados_blog or resultados_page %}
         <ul class="results-list">
           {% for item in resultados_quiz %}
             <li class="result-item">
@@ -124,7 +124,16 @@ h1::after {
               <p>{{ item.contenido }}</p>
             </li>
           {% endfor %}
+        
+            {% for item in resultados_page %}
+        <li class="result-item">
+          <a class="result-link" href="/{{ item.slug }}">
+            📄 {{ item.title }}
+          </a>
+          <p class="result-content">{{ item.description }}</p>
+        </li>
         </ul>
+      {% endfor %}
       {% else %}
         <p class="no-results">No se encontraron resultados para "{{ q }}"</p>
       {% endif %}

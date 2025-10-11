@@ -26,6 +26,21 @@ def unique_slug(model, base_slug):
         i += 1
     return slug
 
+class Page(db.Model):
+    __tablename__ = "pages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    slug = db.Column(db.String(150), unique=True, index=True, nullable=False)
+    title = db.Column(db.String(200), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    content = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Page {self.name}>"
+
 # -------------------------
 # MODELO DE USUARIOS
 # -------------------------

@@ -3,12 +3,12 @@ import json
 import io
 import pyotp
 import qrcode
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file, abort
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import db, User, Quiz, Question, Blog
+from models import db, User, Quiz, Question, Blog, Page
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
@@ -91,6 +91,14 @@ def create_app():
         SUPABASE_URL,
         SUPABASE_ANON_KEY
     )
+
+    @app.context_processor
+    def inject_pages():
+        try:
+            pages = Page.query.order_by(Page.created_at).all()
+        except Exception:
+            pages = []
+        return {"site_pages": pages}
 
 # -----------------------------
 
@@ -200,6 +208,13 @@ def create_app():
                 (Blog.titulo.ilike(f'%{query}%')) |
                 (Blog.contenido.ilike(f'%{query}%')) |
                 (Blog.keywords.ilike(f'%{query}%'))
+            ).all()
+            
+            # Buscar en Pages: title, description y content
+            resultados_page = Page.query.filter(
+                (Page.title.ilike(f'%{query}%')) | 
+                (Page.description.ilike(f'%{query}%')) |
+                (Page.content.ilike(f'%{query}%'))
             ).all()
 
         return render_template(
