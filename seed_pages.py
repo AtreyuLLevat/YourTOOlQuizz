@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from app import create_app
 
 from models import db, Page, slugify, unique_slug
