@@ -11,5 +11,3 @@ with app.app_context():
     db.session.commit()
     print(f"Actualizados {len(users)} usuarios.")
 
-
-
