@@ -1,22 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Publicitario — Estilo Notion</title>
+  <title>Panel Publicitario — Estilo Moderno</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --glass: rgba(255,255,255,0.05);
+      --radius: 12px;
+      --text: #f1f5f9;
+      --border: rgba(255,255,255,0.1);
+      --shadow: rgba(0,0,0,0.2);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    
+    :root[data-theme="light"] {
       --bg: #f7f7f9;
       --panel: #ffffff;
       --muted: #6b7280;
-      --accent: #7c3aed; /* morado similar a yourtoolquizz */
+      --accent: #3b82f6;
       --glass: rgba(255,255,255,0.6);
-      --radius: 12px;
-      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      --text: #0f172a;
+      --border: #eef0f6;
+      --shadow: rgba(15,23,42,0.06);
     }
     
     * { box-sizing: border-box }
@@ -25,7 +38,8 @@
       height: 100%;
       margin: 0;
       background: var(--bg);
-      color: #0f172a;
+      color: var(--text);
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* Layout */
@@ -36,9 +50,10 @@
 
     .sidebar {
       width: 300px;
-      background: linear-gradient(180deg, rgba(124,58,237,0.06), rgba(124,58,237,0.02));
+      background: linear-gradient(180deg, var(--panel), var(--bg));
       padding: 28px;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(10px);
+      border-right: 1px solid var(--border);
     }
 
     .brand {
@@ -52,12 +67,13 @@
       width: 44px;
       height: 44px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--accent), #4c1d95);
+      background: linear-gradient(135deg, var(--accent), #1e40af);
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
       font-weight: 700;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .brand h1 {
@@ -88,11 +104,12 @@
     }
 
     .nav-link:hover {
-      background: rgba(124,58,237,0.08);
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--text);
     }
 
     .nav-link.active {
-      background: rgba(124,58,237,0.12);
+      background: rgba(59, 130, 246, 0.15);
       color: var(--accent);
       font-weight: 600;
     }
@@ -123,9 +140,14 @@
       flex: 1;
       padding: 12px 14px;
       border-radius: 10px;
-      border: 1px solid #e6e7ee;
+      border: 1px solid var(--border);
       background: var(--panel);
       outline: none;
+      color: var(--text);
+    }
+
+    .search input::placeholder {
+      color: var(--muted);
     }
 
     .profile {
@@ -138,7 +160,7 @@
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #ff9a9e, #fecfef);
+      background: linear-gradient(135deg, #3b82f6, #1e40af);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -150,8 +172,9 @@
       background: var(--panel);
       border-radius: var(--radius);
       padding: 28px;
-      box-shadow: 0 6px 18px rgba(15,23,42,0.06);
+      box-shadow: 0 6px 18px var(--shadow);
       display: none;
+      border: 1px solid var(--border);
     }
 
     .page.active {
@@ -175,7 +198,7 @@
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(124,58,237,0.1);
+      background: rgba(59, 130, 246, 0.15);
       color: var(--accent);
       font-weight: 600;
       font-size: 12px;
@@ -189,10 +212,11 @@
     }
 
     .stat-card {
-      background: linear-gradient(180deg, #fff, #fbfbfd);
+      background: linear-gradient(180deg, var(--panel), var(--bg));
       padding: 16px;
       border-radius: 10px;
-      border: 1px solid #eef0f6;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(4px);
     }
 
     .stat-value {
@@ -207,8 +231,8 @@
     }
 
     .alert {
-      background: linear-gradient(135deg, #fffbeb, #fff7ed);
-      border: 1px solid #fed7aa;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), var(--panel));
+      border: 1px solid rgba(59, 130, 246, 0.3);
       border-radius: 10px;
       padding: 16px;
       margin-bottom: 24px;
@@ -218,7 +242,7 @@
     }
 
     .alert i {
-      color: #f59e0b;
+      color: var(--accent);
     }
 
     .section {
@@ -237,16 +261,18 @@
     }
 
     .card {
-      background: linear-gradient(180deg, #fff, #fbfbfd);
+      background: linear-gradient(180deg, var(--panel), var(--bg));
       padding: 20px;
       border-radius: 10px;
-      border: 1px solid #eef0f6;
+      border: 1px solid var(--border);
       transition: transform 0.2s ease;
+      backdrop-filter: blur(4px);
     }
 
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+      box-shadow: 0 8px 20px var(--shadow);
+      border-color: rgba(59, 130, 246, 0.2);
     }
 
     .card h4 {
@@ -277,7 +303,7 @@
     }
 
     .btn:hover {
-      background: #6d28d9;
+      background: #2563eb;
     }
 
     .btn-outline {
@@ -287,7 +313,7 @@
     }
 
     .btn-outline:hover {
-      background: rgba(124,58,237,0.1);
+      background: rgba(59, 130, 246, 0.1);
     }
 
     table {
@@ -298,7 +324,7 @@
     th, td {
       padding: 12px 16px;
       text-align: left;
-      border-bottom: 1px solid #eef0f6;
+      border-bottom: 1px solid var(--border);
     }
 
     th {
@@ -323,9 +349,9 @@
     }
 
     .chart-container {
-      background: linear-gradient(180deg, #fff, #fbfbfd);
+      background: linear-gradient(180deg, var(--panel), var(--bg));
       border-radius: 10px;
-      border: 1px solid #eef0f6;
+      border: 1px solid var(--border);
       padding: 20px;
       margin-bottom: 24px;
       height: 400px;
@@ -346,8 +372,9 @@
 
     .chart-controls button {
       padding: 6px 12px;
-      border: 1px solid #e6e7ee;
-      background: white;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--muted);
       border-radius: 6px;
       cursor: pointer;
       font-size: 13px;
@@ -358,6 +385,146 @@
       color: white;
       border-color: var(--accent);
     }
+
+    /* Nuevos estilos para las mejoras */
+    .campaign-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .campaign-stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .campaign-stat-value {
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .campaign-stat-label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .quiz-content {
+      display: flex;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .quiz-content-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 100;
+      border: none;
+      font-size: 20px;
+    }
+    /* === Modal / Gestión métodos de pago (pegar dentro de <style> o en tu CSS) === */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(2,6,23,0.6);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:120;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity .18s ease;
+    }
+    .modal-overlay.open{ opacity:1; pointer-events:auto; }
+    .modal{
+      width:100%;
+      max-width:720px;
+      background:var(--panel);
+      border-radius:12px;
+      padding:20px;
+      border:1px solid var(--border);
+      box-shadow:0 10px 40px rgba(2,6,23,0.6);
+      transform:translateY(8px);
+      transition:transform .18s ease;
+    }
+    .modal-header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .modal h3{ margin:0; font-size:18px; }
+    .close-btn{ background:transparent; border:none; color:var(--muted); font-size:18px; cursor:pointer; }
+
+    .payment-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+    .payment-item{
+      display:flex; align-items:center; gap:12px; padding:10px;
+      border-radius:8px; border:1px solid var(--border);
+      background:linear-gradient(180deg,transparent,rgba(255,255,255,0.01));
+    }
+    .payment-details{ flex:1; }
+    .payment-meta{ font-size:13px; color:var(--muted); }
+    .primary-badge{
+      display:inline-block; padding:4px 8px; border-radius:999px;
+      background:rgba(16,185,129,0.12); color:#10b981; font-weight:600; font-size:12px;
+    }
+
+    .form-row{ display:flex; gap:10px; margin-bottom:10px; }
+    .form-control{ flex:1; }
+    input[type=text], input[type=month], select{
+      width:100%; padding:10px; border-radius:8px; border:1px solid var(--border);
+      background:var(--panel); color:var(--text); outline:none;
+    }
+
+    .actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+    .btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; background:var(--accent); color:white; border:none; cursor:pointer; }
+    .btn-outline{ background:transparent; border:1px solid var(--border); color:var(--text); }
+
+    .small{ font-size:13px; color:var(--muted); }
+
+    .link-hover {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .link-hover:hover {
+      border-bottom-color: var(--accent);
+      color: var(--text);
+      text-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+    }
+
+    @media (max-width:720px){ .modal{ margin:16px } }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -386,31 +553,22 @@
           <i class="fas fa-chart-line"></i>
           Panel Principal
         </a>
-        <a href="#campaigns" class="nav-link">
-          <i class="fas fa-bullhorn"></i>
-          Gestión de Campañas
-        </a>
+
         <a href="#quizzes" class="nav-link">
           <i class="fas fa-question-circle"></i>
           Gestión de Quizzes
         </a>
-        <a href="#reports" class="nav-link">
-          <i class="fas fa-chart-bar"></i>
-          Estadísticas y Reportes
-        </a>
-        <a href="#content" class="nav-link">
-          <i class="fas fa-image"></i>
-          Gestión de Contenido
-        </a>
+
+
         <a href="#billing" class="nav-link">
           <i class="fas fa-credit-card"></i>
           Facturación y Pagos
         </a>
-        <a href="#support" class="nav-link">
+        <a href="{{ url_for('contact') }}" class="nav-link">
           <i class="fas fa-headset"></i>
           Soporte y Contacto
         </a>
-        <a href="#settings" class="nav-link">
+        <a href="{{ url_for('dashboard') }}" class="nav-link">
           <i class="fas fa-cog"></i>
           Configuración
         </a>
@@ -477,6 +635,66 @@
         </div>
 
         <div class="section">
+          <h3>Campañas Activas</h3>
+          <div class="card-grid">
+            <div class="card">
+              <h4><i class="fas fa-bullhorn" style="color: #3b82f6;"></i> Verano Promo</h4>
+              <p>Campaña de promoción de productos de verano</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$750</div>
+                  <div class="campaign-stat-label">Costo</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">3.8%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">45,230</div>
+                  <div class="campaign-stat-label">Impresiones</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-rocket" style="color: #10b981;"></i> Lanzamiento Producto</h4>
+              <p>Presentación del nuevo producto al mercado</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$1,000</div>
+                  <div class="campaign-stat-label">Costo</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">2.9%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">62,150</div>
+                  <div class="campaign-stat-label">Impresiones</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-shopping-cart" style="color: #f59e0b;"></i> Black Friday</h4>
+              <p>Ofertas especiales para el Black Friday</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$500</div>
+                  <div class="campaign-stat-label">Costo</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">4.2%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">38,500</div>
+                  <div class="campaign-stat-label">Impresiones</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
           <h3>Alertas y Notificaciones</h3>
           <div class="card">
             <h4><i class="fas fa-bell" style="color: #f59e0b;"></i> Campaña por aprobar</h4>
@@ -523,61 +741,6 @@
         </div>
       </section>
 
-      <!-- Gestión de Campañas -->
-      <section id="campaigns" class="page">
-        <div class="meta">
-          <span class="badge">Gestión de Campañas</span>
-          <div>•</div>
-          <div>Crear y administrar tus campañas publicitarias</div>
-        </div>
-        <h2>Gestión de Campañas</h2>
-        <p style="color: var(--muted)">Crea nuevas campañas, edita las existentes y controla su estado.</p>
-
-        <div class="section">
-          <button class="btn">
-            <i class="fas fa-plus"></i>
-            Crear Nueva Campaña
-          </button>
-        </div>
-
-        <div class="section">
-          <h3>Campañas Activas</h3>
-          <div class="card-grid">
-            <div class="card">
-              <h4><i class="fas fa-bullhorn" style="color: #10b981;"></i> Verano Promo</h4>
-              <p>Presupuesto: $750 | Impresiones: 45,230</p>
-              <p>CTR: 3.8% | Estado: <span class="status-active">Activa</span></p>
-              <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <button class="btn-outline">Editar</button>
-                <button class="btn-outline">Pausar</button>
-              </div>
-            </div>
-            <div class="card">
-              <h4><i class="fas fa-bullhorn" style="color: #10b981;"></i> Lanzamiento Producto</h4>
-              <p>Presupuesto: $1,000 | Impresiones: 62,150</p>
-              <p>CTR: 2.9% | Estado: <span class="status-active">Activa</span></p>
-              <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <button class="btn-outline">Editar</button>
-                <button class="btn-outline">Pausar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>Campañas Pendientes de Aprobación</h3>
-          <div class="card">
-            <h4><i class="fas fa-clock" style="color: #f59e0b;"></i> Otoño 2025</h4>
-            <p>Presupuesto: $500 | Inicio: 10 Oct, 2025</p>
-            <p>Estado: <span class="status-pending">Pendiente de revisión</span></p>
-            <div style="margin-top: 12px; display: flex; gap: 8px;">
-              <button class="btn-outline">Editar</button>
-              <button class="btn-outline">Cancelar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- Gestión de Quizzes -->
       <section id="quizzes" class="page">
         <div class="meta">
@@ -589,40 +752,108 @@
         <p style="color: var(--muted)">Vincula quizzes a tus campañas y analiza su rendimiento.</p>
 
         <div class="section">
-          <h3>Quizzes Vinculados</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Quiz</th>
-                <th>Campaña</th>
-                <th>Respuestas</th>
-                <th>Tasa Conversión</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>¿Qué producto es para ti?</td>
-                <td>Lanzamiento Producto</td>
-                <td>1,245</td>
-                <td>12.3%</td>
-                <td>
-                  <button class="btn-outline">Editar</button>
-                  <button class="btn-outline">Estadísticas</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Test de Estilo Verano</td>
-                <td>Verano Promo</td>
-                <td>892</td>
-                <td>9.8%</td>
-                <td>
-                  <button class="btn-outline">Editar</button>
-                  <button class="btn-outline">Estadísticas</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <h3>Quizzes Activos</h3>
+          <div class="card-grid">
+            <div class="card">
+              <h4><i class="fas fa-question-circle" style="color: #3b82f6;"></i> ¿Qué producto es para ti?</h4>
+              <p>Quiz para determinar el producto ideal según preferencias</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">1,245</div>
+                  <div class="campaign-stat-label">Participantes</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">12.3%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$350</div>
+                  <div class="campaign-stat-label">Gastado</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%"></div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">Finaliza en 15 días</div>
+              <div class="quiz-content">
+                <div class="quiz-content-item">
+                  <i class="fas fa-image"></i> 5 imágenes
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-video"></i> 2 videos
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-file-alt"></i> 3 textos
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-sun" style="color: #f59e0b;"></i> Test de Estilo Verano</h4>
+              <p>Descubre tu estilo de verano ideal</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">892</div>
+                  <div class="campaign-stat-label">Participantes</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">9.8%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$280</div>
+                  <div class="campaign-stat-label">Gastado</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 30%"></div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">Finaliza en 45 días</div>
+              <div class="quiz-content">
+                <div class="quiz-content-item">
+                  <i class="fas fa-image"></i> 8 imágenes
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-video"></i> 1 video
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-file-alt"></i> 5 textos
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <h4><i class="fas fa-gift" style="color: #ef4444;"></i> Quiz de Regalos Navideños</h4>
+              <p>Encuentra el regalo perfecto para estas navidades</p>
+              <div class="campaign-stats">
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">523</div>
+                  <div class="campaign-stat-label">Participantes</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">7.5%</div>
+                  <div class="campaign-stat-label">CTR</div>
+                </div>
+                <div class="campaign-stat">
+                  <div class="campaign-stat-value">$420</div>
+                  <div class="campaign-stat-label">Gastado</div>
+                </div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 80%"></div>
+              </div>
+              <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">Finaliza en 8 días</div>
+              <div class="quiz-content">
+                <div class="quiz-content-item">
+                  <i class="fas fa-image"></i> 12 imágenes
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-video"></i> 3 videos
+                </div>
+                <div class="quiz-content-item">
+                  <i class="fas fa-file-alt"></i> 7 textos
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="section">
@@ -643,484 +874,226 @@
               <div class="stat-value">78%</div>
               <div class="stat-label">Tasa de finalización</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Estadísticas y Reportes -->
-      <section id="reports" class="page">
-        <div class="meta">
-          <span class="badge">Estadísticas y Reportes</span>
-          <div>•</div>
-          <div>Métricas clave y análisis de rendimiento</div>
-        </div>
-        <h2>Estadísticas y Reportes</h2>
-        <p style="color: var(--muted)">Visualiza y exporta reportes detallados de tus campañas.</p>
-
-        <div class="section">
-          <h3>Métricas Clave</h3>
-          <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-label">Impresiones</div>
-              <div class="stat-value">107,380</div>
-              <div class="stat-label">Total acumulado</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Clicks</div>
-              <div class="stat-value">3,452</div>
-              <div class="stat-label">Total acumulado</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Conversiones</div>
-              <div class="stat-value">124</div>
-              <div class="stat-label">Total acumulado</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">ROI Estimado</div>
-              <div class="stat-value">142%</div>
-              <div class="stat-label">Retorno promedio</div>
+              <div class="stat-label">Presupuesto Total</div>
+              <div class="stat-value">$1,050</div>
+              <div class="stat-label">Gastado en quizzes</div>
             </div>
           </div>
         </div>
 
         <div class="section">
-          <h3>Rendimiento de Campañas</h3>
-          <div class="chart-container">
-            <div class="chart-header">
-              <h4 style="margin: 0">Comparativa de Métricas</h4>
-              <div class="chart-controls">
-                <button class="chart-btn active" data-period="7d">7 días</button>
-                <button class="chart-btn" data-period="30d">30 días</button>
-                <button class="chart-btn" data-period="90d">90 días</button>
-              </div>
+          <h3>Rendimiento de Quizzes</h3>
+            <div class="card-grid" id="stats-container">
+              <p style="color: var(--muted)">Cargando estadísticas...</p>
             </div>
-            <canvas id="campaignChart"></canvas>
-          </div>
+
+            <!-- Gráfico con CTR -->
+            <canvas id="chart" width="400" height="200"></canvas>
         </div>
 
         <div class="section">
-          <h3>Exportar Reportes</h3>
-          <div class="card-grid">
-            <div class="card">
-              <h4><i class="fas fa-file-pdf" style="color: #ef4444;"></i> Reporte PDF</h4>
-              <p>Genera un reporte detallado en formato PDF con todas las métricas.</p>
-              <button class="btn-outline" style="margin-top: 12px;">
-                <i class="fas fa-download"></i>
-                Descargar PDF
-              </button>
-            </div>
-            <div class="card">
-              <h4><i class="fas fa-file-excel" style="color: #10b981;"></i> Datos Excel</h4>
-              <p>Exporta los datos brutos en formato Excel para análisis avanzado.</p>
-              <button class="btn-outline" style="margin-top: 12px;">
-                <i class="fas fa-download"></i>
-                Descargar Excel
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>Comparativa entre Campañas</h3>
+          <h3>Contenido Utilizado</h3>
           <table>
             <thead>
               <tr>
-                <th>Campaña</th>
-                <th>Impresiones</th>
-                <th>Clicks</th>
-                <th>CTR</th>
-                <th>Conversiones</th>
-                <th>ROI</th>
+                <th>Quiz</th>
+                <th>Imágenes</th>
+                <th>Videos</th>
+                <th>Textos</th>
+                <th>Total Elementos</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Verano Promo</td>
-                <td>45,230</td>
-                <td>1,718</td>
-                <td>3.8%</td>
-                <td>87</td>
-                <td>156%</td>
+                <td>¿Qué producto es para ti?</td>
+                <td>5</td>
+                <td>2</td>
+                <td>3</td>
+                <td>10</td>
               </tr>
               <tr>
-                <td>Lanzamiento Producto</td>
-                <td>62,150</td>
-                <td>1,802</td>
-                <td>2.9%</td>
-                <td>53</td>
-                <td>128%</td>
+                <td>Test de Estilo Verano</td>
+                <td>8</td>
+                <td>1</td>
+                <td>5</td>
+                <td>14</td>
+              </tr>
+              <tr>
+                <td>Quiz de Regalos Navideños</td>
+                <td>12</td>
+                <td>3</td>
+                <td>7</td>
+                <td>22</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- Gestión de Contenido Publicitario -->
-      <section id="content" class="page">
-        <div class="meta">
-          <span class="badge">Gestión de Contenido</span>
-          <div>•</div>
-          <div>Administra banners, imágenes y enlaces</div>
-        </div>
-        <h2>Gestión de Contenido Publicitario</h2>
-        <p style="color: var(--muted)">Sube y administra los elementos creativos de tus campañas.</p>
-
-        <div class="section">
-          <button class="btn">
-            <i class="fas fa-upload"></i>
-            Subir Nuevo Banner
-          </button>
-        </div>
-
-        <div class="section">
-          <h3>Banners Activos</h3>
-          <div class="card-grid">
-            <div class="card">
-              <h4><i class="fas fa-image" style="color: #7c3aed;"></i> Banner Verano</h4>
-              <p>Dimensiones: 728x90 px</p>
-              <p>Estado: <span class="status-active">Activo</span></p>
-              <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <button class="btn-outline">Vista Previa</button>
-                <button class="btn-outline">Editar</button>
-              </div>
-            </div>
-            <div class="card">
-              <h4><i class="fas fa-image" style="color: #7c3aed;"></i> Banner Producto</h4>
-              <p>Dimensiones: 300x250 px</p>
-              <p>Estado: <span class="status-active">Activo</span></p>
-              <div style="margin-top: 12px; display: flex; gap: 8px;">
-                <button class="btn-outline">Vista Previa</button>
-                <button class="btn-outline">Editar</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>Enlaces de Destino</h3>
-          <div class="card">
-            <h4><i class="fas fa-link" style="color: #3b82f6;"></i> Enlaces Configurados</h4>
-            <p>Verano Promo: https://empresa.com/promo-verano</p>
-            <p>Lanzamiento Producto: https://empresa.com/nuevo-producto</p>
-            <button class="btn-outline" style="margin-top: 12px;">
-              <i class="fas fa-edit"></i>
-              Gestionar Enlaces
-            </button>
-          </div>
-        </div>
-      </section>
 
       <!-- Facturación y Pagos -->
-      <section id="billing" class="page">
-        <div class="meta">
-          <span class="badge">Facturación y Pagos</span>
-          <div>•</div>
-          <div>Gestiona tu facturación y métodos de pago</div>
-        </div>
-        <h2>Facturación y Pagos</h2>
-        <p style="color: var(--muted)">Consulta tu historial de facturas y gestiona los pagos.</p>
+<section id="billing" class="page active">
+  <div class="meta">
+    <span class="badge">Facturación y Pagos</span>
+    <div>•</div>
+    <div>Gestiona tu facturación y métodos de pago</div>
+  </div>
 
-        <div class="section">
-          <h3>Historial de Facturas</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Factura</th>
-                <th>Fecha</th>
-                <th>Concepto</th>
-                <th>Importe</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>#INV-2025-0098</td>
-                <td>01 Sep, 2025</td>
-                <td>Campaña Verano Promo</td>
-                <td>$750</td>
-                <td><span class="status-active">Pagada</span></td>
-                <td>
-                  <button class="btn-outline">Descargar</button>
-                </td>
-              </tr>
-              <tr>
-                <td>#INV-2025-0082</td>
-                <td>15 Ago, 2025</td>
-                <td>Campaña Lanzamiento</td>
-                <td>$1,000</td>
-                <td><span class="status-active">Pagada</span></td>
-                <td>
-                  <button class="btn-outline">Descargar</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+  <h2>Facturación y Pagos</h2>
+  <p style="color: var(--muted)">
+    Consulta tu historial de facturas y gestiona los pagos.
+    Si necesitas más información, revisa nuestra
+    <a href="/docs/terminos" class="link-hover">Política de Servicio</a> y
+    <a href="/docs/privacidad" class="link-hover">Política de Privacidad</a>.
+  </p>
 
-        <div class="section">
-          <h3>Método de Pago</h3>
-          <div class="card">
-            <h4><i class="fas fa-credit-card" style="color: #3b82f6;"></i> Tarjeta de Crédito</h4>
-            <p>Visa terminada en 4242 | Expira: 12/2026</p>
-            <div style="margin-top: 12px; display: flex; gap: 8px;">
-              <button class="btn-outline">Cambiar Método</button>
-              <button class="btn-outline">Actualizar</button>
-            </div>
-          </div>
-        </div>
+  <!-- Historial de Facturas -->
+  <div class="section">
+    <h3>Historial de Facturas</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Factura</th>
+          <th>Fecha</th>
+          <th>Concepto</th>
+          <th>Importe</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#INV-2025-0098</td>
+          <td>01 Sep, 2025</td>
+          <td>Campaña Verano Promo</td>
+          <td>$750</td>
+          <td><span class="status-active">Pagada</span></td>
+          <td><button class="btn-outline">Descargar</button></td>
+        </tr>
+        <tr>
+          <td>#INV-2025-0082</td>
+          <td>15 Ago, 2025</td>
+          <td>Campaña Lanzamiento</td>
+          <td>$1,000</td>
+          <td><span class="status-active">Pagada</span></td>
+          <td><button class="btn-outline">Descargar</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-        <div class="section">
-          <h3>Servicio Contratado</h3>
-          <div class="card">
-            <h4><i class="fas fa-crown" style="color: #f59e0b;"></i> Plan Premium</h4>
-            <p>Próxima renovación: 15 Nov, 2025</p>
-            <p>Límite: 10 campañas simultáneas | Soporte prioritario</p>
-            <div style="margin-top: 12px; display: flex; gap: 8px;">
-              <button class="btn">Renovar Servicio</button>
-              <button class="btn-outline">Ampliar</button>
-            </div>
-          </div>
-        </div>
+  <!-- Método de Pago -->
+  <div class="section">
+    <h3>Método de Pago</h3>
+    <div class="card">
+      <h4>
+        <i class="fas fa-credit-card" style="color: #3b82f6;"></i> Tarjeta de Crédito
+      </h4>
+      <p>Visa terminada en <strong>4242</strong> | Expira: 12/2026</p>
+      <p class="small">
+        Consulta nuestras
+        <a href="/docs/pagos" class="link-hover">Condiciones de Pago</a> y
+        <a href="/docs/reembolsos" class="link-hover">Políticas de Reembolso</a>.
+      </p>
+      <div style="margin-top: 12px; display: flex; gap: 8px;">
+        <button id="changeCardBtn" class="btn-outline">Cambiar Método</button>
+        <button class="btn-outline">Actualizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Servicio Contratado -->
+  <div class="section">
+    <h3>Servicio Contratado</h3>
+    <div class="card">
+      <h4>
+        <i class="fas fa-crown" style="color: #f59e0b;"></i> Plan Premium
+      </h4>
+      <p>Próxima renovación: 15 Nov, 2025</p>
+      <p>Límite: 10 campañas simultáneas | Soporte prioritario</p>
+      <p class="small">
+        Antes de renovar, consulta los
+        <a href="/docs/terminos-plan" class="link-hover">Términos del Plan Premium</a>.
+      </p>
+      <div style="margin-top: 12px; display: flex; gap: 8px;">
+        <button class="btn">Renovar Servicio</button>
+      </div>
+    </div>
+  </div>
+
+  
       </section>
+      <div id="paymentModal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document">
+    <div class="modal-header">
+      <h3>Gestionar métodos de pago</h3>
+      <button class="close-btn" id="closeModalBtn" aria-label="Cerrar modal"><i class="fas fa-times"></i></button>
+    </div>
 
-      <!-- Soporte y Contacto -->
-      <section id="support" class="page">
-        <div class="meta">
-          <span class="badge">Soporte y Contacto</span>
-          <div>•</div>
-          <div>Asistencia y resolución de incidencias</div>
-        </div>
-        <h2>Soporte y Contacto</h2>
-        <p style="color: var(--muted)">¿Necesitas ayuda? Contáctanos a través de estos canales.</p>
+    <!-- Lista de métodos existentes (renderizada por JS) -->
+    <div>
+      <div class="small" style="margin-bottom:8px">Métodos disponibles</div>
+      <div class="payment-list" id="paymentList"></div>
+      <div class="small" style="margin-top:6px">Métodos adicionales: (no mostrados por restricciones)</div>
+    </div>
 
-        <div class="section">
-          <h3>Enviar Consulta</h3>
-          <div class="card">
-            <h4><i class="fas fa-envelope" style="color: #7c3aed;"></i> Formulario de Contacto</h4>
-            <p>Describe tu consulta o incidencia y nuestro equipo te responderá en menos de 24h.</p>
-            <div style="margin-top: 16px;">
-              <textarea style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #e6e7ee; min-height: 120px;" placeholder="Describe tu consulta aquí..."></textarea>
-              <button class="btn" style="margin-top: 12px;">
-                <i class="fas fa-paper-plane"></i>
-                Enviar Consulta
-              </button>
-            </div>
-          </div>
-        </div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
 
-        <div class="section">
-          <h3>Chat de Soporte</h3>
-          <div class="card">
-            <h4><i class="fas fa-comments" style="color: #10b981;"></i> Soporte en Tiempo Real</h4>
-            <p>Horario: Lunes a Viernes de 9:00 a 18:00</p>
-            <button class="btn" style="margin-top: 12px;">
-              <i class="fas fa-comment"></i>
-              Iniciar Chat
-            </button>
-          </div>
+    <!-- Formulario UI para añadir/editar tarjeta -->
+    <form id="cardForm" autocomplete="off">
+      <div class="small" style="margin-bottom:8px">Añadir / Editar tarjeta</div>
+      <div class="form-row">
+        <div class="form-control">
+          <label class="small">Titular</label>
+          <input type="text" id="cardName" placeholder="Nombre del titular" required>
         </div>
+        <div class="form-control">
+          <label class="small">Número (solo UI)</label>
+          <input type="text" id="cardNumber" placeholder="•••• •••• •••• 4242" inputmode="numeric" pattern="[0-9 ]*" required>
+        </div>
+      </div>
 
-        <div class="section">
-          <h3>Preguntas Frecuentes</h3>
-          <div class="card">
-            <h4><i class="fas fa-question-circle" style="color: #3b82f6;"></i> ¿Cómo aumentar el CTR de mis campañas?</h4>
-            <p>Revisa nuestra guía de mejores prácticas para optimizar tus banners y textos publicitarios.</p>
-          </div>
-          <div class="card">
-            <h4><i class="fas fa-question-circle" style="color: #3b82f6;"></i> ¿Puedo cambiar el presupuesto de una campaña activa?</h4>
-            <p>Sí, puedes ajustar el presupuesto en cualquier momento desde la sección de gestión de campañas.</p>
-          </div>
+            <div class="form-row">
+        <div style="flex:1">
+          <label class="small">Expiración</label>
+          <input type="month" id="cardExpiry" required>
         </div>
-      </section>
+        <div style="width:110px">
+          <label class="small">CVV (UI)</label>
+          <input type="text" id="cardCvv" placeholder="123" inputmode="numeric" pattern="[0-9]*" maxlength="4" required>
+        </div>
+      </div>
 
-      <!-- Configuración de la Cuenta -->
-      <section id="settings" class="page">
-        <div class="meta">
-          <span class="badge">Configuración</span>
-          <div>•</div>
-          <div>Personaliza tu cuenta y preferencias</div>
-        </div>
-        <h2>Configuración de la Cuenta</h2>
-        <p style="color: var(--muted)">Gestiona tus datos de contacto y preferencias de la cuenta.</p>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <input type="checkbox" id="setPrimary">
+        <label for="setPrimary" class="small">Establecer como tarjeta principal</label>
+      </div>
 
-        <div class="section">
-          <h3>Datos de Contacto</h3>
-          <div class="card">
-            <h4><i class="fas fa-user" style="color: #7c3aed;"></i> Información Personal</h4>
-            <p>Nombre: Usuario Empresa</p>
-            <p>Email: admin@empresa.com</p>
-            <p>Teléfono: +34 123 456 789</p>
-            <button class="btn-outline" style="margin-top: 12px;">
-              <i class="fas fa-edit"></i>
-              Editar Información
-            </button>
-          </div>
-        </div>
+      <div class="actions">
+        <button type="button" id="cancelBtn" class="btn-outline">Cancelar</button>
+        <button type="submit" class="btn">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-        <div class="section">
-          <h3>Preferencias de Notificación</h3>
-          <div class="card">
-            <h4><i class="fas fa-bell" style="color: #f59e0b;"></i> Alertas y Notificaciones</h4>
-            <p>Recibir alertas por email cuando una campaña requiera aprobación.</p>
-            <p>Notificarme semanalmente con el reporte de rendimiento.</p>
-            <p>Alertar cuando el presupuesto de una campaña esté por agotarse.</p>
-            <button class="btn-outline" style="margin-top: 12px;">
-              <i class="fas fa-edit"></i>
-              Configurar Notificaciones
-            </button>
-          </div>
-        </div>
 
-        <div class="section">
-          <h3>Configuración de Privacidad</h3>
-          <div class="card">
-            <h4><i class="fas fa-shield-alt" style="color: #10b981;"></i> Privacidad y Seguridad</h4>
-            <p>Compartir datos anónimos para mejorar el servicio.</p>
-            <p>Permitir el uso de cookies para personalización.</p>
-            <p>Mostrar perfil de empresa en directorio público.</p>
-            <button class="btn-outline" style="margin-top: 12px;">
-              <i class="fas fa-edit"></i>
-              Gestionar Privacidad
-            </button>
-          </div>
-        </div>
-      </section>
 
       <footer style="margin-top: 18px; color: var(--muted); font-size: 13px">
-        © 2025 AdManager — Panel Publicitario · Diseño estilo Notion
+        © 2025 AdManager — Panel Publicitario · Diseño estilo Moderno
       </footer>
     </main>
   </div>
 
-  <script>
-    const links = document.querySelectorAll('.nav-link');
-    const pages = document.querySelectorAll('.page');
-
-    links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        // Quitar active de todos los enlaces y páginas
-        links.forEach(l => l.classList.remove('active'));
-        pages.forEach(p => p.classList.remove('active'));
-
-        // Agregar active al enlace clicado y mostrar su sección
-        link.classList.add('active');
-        const targetId = link.getAttribute('href').substring(1);
-        document.getElementById(targetId).classList.add('active');
-        
-        // Scroll al inicio de la página
-        window.scrollTo(0, 0);
-      });
-    });
-
-    // Gráfico de estadísticas
-    document.addEventListener('DOMContentLoaded', function() {
-      const ctx = document.getElementById('campaignChart').getContext('2d');
-      
-      // Datos para el gráfico
-      const campaignChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Verano Promo', 'Lanzamiento Producto', 'Otoño 2025', 'Navidad 2025', 'Invierno 2026'],
-          datasets: [
-            {
-              label: 'Impresiones (miles)',
-              data: [45.2, 62.1, 0, 38.5, 25.3],
-              backgroundColor: 'rgba(124, 58, 237, 0.7)',
-              borderColor: 'rgba(124, 58, 237, 1)',
-              borderWidth: 1,
-              yAxisID: 'y'
-            },
-            {
-              label: 'CTR (%)',
-              data: [3.8, 2.9, 0, 4.2, 3.1],
-              backgroundColor: 'rgba(16, 185, 129, 0.7)',
-              borderColor: 'rgba(16, 185, 129, 1)',
-              borderWidth: 1,
-              type: 'line',
-              yAxisID: 'y1'
-            },
-            {
-              label: 'Conversiones',
-              data: [87, 53, 0, 42, 28],
-              backgroundColor: 'rgba(245, 158, 11, 0.7)',
-              borderColor: 'rgba(245, 158, 11, 1)',
-              borderWidth: 1,
-              yAxisID: 'y'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              title: {
-                display: true,
-                text: 'Impresiones / Conversiones'
-              }
-            },
-            y1: {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              title: {
-                display: true,
-                text: 'CTR (%)'
-              },
-              grid: {
-                drawOnChartArea: false
-              },
-              min: 0,
-              max: 5
-            }
-          },
-          plugins: {
-            title: {
-              display: true,
-              text: 'Rendimiento de Campañas Publicitarias'
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false
-            }
-          }
-        }
-      });
-
-    
-    
-const chartButtons = document.querySelectorAll('.chart-btn');
-
-chartButtons.forEach(button => {
-  button.addEventListener('click', () => {
-    // Cambiar estado activo
-    chartButtons.forEach(b => b.classList.remove('active'));
-    button.classList.add('active');
-
-    const period = button.dataset.period;
-
-    // Simulación de actualización de datos según periodo
-    let newData;
-    if (period === '7d') {
-      newData = [12.3, 18.4, 0, 15.6, 10.2];
-    } else if (period === '30d') {
-      newData = [45.2, 62.1, 0, 38.5, 25.3];
-    } else {
-      newData = [132.1, 198.4, 0, 120.5, 78.6];
-    }
-
-    campaignChart.data.datasets[0].data = newData;
-    campaignChart.update();
-  });
-});
-  });
-
-  </script>
+  <button class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  <script type="module" src="menuPublicitario.js"></script>
+  <script type="module" src="supabaseClient.js"></script>
+  <script type="module" src="verificarPlan.js"></script>
+  <script type="module" src="overlayCompra.js"></script>
+  <script type="module" src="main.js"></script>
+  <script type="module" src="menuPublicitariobase.js"></script>
 </body>
 </html>
