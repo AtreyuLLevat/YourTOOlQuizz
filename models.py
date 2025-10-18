@@ -52,11 +52,53 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     supabase_id = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
     otp_secret = db.Column(db.String(32), nullable=False)  # 🔐 Clave 2FA obligatoria
+    stripe_customer_id = db.Column(db.String(100), unique=True)
+    current_plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"))
+    plan_expiration = db.Column(db.DateTime)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
+    current_plan = db.relationship("Plan", foreign_keys=[current_plan_id])
+    user_plans = db.relationship("UserPlan", backref="user", lazy=True)
 
     def __repr__(self):
         return f"<User {self.email}>"
+
+
+class Plan(db.Model):
+    __tablename__ = "plans"
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    nombre = db.Column(db.String(100), nullable=False)
+    stripe_price_id = db.Column(db.String(100), nullable=False)
+    duracion_dias = db.Column(db.Integer, nullable=False)
+    precio = db.Column(db.Numeric(10, 2), nullable=False)
+    descripcion = db.Column(db.Text)
+    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+
+class UserPlan(db.Model):
+    __tablename__ = "user_plans"
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"), nullable=False)
+    stripe_subscription_id = db.Column(db.String(100))
+    fecha_inicio = db.Column(db.DateTime, default=datetime.utcnow)
+    fecha_fin = db.Column(db.DateTime)
+    dinero_gastado = db.Column(db.Numeric(10, 2))
+    estado = db.Column(db.String(20), default="activo")
+
+class QuizAnalytics(db.Model):
+    __tablename__ = "quiz_analytics"
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"))
+    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"))
+    clicks = db.Column(db.Integer, default=0)
+    impresiones = db.Column(db.Integer, default=0)
+    ctr = db.Column(db.Numeric(5, 2))
+    imagenes_usadas = db.Column(db.JSON)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 # -------------------------
 # MODELO DE QUIZZES

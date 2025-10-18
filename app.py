@@ -3,21 +3,23 @@ import json
 import io
 import pyotp
 import qrcode
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app, send_file, abort
+import stripe
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import db, User, Quiz, Question, Blog, Page
+from models import db, User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
 from sqlalchemy import or_
 import base64
 from tu_modulo_de_formularios import Quizzproductividad
-from supabase import create_client
+from supabase import create_client, Client
 from forms import ChangePasswordForm
 from supabase.lib.client_options import ClientOptions
+from datetime import datetime, timedelta
 
 
 
@@ -102,7 +104,141 @@ def create_app():
             abort(404)  # si no existe, muestra error 404
 
         return render_template('page.html', page=page)
+    
+    @app.route("/api/crear-sesion", methods=["POST"])
+    def crear_sesion():
+        data = request.json
+        user_id = data.get("userId")
+        plan_id = data.get("planId")
+        
+        if not user_id or not plan_id:
+            return jsonify({"error": "Faltan userId o planId"}), 400
 
+        # Obtener stripe_price_id del plan
+        plan_resp = supabase.table("plans").select("stripe_price_id, duration_days").eq("id", plan_id).single().execute()
+        if plan_resp.error:
+            return jsonify({"error": str(plan_resp.error)}), 400
+        plan = plan_resp.data
+        price_id = plan["stripe_price_id"]
+
+        try:
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                mode="subscription",  # o 'payment' si es one-time
+                line_items=[{"price": price_id, "quantity": 1}],
+                success_url=SUCCESS_URL,
+                cancel_url=CANCEL_URL,
+                client_reference_id=user_id
+            )
+            return jsonify({"url": session.url})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+    # === Webhook de Stripe ===
+    @app.route("/webhook-stripe", methods=["POST"])
+    def webhook_stripe():
+        payload = request.data
+        sig_header = request.headers.get("stripe-signature")
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, STRIPE_WEBHOOK_SECRET
+            )
+        except stripe.error.SignatureVerificationError:
+            abort(400)
+
+        # Eventos a manejar
+        if event["type"] == "checkout.session.completed":
+            session = event["data"]["object"]
+            user_id = session.get("client_reference_id")
+            customer_id = session.get("customer")
+            subscription_id = session.get("subscription")
+
+            # Actualizar stripe_customer_id del usuario
+            supabase.table("users").update({"stripe_customer_id": customer_id}).eq("id", user_id).execute()
+
+            # Obtener plan por price_id
+            price_id = session["display_items"][0]["price"]["id"] if "display_items" in session else None
+            plan_resp = supabase.table("plans").select("id, duration_days").eq("stripe_price_id", price_id).single().execute()
+            if plan_resp.data:
+                plan = plan_resp.data
+                fecha_inicio = datetime.utcnow()
+                fecha_fin = fecha_inicio + timedelta(days=plan["duration_days"])
+                
+                supabase.table("user_plans").insert({
+                    "user_id": user_id,
+                    "plan_id": plan["id"],
+                    "stripe_subscription_id": subscription_id,
+                    "fecha_inicio": fecha_inicio.isoformat(),
+                    "fecha_fin": fecha_fin.isoformat(),
+                    "estado": "activo",
+                    "dinero_gastado": session["amount_total"] / 100
+                }).execute()
+
+        return jsonify({"status": "ok"})
+
+    @app.route("/api/cancelar-suscripcion", methods=["POST"])
+    def cancelar_suscripcion():
+        data = request.json
+        user_id = data.get("userId")
+        
+        # Obtener la suscripción activa
+        resp = supabase.table("user_plans").select("stripe_subscription_id").eq("user_id", user_id).eq("estado", "activo").single().execute()
+        if not resp.data:
+            return jsonify({"error": "No hay suscripción activa"}), 400
+        
+        subscription_id = resp.data["stripe_subscription_id"]
+        stripe.Subscription.delete(subscription_id)  # Cancela en Stripe
+
+        # Actualizar estado en Supabase
+        supabase.table("user_plans").update({"estado": "cancelado"}).eq("stripe_subscription_id", subscription_id).execute()
+        return jsonify({"status": "cancelada"})
+        
+    @app.route("/api/verificar-plan", methods=["POST"])
+    def verificar_plan():
+        user_id = request.json.get("userId")
+        plan_resp = supabase.table("user_plans").select("fecha_fin, estado").eq("user_id", user_id).eq("estado", "activo").order("fecha_fin", desc=True).limit(1).execute()
+        if not plan_resp.data:
+            return jsonify({"activo": False})
+        
+        plan = plan_resp.data
+        from datetime import datetime
+        if datetime.fromisoformat(plan["fecha_fin"]) > datetime.utcnow():
+            return jsonify({"activo": True})
+        return jsonify({"activo": False})
+    api = Blueprint('api', __name__)
+
+    @api.route('/api/quizzes-estadisticas/<user_id>')
+    def quizzes_estadisticas(user_id):
+        try:
+            # Buscar quizzes asociados al usuario
+            data = db.session.query(
+                Quiz.id,
+                Quiz.title,
+                db.func.sum(QuizAnalytics.clicks).label("clicks"),
+                db.func.sum(QuizAnalytics.impresiones).label("impresiones"),
+                db.func.sum(QuizAnalytics.dinero_gastado).label("dinero"),
+            ).join(QuizAnalytics, Quiz.id == QuizAnalytics.quiz_id) \
+            .filter(QuizAnalytics.user_id == user_id) \
+            .group_by(Quiz.id, Quiz.title) \
+            .all()
+
+            quizzes = []
+            for q in data:
+                ctr = round((q.clicks / q.impresiones) * 100, 2) if q.impresiones else 0
+                quizzes.append({
+                    "id": q.id,
+                    "nombre": q.title,
+                    "clicks": q.clicks or 0,
+                    "impresiones": q.impresiones or 0,
+                    "ctr": ctr,
+                    "dinero": q.dinero or 0
+                })
+
+            return jsonify(quizzes)
+        except Exception as e:
+            print("Error:", e)
+            return jsonify({"error": "No se pudieron obtener las estadísticas"}), 500
 # -----------------------------
 
     # RUTAS
@@ -355,6 +491,12 @@ def create_app():
 
         return render_template("dashboard.html", usuario=usuario)
         
+
+
+    @app.route("/Menúpublicitario")
+    def menupublicitario():
+        # Este endpoint sirve la página HTML / plantilla
+        return render_template("Menúpublicitario.html")
 
 
 
