@@ -26,6 +26,9 @@ def unique_slug(model, base_slug):
         i += 1
     return slug
 
+# -------------------------
+# MODELO DE PÁGINAS (CMS)
+# -------------------------
 class Page(db.Model):
     __tablename__ = "pages"
 
@@ -51,13 +54,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     supabase_id = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
-    otp_secret = db.Column(db.String(32), nullable=False)  # 🔐 Clave 2FA obligatoria
+    otp_secret = db.Column(db.String(32), nullable=False)
     stripe_customer_id = db.Column(db.String(100), unique=True)
     current_plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"))
     plan_expiration = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
     current_plan = db.relationship("Plan", foreign_keys=[current_plan_id])
@@ -66,9 +70,12 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f"<User {self.email}>"
 
-
+# -------------------------
+# MODELOS DE PLANES Y SUSCRIPCIONES
+# -------------------------
 class Plan(db.Model):
     __tablename__ = "plans"
+
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     nombre = db.Column(db.String(100), nullable=False)
     stripe_price_id = db.Column(db.String(100), nullable=False)
@@ -77,8 +84,14 @@ class Plan(db.Model):
     descripcion = db.Column(db.Text)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user_plans = db.relationship("UserPlan", backref="plan", lazy=True)
+
+    def __repr__(self):
+        return f"<Plan {self.nombre}>"
+
 class UserPlan(db.Model):
     __tablename__ = "user_plans"
+
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"), nullable=False)
@@ -88,8 +101,15 @@ class UserPlan(db.Model):
     dinero_gastado = db.Column(db.Numeric(10, 2))
     estado = db.Column(db.String(20), default="activo")
 
+    def __repr__(self):
+        return f"<UserPlan User={self.user_id} Plan={self.plan_id}>"
+
+# -------------------------
+# MODELO DE ANALÍTICA DE QUIZZES
+# -------------------------
 class QuizAnalytics(db.Model):
     __tablename__ = "quiz_analytics"
+
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"))
@@ -99,6 +119,9 @@ class QuizAnalytics(db.Model):
     ctr = db.Column(db.Numeric(5, 2))
     imagenes_usadas = db.Column(db.JSON)
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<QuizAnalytics Quiz={self.quiz_id} User={self.user_id}>"
 
 # -------------------------
 # MODELO DE QUIZZES
@@ -111,11 +134,13 @@ class Quiz(db.Model):
     contenido = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     keywords = db.Column(db.String(300), nullable=True)
-    slug = db.Column(db.String(200), unique=True, index=True, nullable=True)  # Nuevo campo slug
+    slug = db.Column(db.String(200), unique=True, index=True, nullable=True)
     image_url = db.Column(db.String(300), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
     questions = db.relationship("Question", backref="quiz", lazy=True)
     results = db.relationship("Result", backref="quiz", lazy=True)
+    analytics = db.relationship("QuizAnalytics", backref="quiz", lazy=True)
 
     def __repr__(self):
         return f"<Quiz {self.titulo}>"
@@ -129,7 +154,6 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(500), nullable=False)
     answer = db.Column(db.String(200), nullable=False)
-
     quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
 
     def __repr__(self):
@@ -144,7 +168,6 @@ class Result(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer, nullable=False)
     completed_at = db.Column(db.DateTime, default=datetime.utcnow)
-
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
 
@@ -155,24 +178,24 @@ class Result(db.Model):
 # MODELO DE BLOGS
 # -------------------------
 class Blog(db.Model):
-    __tablename__ = 'blogst'
-    
+    __tablename__ = "blogst"
+
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(200), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
-    keywords = db.Column(db.String(300), nullable=True)  # Coma-separadas
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    keywords = db.Column(db.String(300), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    slug = db.Column(db.String(200), unique=True, index=True, nullable=True)  # Nuevo campo slug
+    slug = db.Column(db.String(200), unique=True, index=True, nullable=True)
     image_url = db.Column(db.String(300), nullable=True)
-    
-    autor = db.relationship('User', backref=db.backref('blogst', lazy=True))
-    
+
+    autor = db.relationship("User", backref=db.backref("blogst", lazy=True))
+
     def __repr__(self):
         return f"<Blog {self.titulo}>"
 
 # -------------------------
-# EVENTOS PARA CREAR SLUGS AUTOMÁTICOS
+# EVENTOS PARA SLUGS AUTOMÁTICOS
 # -------------------------
 @event.listens_for(Quiz, "before_insert")
 def quiz_before_insert(mapper, connection, target):

@@ -20,6 +20,7 @@ from supabase import create_client, Client
 from forms import ChangePasswordForm
 from supabase.lib.client_options import ClientOptions
 from datetime import datetime, timedelta
+from account_routes import account_bp
 
 
 
@@ -46,6 +47,11 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
+    SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL")
+    CANCEL_URL = os.getenv("STRIPE_CANCEL_URL")
+    STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
 
 
     db.init_app(app)
@@ -66,6 +72,10 @@ def create_app():
     # -----------------------------
     with app.app_context():
         db.create_all()  # Crea tablas si no existen
+
+    app.register_blueprint(account_bp)
+
+
 
     @app.after_request
     def add_csp(response):
@@ -478,18 +488,6 @@ def create_app():
 
         return render_template("login.html", form=form)
 
-
-    @app.route("/dashboard")
-    @login_required
-    def dashboard():
-        SUPABASE_URL = os.getenv("SUPABASE_URL")
-        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-
-        response = supabase.table("users").select("*").eq("email", current_user.email).single().execute()
-        usuario = response.data if response.data else {}
-
-        return render_template("dashboard.html", usuario=usuario)
         
 
 
@@ -500,42 +498,25 @@ def create_app():
 
 
 
-    @app.route("/change_password", methods=["GET", "POST"])
+    @app.route("/change_password", methods=["POST"])
     @login_required
     def change_password():
-        form = ChangePasswordForm()
-        if form.validate_on_submit():
-            new_password = form.new_password.data
-            confirm_password = form.confirm_password.data
+        data = request.get_json()
+        new_password = data.get("new_password")
 
-            if new_password != confirm_password:
-                flash("Las contraseñas no coinciden", "error")
-                return redirect(url_for("change_password"))
+        if not new_password:
+            return jsonify({"status":"error","error":"Contraseña vacía"})
 
-            supabase_id = getattr(current_user, "supabase_id", None)
-            if not supabase_id:
-                flash("No se encontró el identificador de Supabase para tu cuenta. Contacta soporte.", "error")
-                return redirect(url_for("change_password"))
+        try:
+            supabase_admin.auth.admin.update_user_by_id(
+                str(current_user.supabase_id),
+                {"password": new_password}
+            )
+            return jsonify({"status":"success"})
+        except Exception as e:
+            return jsonify({"status":"error","error": str(e)})
 
-            str_id = str(supabase_id)
-            current_app.logger.info("Intentando cambiar contraseña del usuario Supabase: %s", str_id)
 
-            try:
-                # Actualizar contraseña usando la API correcta
-                upd = supabase_admin.auth.admin.update_user_by_id(
-                    str_id,
-                    {"password": new_password}
-                )
-                current_app.logger.info("Respuesta update_user_by_id: %s", repr(upd))
-            except Exception as e:
-                current_app.logger.exception("Error actualizando contraseña en Supabase")
-                flash(f"No se pudo actualizar la contraseña: {e}", "error")
-                return redirect(url_for("change_password"))
-
-            flash("Contraseña actualizada con éxito 🎉", "success")
-            return redirect(url_for("dashboard"))
-
-        return render_template("change_password.html", form=form)
 
 
 
