@@ -497,9 +497,16 @@ def create_app():
         return render_template("Menúpublicitario.html")
 
     @app.route("/account")
+    @login_required
     def dashboard():
-        # Este endpoint sirve la página HTML / plantilla
-        return render_template("account.html")
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+        response = supabase.table("users").select("*").eq("email", current_user.email).single().execute()
+        usuario = response.data if response.data else {}
+        return render_template("account.html", usuario=usuario)
+
 
 
     @app.route("/change_password", methods=["POST"])
