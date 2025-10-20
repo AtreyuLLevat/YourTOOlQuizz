@@ -496,6 +496,10 @@ def create_app():
         # Este endpoint sirve la página HTML / plantilla
         return render_template("Menúpublicitario.html")
 
+    @app.route("/account")
+    def dashboard():
+        # Este endpoint sirve la página HTML / plantilla
+        return render_template("account.html")
 
 
     @app.route("/change_password", methods=["POST"])
