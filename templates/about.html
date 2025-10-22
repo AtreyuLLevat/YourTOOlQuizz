@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Sobre nosotros - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+  body {
+    background: #ffffff;
+    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+    color: #222;
+  }
+
+  main {
+    max-width: 860px;
+    margin: 100px auto;
+    padding: 0 32px;
+    text-align: left;
+    line-height: 1.9;
+  }
+
+  h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #111;
+    text-align: left;
+    margin-bottom: 60px;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 30px;
+    letter-spacing: 0.02em;
+    line-height: 1.9;
+  }
+
+  p + p {
+    margin-top: 10px;
+  }
+
+  strong {
+    color: #0f172a;
+    font-weight: 600;
+  }
+
+  em {
+    color: #2563eb;
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .intro {
+    font-size: 1.25rem;
+    color: #111;
+    margin-bottom: 45px;
+    line-height: 1.85;
+  }
+
+  .signature {
+    margin-top: 60px;
+    font-weight: 600;
+    color: #1e40af;
+    text-align: left;
+    font-size: 1.1rem;
+  }
+
+  .promoter-link {
+    display: inline-block;
+    margin: 70px auto 0;
+    padding: 15px 36px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background 0.25s ease, transform 0.25s ease;
+    font-size: 1.1rem;
+    letter-spacing: 0.4px;
+  }
+
+  .promoter-link:hover {
+    background: #1e3a8a;
+    transform: scale(1.03);
+  }
+  /* Cita final elegante tipo editorial */
+.about-quote {
+  border-left: 4px solid #ccc;
+  padding-left: 28px;
+  margin: 60px 0 50px;
+  font-style: normal;
+  color: #222;
+}
+
+.about-quote p {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.about-quote strong {
+  font-weight: 600;
+  color: #000;
+}
+
+.about-quote em {
+  color: #555;
+  font-style: italic;
+  font-weight: 400;
+  display: block;
+  margin-top: 8px;
+}
+
+
+  @media (max-width: 768px) {
+    main {
+      margin: 60px 20px;
+      padding: 0;
+    }
+
+    p {
+      font-size: 1.05rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+  <h1>Bienvenido/a.</h1>
+
+  <p class="intro"><br>
+    Gracias por visitar <strong>YourToolQuizz</strong> y por tomarte un momento para conocer más sobre nosotros.
+    Queremos aprovechar este espacio para contarte quiénes somos, cuál es nuestra misión y por qué existimos.
+  </p>
+
+  <p>
+    Cada día nacen nuevas aplicaciones más innovadoras y efectivas. En <strong>YourToolQuizz</strong> queremos dar visibilidad a estos proyectos emergentes para convertirlos en grandes éxitos, ayudándolos a llegar a la audiencia adecuada. Y nosotros te las traemos a ti, para que optimices tu día a día y descubras nuevas posibilidades.
+  </p>
+
+  <p>
+    Aunque existan herramientas increíbles, encontrarlas y conocerlas en profundidad requiere tiempo y guía. Nosotros nos encargamos de hacerlo fácil. Es un ciclo digital pensado para conectar necesidades reales: descubrir, comparar y promover herramientas digitales de forma sencilla, precisa y efectiva.
+  </p>
+
+  <p>
+    Nuestra plataforma ofrece un espacio donde creadores y desarrolladores pueden mostrar su trabajo a una audiencia interesada, generando impacto real. Al mismo tiempo, damos a los usuarios la oportunidad de acceder a aplicaciones innovadoras antes que nadie, probarlas y sacarles el máximo provecho. Es un ciclo donde todos ganan.
+  </p>
+
+  <p>
+    Nuestra misión es clara: <strong>facilitar la conexión entre quienes necesitan soluciones y quienes las crean.</strong>
+    Queremos transformar la búsqueda y la promoción de herramientas digitales en un proceso simple, eficiente y lleno de valor.
+  </p>
+
+  <p>
+    Cada función, diseño y contenido en <strong>YourToolQuizz</strong> están pensados para generar confianza, optimizar resultados y potenciar el crecimiento. Nuestro compromiso es con la excelencia, la transparencia y el éxito de nuestra comunidad.
+  </p>
+
+  <blockquote class="about-quote">
+    <p><strong>Tu progreso y tu visibilidad son nuestra prioridad.</strong></p>
+    <p><em>Because finding the right tool should be simple, and sharing it should be powerful.</em></p>
+  </blockquote>
+
+  <div class="signature">— El equipo de YourToolQuizz</div>
+
+  <div style="text-align: center;">
+    <a href="{{ url_for('servicio') }}" class="promoter-link">¡PROMOCIÓNATE AHORA!</a>
+  </div>
+
+</main>
+{% endblock %}
