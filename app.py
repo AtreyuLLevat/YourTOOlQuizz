@@ -34,6 +34,7 @@ print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 # -----------------------------
 def create_app():
     app = Flask(__name__)
+    app.register_blueprint(account_bp)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"poolclass": NullPool}
@@ -64,8 +65,6 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    with app.app_context():
-        db.create_all()
 
     # -----------------------------
     # CONTEXTO DE LA APP
@@ -73,7 +72,7 @@ def create_app():
     with app.app_context():
         db.create_all()  # Crea tablas si no existen
 
-    app.register_blueprint(account_bp)
+    
 
 
 
