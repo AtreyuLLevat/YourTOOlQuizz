@@ -3,7 +3,263 @@
 
 {% block extra_css %}
 <style>
-  /* --- Tu CSS tal cual --- */
+:root {
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --text: #1e293b;
+  --muted: #64748b;
+  --danger: #dc2626;
+  --radius: 10px;
+  --shadow: 0 2px 6px rgba(0,0,0,0.04);
+  --sidebar-width: 200px;
+  --transition: all 0.2s ease;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* ---- Layout general ---- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ---- Sidebar ---- */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--card-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  box-shadow: var(--shadow);
+}
+
+.sidebar .logo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.sidebar .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar .nav a {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 500;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.sidebar .nav a:hover {
+  background: #f1f5f9;
+  color: var(--primary);
+}
+
+.sidebar .hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* ---- Main ---- */
+.main {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 40px 60px;
+  box-sizing: border-box;
+}
+
+.content-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ---- Títulos ---- */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* ---- Secciones ---- */
+.section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 32px;
+  box-shadow: var(--shadow);
+}
+
+.section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.section p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* ---- Campos ---- */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+/* ---- Botones ---- */
+.btn {
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn.hidden {
+  display: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* ---- Logout ---- */
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  margin-top: 30px;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* ---- Checkbox ---- */
+input[type="checkbox"] {
+  transform: scale(1.1);
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+/* ---- Enlaces ---- */
+.link-hover {
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.link-hover:hover {
+  text-decoration: underline;
+}
+
+/* ---- Scroll ---- */
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+.main::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.main::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    padding: 24px;
+  }
+
+  .content-inner {
+    max-width: 100%;
+    gap: 32px;
+  }
+}
+
+
 </style>
 {% endblock %}
 
