@@ -451,8 +451,17 @@
   </style>
   
   {% block extra_css %}{% endblock %}
+<!-- Favicon general -->
+<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='Imagenes/logo.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='Imagenes/logo.png') }}">
+
+<!-- Apple Touch Icon (iPhone, iPad) -->
+<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='Imagenes/logo.png') }}">
+
 
 </head>
+
+
 <body>
   <!-- HEADER REORGANIZADO -->
   <header>

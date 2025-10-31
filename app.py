@@ -248,6 +248,18 @@ def create_app():
         except Exception as e:
             print("Error:", e)
             return jsonify({"error": "No se pudieron obtener las estadísticas"}), 500
+
+
+
+
+    @app.route('/logo.png')
+    def logo():
+        return send_from_directory(
+            os.path.join(app.root_path, 'static/Imagenes'),
+            'logo.png', mimetype='image/png'
+        )
+
+
 # -----------------------------
 
     # RUTAS
