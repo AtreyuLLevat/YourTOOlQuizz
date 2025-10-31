@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Centro de Cuenta | YourToolQuizz{% endblock %}
 
+
 {% block extra_css %}
 <style>
 :root {
@@ -19,73 +20,20 @@
   font-family: "Inter", "Segoe UI", sans-serif;
 }
 
-/* ---- Layout general ---- */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: var(--bg);
-  color: var(--text);
-}
-
-body {
+/* === ESTRUCTURA GENERAL DEL ÁREA PRINCIPAL === */
+.dashboard-container {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 120px); /* resta header + footer aproximados */
+  background: var(--bg);
   overflow: hidden;
 }
 
-/* ---- Sidebar ---- */
-.sidebar {
-  width: var(--sidebar-width);
-  background: var(--card-bg);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 16px;
-  box-shadow: var(--shadow);
-}
+/* === SIDEBAR === */
 
-.sidebar .logo {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 30px;
-  text-align: center;
-}
 
-.sidebar .nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sidebar .nav a {
-  text-decoration: none;
-  color: var(--text);
-  font-weight: 500;
-  padding: 8px 10px;
-  border-radius: 6px;
-  transition: var(--transition);
-}
-
-.sidebar .nav a:hover {
-  background: #f1f5f9;
-  color: var(--primary);
-}
-
-.sidebar .hint {
-  color: var(--muted);
-  font-size: 0.85rem;
-  line-height: 1.4;
-  text-align: center;
-  margin-top: 20px;
-}
-
-/* ---- Main ---- */
+/* === CONTENIDO PRINCIPAL === */
 .main {
   flex: 1;
-  height: 100vh;
   overflow-y: auto;
   background: var(--bg);
   padding: 40px 60px;
@@ -100,7 +48,7 @@ body {
   gap: 40px;
 }
 
-/* ---- Títulos ---- */
+/* === TITULOS Y TEXTOS === */
 h1 {
   font-size: 2rem;
   font-weight: 700;
@@ -113,7 +61,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* ---- Secciones ---- */
+/* === SECCIONES === */
 .section {
   background: var(--card-bg);
   border: 1px solid var(--border);
@@ -134,7 +82,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* ---- Campos ---- */
+/* === CAMPOS === */
 .field {
   display: flex;
   flex-direction: column;
@@ -164,7 +112,7 @@ input:focus {
   box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
 }
 
-/* ---- Botones ---- */
+/* === BOTONES === */
 .btn {
   padding: 10px 16px;
   font-size: 0.95rem;
@@ -184,17 +132,13 @@ input:focus {
   background: var(--primary-hover);
 }
 
-.btn.hidden {
-  display: none;
-}
-
 .actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 10px;
 }
 
-/* ---- Logout ---- */
+/* === BOTÓN DE SALIDA === */
 .logout-btn {
   background: transparent;
   border: 1px solid var(--border);
@@ -213,14 +157,14 @@ input:focus {
   border-color: #fca5a5;
 }
 
-/* ---- Checkbox ---- */
+/* === CHECKBOX === */
 input[type="checkbox"] {
   transform: scale(1.1);
   margin-right: 6px;
   cursor: pointer;
 }
 
-/* ---- Enlaces ---- */
+/* === ENLACES === */
 .link-hover {
   color: var(--primary);
   text-decoration: none;
@@ -231,7 +175,7 @@ input[type="checkbox"] {
   text-decoration: underline;
 }
 
-/* ---- Scroll ---- */
+/* === SCROLL === */
 .main::-webkit-scrollbar {
   width: 8px;
 }
@@ -243,16 +187,14 @@ input[type="checkbox"] {
   background: #94a3b8;
 }
 
-/* ---- Responsive ---- */
+/* === RESPONSIVE === */
 @media (max-width: 900px) {
   .sidebar {
     display: none;
   }
-
   .main {
     padding: 24px;
   }
-
   .content-inner {
     max-width: 100%;
     gap: 32px;
@@ -260,17 +202,12 @@ input[type="checkbox"] {
 }
 
 
+
 </style>
 {% endblock %}
 
 {% block content %}
-<aside class="sidebar">
-  <div class="logo">Side bar</div>
-  <nav class="nav">
-    <a href="{{ url_for('menupublicitario') }}">Menú publicitario</a>
-  </nav>
-  <div class="hint">Centro de cuenta y privacidad.</div>
-</aside>
+
 
 <main class="main">
   <div class="content-inner">
