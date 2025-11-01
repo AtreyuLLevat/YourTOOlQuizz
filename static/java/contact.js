@@ -1,47 +1,40 @@
+document.addEventListener("readystatechange", () => {
+  if (document.readyState !== "complete") return;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const sections = document.querySelectorAll("section");
-  const navLinks = document.querySelectorAll(".menu a");
+  const sections = Array.from(document.querySelectorAll("main section"));
+  const navLinks = Array.from(document.querySelectorAll(".menu a"));
 
-  // --- Mostrar solo la primera sección al cargar ---
-  sections.forEach((section, index) => {
-    section.style.display = index === 0 ? "block" : "none";
-  });
-  navLinks[0].classList.add("active");
+  if (!sections.length || !navLinks.length) {
+    console.warn("No se encontraron secciones o enlaces del menú.");
+    return;
+  }
 
-  // --- Al hacer clic en un enlace ---
+  // --- Función para mostrar una sección ---
+  const showSection = (id) => {
+    sections.forEach(section => {
+      section.style.display = section.id === id ? "block" : "none";
+    });
+
+    navLinks.forEach(link => {
+      link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+    });
+
+    // Actualiza el hash en la URL
+    history.replaceState(null, null, "#" + id);
+  };
+
+  // --- Mostrar la primera o la del hash ---
+  const currentHash = window.location.hash.substring(1);
+  const initialId = currentHash && document.getElementById(currentHash) ? currentHash : sections[0].id;
+  showSection(initialId);
+
+  // --- Click en enlaces ---
   navLinks.forEach(link => {
-    link.addEventListener("click", e => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-
       const targetId = link.getAttribute("href").substring(1);
-      const targetSection = document.getElementById(targetId);
-
-      // Quitar "active" de todos los links
-      navLinks.forEach(l => l.classList.remove("active"));
-      link.classList.add("active");
-
-      // Ocultar todas las secciones excepto la seleccionada
-      sections.forEach(section => {
-        section.style.display = section === targetSection ? "block" : "none";
-      });
-
-      // Scroll al inicio del contenido
-      window.scrollTo({
-        top: document.querySelector("main").offsetTop - 20,
-        behavior: "smooth"
-      });
+      if (document.getElementById(targetId)) showSection(targetId);
+      window.scrollTo({ top: document.querySelector("main").offsetTop - 20, behavior: "smooth" });
     });
   });
-
-  // --- (Opcional) Detectar hash al cargar la página ---
-  const hash = window.location.hash;
-  if (hash) {
-    const target = document.querySelector(hash);
-    if (target) {
-      navLinks.forEach(l => l.classList.remove("active"));
-      document.querySelector(`.menu a[href="${hash}"]`).classList.add("active");
-      sections.forEach(s => (s.style.display = s === target ? "block" : "none"));
-    }
-  }
 });
