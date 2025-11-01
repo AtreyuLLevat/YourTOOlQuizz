@@ -448,6 +448,23 @@
     main {
       min-height: calc(100vh - 200px); /* Ajusta según la altura de tu header y footer */
     }
+    .header-search-form {
+      display: flex;
+      align-items: center;
+      width: 100%; /* ocupa todo el ancho disponible */
+    }
+
+    .header-searchbar .material-icons {
+      flex-shrink: 0; /* evita que el ícono se reduzca */
+      margin-right: 8px; /* separación pequeña */
+    }
+
+    .header-search-input {
+      flex: 1; /* el input ocupa todo el espacio restante */
+      width: 100%;
+      padding-right: 12px;
+    }
+
   </style>
   
   {% block extra_css %}{% endblock %}
