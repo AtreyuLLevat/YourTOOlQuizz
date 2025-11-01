@@ -554,7 +554,7 @@ def create_app():
             flash("Tu correo ha sido verificado correctamente. Ya puedes iniciar sesión.", "success")
 
         return redirect(url_for("login"))
-        
+
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if current_user.is_authenticated:
@@ -568,11 +568,6 @@ def create_app():
                 flash("Usuario o contraseña incorrectos", "error")
                 return redirect(url_for("login"))
 
-            # Verificación de OTP solo una vez
-            totp = pyotp.TOTP(user.otp_secret)
-            if not totp.verify(form.otp_code.data):
-                flash("Código 2FA inválido", "error")
-                return redirect(url_for("login"))
 
             login_user(user, remember=form.remember_me.data)
             flash("Sesión iniciada", "success")
