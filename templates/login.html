@@ -26,13 +26,29 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
+  width: 100%;
+}
+
+.form-group {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+label {
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  margin-left: 2px;
 }
 
 input[type="email"],
 input[type="password"] {
   width: 100%;
-  max-width: 360px;
   padding: 14px 16px;
   border-radius: 10px;
   border: 1.5px solid #cbd5e1;
@@ -64,14 +80,6 @@ button[type="submit"]:hover {
   transform: translateY(-2px);
 }
 
-label {
-  align-self: flex-start;
-  margin-left: 50px;
-  font-weight: 600;
-  color: #111827;
-  font-size: 0.95rem;
-}
-
 .remember-me {
   display: flex;
   align-items: center;
@@ -83,12 +91,14 @@ label {
 
 /* Flash messages */
 .flash-message {
-  margin-top: 18px;
+  margin-top: 8px;
   font-size: 0.95rem;
   border-left: 4px solid;
   padding: 10px 14px;
   border-radius: 6px;
   text-align: left;
+  width: 100%;
+  max-width: 360px;
 }
 
 .flash-message.success { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
@@ -119,17 +129,21 @@ p a:hover {
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
 
-    <label>{{ form.email.label }}</label>
-    {{ form.email(class="form-input", placeholder="Introduce tu correo") }}
-    {% for error in form.email.errors %}
-      <div class="flash-message error">{{ error }}</div>
-    {% endfor %}
+    <div class="form-group">
+      <label>{{ form.email.label }}</label>
+      {{ form.email(class="form-input", placeholder="Introduce tu correo") }}
+      {% for error in form.email.errors %}
+        <div class="flash-message error">{{ error }}</div>
+      {% endfor %}
+    </div>
 
-    <label>{{ form.password.label }}</label>
-    {{ form.password(class="form-input", placeholder="Introduce tu contraseña") }}
-    {% for error in form.password.errors %}
-      <div class="flash-message error">{{ error }}</div>
-    {% endfor %}
+    <div class="form-group">
+      <label>{{ form.password.label }}</label>
+      {{ form.password(class="form-input", placeholder="Introduce tu contraseña") }}
+      {% for error in form.password.errors %}
+        <div class="flash-message error">{{ error }}</div>
+      {% endfor %}
+    </div>
 
     <div class="remember-me">
       {{ form.remember_me() }} <span>Recordarme</span>
