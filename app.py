@@ -570,7 +570,6 @@ def create_app():
 
 
             login_user(user, remember=form.remember_me.data)
-            flash("Sesión iniciada", "success")
             return redirect(url_for("dashboard"))
 
         return render_template("login.html", form=form)
@@ -624,7 +623,6 @@ def create_app():
     @login_required
     def logout():
         logout_user()
-        flash("Sesión cerrada correctamente", "info")
         return redirect(url_for("login"))
     
     @app.route("/quiz/<slug>")
