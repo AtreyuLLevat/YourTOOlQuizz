@@ -1,284 +1,178 @@
 {% extends "base.html" %}
-{% block title %}Centro Legal | YourToolQuizz{% endblock %}
-
+{% block title %}Ayuda | YourToolQuizz{% endblock %}
 {% block extra_css %}
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
-
-  body {
-    background: #fff;
-    font-family: 'Inter', sans-serif;
-    color: #242424;
-    margin: 0;
-    line-height: 1.8;
-  }
-
-  .layout {
-    display: flex;
-    min-height: 100vh;
-  }
-
-  /* --- SIDEBAR --- */
-  .sidebar {
-    width: 260px;
-    background: #f8fafc;
-    border-right: 1px solid #e5e7eb;
-    padding: 32px;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-  }
-
-  .sidebar h2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #111827;
-    letter-spacing: -0.5px;
-    margin-bottom: 32px;
-  }
-
-  .sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .sidebar li {
-    margin-bottom: 14px;
-  }
-
-  .sidebar a {
-    color: #1e293b;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.97rem;
-    transition: color 0.3s, transform 0.2s;
-    cursor: pointer;
-  }
-
-  .sidebar a:hover {
-    color: #2563eb;
-    transform: translateX(4px);
-  }
-
-  .sidebar a.active {
-    font-weight: 600;
-    color: #2563eb;
-  }
-
-  /* --- CUERPO PRINCIPAL --- */
-  main {
-    flex: 1;
-    max-width: 100%;
-    width: 100%;
-    margin: 0 auto;
-    padding: 60px 40px;
-  }
-
-  main h1 {
-    font-size: 2.6rem;
-    font-weight: 700;
-    color: #000;
-    margin-bottom: 36px;
-    line-height: 1.3;
-  }
-
-  main h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin-top: 60px;
-    margin-bottom: 20px;
-    color: #000;
-  }
-
-  main h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-top: 36px;
-    margin-bottom: 16px;
-    color: #000;
-  }
-
-  main p {
-    font-size: 1.2rem;
-    margin-bottom: 24px;
-    color: #242424;
-  }
-
-  main ul {
-    padding-left: 24px;
-    margin-bottom: 24px;
-  }
-
-  main li {
-    font-size: 1.2rem;
-    margin-bottom: 14px;
-    color: #242424;
-  }
-
-  main a {
-    color: #000;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    transition: opacity 0.3s;
-  }
-
-  main a:hover {
-    opacity: 0.7;
-  }
-
-  blockquote {
-    border-left: 3px solid #000;
-    padding-left: 20px;
-    margin: 40px 0;
-    font-style: italic;
-    color: #555;
-    font-size: 1.2rem;
-  }
-
-  @media (max-width: 900px) {
-    .layout {
-      flex-direction: column;
-    }
-
-    .sidebar {
-      width: 100%;
-      height: auto;
-      border-right: none;
-      border-bottom: 1px solid #e5e7eb;
-    }
-
-    main {
-      padding: 32px 20px;
-    }
-
-    main h1 {
-      font-size: 2rem;
-    }
-
-    main p,
-    main li {
-      font-size: 1.1rem;
-    }
-  }
-  html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+:root {
+  --bg: #ffffff;
+  --sidebar-bg: #ffffff;
+  --border: #000000;
+  --primary: #2563eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --radius: 12px;
 }
 
-.app {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
-  min-height: 100vh; /* en vez de height: 100vh */
-  overflow: hidden;
-}
-
-
-.sidebar {
-  height: 100vh; /* 🔹 fuerza la altura completa */
-  position: sticky;
-  align-self: start;
-  height: 100%;
-  top: 0;
-  left: 0;
+/* ===== LAYOUT GENERAL ===== */
+.layout-recursos {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* opcional: reparte los elementos */
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
-  border-right: 1px solid var(--border);
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(15,23,42,0.05);
-  overflow-y: auto; /* 🔹 permite scroll si el contenido es más largo */
+  height: calc(100vh - 120px); /* resta solo header y footer aproximados */
+  background: var(--bg);
 }
 
-.main {
-  height: 100vh; /* 🔹 igual altura que la sidebar */
+/* ===== SIDEBAR ===== */
+.layout-recursos aside {
+  flex: 0 0 260px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  position: sticky;
+  top: 80px; /* altura del header */
+  height: calc(100vh - 120px);
   overflow-y: auto;
-  padding: 60px 80px;
-  background: #fff;
+}
+
+aside h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.menu a {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.menu a:hover {
+  color: var(--primary);
+  background: rgba(37,99,235,0.05);
+}
+
+.menu a.active {
+  background: rgba(37,99,235,0.1);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ===== CONTENIDO PRINCIPAL ===== */
+.layout-recursos main {
+  flex: 1;
+  padding: 3rem 4rem;
+  overflow-y: auto;
+}
+
+section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 80px;
+}
+
+section h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+section p {
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 1.05rem;
+  max-width: 900px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .layout-recursos {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .layout-recursos aside {
+    position: static;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    height: auto;
+  }
+
+  .layout-recursos main {
+    padding: 2rem 1.5rem;
+  }
 }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>Documentos</h2>
-    <ul>
-      <li><a class="active" data-doc="terms">Términos de servicio</a></li>
-      <li><a data-doc="privacy">Política de privacidad</a></li>
-      <li><a data-doc="legal">Aviso legal</a></li>
-      <li><a data-doc="cookies">Política de cookies</a></li>
-    </ul>
+  {% block content %}
+
+<div class="layout-recursos">
+  <aside>
+    <h2>Centro legal</h2>
+    <nav class="menu" id="sidebar-menu">
+      <a href="#guia-usuarios">Términos legales y privacidad</a>
+      <a href="#recursos-creadores">Pagos y transacciones</a>
+      <a href="#comunidad">Información legal</a>
+      <a href="#integraciones">Sobre impuestos regionales</a>
+      <a href="#novedades">Uso de información priviliegiada</a>
+      <a href="#faq">Derechos de usuario</a>
+    </nav>
   </aside>
 
-  <!-- CUERPO PRINCIPAL -->
-  <main id="legal-content">
-    <h1>Términos de servicio</h1>
-    <p>Bienvenido a <strong>YourToolQuizz</strong>. Estos términos regulan el uso del sitio web y sus servicios asociados. Al acceder, aceptas estas condiciones en su totalidad.</p>
-    <h2>1. Uso permitido</h2>
-    <p>El usuario se compromete a utilizar la plataforma de manera responsable y conforme a la legislación vigente.</p>
-    <blockquote>“La transparencia y la confianza son la base de nuestra relación contigo.”</blockquote>
+  <main>
+    <section id="guia-usuarios">
+      <h3>Términos legales y privacidad</h3>
+      <p>
+        Aprende a dominar YourToolQuizz desde cero. Esta guía te ayudará a configurar tu cuenta, 
+        crear tus primeros quizzes y personalizar cada detalle para ofrecer la mejor experiencia.
+      </p>
+    </section>
+
+    <section id="recursos-creadores">
+      <h3>Pagos y transacciones</h3>
+      <p>
+        Encuentra plantillas, ejemplos visuales y material descargable para inspirarte. 
+        Diseñado especialmente para creadores que buscan destacar su contenido.
+      </p>
+    </section>
+
+    <section id="comunidad">
+      <h3>Información legal</h3>
+      <p>
+        Conéctate con otros usuarios, comparte ideas, y encuentra ayuda en nuestra comunidad activa. 
+        Accede a foros, grupos privados y soporte técnico especializado.
+      </p>
+    </section>
+
+    <section id="integraciones">
+      <h3>Sobre impuestos regionales</h3>
+      <p>
+        Sincroniza YourToolQuizz con tus herramientas favoritas como Notion, Slack o Google Workspace. 
+        Automatiza tareas y lleva el control de tus datos sin esfuerzo.
+      </p>
+    </section>
+
+    <section id="novedades">
+      <h3>Uso de Información priviliegiada</h3>
+      <p>
+        Mantente al día con las últimas funciones, mejoras y correcciones de errores. 
+        Consulta el historial de versiones y descubre lo que viene pronto.
+      </p>
+    </section>
+
+    <section id="faq">
+      <h3>Derechos de usuario</h3>
+      <p>
+        Encuentra respuestas a las dudas más comunes: seguridad, pagos, cuentas y 
+        configuración avanzada de tu espacio en YourToolQuizz.
+      </p>
+    </section>
   </main>
 </div>
 {% endblock %}
-
 {% block extra_js %}
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const links = document.querySelectorAll(".sidebar a");
-  const content = document.getElementById("legal-content");
 
-  const docs = {
-    terms: `
-      <h1>Términos de servicio</h1>
-      <p>Bienvenido a <strong>YourToolQuizz</strong>. Estos términos regulan el uso del sitio web y sus servicios asociados. Al acceder, aceptas estas condiciones en su totalidad.</p>
-      <h2>1. Uso permitido</h2>
-      <p>El usuario se compromete a utilizar la plataforma de manera responsable y conforme a la legislación vigente.</p>
-      <blockquote>“La transparencia y la confianza son la base de nuestra relación contigo.”</blockquote>
-      <h2>2. Propiedad intelectual</h2>
-      <p>Todos los derechos sobre los contenidos, logotipos, textos e imágenes son propiedad de YourToolQuizz.</p>
-    `,
-    privacy: `
-      <h1>Política de privacidad</h1>
-      <p>Tu privacidad es importante para nosotros. En <strong>YourToolQuizz</strong> cumplimos con el Reglamento General de Protección de Datos (RGPD).</p>
-      <h2>1. Datos recopilados</h2>
-      <p>Solo recopilamos los datos necesarios para ofrecerte una mejor experiencia, como tu nombre, correo electrónico y preferencias.</p>
-      <h2>2. Uso de la información</h2>
-      <p>Los datos se usan exclusivamente para personalizar tu experiencia y nunca se comparten sin consentimiento.</p>
-      <blockquote>“Tus datos, tu control. Siempre.”</blockquote>
-    `,
-    legal: `
-      <h1>Aviso legal</h1>
-      <p>Este sitio es operado por <strong>YourToolQuizz</strong>. El acceso y uso del mismo implica la aceptación de las condiciones publicadas.</p>
-      <h2>1. Identificación</h2>
-      <p>YourToolQuizz es una marca registrada. Para cualquier consulta, puedes escribirnos a contacto@yourtoolquizz.site</p>
-    `,
-    cookies: `
-      <h1>Política de cookies</h1>
-      <p>Utilizamos cookies para mejorar tu experiencia de navegación y analizar el tráfico del sitio.</p>
-      <h2>1. Qué son las cookies</h2>
-      <p>Las cookies son pequeños archivos que se almacenan en tu navegador para recordar tus preferencias.</p>
-      <h2>2. Cómo gestionarlas</h2>
-      <p>Puedes configurar tu navegador para aceptar o rechazar cookies según tus preferencias.</p>
-    `,
-  };
-
-  links.forEach(link => {
-    link.addEventListener("click", () => {
-      links.forEach(l => l.classList.remove("active"));
-      link.classList.add("active");
-
-      const selected = link.getAttribute("data-doc");
-      content.innerHTML = docs[selected] || "<p>Documento no encontrado.</p>";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  });
-});
-</script>
+  <script src="{{ url_for('static', filename='java/legal.js') }}"defer> </script>
 {% endblock %}
