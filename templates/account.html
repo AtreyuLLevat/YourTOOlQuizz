@@ -263,21 +263,6 @@ input[type="checkbox"] {
 </section>
 
 
-    <!-- Privacidad -->
-    <section class="section" id="privacidad">
-      <h2>Privacidad y Datos</h2>
-      <p>Controla la visibilidad de tu cuenta y cómo se usan tus datos.</p>
-      <div class="field"><label><input type="checkbox" id="publicProfile" checked> Mostrar perfil públicamente</label></div>
-      <div class="field"><label><input type="checkbox" id="dataUsage"> Permitir uso de datos para mejorar el servicio</label></div>
-      <div class="actions">
-        <button class="btn primary hidden" id="savePrivacy">Guardar Preferencias</button>
-      </div>
-      <hr style="margin:20px 0; border:none; border-top:1px solid #e5e7eb">
-      <p>Puedes <a href="#" class="link-hover">descargar tus datos personales</a> o
-      <a href="#" class="link-hover">eliminar tu cuenta</a> siguiendo las políticas de
-      <a href="#" class="link-hover">Privacidad y Seguridad</a>.</p>
-    </section>
-
     <!-- Notificaciones -->
     <section class="section" id="notificaciones">
       <h2>Notificaciones</h2>
@@ -288,6 +273,20 @@ input[type="checkbox"] {
       <div class="actions">
         <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
       </div>
+    </section>
+
+    
+
+    <!-- Privacidad -->
+    <section class="section" id="privacidad">
+      <h2>Menú publicitario</h2>
+      <p>Controla tus servicios contratados en este menú.</p>
+      <div class="actions">
+      <a href="{{ url_for('menupublicitario') }}" class="btn primary hidden" id="saveNotifications" style="text-decoration: none;">
+        Acceder al menú.
+      </a>
+      </div>
+
     </section>
 
     <!-- Cerrar sesión -->
