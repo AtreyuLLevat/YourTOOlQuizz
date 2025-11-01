@@ -479,7 +479,7 @@ def create_app():
                 msg = Message("Confirma tu correo en YourToolQuizz", recipients=[email])
                 msg.html = html_body
                 mail.send(msg)
-                flash("Te hemos enviado un correo para verificar tu cuenta.", "success")
+                flash("Te hemos enviado un correo para verificar tu correo electrónico.", "success")
             except Exception as e:
                 current_app.logger.exception("Error enviando correo de verificación")
                 flash("No se pudo enviar el correo de verificación. Intenta más tarde.", "error")
