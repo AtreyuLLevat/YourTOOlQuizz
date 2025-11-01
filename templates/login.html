@@ -1,177 +1,153 @@
 {% extends "base.html" %}
-
-{% block title %}Inicia sesion | YourToolQuizz{% endblock %}
+{% block title %}Iniciar sesión | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
 <style>
-/* ------------------ LOGIN FORM ------------------ */
+body {
+  background: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
+}
+
 main {
-  max-width: 420px;
-  margin: 60px auto;
-  padding: 40px 32px;
-  background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
-  flex: 1;
+  max-width: 460px;
+  margin: 120px auto;
+  text-align: center;
 }
 
 h2 {
-  text-align: center;
   font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 28px;
-  color: #000;
-  position: relative;
-}
-h2::after {
-  content: "";
-  display: block;
-  width: 50px;
-  height: 4px;
-  background: #2563eb;
-  margin: 12px auto 0;
-  border-radius: 2px;
+  margin-bottom: 24px;
+  color: #111827;
 }
 
-/* FORM */
 form {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
 }
-label {
-  font-weight: 600;
-  margin-bottom: 6px;
-  font-size: 0.95rem;
-  color: #111;
-}
-input[type="text"],
+
 input[type="email"],
 input[type="password"] {
-  padding: 12px 14px;
+  width: 100%;
+  max-width: 360px;
+  padding: 14px 16px;
   border-radius: 10px;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid #cbd5e1;
   font-size: 1rem;
-  background: #fafafa;
+  background: #f9fafb;
   transition: all 0.3s ease;
 }
+
 input:focus {
   border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
   outline: none;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
 }
 
-/* SUBMIT BUTTON */
-button[type="submit"], .quiz-btn {
-  padding: 14px 20px;
+button[type="submit"] {
+  padding: 12px 28px;
   border-radius: 10px;
-  background: #2563eb;
+  background-color: #2563eb;
   color: #fff;
   font-weight: 600;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  margin-top: 10px;
 }
-button[type="submit"]:hover, .quiz-btn:hover {
-  background: #d97706;
+
+button[type="submit"]:hover {
+  background-color: #d97706;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-/* FLASH MESSAGES */
-.flash-message {
-  margin-top: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
+label {
+  align-self: flex-start;
+  margin-left: 50px;
+  font-weight: 600;
+  color: #111827;
   font-size: 0.95rem;
-  font-weight: 500;
-}
-.flash-message.success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border-left: 4px solid #2e7d32;
-}
-.flash-message.error {
-  background-color: #fdecea;
-  color: #c62828;
-  border-left: 4px solid #c62828;
 }
 
-/* GOOGLE BUTTON */
-.google-btn {
+.remember-me {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #fff;
-  border: 1.5px solid #ddd;
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #334155;
+  margin-top: 6px;
 }
-.google-btn:hover {
-  background: #f9f9f9;
-  transform: translateY(-1px);
-}
-.google-logo { width: 18px; height: 18px; }
 
-/* LINK REGISTRO */
+/* Flash messages */
+.flash-message {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  border-left: 4px solid;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.flash-message.success { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+.flash-message.error { background: #fdecea; color: #c62828; border-color: #c62828; }
+
+/* Link inferior */
+p {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #475569;
+}
 p a {
   color: #2563eb;
   font-weight: 600;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.3s ease;
 }
 p a:hover {
   color: #d97706;
 }
+</style>
+{% endblock %}
 
-  
-  </style>
-  {% endblock %}
 {% block content %}
-  <main>
-    <h2>Iniciar Sesión</h2>
+<main>
+  <h2>Iniciar sesión</h2>
 
-    <form method="POST" novalidate>
-      {{ form.hidden_tag() }}
+  <form method="POST" novalidate>
+    {{ form.hidden_tag() }}
 
-      <label>{{ form.email.label }}</label>
-      {{ form.email(class="form-input", placeholder="Introduce tu correo") }}
-      {% for error in form.email.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    <label>{{ form.email.label }}</label>
+    {{ form.email(class="form-input", placeholder="Introduce tu correo") }}
+    {% for error in form.email.errors %}
+      <div class="flash-message error">{{ error }}</div>
+    {% endfor %}
 
-      <label>{{ form.password.label }}</label>
-      {{ form.password(class="form-input", placeholder="Introduce tu contraseña") }}
-      {% for error in form.password.errors %}<span class="error">{{ error }}</span>{% endfor %}
+    <label>{{ form.password.label }}</label>
+    {{ form.password(class="form-input", placeholder="Introduce tu contraseña") }}
+    {% for error in form.password.errors %}
+      <div class="flash-message error">{{ error }}</div>
+    {% endfor %}
 
-      <label>{{ form.otp_code.label }}</label>
-      {{ form.otp_code(class="form-input", placeholder="Código de 6 dígitos") }}
-      {% for e in form.otp_code.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    <div class="remember-me">
+      {{ form.remember_me() }} <span>Recordarme</span>
+    </div>
 
-      <div>{{ form.remember_me() }} Recordarme</div>
+    <button type="submit">Entrar</button>
+  </form>
 
-      {{ form.submit(class="quiz-btn") }}
-    </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="flash-message {{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-
-<p style="margin-top:16px; text-align:center;">
-  ¿No tienes cuenta? 
-  <a href="{{ url_for('register') }}">Regístrate aquí</a>
-</p>
-
-  </main>
+  <p>¿No tienes cuenta? 
+    <a href="{{ url_for('register_email') }}">Crea una aquí</a>
+  </p>
+</main>
 {% endblock %}

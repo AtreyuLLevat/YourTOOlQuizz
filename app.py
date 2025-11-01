@@ -21,7 +21,8 @@ from forms import ChangePasswordForm
 from supabase.lib.client_options import ClientOptions
 from datetime import datetime, timedelta
 from account_routes import account_bp
-
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from flask import render_template_string
 
 
 
@@ -259,7 +260,7 @@ def create_app():
             'logo.png', mimetype='image/png'
         )
 
-
+    serializer = URLSafeTimedSerializer(app.secret_key)
 # -----------------------------
 
     # RUTAS
@@ -435,45 +436,125 @@ def create_app():
     # -----------------------------
     # RUTAS DE USUARIOS (LOGIN)
     # -----------------------------
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
+    @app.route('/register_email', methods=["GET", "POST"])
+    def register_email():
         if current_user.is_authenticated:
             return redirect(url_for("dashboard"))
 
-        form = RegisterForm()
-        if form.validate_on_submit():
-            hashed_pw = generate_password_hash(form.password.data)
-            otp_secret = pyotp.random_base32()
-            new_user = User(email=form.email.data, password=hashed_pw, otp_secret=otp_secret)
+        if request.method == "POST":
+            email = request.form.get("email")
+
+            # Comprobamos si ya existe
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                flash("Este correo ya está registrado. Inicia sesión.", "info")
+                return redirect(url_for("login"))
+
+            # Generamos token y enlace de verificación
+            token = serializer.dumps(email, salt="email-verify")
+            verify_url = url_for("verify_email_step", token=token, _external=True)
+
+            # Email HTML profesional
+            html_body = render_template_string("""
+            <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+              <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <div style="text-align:center; margin-bottom: 25px;">
+                  <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                </div>
+                <h2 style="color:#111827; text-align:center;">Confirma tu correo</h2>
+                <p style="color:#374151; font-size:15px;">Gracias por registrarte en <strong>YourToolQuizz</strong>. Haz clic en el botón de abajo para confirmar tu dirección de correo y continuar con la creación de tu cuenta.</p>
+                <div style="text-align:center; margin:30px 0;">
+                  <a href="{{ verify_url }}" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">Verificar correo</a>
+                </div>
+                <p style="font-size:13px; color:#6b7280;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+                <p style="font-size:13px; color:#2563eb;">{{ verify_url }}</p>
+                <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
+                <p style="font-size:12px; color:#9ca3af; text-align:center;">© {{ now.year }} YourToolQuizz. Todos los derechos reservados.</p>
+              </div>
+            </div>
+            """, verify_url=verify_url, now=datetime.utcnow())
+
+            # Envío de correo
+            try:
+                msg = Message("Confirma tu correo en YourToolQuizz", recipients=[email])
+                msg.html = html_body
+                mail.send(msg)
+                flash("Te hemos enviado un correo para verificar tu cuenta.", "success")
+            except Exception as e:
+                current_app.logger.exception("Error enviando correo de verificación")
+                flash("No se pudo enviar el correo de verificación. Intenta más tarde.", "error")
+
+            return redirect(url_for("login"))
+
+        return render_template("register_email.html")
+
+    # Paso 2 – Usuario hace clic en el enlace del correo
+    @app.route("/verify_email/<token>")
+    def verify_email_step(token):
+        try:
+            email = serializer.loads(token, salt="email-verify", max_age=3600)
+        except SignatureExpired:
+            flash("El enlace ha expirado. Vuelve a registrarte.", "error")
+            return redirect(url_for("register_email"))
+        except BadSignature:
+            flash("Enlace inválido.", "error")
+            return redirect(url_for("register_email"))
+
+        # Redirigir al paso de crear contraseña
+        return redirect(url_for("set_password", token=token))
+
+    # Paso 3 – Crear contraseña y finalizar registro
+    @app.route("/set_password/<token>", methods=["GET", "POST"])
+    def set_password(token):
+        try:
+            email = serializer.loads(token, salt="email-verify", max_age=3600)
+        except (SignatureExpired, BadSignature):
+            flash("El enlace no es válido o ha expirado.", "error")
+            return redirect(url_for("register_email"))
+
+        if request.method == "POST":
+            password = request.form.get("password")
+            confirm = request.form.get("confirm")
+
+            if not password or password != confirm:
+                flash("Las contraseñas no coinciden.", "error")
+                return redirect(url_for("set_password", token=token))
+
+            hashed_pw = generate_password_hash(password)
+
+            # Crear usuario verificado directamente
+            new_user = User(email=email, password=hashed_pw, is_verified=True)
             db.session.add(new_user)
             db.session.commit()
 
-            # Crear QR (otpauth://...)
-            totp = pyotp.TOTP(otp_secret)
-            otp_uri = totp.provisioning_uri(name=form.email.data, issuer_name="YourToolQuizz")
-            qr_img = qrcode.make(otp_uri)
-            img_bytes = io.BytesIO()
-            qr_img.save(img_bytes, format='PNG')
-            qr_b64 = base64.b64encode(img_bytes.getvalue()).decode("utf-8")
+            login_user(new_user)
+            flash("Cuenta creada con éxito. ¡Bienvenido!", "success")
+            return redirect(url_for("dashboard"))
 
-            # Intentar enviar email (pero no fallar si no se puede)
-            try:
-                msg = Message("Configura tu 2FA en YourToolQuizz", recipients=[form.email.data])
-                msg.body = f"Hola, añade esta clave en tu app TOTP: {otp_secret}\nO escanea el QR adjunto."
-                # adjunto
-                img_bytes.seek(0)
-                msg.attach("2fa_qr.png", "image/png", img_bytes.read())
-                mail.send(msg)
-                flash("Registro exitoso. Te enviamos el QR por email.", "success")
-            except Exception as e:
-                current_app.logger.exception("Fallo enviando email 2FA")
-                flash("Registro exitoso. No pudimos enviar el email: configura tu 2FA con el QR mostrado abajo.", "error")
+        return render_template("set_password.html")
+    # Nueva ruta: verificar el correo
+    @app.route("/verify/<token>")
+    def verify_email(token):
+        s = URLSafeTimedSerializer(app.secret_key)
+        try:
+            email = s.loads(token, salt='email-confirm', max_age=3600)  # 1 hora de validez
+        except SignatureExpired:
+            flash("El enlace de verificación ha expirado. Regístrate nuevamente.", "error")
+            return redirect(url_for("register"))
+        except BadSignature:
+            flash("Enlace de verificación inválido.", "error")
+            return redirect(url_for("register"))
 
-            # Mostrar en la misma página (una sola vez) el QR y la clave
-            return render_template("register.html", form=RegisterForm(), qr_png=qr_b64, otp_secret=otp_secret)
+        user = User.query.filter_by(email=email).first_or_404()
+        if user.is_verified:
+            flash("Tu cuenta ya está verificada. Puedes iniciar sesión.", "info")
+        else:
+            user.is_verified = True
+            db.session.commit()
+            flash("Tu correo ha sido verificado correctamente. Ya puedes iniciar sesión.", "success")
 
-        return render_template("register.html", form=form)
-
+        return redirect(url_for("login"))
+        
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if current_user.is_authenticated:
