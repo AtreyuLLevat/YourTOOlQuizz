@@ -24,10 +24,19 @@ class RegisterForm(FlaskForm):
 
 # (2) Login simplificado: eliminamos OTP, ya que el 2FA por QR fue reemplazado
 class LoginForm(FlaskForm):
-    email = StringField("Correo electrónico", validators=[DataRequired(), Email(), Length(max=150)])
-    password = PasswordField("Contraseña", validators=[DataRequired()])
+    email = StringField(
+        "Correo electrónico",
+        validators=[DataRequired(), Email(), Length(max=150)],
+        render_kw={"type": "email", "placeholder": "Introduce tu correo"}
+    )
+    password = PasswordField(
+        "Contraseña",
+        validators=[DataRequired()],
+        render_kw={"type": "password", "placeholder": "Introduce tu contraseña"}
+    )
     remember_me = BooleanField("Recordarme")
     submit = SubmitField("Iniciar sesión")
+
 
 # (3) Contacto (sin cambios)
 class ContactForm(FlaskForm):
@@ -59,12 +68,6 @@ class ChangePasswordForm(FlaskForm):
     )
     submit = SubmitField('Actualizar contraseña')
 
-class LoginForm(FlaskForm):
-    email = StringField("Correo electrónico", validators=[DataRequired(), Email(), Length(max=150)])
-    password = PasswordField("Contraseña", validators=[DataRequired()])
-    otp_code = StringField("Código 2FA", validators=[DataRequired(), Length(min=6, max=6)])  # Nuevo
-    remember_me = BooleanField("Recordarme")  # Nuevo
-    submit = SubmitField("Iniciar sesión")
 
 class ContactForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired()])
