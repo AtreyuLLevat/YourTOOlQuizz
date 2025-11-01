@@ -54,7 +54,6 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     supabase_id = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
-    otp_secret = db.Column(db.String(32), nullable=False)
     stripe_customer_id = db.Column(db.String(100), unique=True)
     current_plan_id = db.Column(UUID(as_uuid=True), db.ForeignKey("plans.id"))
     plan_expiration = db.Column(db.DateTime)
