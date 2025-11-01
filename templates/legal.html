@@ -1,260 +1,246 @@
 {% extends "base.html" %}
-
-{% block title %}legal | YourToolQuizz{% endblock %}
+{% block title %}Centro Legal | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --border: #e2e8f0;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --text: #1e293b;
-      --muted: #64748b;
-      --radius: 10px;
-      --sidebar-width: 320px;
-      --gap: 20px;
-      --glass: rgba(255,255,255,0.6);
-    }
-html,body {
-  height: 100%;
-  margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: var(--text);
-  background: linear-gradient(180deg,#f6fbff 0%,var(--bg) 100%);
-}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&display=swap');
 
-a{color:inherit;text-decoration:none}
+  body {
+    background: #fff;
+    font-family: 'Inter', sans-serif;
+    color: #242424;
+    margin: 0;
+    line-height: 1.8;
+  }
 
-.app {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
-  gap: var(--gap);
-  padding: 24px;
-  height: 100vh;
-  box-sizing: border-box;
-  align-items: start;
-}
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
 
-/* Sidebar legal (ahora a la izquierda) */
-.sidebar {
-  height: calc(100vh - 48px);
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  overflow: auto;
-  position: sticky;
-  top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+  /* --- SIDEBAR --- */
+  .sidebar {
+    width: 260px;
+    background: #f8fafc;
+    border-right: 1px solid #e5e7eb;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
 
-.search {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--glass);
-}
-.search input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 14px;
-  color: var(--text);
-  width: 100%;
-}
+  .sidebar h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.5px;
+    margin-bottom: 32px;
+  }
 
-.sections {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
 
-.section-btn {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  cursor: pointer;
-}
+  .sidebar li {
+    margin-bottom: 14px;
+  }
 
-.section-btn:hover {
-  background: linear-gradient(90deg, rgba(37,99,235,0.06), rgba(29,78,216,0.03));
-}
-.section-btn.active {
-  background: linear-gradient(90deg, rgba(37,99,235,0.12), rgba(29,78,216,0.06));
-  border-color: rgba(37,99,235,0.12);
-}
+  .sidebar a {
+    color: #1e293b;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.97rem;
+    transition: color 0.3s, transform 0.2s;
+    cursor: pointer;
+  }
 
-.section-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-.section-small {
-  font-size: 12px;
-  color: var(--muted);
-}
+  .sidebar a:hover {
+    color: #2563eb;
+    transform: translateX(4px);
+  }
 
-.main {
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow: auto;
-  padding-right: 6px;
-}
+  .sidebar a.active {
+    font-weight: 600;
+    color: #2563eb;
+  }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.page-title {
-  font-size: 20px;
-  font-weight: 700;
-}
-.subtitle {
-  color: var(--muted);
-  font-size: 13px;
-}
+  /* --- CUERPO PRINCIPAL --- */
+  main {
+    flex: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
 
-.content-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: 0 6px 18px rgba(15,23,42,0.03);
-}
+  main h1 {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 36px;
+    line-height: 1.3;
+  }
 
-.doc {min-height:60vh}
-.doc h2 {margin-top:0}
-.doc p {line-height:1.6;color:var(--text)}
-.doc .meta {color:var(--muted);font-size:13px;margin-bottom:12px}
+  main h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 60px;
+    margin-bottom: 20px;
+    color: #000;
+  }
 
-footer {
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-  padding: 10px;
-}
+  main h3 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 36px;
+    margin-bottom: 16px;
+    color: #000;
+  }
 
-@media (max-width:1000px){
-  .app{grid-template-columns:1fr}
-  .sidebar{display:none}
-}
+  main p {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+    color: #242424;
+  }
 
+  main ul {
+    padding-left: 24px;
+    margin-bottom: 24px;
+  }
 
-  </style>
-{%endblock%}
-{%block content%}
+  main li {
+    font-size: 1.2rem;
+    margin-bottom: 14px;
+    color: #242424;
+  }
 
-<body>
-  <div class="app" role="application">
-    <aside class="sidebar" aria-label="Índice legal">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="font-weight:700">Documentos legales</div>
-        <div style="flex:1"></div>
-      </div>
+  main a {
+    color: #000;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    transition: opacity 0.3s;
+  }
 
-```
-  <div class="search" role="search">
-    <span>🔍</span>
-    <input id="search" placeholder="Buscar (ej: privacidad, cookies, GDPR)..." aria-label="Buscar documentos legales" />
-  </div>
+  main a:hover {
+    opacity: 0.7;
+  }
 
-  <div class="sections" id="sections" role="list">
-    <!-- botones generados por JS -->
-  </div>
+  blockquote {
+    border-left: 3px solid #000;
+    padding-left: 20px;
+    margin: 40px 0;
+    font-style: italic;
+    color: #555;
+    font-size: 1.2rem;
+  }
 
-  <div style="margin-top:8px;color:var(--muted);font-size:13px">
-    Consejo: usa el campo de búsqueda para filtrar rápidamente.
-  </div>
-</aside>
-
-<main class="main" id="main">
-  <div class="header">
-    <div>
-      <div class="page-title">Centro Legal — YourToolQuizz</div>
-      <div class="subtitle">Toda la documentación legal organizada en un único lugar.</div>
-    </div>
-  </div>
-
-  <div class="content-card">
-    <div id="doc" class="doc">
-      <h2>Bienvenido al Centro Legal</h2>
-      <div class="meta">Seleccione un apartado de la columna izquierda para leerlo.</div>
-      <p>Este archivo HTML contiene una serie de documentos legales ficticios pensados para servir como plantilla. Puedes filtrar los apartados, navegar entre ellos y copiar el contenido desde el navegador para adaptarlo a tu proyecto.</p>
-    </div>
-  </div>
-
-  <footer>© YourToolQuizz — Plantilla legal</footer>
-</main>
-```
-{%endblock %}
-  </div>
-
-{%block extra_js %}
-  <script>
-    const docs = [
-      {id:'terms', title:'Términos de Servicio', summary:'Reglas y condiciones para el uso del servicio.', content:`<div class="meta">Última actualización: 1 de octubre de 2025</div>
-<p>Estos Términos de Servicio regulan el uso de la plataforma YourToolQuizz ("la Plataforma").</p>`},
-      {id:'privacy', title:'Política de Privacidad', summary:'Cómo tratamos tus datos personales.', content:`<div class="meta">Última actualización: 15 de septiembre de 2025</div>
-<p>En YourToolQuizz respetamos tu privacidad.</p>`},
-      {id:'cookies', title:'Política de Cookies', summary:'Uso de cookies y tecnologías similares.', content:`<div class="meta">Última actualización: 27 de agosto de 2025</div>
-<p>Utilizamos cookies para mejorar la experiencia.</p>`}
-    ];
-
-    const sectionsEl = document.getElementById('sections');
-    const docEl = document.getElementById('doc');
-    const searchInput = document.getElementById('search');
-
-    function createList(items){
-      sectionsEl.innerHTML = '';
-      for(const d of items){
-        const btn = document.createElement('button');
-        btn.className = 'section-btn';
-        btn.setAttribute('data-id', d.id);
-        btn.setAttribute('role','listitem');
-        btn.innerHTML = `<div style="flex:1"><div class="section-title">${d.title}</div><div class="section-small">${d.summary}</div></div>`;
-        btn.addEventListener('click',()=>{ renderDocById(d.id); });
-        sectionsEl.appendChild(btn);
-      }
+  @media (max-width: 900px) {
+    .layout {
+      flex-direction: column;
     }
 
-    function renderDocById(id){
-      const d = docs.find(x=>x.id===id);
-      if(!d) return;
-      docEl.innerHTML = `<h2>${d.title}</h2>${d.content}`;
-      highlightActive(id);
-      history.replaceState(null,'',`#${id}`);
-      docEl.scrollTop = 0;
+    .sidebar {
+      width: 100%;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
     }
 
-    function highlightActive(id){
-      document.querySelectorAll('.section-btn').forEach(b=>{
-        b.classList.toggle('active', b.getAttribute('data-id')===id);
-      });
+    main {
+      padding: 32px 20px;
     }
 
-    searchInput.addEventListener('input',(e)=>{
-      const q = e.target.value.trim().toLowerCase();
-      const filtered = docs.filter(d=> (d.title + ' ' + d.summary + ' ' + d.content).toLowerCase().includes(q));
-      createList(filtered);
-      if(filtered.length===1){ renderDocById(filtered[0].id); }
+    main h1 {
+      font-size: 2rem;
+    }
+
+    main p,
+    main li {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h2>Documentos</h2>
+    <ul>
+      <li><a class="active" data-doc="terms">Términos de servicio</a></li>
+      <li><a data-doc="privacy">Política de privacidad</a></li>
+      <li><a data-doc="legal">Aviso legal</a></li>
+      <li><a data-doc="cookies">Política de cookies</a></li>
+    </ul>
+  </aside>
+
+  <!-- CUERPO PRINCIPAL -->
+  <main id="legal-content">
+    <h1>Términos de servicio</h1>
+    <p>Bienvenido a <strong>YourToolQuizz</strong>. Estos términos regulan el uso del sitio web y sus servicios asociados. Al acceder, aceptas estas condiciones en su totalidad.</p>
+    <h2>1. Uso permitido</h2>
+    <p>El usuario se compromete a utilizar la plataforma de manera responsable y conforme a la legislación vigente.</p>
+    <blockquote>“La transparencia y la confianza son la base de nuestra relación contigo.”</blockquote>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const links = document.querySelectorAll(".sidebar a");
+  const content = document.getElementById("legal-content");
+
+  const docs = {
+    terms: `
+      <h1>Términos de servicio</h1>
+      <p>Bienvenido a <strong>YourToolQuizz</strong>. Estos términos regulan el uso del sitio web y sus servicios asociados. Al acceder, aceptas estas condiciones en su totalidad.</p>
+      <h2>1. Uso permitido</h2>
+      <p>El usuario se compromete a utilizar la plataforma de manera responsable y conforme a la legislación vigente.</p>
+      <blockquote>“La transparencia y la confianza son la base de nuestra relación contigo.”</blockquote>
+      <h2>2. Propiedad intelectual</h2>
+      <p>Todos los derechos sobre los contenidos, logotipos, textos e imágenes son propiedad de YourToolQuizz.</p>
+    `,
+    privacy: `
+      <h1>Política de privacidad</h1>
+      <p>Tu privacidad es importante para nosotros. En <strong>YourToolQuizz</strong> cumplimos con el Reglamento General de Protección de Datos (RGPD).</p>
+      <h2>1. Datos recopilados</h2>
+      <p>Solo recopilamos los datos necesarios para ofrecerte una mejor experiencia, como tu nombre, correo electrónico y preferencias.</p>
+      <h2>2. Uso de la información</h2>
+      <p>Los datos se usan exclusivamente para personalizar tu experiencia y nunca se comparten sin consentimiento.</p>
+      <blockquote>“Tus datos, tu control. Siempre.”</blockquote>
+    `,
+    legal: `
+      <h1>Aviso legal</h1>
+      <p>Este sitio es operado por <strong>YourToolQuizz</strong>. El acceso y uso del mismo implica la aceptación de las condiciones publicadas.</p>
+      <h2>1. Identificación</h2>
+      <p>YourToolQuizz es una marca registrada. Para cualquier consulta, puedes escribirnos a contacto@yourtoolquizz.site</p>
+    `,
+    cookies: `
+      <h1>Política de cookies</h1>
+      <p>Utilizamos cookies para mejorar tu experiencia de navegación y analizar el tráfico del sitio.</p>
+      <h2>1. Qué son las cookies</h2>
+      <p>Las cookies son pequeños archivos que se almacenan en tu navegador para recordar tus preferencias.</p>
+      <h2>2. Cómo gestionarlas</h2>
+      <p>Puedes configurar tu navegador para aceptar o rechazar cookies según tus preferencias.</p>
+    `,
+  };
+
+  links.forEach(link => {
+    link.addEventListener("click", () => {
+      links.forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+
+      const selected = link.getAttribute("data-doc");
+      content.innerHTML = docs[selected] || "<p>Documento no encontrado.</p>";
+      window.scrollTo({ top: 0, behavior: "smooth" });
     });
-
-    createList(docs);
-
-    const hash = location.hash.replace('#','');
-    if(hash && docs.some(x=>x.id===hash)){ renderDocById(hash); }
-  </script>
+  });
+});
+</script>
 {% endblock %}
