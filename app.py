@@ -661,7 +661,6 @@ def create_app():
 
         update = supabase.table("users").update({
             "password": new_hashed,
-            "updated_at": datetime.utcnow()  # registro del cambio
         }).eq("email", current_user.email).execute()
 
         if not update.data:
