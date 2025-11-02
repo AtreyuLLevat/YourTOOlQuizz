@@ -4,7 +4,7 @@ import io
 import pyotp
 import qrcode
 import stripe
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint, render_template_string
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -597,7 +597,117 @@ def create_app():
 
         return render_template("login.html", form=form)
 
-        
+       # -----------------------------
+# RESTABLECER CONTRASEÑA
+# -----------------------------
+    @app.route("/forgot_password", methods=["GET", "POST"])
+    def forgot_password():
+        if request.method == "POST":
+            email = request.form.get("email").strip().lower()
+            user = User.query.filter_by(email=email).first()
+
+            if not user:
+                flash("No existe ninguna cuenta con ese correo.", "error")
+                return redirect(url_for("forgot_password"))
+
+            # Generar token válido por 1 hora
+            s = URLSafeTimedSerializer(app.secret_key)
+            token = s.dumps(email, salt="password-reset-salt")
+
+            reset_url = url_for("reset_password", token=token, _external=True)
+
+            # Plantilla HTML profesional del correo
+            html_body = """
+            <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+            <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                
+                <div style="text-align:center; margin-bottom: 25px;">
+                <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                </div>
+
+                <h2 style="color:#111827; text-align:center;">Restablecer contraseña</h2>
+
+                <p style="color:#374151; font-size:15px;">
+                Hemos recibido una solicitud para restablecer tu contraseña en <strong>YourToolQuizz</strong>.
+                Si no fuiste tú, ignora este mensaje.
+                </p>
+
+                <div style="text-align:center; margin:30px 0;">
+                <a href="{{ reset_url }}" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                    Restablecer contraseña
+                </a>
+                </div>
+
+                <p style="font-size:13px; color:#6b7280;">
+                Si el botón no funciona, copia y pega este enlace en tu navegador:
+                </p>
+
+                <p style="font-size:13px; color:#2563eb; word-break:break-all;">
+                {{ reset_url }}
+                </p>
+
+                <p style="font-size:12px; color:#6b7280; margin-top:20px;">
+                Este enlace caducará en 1 hora por motivos de seguridad.
+                </p>
+
+                <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
+
+                <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                © {{ now.year }} YourToolQuizz — Todos los derechos reservados.
+                </p>
+
+            </div>
+            </div>
+            """
+
+            # Enviar correo
+            try:
+                msg = Message("Restablecer contraseña - YourToolQuizz", recipients=[email])
+                msg.html = render_template_string(html_body, reset_url=reset_url, now=datetime.utcnow())
+                mail = Mail(app)
+                mail.send(msg)
+                flash("Te hemos enviado un correo con instrucciones para restablecer tu contraseña.", "success")
+            except Exception as e:
+                print(f"❌ Error enviando correo: {e}")
+                flash("No se pudo enviar el correo. Intenta más tarde.", "error")
+
+            return redirect(url_for("login"))
+
+        return render_template("forgot_password.html")
+
+
+    @app.route("/reset_password/<token>", methods=["GET", "POST"])
+    def reset_password(token):
+        s = URLSafeTimedSerializer(app.secret_key)
+        try:
+            email = s.loads(token, salt="password-reset-salt", max_age=3600)
+        except SignatureExpired:
+            flash("El enlace ha expirado. Solicita uno nuevo.", "error")
+            return redirect(url_for("forgot_password"))
+        except BadSignature:
+            flash("Enlace inválido.", "error")
+            return redirect(url_for("forgot_password"))
+
+        if request.method == "POST":
+            password = request.form.get("password")
+            confirm = request.form.get("confirm")
+
+            if not password or password != confirm:
+                flash("Las contraseñas no coinciden.", "error")
+                return redirect(url_for("reset_password", token=token))
+
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                flash("Usuario no encontrado.", "error")
+                return redirect(url_for("forgot_password"))
+
+            user.password = generate_password_hash(password)
+            db.session.commit()
+
+            flash("Tu contraseña ha sido restablecida correctamente.", "success")
+            return redirect(url_for("login"))
+
+        return render_template("reset_password.html")
 
 
     @app.route("/Menúpublicitario")

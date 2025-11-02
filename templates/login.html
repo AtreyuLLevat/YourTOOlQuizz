@@ -144,6 +144,9 @@ p a:hover {
         <div class="flash-message error">{{ error }}</div>
       {% endfor %}
     </div>
+    <p>
+      <a href="{{ url_for('forgot_password') }}">¿Olvidaste tu contraseña?</a>
+    </p>
 
     <div class="remember-me">
       {{ form.remember_me() }} <span>Recordarme</span>
