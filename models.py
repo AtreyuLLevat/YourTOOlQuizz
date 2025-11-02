@@ -3,8 +3,10 @@ from flask_login import UserMixin
 from datetime import datetime
 from sqlalchemy import event
 import unicodedata, re
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
+
+
 
 db = SQLAlchemy()
 
@@ -62,6 +64,11 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_verified = db.Column(db.Boolean, default=False)
+    notifications = db.Column(JSON, default=lambda: {
+        "newsletters": True,
+        "reminders": False,
+        "offers": False
+    })    
 
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
