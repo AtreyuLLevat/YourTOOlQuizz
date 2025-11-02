@@ -2,7 +2,10 @@ from flask_mail import Message
 from models import User, db
 from flask import current_app
 from datetime import datetime, timedelta
-from app import mail  # asegúrate de que mail esté inicializado en tu app
+from flask_mail import Message
+from models import User
+from extensions import mail  # 👈 crea este import (explicado abajo)
+
 
 # ======= FUNCIONES DE ENVÍO ======= #
 

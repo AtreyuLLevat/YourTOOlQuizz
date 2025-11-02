@@ -25,8 +25,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import render_template_string
 from flask_bcrypt import Bcrypt
 from apscheduler.schedulers.background import BackgroundScheduler
-from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
-
+from extensions import db, mail
 
 
 
@@ -70,7 +69,6 @@ def create_app():
 
 
 
-    mail = Mail()
     mail.init_app(app)
     db.init_app(app)
     Migrate(app, db)
@@ -978,7 +976,7 @@ def create_app():
         scheduler.add_job(enviar_ofertas, "interval", weeks=1)
         # También añadimos boletines
         from notifications_service import enviar_newsletters
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=20)
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=27)
         scheduler.start()
         if not scheduler.running:
             scheduler.start()        
