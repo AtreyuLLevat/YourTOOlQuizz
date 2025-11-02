@@ -177,7 +177,7 @@ def create_app():
                 line_items=[
                     {
                         # Price ID predefinido en Stripe
-                        'price': 'price_1SP0gbR9XxliZcJ1neyKu0Kz',
+                        'price': 'price_1SP1CLR9XxliZcJ1F0edTxwl',
                         'quantity': 1,
                     },
                 ],
