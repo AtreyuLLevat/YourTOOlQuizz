@@ -33,7 +33,7 @@ from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_n
 
 
 
-mail = Mail()
+
 
 load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
@@ -70,7 +70,7 @@ def create_app():
 
 
 
-
+    mail = Mail()
     mail.init_app(app)
     db.init_app(app)
     Migrate(app, db)
@@ -978,7 +978,7 @@ def create_app():
         scheduler.add_job(enviar_ofertas, "interval", weeks=1)
         # También añadimos boletines
         from notifications_service import enviar_newsletters
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=13)
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=20)
         scheduler.start()
         if not scheduler.running:
             scheduler.start()        
