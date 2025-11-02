@@ -787,57 +787,37 @@ def create_app():
         new_password = data.get("new_password")
         confirm_password = data.get("confirm_password")
 
-        # 1️⃣ Validar campos
         if not current_password or not new_password or not confirm_password:
             return jsonify({"success": False, "message": "Faltan campos."}), 400
-
         if new_password != confirm_password:
             return jsonify({"success": False, "message": "Las contraseñas no coinciden."}), 400
-
-        # 2️⃣ Longitud mínima
         if len(new_password) < 8:
             return jsonify({"success": False, "message": "La nueva contraseña debe tener al menos 8 caracteres."}), 400
 
-        # 3️⃣ Obtener al usuario desde Supabase
         response = supabase.table("users").select("password").eq("email", current_user.email).single().execute()
         if not response.data:
             return jsonify({"success": False, "message": "Usuario no encontrado."}), 404
 
         hashed_password = response.data["password"]
-
-        # 4️⃣ Verificar la contraseña actual
         if not check_password_hash(hashed_password, current_password):
             return jsonify({"success": False, "message": "La contraseña actual es incorrecta."}), 401
 
-        # 5️⃣ Encriptar y actualizar en Supabase
         new_hashed = generate_password_hash(new_password)
-
         update = supabase.table("users").update({
             "password": new_hashed,
-            "updated_at": datetime.utcnow().isoformat()  # ✅ convertido a string
+            "updated_at": datetime.utcnow().isoformat()
         }).eq("email", current_user.email).execute()
 
         if not update.data:
             return jsonify({"success": False, "message": "Error al actualizar la contraseña."}), 500
 
-        # 6️⃣ Registrar log de seguridad
-        supabase.table("security_logs").insert({
-            "user_email": current_user.email,
-            "event": "Cambio de contraseña",
-            "timestamp": datetime.utcnow().isoformat(),  # ✅ convertido a string
-            "ip_address": request.remote_addr
-        }).execute()
-
-        # 7️⃣ Invalidar sesiones activas (cerrar sesión actual)
-        logout_user()
-
-        # 8️⃣ Enviar correo de confirmación de seguridad
+        # 🔹 Enviar correo de confirmación
         try:
-            subject = "🔒 Tu contraseña ha sido cambiada correctamente"
-            s = URLSafeTimedSerializer(app.secret_key)
+            s = URLSafeTimedSerializer(current_app.secret_key)
             token = s.dumps(current_user.email, salt="password-change-alert")
 
-            html_body = """
+            subject = "🔒 Tu contraseña ha sido cambiada correctamente"
+            html_body = render_template_string("""
             <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
             <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                 
@@ -848,12 +828,12 @@ def create_app():
                 <h2 style="color:#111827; text-align:center;">Contraseña actualizada</h2>
 
                 <p style="color:#374151; font-size:15px;">
-                Hola <strong>{{ email }}</strong>, queremos informarte que tu contraseña de <strong>YourToolQuizz</strong> se ha cambiado correctamente.
+                Hola <strong>{{ email }}</strong>, tu contraseña de <strong>YourToolQuizz</strong> se ha cambiado correctamente.
                 </p>
 
                 <p style="color:#374151; font-size:15px;">
-                Si fuiste tú, no necesitas hacer nada más.<br>
-                Si no reconoces este cambio, haz clic en el siguiente enlace:
+                Si fuiste tú, no necesitas hacer nada más.  
+                Si no reconoces este cambio, haz clic en el botón siguiente para proteger tu cuenta:
                 </p>
 
                 <div style="text-align:center; margin:30px 0;">
@@ -864,40 +844,28 @@ def create_app():
                 </div>
 
                 <p style="font-size:13px; color:#6b7280;">
-                Por motivos de seguridad, se ha cerrado tu sesión actual.
+                Si no realizaste este cambio, cerraremos tus sesiones y te guiaremos para restablecer tu contraseña.
                 </p>
 
                 <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
-
                 <p style="font-size:12px; color:#9ca3af; text-align:center;">
                 © {{ year }} YourToolQuizz — Todos los derechos reservados.
                 </p>
             </div>
             </div>
-            """
-
-            # ✅ Renderizamos correctamente la plantilla con Jinja
-            rendered_html = render_template_string(
-                html_body,
-                email=current_user.email,
-                token=token,
-                year=datetime.utcnow().year
-            )
+            """, email=current_user.email, token=token, year=datetime.utcnow().year)
 
             msg = Message(subject, recipients=[current_user.email])
-            msg.html = rendered_html
+            msg.html = html_body
             mail = Mail(current_app)
             mail.send(msg)
-
             print(f"✅ Correo de confirmación de cambio de contraseña enviado a {current_user.email}")
-
         except Exception as e:
             print(f"❌ Error enviando correo de cambio de contraseña: {e}")
-            
-        # 9️⃣ Respuesta final al usuario
+
         return jsonify({
             "success": True,
-            "message": "Contraseña actualizada correctamente. Se ha cerrado tu sesión por seguridad y te enviamos un correo de confirmación."
+            "message": "Contraseña actualizada correctamente. Te hemos enviado un correo de confirmación."
         })
 
     @app.route("/not_me_password_change/<token>")
