@@ -39,20 +39,41 @@ print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 
 def iniciar_tareas(app):
-    """Inicializa las tareas automáticas de notificaciones."""
+    """Inicializa las tareas automáticas de notificaciones con reglas específicas."""
     from apscheduler.schedulers.background import BackgroundScheduler
-    from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
+    from apscheduler.triggers.cron import CronTrigger
+    from notifications_service import enviar_recordatorios, enviar_newsletters
 
     scheduler = BackgroundScheduler()
 
     if not scheduler.running:
-        with app.app_context():
-            scheduler.add_job(lambda: enviar_recordatorios(app), "interval", seconds=30)
-            scheduler.add_job(lambda: enviar_ofertas(app), "interval", seconds=45)
-            scheduler.add_job(lambda: enviar_newsletters(app), "interval", seconds=60)
+        scheduler.start()
+        print("🕒 Scheduler iniciado correctamente.")
 
-            scheduler.start()
-            print("🕒 Tareas automáticas de notificaciones activadas correctamente.")
+    # --- Recordatorios automáticos ---
+    # Se ejecuta cada día a las 10:00, pero solo a usuarios cuyo plazo de suscripción termina pronto
+    from datetime import datetime, timedelta
+    from models import User
+
+    def recordatorios_personalizados():
+        with app.app_context():
+            print("🕒 Ejecutando recordatorios a usuarios con suscripción próxima a vencer")
+            hoy = datetime.utcnow()
+            # Por ejemplo: usuarios cuya suscripción termina en los próximos 3 días
+            limite = hoy + timedelta(days=3)
+            usuarios = User.query.filter(User.subscription_end <= limite).all()
+            for user in usuarios:
+                enviar_recordatorios(app, user)  # modificaremos la función para aceptar un usuario
+                print(f"📧 Recordatorio enviado a {user.email}")
+
+    scheduler.add_job(recordatorios_personalizados, "interval", hours=24, next_run_time=datetime.utcnow())
+
+    # --- Newsletter semanal ---
+    # Se envía cada viernes a las 19:00
+    trigger_newsletter = CronTrigger(day_of_week="fri", hour=19, minute=0)
+    scheduler.add_job(lambda: enviar_newsletters(app), trigger_newsletter)
+
+    print("🕒 Tareas configuradas: recordatorios diarios y newsletter semanal")
 
 # -----------------------------
 # FACTORY DE LA APP
