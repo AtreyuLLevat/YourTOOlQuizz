@@ -218,14 +218,15 @@ input[type="checkbox"] {
     <section class="section" id="perfil">
       <h2>Perfil general</h2>
       <p>Tu información personal se usa para gestionar tu cuenta y ofrecerte una mejor experiencia.</p>
-      <div class="field">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" value="{{ usuario.email }}">
-      </div>
+
       <div class="field">
         <label for="name">Nombre</label>
       <input id="name" type="text" value="{{ usuario.name or usuario.email.split('@')[0] }}">
 
+      </div>
+      <div class="field">
+        <label for="email">Correo electrónico</label>
+        <input id="email" type="email" value="{{ usuario.email }}">
       </div>
       <div class="actions">
         <button class="btn primary hidden" id="saveProfile">Guardar cambios</button>
