@@ -671,7 +671,6 @@ def create_app():
         supabase.table("security_logs").insert({
             "user_email": current_user.email,
             "event": "Cambio de contraseña",
-            "timestamp": datetime.utcnow(),
             "ip_address": request.remote_addr
         }).execute()
 
