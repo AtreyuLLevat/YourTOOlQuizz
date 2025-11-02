@@ -25,7 +25,7 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import render_template_string
 from flask_bcrypt import Bcrypt
 from apscheduler.schedulers.background import BackgroundScheduler
-from extensions import db, mail
+from extensions import mail
 
 
 

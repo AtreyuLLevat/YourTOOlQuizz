@@ -3,7 +3,7 @@ from models import User, db
 from flask import current_app
 from datetime import datetime, timedelta
 from flask_mail import Message
-from models import User
+from models import User, db
 from extensions import mail  # 👈 crea este import (explicado abajo)
 
 
