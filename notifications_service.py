@@ -7,17 +7,25 @@ from extensions import mail  # 👈 crea este import (explicado abajo)
  # evitar circular import
 
 # --- Recordatorios ---
-def enviar_recordatorios(app):
+def enviar_recordatorios(app, user=None):
+    """Envía recordatorios a un usuario o a todos si user=None"""
     with app.app_context():
-        print("🕒 Ejecutando tarea: enviar_recordatorios")
-        usuarios = User.query.filter(User.notifications['reminders'].as_boolean() == True).all()
-        for user in usuarios:
-            msg = Message("Recordatorio YourToolQuizz",
-                          sender="support@yourtoolquizz.site",
-                          recipients=[user.email])
+        if user:
+            usuarios = [user]
+        else:
+            from models import User
+            usuarios = User.query.filter(User.notifications['reminders'].as_boolean() == True).all()
+
+        for u in usuarios:
+            msg = Message(
+                "Recordatorio YourToolQuizz",
+                sender="support@yourtoolquizz.site",
+                recipients=[u.email]
+            )
             msg.body = "¡Hola! Tienes recordatorios pendientes en YourToolQuizz."
+            from extensions import mail
             mail.send(msg)
-            print(f"📧 Recordatorio enviado a {user.email}")
+            print(f"📧 Recordatorio enviado a {u.email}")
 
 # --- Ofertas ---
 def enviar_ofertas(app):
