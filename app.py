@@ -38,6 +38,21 @@ load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 
+def iniciar_tareas(app):
+    """Inicializa las tareas automáticas de notificaciones."""
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
+
+    scheduler = BackgroundScheduler()
+
+    if not scheduler.running:
+        with app.app_context():
+            scheduler.add_job(enviar_recordatorios, "interval", days=1)
+            scheduler.add_job(enviar_ofertas, "interval", weeks=1)
+            scheduler.add_job(enviar_newsletters, "cron", day_of_week="sun", hour=19, minute=45)
+            scheduler.start()
+            print("🕒 Tareas automáticas de notificaciones activadas correctamente.")
+
 # -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
@@ -74,6 +89,7 @@ def create_app():
     Migrate(app, db)
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
+    
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -86,6 +102,7 @@ def create_app():
     with app.app_context():
         db.create_all()  # Crea tablas si no existen
 
+    iniciar_tareas(app)
     
 
 
@@ -970,25 +987,9 @@ def create_app():
     # -----------------------------
     # PROGRAMADOR AUTOMÁTICO DE NOTIFICACIONES
     # -----------------------------
-    def iniciar_tareas():
-        # 👇 Importamos aquí dentro, para evitar el import circular
-        from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
-
-        scheduler = BackgroundScheduler()
-
-        # 👇 Ahora sí podemos registrar las tareas
-        scheduler.add_job(enviar_recordatorios, "interval", days=1)
-        scheduler.add_job(enviar_ofertas, "interval", weeks=1)
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week=6, hour=19, minute=33)
 
 
-        scheduler.start()
-        print("🕒 Tareas automáticas de notificaciones activadas.")
-
-
-    # Inicia el scheduler al arrancar la app
-    iniciar_tareas()
-
+    
     return app
 
 
