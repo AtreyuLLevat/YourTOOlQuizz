@@ -35,6 +35,7 @@ print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 # -----------------------------
 def create_app():
     app = Flask(__name__)
+    api = Blueprint('api', __name__)
     name = User.name
     bcrypt = Bcrypt(app)
     app.register_blueprint(account_bp)
@@ -156,7 +157,7 @@ def create_app():
             print("Error:", e)
             return jsonify({"error": "No se pudieron obtener las estadísticas"}), 500
 
-
+    app.register_blueprint(api)
 
 
     @app.route('/logo.png')
