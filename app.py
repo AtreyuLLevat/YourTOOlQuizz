@@ -181,7 +181,7 @@ def create_app():
                         'quantity': 1,
                     },
                 ],
-                mode='payment',  # pago único
+                mode='suscription',  # pago único
                 success_url=f"{YOUR_DOMAIN}/success.html?session_id={{CHECKOUT_SESSION_ID}}",
                 cancel_url=f"{YOUR_DOMAIN}/cancel.html",
 
