@@ -653,11 +653,12 @@ def create_app():
         hashed_password = response.data["password"]
 
         # 4️⃣ Verificar la contraseña actual
-        if not bcrypt.check_password_hash(hashed_password, current_password):
+        if not check_password_hash(hashed_password, current_password):
             return jsonify({"success": False, "message": "La contraseña actual es incorrecta."}), 401
 
         # 5️⃣ Encriptar y actualizar en Supabase
-        new_hashed = bcrypt.generate_password_hash(new_password).decode("utf-8")
+        new_hashed = generate_password_hash(new_password)
+
         update = supabase.table("users").update({
             "password": new_hashed,
             "updated_at": datetime.utcnow()  # registro del cambio
