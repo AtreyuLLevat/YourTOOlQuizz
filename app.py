@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from account_routes import account_bp
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import render_template_string
-
+from flask_bcrypt import Bcrypt
 
 
 load_dotenv()
@@ -36,6 +36,7 @@ print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 def create_app():
     app = Flask(__name__)
     name = User.name
+    bcrypt = Bcrypt(app)
     app.register_blueprint(account_bp)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -624,20 +625,62 @@ def create_app():
     @app.route("/change_password", methods=["POST"])
     @login_required
     def change_password():
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
         data = request.get_json()
+        current_password = data.get("current_password")
         new_password = data.get("new_password")
+        confirm_password = data.get("confirm_password")
 
-        if not new_password:
-            return jsonify({"status":"error","error":"Contraseña vacía"})
+        # 1️⃣ Validar campos
+        if not current_password or not new_password or not confirm_password:
+            return jsonify({"success": False, "message": "Faltan campos."}), 400
 
-        try:
-            supabase_admin.auth.admin.update_user_by_id(
-                str(current_user.supabase_id),
-                {"password": new_password}
-            )
-            return jsonify({"status":"success"})
-        except Exception as e:
-            return jsonify({"status":"error","error": str(e)})
+        if new_password != confirm_password:
+            return jsonify({"success": False, "message": "Las contraseñas no coinciden."}), 400
+
+        # 2️⃣ Longitud mínima
+        if len(new_password) < 8:
+            return jsonify({"success": False, "message": "La nueva contraseña debe tener al menos 8 caracteres."}), 400
+
+        # 3️⃣ Obtener al usuario desde Supabase
+        response = supabase.table("users").select("password").eq("email", current_user.email).single().execute()
+        if not response.data:
+            return jsonify({"success": False, "message": "Usuario no encontrado."}), 404
+
+        hashed_password = response.data["password"]
+
+        # 4️⃣ Verificar la contraseña actual
+        if not bcrypt.check_password_hash(hashed_password, current_password):
+            return jsonify({"success": False, "message": "La contraseña actual es incorrecta."}), 401
+
+        # 5️⃣ Encriptar y actualizar en Supabase
+        new_hashed = bcrypt.generate_password_hash(new_password).decode("utf-8")
+        update = supabase.table("users").update({
+            "password": new_hashed,
+            "updated_at": datetime.utcnow()  # registro del cambio
+        }).eq("email", current_user.email).execute()
+
+        if not update.data:
+            return jsonify({"success": False, "message": "Error al actualizar la contraseña."}), 500
+
+        # 6️⃣ Registrar log de seguridad
+        supabase.table("security_logs").insert({
+            "user_email": current_user.email,
+            "event": "Cambio de contraseña",
+            "timestamp": datetime.utcnow(),
+            "ip_address": request.remote_addr
+        }).execute()
+
+        # 7️⃣ Invalidar sesiones activas (cerrar sesión actual)
+        logout_user()
+
+        return jsonify({
+            "success": True,
+            "message": "Contraseña actualizada correctamente. Por seguridad, vuelve a iniciar sesión."
+        })
 
 
 
