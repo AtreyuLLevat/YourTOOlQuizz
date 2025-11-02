@@ -50,23 +50,6 @@ def iniciar_tareas(app):
         scheduler.start()
         print("🕒 Scheduler iniciado correctamente.")
 
-    # --- Recordatorios automáticos ---
-    # Se ejecuta cada día a las 10:00, pero solo a usuarios cuyo plazo de suscripción termina pronto
-    from datetime import datetime, timedelta
-    from models import User
-
-    def recordatorios_personalizados():
-        with app.app_context():
-            print("🕒 Ejecutando recordatorios a usuarios con suscripción próxima a vencer")
-            hoy = datetime.utcnow()
-            # Por ejemplo: usuarios cuya suscripción termina en los próximos 3 días
-            limite = hoy + timedelta(days=3)
-            usuarios = User.query.filter(User.subscription_end <= limite).all()
-            for user in usuarios:
-                enviar_recordatorios(app, user)  # modificaremos la función para aceptar un usuario
-                print(f"📧 Recordatorio enviado a {user.email}")
-
-    scheduler.add_job(recordatorios_personalizados, "interval", hours=24, next_run_time=datetime.utcnow())
 
     # --- Newsletter semanal ---
     # Se envía cada viernes a las 19:00
