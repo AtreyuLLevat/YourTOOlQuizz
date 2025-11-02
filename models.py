@@ -51,6 +51,7 @@ class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  # 👈 Nueva columna
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
     supabase_id = db.Column(UUID(as_uuid=True), unique=True, nullable=True)
@@ -62,14 +63,14 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_verified = db.Column(db.Boolean, default=False)
 
-
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
     current_plan = db.relationship("Plan", foreign_keys=[current_plan_id])
     user_plans = db.relationship("UserPlan", backref="user", lazy=True)
 
     def __repr__(self):
-        return f"<User {self.email}>"
+        return f"<User {self.name} ({self.email})>"
+
 
 # -------------------------
 # MODELOS DE PLANES Y SUSCRIPCIONES

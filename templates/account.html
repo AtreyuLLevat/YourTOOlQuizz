@@ -224,7 +224,8 @@ input[type="checkbox"] {
       </div>
       <div class="field">
         <label for="name">Nombre</label>
-        <input id="name" type="text" value="{{ usuario.nombre or usuario.email.split('@')[0] }}">
+      <input id="name" type="text" value="{{ usuario.nombre or usuario.email.split('@')[0] }}">
+
       </div>
       <div class="actions">
         <button class="btn primary hidden" id="saveProfile">Guardar cambios</button>

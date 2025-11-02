@@ -35,6 +35,7 @@ print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 # -----------------------------
 def create_app():
     app = Flask(__name__)
+    name = User.name
     app.register_blueprint(account_bp)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -442,7 +443,16 @@ def create_app():
             return redirect(url_for("dashboard"))
 
         if request.method == "POST":
-            email = request.form.get("email")
+            name = request.form.get("name", "").strip()
+            email = request.form.get("email", "").strip()
+
+            if not name:
+                flash("Por favor introduce tu nombre.", "error")
+                return redirect(url_for("register_email"))
+
+            if not email:
+                flash("Por favor introduce tu correo.", "error")
+                return redirect(url_for("register_email"))
 
             # Comprobamos si ya existe
             existing_user = User.query.filter_by(email=email).first()
@@ -450,29 +460,29 @@ def create_app():
                 flash("Este correo ya está registrado. Inicia sesión.", "info")
                 return redirect(url_for("login"))
 
-            # Generamos token y enlace de verificación
-            token = serializer.dumps(email, salt="email-verify")
+            # Generamos token con email + name
+            token = serializer.dumps({"email": email, "name": name}, salt="email-verify")
             verify_url = url_for("verify_email_step", token=token, _external=True)
 
-            # Email HTML profesional
+            # Email HTML profesional (ahora saluda por nombre)
             html_body = render_template_string("""
             <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
-              <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
                 <div style="text-align:center; margin-bottom: 25px;">
-                  <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
                 </div>
                 <h2 style="color:#111827; text-align:center;">Confirma tu correo</h2>
-                <p style="color:#374151; font-size:15px;">Gracias por registrarte en <strong>YourToolQuizz</strong>. Haz clic en el botón de abajo para confirmar tu dirección de correo y continuar con la creación de tu cuenta.</p>
+                <p style="color:#374151; font-size:15px;">¡Hola {{ name }}! Gracias por registrarte en <strong>YourToolQuizz</strong>. Haz clic en el botón de abajo para confirmar tu dirección de correo y continuar con la creación de tu cuenta.</p>
                 <div style="text-align:center; margin:30px 0;">
-                  <a href="{{ verify_url }}" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">Verificar correo</a>
+                <a href="{{ verify_url }}" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">Verificar correo</a>
                 </div>
                 <p style="font-size:13px; color:#6b7280;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
                 <p style="font-size:13px; color:#2563eb;">{{ verify_url }}</p>
                 <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
                 <p style="font-size:12px; color:#9ca3af; text-align:center;">© {{ now.year }} YourToolQuizz. Todos los derechos reservados.</p>
-              </div>
             </div>
-            """, verify_url=verify_url, now=datetime.utcnow())
+            </div>
+            """, verify_url=verify_url, now=datetime.utcnow(), name=name)
 
             # Envío de correo
             try:
@@ -486,13 +496,18 @@ def create_app():
 
             return redirect(url_for("login"))
 
+        # Si GET, renderiza template de registro (recuerda que tu template debe tener campos name y email)
         return render_template("register_email.html")
+
 
     # Paso 2 – Usuario hace clic en el enlace del correo
     @app.route("/verify_email/<token>")
     def verify_email_step(token):
         try:
-            email = serializer.loads(token, salt="email-verify", max_age=3600)
+            data = serializer.loads(token, salt="email-verify", max_age=3600)
+            # data es dict: {"email": "...", "name": "..."}
+            email = data.get("email")
+            name = data.get("name")
         except SignatureExpired:
             flash("El enlace ha expirado. Vuelve a registrarte.", "error")
             return redirect(url_for("register_email"))
@@ -500,14 +515,17 @@ def create_app():
             flash("Enlace inválido.", "error")
             return redirect(url_for("register_email"))
 
-        # Redirigir al paso de crear contraseña
+        # Redirigir al paso de crear contraseña, mantenemos el token para recuperar name/email luego
         return redirect(url_for("set_password", token=token))
+
 
     # Paso 3 – Crear contraseña y finalizar registro
     @app.route("/set_password/<token>", methods=["GET", "POST"])
     def set_password(token):
         try:
-            email = serializer.loads(token, salt="email-verify", max_age=3600)
+            data = serializer.loads(token, salt="email-verify", max_age=3600)
+            email = data.get("email")
+            name = data.get("name")
         except (SignatureExpired, BadSignature):
             flash("El enlace no es válido o ha expirado.", "error")
             return redirect(url_for("register_email"))
@@ -522,8 +540,14 @@ def create_app():
 
             hashed_pw = generate_password_hash(password)
 
-            # Crear usuario verificado directamente
-            new_user = User(email=email, password=hashed_pw, is_verified=True)
+            # Antes de crear, comprobar si ya existe (evita duplicados si el usuario hizo click varias veces)
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                flash("Este correo ya fue registrado. Inicia sesión.", "info")
+                return redirect(url_for("login"))
+
+            # Crear usuario verificado directamente con name
+            new_user = User(name=name, email=email, password=hashed_pw, is_verified=True)
             db.session.add(new_user)
             db.session.commit()
 
@@ -531,7 +555,9 @@ def create_app():
             flash("Cuenta creada con éxito. ¡Bienvenido!", "success")
             return redirect(url_for("dashboard"))
 
-        return render_template("set_password.html")
+    # GET -> mostrar formulario para establecer contraseña
+    # Asegúrate de que el template 'set_password.html' muestre el nombre si quieres:
+        return render_template("set_password.html", name=name)
     # Nueva ruta: verificar el correo
     @app.route("/verify/<token>")
     def verify_email(token):
@@ -591,7 +617,7 @@ def create_app():
 
         response = supabase.table("users").select("*").eq("email", current_user.email).single().execute()
         usuario = response.data if response.data else {}
-        return render_template("account.html", usuario=usuario)
+        return render_template("account.html", usuario=current_user)
 
 
 

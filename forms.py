@@ -5,6 +5,7 @@ from models import User
 
 # (1) Mantenerlo, por si lo usas más adelante (no se usará en el flujo actual)
 class RegisterForm(FlaskForm):
+    name = StringField("Nombre", validators=[DataRequired(), Length(min=2, max=100)])
     email = StringField("Correo electrónico", validators=[DataRequired(), Email(), Length(max=150)])
     password = PasswordField("Contraseña", validators=[
         DataRequired(),

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Verificar correo | YourToolQuizz{% endblock %}
+{% block title %}Registro | YourToolQuizz{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -28,6 +28,7 @@ p {
   line-height: 1.6;
 }
 
+input[type="text"],
 input[type="email"] {
   width: 100%;
   max-width: 380px;
@@ -35,6 +36,7 @@ input[type="email"] {
   border: 1.5px solid #cbd5e1;
   border-radius: 10px;
   font-size: 1rem;
+  margin-bottom: 15px;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -45,7 +47,7 @@ input:focus {
 }
 
 button {
-  margin-top: 20px;
+  margin-top: 10px;
   padding: 12px 30px;
   background-color: #2563eb;
   color: #fff;
@@ -62,7 +64,6 @@ button:hover {
   transform: translateY(-2px);
 }
 
-/* mensajes flash */
 .flash-message {
   margin-top: 16px;
   font-size: 0.95rem;
@@ -79,10 +80,12 @@ button:hover {
 
 {% block content %}
 <main>
-  <h2>Introduce tu correo electrónico</h2>
-  <p>Introduce tu dirección de correo electrónico para recibir un enlace de verificación.</p>
+  <h2>Crea tu cuenta</h2>
+  <p>Introduce tu nombre y tu correo electrónico para recibir un enlace de verificación.</p>
 
   <form method="POST">
+    <input type="text" name="name" placeholder="Tu nombre" required>
+    <br>
     <input type="email" name="email" placeholder="tu@correo.com" required>
     <br>
     <button type="submit">Enviar enlace</button>
