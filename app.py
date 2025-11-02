@@ -971,16 +971,19 @@ def create_app():
     # PROGRAMADOR AUTOMÁTICO DE NOTIFICACIONES
     # -----------------------------
     def iniciar_tareas():
+        # 👇 Importamos aquí dentro, para evitar el import circular
+        from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
+
         scheduler = BackgroundScheduler()
+
+        # 👇 Ahora sí podemos registrar las tareas
         scheduler.add_job(enviar_recordatorios, "interval", days=1)
         scheduler.add_job(enviar_ofertas, "interval", weeks=1)
-        # También añadimos boletines
-        from notifications_service import enviar_newsletters
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=27)
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=30)
+
         scheduler.start()
-        if not scheduler.running:
-            scheduler.start()        
         print("🕒 Tareas automáticas de notificaciones activadas.")
+
 
     # Inicia el scheduler al arrancar la app
     iniciar_tareas()
