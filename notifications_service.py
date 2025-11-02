@@ -7,7 +7,7 @@ from extensions import mail  # 👈 crea este import (explicado abajo)
  # evitar circular import
 
 # --- Recordatorios ---
-def enviar_recordatorios():
+def enviar_recordatorios(app):
     with app.app_context():
         print("🕒 Ejecutando tarea: enviar_recordatorios")
         usuarios = User.query.filter(User.notifications['reminders'].as_boolean() == True).all()
@@ -20,7 +20,7 @@ def enviar_recordatorios():
             print(f"📧 Recordatorio enviado a {user.email}")
 
 # --- Ofertas ---
-def enviar_ofertas():
+def enviar_ofertas(app):
     with app.app_context():
         print("💸 Ejecutando tarea: enviar_ofertas")
         usuarios = User.query.filter(User.notifications['offers'].as_boolean() == True).all()
@@ -33,7 +33,7 @@ def enviar_ofertas():
             print(f"📧 Oferta enviada a {user.email}")
 
 # --- Newsletters ---
-def enviar_newsletters():
+def enviar_newsletters(app):
     with app.app_context():
         print("📰 Ejecutando tarea: enviar_newsletters")
         usuarios = User.query.filter(User.notifications['newsletters'].as_boolean() == True).all()
