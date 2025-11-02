@@ -870,7 +870,7 @@ def create_app():
 
     @app.route("/not_me_password_change/<token>")
     def not_me_password_change(token):
-        s = URLSafeTimedSerializer(app.secret_key)
+        s = URLSafeTimedSerializer(current_app.secret_key)
         try:
             email = s.loads(token, salt="password-change-alert", max_age=3600)
         except SignatureExpired:
@@ -880,18 +880,16 @@ def create_app():
             flash("Enlace inválido.", "error")
             return redirect(url_for("forgot_password"))
 
-        # Buscar al usuario
-        user = User.query.filter_by(email=email).first()
-        if user:
-            # Registrar acción de seguridad en logs (opcional)
-            print(f"⚠️ Usuario {email} ha reportado un cambio de contraseña no autorizado")
+        # 🔒 Cerrar sesión del usuario actual
+        logout_user()
+        print(f"⚠️ Usuario {email} ha reportado un cambio de contraseña no autorizado.")
 
-            # Cerrar todas las sesiones activas (si gestionas sesiones persistentes)
-            logout_user()
+        # 🔑 Generar nuevo token de restablecimiento
+        reset_token = s.dumps(email, salt="password-reset-salt")
 
-        # Mostrar mensaje de seguridad
-        flash("Hemos cerrado todas tus sesiones por seguridad. Restablece tu contraseña para proteger tu cuenta.", "error")
-        return redirect(url_for("forgot_password"))
+        # 🔁 Redirigir directamente al formulario de restablecer contraseña
+        flash("Hemos cerrado todas tus sesiones por seguridad. Restablece tu contraseña.", "error")
+        return redirect(url_for("reset_password", token=reset_token))
 
 
 
