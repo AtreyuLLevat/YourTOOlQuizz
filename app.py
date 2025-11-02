@@ -978,7 +978,7 @@ def create_app():
         scheduler.add_job(enviar_ofertas, "interval", weeks=1)
         # También añadimos boletines
         from notifications_service import enviar_newsletters
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=10)
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=13)
         scheduler.start()
         if not scheduler.running:
             scheduler.start()        
