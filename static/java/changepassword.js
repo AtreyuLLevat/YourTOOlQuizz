@@ -9,21 +9,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const new_password = document.getElementById("new_password").value;
     const confirm_password = document.getElementById("confirm_password").value;
 
-    const response = await fetch("/change_password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ current_password, new_password, confirm_password }),
-    });
+    try {
+      const response = await fetch("/change_password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ current_password, new_password, confirm_password }),
+      });
 
-    const result = await response.json();
+      const data = await response.json();
 
-    feedback.style.display = "block";
-    feedback.style.color = result.success ? "green" : "red";
-    feedback.textContent = result.message;
-
-    if (result.success) {
-      form.reset();
-      setTimeout(() => (feedback.style.display = "none"), 3000);
+      feedback.style.display = "block";
+      feedback.style.color = data.success ? "green" : "red";
+      feedback.textContent = data.message;
+    } catch (error) {
+      feedback.style.display = "block";
+      feedback.style.color = "red";
+      feedback.textContent = "Ocurrió un error al intentar actualizar la contraseña.";
     }
   });
 });
