@@ -42,4 +42,27 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(`${tab}-table`).classList.add('active');
       });
     });
+
+    async function checkout(priceId) {
+    const lineItems = [{ price: priceId, quantity: 1 }];
+
+    try {
+        const response = await fetch("/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ line_items: lineItems })
+        });
+
+        const data = await response.json();
+        if (data.url) {
+            window.location.href = data.url; // Redirige al Checkout de Stripe
+        } else {
+            alert("Error al iniciar el pago: " + data.error);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Ocurrió un error al iniciar el pago.");
+    }
+}
+
     });

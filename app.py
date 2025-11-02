@@ -38,6 +38,8 @@ def create_app():
     name = User.name
     bcrypt = Bcrypt(app)
     app.register_blueprint(account_bp)
+    stripe.api_key = os.getenv("STRIPE_API_KEY")
+    YOUR_DOMAIN = "https://yourtoolquizz.site"
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"poolclass": NullPool}
@@ -51,10 +53,12 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = app.config['MAIL_USERNAME']
-    SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URL")
-    CANCEL_URL = os.getenv("STRIPE_CANCEL_URL")
+    SUCCESS_URL = os.getenv("STRIPE_SUCCESS_URLpost")
+    CANCEL_URL = os.getenv("STRIPE_CANCEL_URLpost")
     STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
-    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+
 
 
 
@@ -117,108 +121,8 @@ def create_app():
 
         return render_template('page.html', page=page)
     
-    @app.route("/api/crear-sesion", methods=["POST"])
-    def crear_sesion():
-        data = request.json
-        user_id = data.get("userId")
-        plan_id = data.get("planId")
-        
-        if not user_id or not plan_id:
-            return jsonify({"error": "Faltan userId o planId"}), 400
 
-        # Obtener stripe_price_id del plan
-        plan_resp = supabase.table("plans").select("stripe_price_id, duration_days").eq("id", plan_id).single().execute()
-        if plan_resp.error:
-            return jsonify({"error": str(plan_resp.error)}), 400
-        plan = plan_resp.data
-        price_id = plan["stripe_price_id"]
-
-        try:
-            session = stripe.checkout.Session.create(
-                payment_method_types=["card"],
-                mode="subscription",  # o 'payment' si es one-time
-                line_items=[{"price": price_id, "quantity": 1}],
-                success_url=SUCCESS_URL,
-                cancel_url=CANCEL_URL,
-                client_reference_id=user_id
-            )
-            return jsonify({"url": session.url})
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-
-    # === Webhook de Stripe ===
-    @app.route("/webhook-stripe", methods=["POST"])
-    def webhook_stripe():
-        payload = request.data
-        sig_header = request.headers.get("stripe-signature")
-
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET
-            )
-        except stripe.error.SignatureVerificationError:
-            abort(400)
-
-        # Eventos a manejar
-        if event["type"] == "checkout.session.completed":
-            session = event["data"]["object"]
-            user_id = session.get("client_reference_id")
-            customer_id = session.get("customer")
-            subscription_id = session.get("subscription")
-
-            # Actualizar stripe_customer_id del usuario
-            supabase.table("users").update({"stripe_customer_id": customer_id}).eq("id", user_id).execute()
-
-            # Obtener plan por price_id
-            price_id = session["display_items"][0]["price"]["id"] if "display_items" in session else None
-            plan_resp = supabase.table("plans").select("id, duration_days").eq("stripe_price_id", price_id).single().execute()
-            if plan_resp.data:
-                plan = plan_resp.data
-                fecha_inicio = datetime.utcnow()
-                fecha_fin = fecha_inicio + timedelta(days=plan["duration_days"])
-                
-                supabase.table("user_plans").insert({
-                    "user_id": user_id,
-                    "plan_id": plan["id"],
-                    "stripe_subscription_id": subscription_id,
-                    "fecha_inicio": fecha_inicio.isoformat(),
-                    "fecha_fin": fecha_fin.isoformat(),
-                    "estado": "activo",
-                    "dinero_gastado": session["amount_total"] / 100
-                }).execute()
-
-        return jsonify({"status": "ok"})
-
-    @app.route("/api/cancelar-suscripcion", methods=["POST"])
-    def cancelar_suscripcion():
-        data = request.json
-        user_id = data.get("userId")
-        
-        # Obtener la suscripción activa
-        resp = supabase.table("user_plans").select("stripe_subscription_id").eq("user_id", user_id).eq("estado", "activo").single().execute()
-        if not resp.data:
-            return jsonify({"error": "No hay suscripción activa"}), 400
-        
-        subscription_id = resp.data["stripe_subscription_id"]
-        stripe.Subscription.delete(subscription_id)  # Cancela en Stripe
-
-        # Actualizar estado en Supabase
-        supabase.table("user_plans").update({"estado": "cancelado"}).eq("stripe_subscription_id", subscription_id).execute()
-        return jsonify({"status": "cancelada"})
-        
-    @app.route("/api/verificar-plan", methods=["POST"])
-    def verificar_plan():
-        user_id = request.json.get("userId")
-        plan_resp = supabase.table("user_plans").select("fecha_fin, estado").eq("user_id", user_id).eq("estado", "activo").order("fecha_fin", desc=True).limit(1).execute()
-        if not plan_resp.data:
-            return jsonify({"activo": False})
-        
-        plan = plan_resp.data
-        from datetime import datetime
-        if datetime.fromisoformat(plan["fecha_fin"]) > datetime.utcnow():
-            return jsonify({"activo": True})
-        return jsonify({"activo": False})
-    api = Blueprint('api', __name__)
+ 
 
     @api.route('/api/quizzes-estadisticas/<user_id>')
     def quizzes_estadisticas(user_id):
@@ -263,6 +167,97 @@ def create_app():
         )
 
     serializer = URLSafeTimedSerializer(app.secret_key)
+
+    @app.route("/create-checkout-session", methods=["POST"])
+    def create_checkout_session():
+        try:
+            # Aquí defines los productos que se van a vender
+            checkout_session = stripe.checkout.Session.create(
+                line_items=[
+                    {
+                        # Price ID predefinido en Stripe
+                        'price': 'price_1SP0gbR9XxliZcJ1neyKu0Kz',
+                        'quantity': 1,
+                    },
+                ],
+                mode='payment',  # pago único
+                success_url=f"{YOUR_DOMAIN}/success.html?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{YOUR_DOMAIN}/cancel.html",
+
+            )
+                
+            # Devuelve la URL de la sesión para redirigir al cliente
+            return redirect(checkout_session.url, code=303)
+        except Exception as e:
+            return jsonify(error=str(e)), 400
+
+    @app.route("/webhook", methods=["POST"])
+    def stripe_webhook():
+        payload = request.data
+        sig_header = request.headers.get('Stripe-Signature')
+        event = None
+
+        # Validación del webhook
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError as e:
+            # payload inválido
+            return jsonify({"success": False, "error": "Invalid payload"}), 400
+        except stripe.error.SignatureVerificationError as e:
+            # firma inválida
+            return jsonify({"success": False, "error": "Invalid signature"}), 400
+
+        # Manejar el evento checkout.session.completed
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+
+            # Obtener email del cliente
+            customer_email = session.get('customer_email')
+
+            # Actualizar base de datos: marcar plan como activo
+            mark_plan_as_active(customer_email, session['id'], session['amount_total']/100)
+
+            # Enviar correo de confirmación (puedes usar SMTP, SendGrid, etc.)
+            send_confirmation_email(customer_email, session)
+
+        return jsonify({"success": True})
+
+    def mark_plan_as_active(email, stripe_session_id, amount_paid):
+        """
+        Marca en tu DB que el usuario tiene un plan activo.
+        """
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            user.plan_active = True
+            user.last_payment_id = stripe_session_id
+            user.last_payment_amount = amount_paid
+            user.last_payment_date = datetime.utcnow()
+            # Guardar cambios en tu DB
+            db.session.commit()
+
+
+    def send_confirmation_email(email, session):
+        """
+        Envía un correo de confirmación al cliente.
+        """
+        subject = "Gracias por tu compra en YourToolQuizz"
+        body = f"""
+        Hola {email},
+
+        Gracias por tu pago de {session['amount_total']/100} {session['currency'].upper()}.
+        Tu plan ahora está activo.
+
+        ID de sesión: {session['id']}
+
+        Saludos,
+        YourToolQuizz
+        """
+        # Aquí tu función de envío de correo
+        send_email(email, subject, body)
+
 # -----------------------------
 
     # RUTAS

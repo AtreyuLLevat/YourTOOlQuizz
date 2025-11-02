@@ -612,7 +612,12 @@
             <li>Hasta 100 respuestas/mes</li>
           </ul>
           <span class="badge">Ideal para comenzar</span>
-          <a href="#contacto" class="btn">Comenzar ahora</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
 
         <div class="plan">
@@ -625,7 +630,12 @@
             <li>Hasta 500 respuestas/mes</li>
           </ul>
           <span class="badge">Más popular</span>
-          <a href="#contacto" class="btn">Elegir plan</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
 
         <div class="plan">
@@ -638,7 +648,12 @@
             <li>Respuestas ilimitadas</li>
           </ul>
           <span class="badge">Para destacar</span>
-          <a href="#contacto" class="btn">Máximo impacto</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
       </div>
 
@@ -673,7 +688,12 @@
             <li>1 imagen incluida</li>
           </ul>
           <span class="badge">Perfecto para comenzar</span>
-          <a href="#contacto" class="btn">Solicitar artículo</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
 
         <div class="plan">
@@ -686,7 +706,12 @@
             <li>Hasta 3 imágenes</li>
           </ul>
           <span class="badge">Mayor exposición</span>
-          <a href="#contacto" class="btn">Solicitar artículo</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
 
         <div class="plan">
@@ -699,7 +724,12 @@
             <li>Múltiples formatos de contenido</li>
           </ul>
           <span class="badge">Experiencia completa</span>
-          <a href="#contacto" class="btn">Colaborar ahora</a>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+    <input type="hidden" name="lookup_key" value="starter_monthly">
+    <button type="submit" class="btn">Comenzar ahora</button>
+</form>
+
+
         </div>
       </div>
 
