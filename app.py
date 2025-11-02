@@ -49,7 +49,7 @@ def iniciar_tareas(app):
         with app.app_context():
             scheduler.add_job(enviar_recordatorios, "interval", days=1)
             scheduler.add_job(enviar_ofertas, "interval", weeks=1)
-            scheduler.add_job(enviar_newsletters, "cron", day_of_week="sun", hour=19, minute=45)
+            scheduler.add_job(enviar_newsletters, "cron", day_of_week="sun", hour=19, minute=55)
             scheduler.start()
             print("🕒 Tareas automáticas de notificaciones activadas correctamente.")
 
