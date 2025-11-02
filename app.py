@@ -888,7 +888,7 @@ def create_app():
         reset_token = s.dumps(email, salt="password-reset-salt")
 
         # 🔁 Redirigir directamente al formulario de restablecer contraseña
-        flash("Hemos cerrado todas tus sesiones por seguridad. Restablece tu contraseña.", "error")
+        flash("Hemos cerrado todas tus sesiones por seguridad. Restablece tu contraseña ahora.", "error")
         return redirect(url_for("reset_password", token=reset_token))
 
 
