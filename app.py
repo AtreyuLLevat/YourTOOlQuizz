@@ -979,7 +979,8 @@ def create_app():
         # 👇 Ahora sí podemos registrar las tareas
         scheduler.add_job(enviar_recordatorios, "interval", days=1)
         scheduler.add_job(enviar_ofertas, "interval", weeks=1)
-        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=30)
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week=6, hour=19, minute=33)
+
 
         scheduler.start()
         print("🕒 Tareas automáticas de notificaciones activadas.")
