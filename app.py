@@ -24,7 +24,16 @@ from account_routes import account_bp
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask import render_template_string
 from flask_bcrypt import Bcrypt
+from apscheduler.schedulers.background import BackgroundScheduler
+from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
 
+
+
+
+
+
+
+mail = Mail()
 
 load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
@@ -62,9 +71,8 @@ def create_app():
 
 
 
-
+    mail.init_app(app)
     db.init_app(app)
-    mail = Mail(app)
     Migrate(app, db)
     login_manager = LoginManager(app)
     login_manager.login_view = 'login'
@@ -961,7 +969,26 @@ def create_app():
     def internal_error(e):
         return render_template('500.html'), 500
 
+    # -----------------------------
+    # PROGRAMADOR AUTOMÁTICO DE NOTIFICACIONES
+    # -----------------------------
+    def iniciar_tareas():
+        scheduler = BackgroundScheduler()
+        scheduler.add_job(enviar_recordatorios, "interval", days=1)
+        scheduler.add_job(enviar_ofertas, "interval", weeks=1)
+        # También añadimos boletines
+        from notifications_service import enviar_newsletters
+        scheduler.add_job(enviar_newsletters, "cron", day_of_week="Sunday", hour=19, minute=10)
+        scheduler.start()
+        if not scheduler.running:
+            scheduler.start()        
+        print("🕒 Tareas automáticas de notificaciones activadas.")
+
+    # Inicia el scheduler al arrancar la app
+    iniciar_tareas()
+
     return app
+
 
 
 # -----------------------------
