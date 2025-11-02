@@ -200,6 +200,115 @@ input[type="checkbox"] {
     gap: 32px;
   }
 }
+.hidden { display: none; }
+
+.notif-message {
+  margin-top: 15px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  animation: fadeIn 0.4s ease;
+}
+
+.notif-message.success {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-left: 4px solid #0284c7;
+}
+
+.notif-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.35s ease;
+}
+
+.modal-content h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+.modal-content p {
+  font-size: 1rem;
+  color: #374151;
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.modal-btn.primary {
+  background: #2563eb;
+  color: #fff;
+}
+.modal-btn.primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.modal-btn.secondary {
+  background: #f3f4f6;
+  color: #1e293b;
+}
+.modal-btn.secondary:hover {
+  background: #e2e8f0;
+  transform: translateY(-2px);
+}
+
+.hidden { display: none; }
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes slideUp {
+  from {transform: translateY(40px); opacity: 0;}
+  to {transform: translateY(0); opacity: 1;}
+}
 
 
 
@@ -262,16 +371,26 @@ input[type="checkbox"] {
 
 
     <!-- Notificaciones -->
-    <section class="section" id="notificaciones">
-      <h2>Notificaciones</h2>
-      <p>Elige los tipos de notificaciones que deseas recibir.</p>
-      <div class="field"><label><input type="checkbox" checked id="newsletters"> Boletines informativos</label></div>
-      <div class="field"><label><input type="checkbox" id="reminders"> Recordatorios de actividades</label></div>
-      <div class="field"><label><input type="checkbox" id="offers"> Ofertas y novedades</label></div>
-      <div class="actions">
-        <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
-      </div>
-    </section>
+<section class="section" id="notificaciones">
+  <h2>Notificaciones</h2>
+  <p>Elige los tipos de notificaciones que deseas recibir.</p>
+
+  <div class="field">
+    <label><input type="checkbox" checked id="newsletters"> Boletines informativos</label>
+  </div>
+  <div class="field">
+    <label><input type="checkbox" id="reminders"> Recordatorios de actividades</label>
+  </div>
+  <div class="field">
+    <label><input type="checkbox" id="offers"> Ofertas y novedades</label>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
+  </div>
+
+  <div id="notifMessage" class="notif-message" style="display:none;"></div>
+</section>
 
     
 
@@ -293,6 +412,16 @@ input[type="checkbox"] {
     </form>
   </div>
 </main>
+<div id="unsavedModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <h3>⚠️ Cambios sin guardar</h3>
+    <p>¿Deseas guardar tus cambios antes de salir?</p>
+    <div class="modal-buttons">
+      <button id="modalSave" class="modal-btn primary">Guardar</button>
+      <button id="modalDiscard" class="modal-btn secondary">Descartar</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -303,4 +432,6 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/cuenta.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+
 {% endblock %}
