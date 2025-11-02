@@ -47,7 +47,7 @@ def iniciar_tareas(app):
 
     if not scheduler.running:
         with app.app_context():
-            scheduler.add_job(enviar_recordatorios, "interval", days=1)
+            scheduler.add_job(enviar_recordatorios, "interval", seconds=30)
             scheduler.add_job(enviar_ofertas, "interval", weeks=1)
             scheduler.add_job(enviar_newsletters, "cron", day_of_week="sun", hour=20, minute=0)
             scheduler.start()
