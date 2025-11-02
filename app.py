@@ -213,15 +213,62 @@ def create_app():
         # Manejar el evento checkout.session.completed
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
-
-            # Obtener email del cliente
             customer_email = session.get('customer_email')
+            amount = session.get('amount_total', 0) / 100
+            currency = session.get('currency', 'eur').upper()
 
-            # Actualizar base de datos: marcar plan como activo
-            mark_plan_as_active(customer_email, session['id'], session['amount_total']/100)
+            # 🔹 Marca el plan como activo en tu DB
+            mark_plan_as_active(customer_email, session['id'], amount)
 
-            # Enviar correo de confirmación (puedes usar SMTP, SendGrid, etc.)
-            send_confirmation_email(customer_email, session)
+            # 🔹 Envía correo de agradecimiento al cliente
+            try:
+                subject = "🎉 Gracias por tu compra en YourToolQuizz"
+                html_body = f"""
+                <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+                <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+
+                    <div style="text-align:center; margin-bottom: 25px;">
+                    <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                    </div>
+
+                    <h2 style="color:#111827; text-align:center;">¡Gracias por tu compra! 🎉</h2>
+
+                    <p style="color:#374151; font-size:15px;">
+                    Hola, nos alegra mucho que hayas confiado en <strong>YourToolQuizz</strong>.
+                    Tu pago de <strong>{amount} {currency}</strong> se ha procesado correctamente.
+                    </p>
+
+                    <p style="color:#374151; font-size:15px;">
+                    Ya puedes disfrutar de tu servicio o plan adquirido. Si tienes alguna duda, contáctanos en cualquier momento.
+                    </p>
+
+                    <div style="text-align:center; margin:30px 0;">
+                    <a href="https://yourtoolquizz.site/account" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                        Ir a mi cuenta
+                    </a>
+                    </div>
+
+                    <p style="font-size:13px; color:#6b7280;">
+                    Este mensaje se ha generado automáticamente para confirmar tu compra. 
+                    Si no reconoces este pago, contáctanos inmediatamente.
+                    </p>
+
+                    <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
+
+                    <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                    © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
+                    </p>
+
+                </div>
+                </div>
+                """
+
+                msg = Message(subject, recipients=[customer_email])
+                msg.html = html_body
+                mail.send(msg)
+                print(f"✅ Correo de agradecimiento enviado a {customer_email}")
+            except Exception as e:
+                print(f"❌ Error enviando correo de agradecimiento: {e}")
 
         return jsonify({"success": True})
 
@@ -784,10 +831,99 @@ def create_app():
         # 7️⃣ Invalidar sesiones activas (cerrar sesión actual)
         logout_user()
 
+        # 8️⃣ Enviar correo de confirmación de seguridad
+        try:
+            subject = "🔒 Tu contraseña ha sido cambiada correctamente"
+            s = URLSafeTimedSerializer(app.secret_key)
+            token = s.dumps(current_user.email, salt="password-change-alert")
+
+            html_body = """
+            <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+            <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                
+                <div style="text-align:center; margin-bottom: 25px;">
+                <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                </div>
+
+                <h2 style="color:#111827; text-align:center;">Contraseña actualizada</h2>
+
+                <p style="color:#374151; font-size:15px;">
+                Hola <strong>{{ email }}</strong>, queremos informarte que tu contraseña de <strong>YourToolQuizz</strong> se ha cambiado correctamente.
+                </p>
+
+                <p style="color:#374151; font-size:15px;">
+                Si fuiste tú, no necesitas hacer nada más.<br>
+                Si no reconoces este cambio, haz clic en el siguiente enlace:
+                </p>
+
+                <div style="text-align:center; margin:30px 0;">
+                <a href="{{ url_for('not_me_password_change', token=token, _external=True) }}" 
+                    style="background:#d97706; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                    No he sido yo
+                </a>
+                </div>
+
+                <p style="font-size:13px; color:#6b7280;">
+                Por motivos de seguridad, se ha cerrado tu sesión actual.
+                </p>
+
+                <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;">
+
+                <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                © {{ year }} YourToolQuizz — Todos los derechos reservados.
+                </p>
+            </div>
+            </div>
+            """
+
+            # ✅ Renderizamos correctamente la plantilla con Jinja
+            rendered_html = render_template_string(
+                html_body,
+                email=current_user.email,
+                token=token,
+                year=datetime.utcnow().year
+            )
+
+            msg = Message(subject, recipients=[current_user.email])
+            msg.html = rendered_html
+            mail = Mail(current_app)
+            mail.send(msg)
+
+            print(f"✅ Correo de confirmación de cambio de contraseña enviado a {current_user.email}")
+
+        except Exception as e:
+            print(f"❌ Error enviando correo de cambio de contraseña: {e}")
+            
+        # 9️⃣ Respuesta final al usuario
         return jsonify({
             "success": True,
-            "message": "Contraseña actualizada correctamente. Por seguridad, vuelve a iniciar sesión."
+            "message": "Contraseña actualizada correctamente. Se ha cerrado tu sesión por seguridad y te enviamos un correo de confirmación."
         })
+
+    @app.route("/not_me_password_change/<token>")
+    def not_me_password_change(token):
+        s = URLSafeTimedSerializer(app.secret_key)
+        try:
+            email = s.loads(token, salt="password-change-alert", max_age=3600)
+        except SignatureExpired:
+            flash("El enlace ha expirado. Solicita un restablecimiento de contraseña.", "error")
+            return redirect(url_for("forgot_password"))
+        except BadSignature:
+            flash("Enlace inválido.", "error")
+            return redirect(url_for("forgot_password"))
+
+        # Buscar al usuario
+        user = User.query.filter_by(email=email).first()
+        if user:
+            # Registrar acción de seguridad en logs (opcional)
+            print(f"⚠️ Usuario {email} ha reportado un cambio de contraseña no autorizado")
+
+            # Cerrar todas las sesiones activas (si gestionas sesiones persistentes)
+            logout_user()
+
+        # Mostrar mensaje de seguridad
+        flash("Hemos cerrado todas tus sesiones por seguridad. Restablece tu contraseña para proteger tu cuenta.", "error")
+        return redirect(url_for("forgot_password"))
 
 
 
