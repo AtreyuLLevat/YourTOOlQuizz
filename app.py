@@ -661,6 +661,7 @@ def create_app():
 
         update = supabase.table("users").update({
             "password": new_hashed,
+            "updated_at": datetime.utcnow().isoformat()  # ✅ convertido a string
         }).eq("email", current_user.email).execute()
 
         if not update.data:
@@ -670,6 +671,7 @@ def create_app():
         supabase.table("security_logs").insert({
             "user_email": current_user.email,
             "event": "Cambio de contraseña",
+            "timestamp": datetime.utcnow().isoformat(),  # ✅ convertido a string
             "ip_address": request.remote_addr
         }).execute()
 
