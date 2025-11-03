@@ -220,7 +220,7 @@ def create_app():
         except Exception as e:
             return jsonify(error=str(e)), 400
 
-    @app.route("/webhook", methods=["POST"])
+    @app.route("/webhook-stripe", methods=["POST"])
     def stripe_webhook():
         payload = request.data
         sig_header = request.headers.get('Stripe-Signature')
