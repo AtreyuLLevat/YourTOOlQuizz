@@ -231,17 +231,15 @@ def create_app():
             event = stripe.Webhook.construct_event(
                 payload, sig_header, endpoint_secret
             )
-        except ValueError as e:
-            # payload inválido
+        except ValueError:
             return jsonify({"success": False, "error": "Invalid payload"}), 400
-        except stripe.error.SignatureVerificationError as e:
-            # firma inválida
+        except stripe.error.SignatureVerificationError:
             return jsonify({"success": False, "error": "Invalid signature"}), 400
 
         # Manejar el evento checkout.session.completed
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
-            customer_email = session.get('customer_email')
+            customer_email = session.get('customer_email')  # ✅ Email del cliente
             amount = session.get('amount_total', 0) / 100
             currency = session.get('currency', 'eur').upper()
 
@@ -281,7 +279,8 @@ def create_app():
                     Si no reconoces este pago, contáctanos inmediatamente.
                     </p>
 
-                    <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;"
+                    <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;" />
+
                     <p style="font-size:12px; color:#9ca3af; text-align:center;">
                     © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
                     </p>
@@ -290,14 +289,17 @@ def create_app():
                 </div>
                 """
 
-                msg = Message(subject, recipients={email})
+                # Enviar correo al email del cliente
+                msg = Message(subject, recipients=[customer_email])
                 msg.html = html_body
                 mail.send(msg)
-                print(f"✅ Correo de agradecimiento enviado a {email}")
+                print(f"✅ Correo de agradecimiento enviado a {customer_email}")
+
             except Exception as e:
                 print(f"❌ Error enviando correo de agradecimiento: {e}")
 
         return jsonify({"success": True})
+
 
     def mark_plan_as_active(email, stripe_session_id, amount_paid):
         """
