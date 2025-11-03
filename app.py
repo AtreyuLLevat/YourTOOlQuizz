@@ -467,16 +467,25 @@ def create_app():
             q=query
         )
 
+
     @app.route("/success.html")
+    @login_required
     def success():
-        session_id = request.args.get("session_id")
-        return render_template("success.html", session_id=session_id)
+        # Solo accesible si el usuario está logueado
+        user_email = current_user.email
+        message = f"🎉 ¡Gracias por tu compra, {user_email}! Tu pago se ha procesado correctamente."
+
+        return render_template("success.html", message=message)
+
 
     @app.route("/cancel.html")
+    @login_required
     def cancel():
-    # Opcional: puedes recibir parámetros si los envía Stripe
-        session_id = request.args.get("session_id")
-        return render_template("cancel.html", session_id=session_id)
+        user_email = current_user.email
+        message = f"⚠️ Hola {user_email}, tu pago ha sido cancelado. No se ha procesado ningún cargo."
+
+        return render_template("cancel.html", message=message)
+
     # -----------------------------
     # FORMULARIOS Y CONTACTO
     # -----------------------------
