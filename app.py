@@ -39,18 +39,24 @@ print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
 
 def iniciar_tareas(app):
+    """Inicializa las tareas automáticas de notificaciones con reglas específicas."""
     from apscheduler.schedulers.background import BackgroundScheduler
-    from notifications_service import enviar_recordatorios, enviar_ofertas, enviar_newsletters
+    from apscheduler.triggers.cron import CronTrigger
+    from notifications_service import enviar_recordatorios, enviar_newsletters
 
     scheduler = BackgroundScheduler()
 
     if not scheduler.running:
-        scheduler.add_job(lambda: enviar_recordatorios(app), "interval", seconds=30)
-        scheduler.add_job(lambda: enviar_ofertas(app), "interval", seconds=45)
-        scheduler.add_job(lambda: enviar_newsletters(app), "interval", seconds=60)
-
         scheduler.start()
-        print("🕒 Tareas automáticas de notificaciones activadas correctamente.")
+        print("🕒 Scheduler iniciado correctamente.")
+
+
+    # --- Newsletter semanal ---
+    # Se envía cada viernes a las 19:00
+    trigger_newsletter = CronTrigger(day_of_week="fri", hour=19, minute=0)
+    scheduler.add_job(lambda: enviar_newsletters(app), trigger_newsletter)
+
+    print("🕒 Tareas configuradas: recordatorios diarios y newsletter semanal")
 
 # -----------------------------
 # FACTORY DE LA APP
