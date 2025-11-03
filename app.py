@@ -291,10 +291,10 @@ def create_app():
                 </div>
                 """
 
-                msg = Message(subject, recipients=[customer_email])
+                msg = Message(subject, recipients={current_user.email})
                 msg.html = html_body
                 mail.send(msg)
-                print(f"✅ Correo de agradecimiento enviado a {customer_email}")
+                print(f"✅ Correo de agradecimiento enviado a {current_user.email}")
             except Exception as e:
                 print(f"❌ Error enviando correo de agradecimiento: {e}")
 
@@ -466,7 +466,16 @@ def create_app():
             q=query
         )
 
+    @app.route("/success.html")
+    def success():
+        session_id = request.args.get("session_id")
+        return render_template("success.html", session_id=session_id)
 
+    @app.route("/cancel.html")
+    def cancel():
+    # Opcional: puedes recibir parámetros si los envía Stripe
+        session_id = request.args.get("session_id")
+        return render_template("cancel.html", session_id=session_id)
     # -----------------------------
     # FORMULARIOS Y CONTACTO
     # -----------------------------
