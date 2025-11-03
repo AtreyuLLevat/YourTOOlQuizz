@@ -850,6 +850,24 @@ def create_app():
             return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 
+    @app.route("/get_notifications", methods=["GET"])
+    @login_required
+    def get_notifications():
+        try:
+            SUPABASE_URL = os.getenv("SUPABASE_URL")
+            SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+            supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+            response = supabase.table("users").select("notifications").eq("email", current_user.email).single().execute()
+
+            if not response.data:
+                return jsonify({"success": False, "message": "Usuario no encontrado."}), 404
+
+            prefs = response.data.get("notifications", {})
+            return jsonify({"success": True, "notifications": prefs})
+        except Exception as e:
+            print(f"❌ Error al obtener notificaciones: {e}")
+            return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 
     @app.route("/change_password", methods=["POST"])
