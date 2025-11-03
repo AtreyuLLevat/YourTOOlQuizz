@@ -121,7 +121,6 @@ class UserPlan(db.Model):
     renewal_date = db.Column(db.DateTime, nullable=False)
     estado = db.Column(db.String(20), default="activo")
     
-    user = db.relationship("User", backref=db.backref("plans", lazy=True))
 
 
 
