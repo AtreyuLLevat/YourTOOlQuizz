@@ -827,29 +827,6 @@ def create_app():
         usuario = response.data if response.data else {}
         return render_template("account.html", usuario=current_user)
     
-    @app.route("/save_notifications", methods=["POST"])
-    @login_required
-    def save_notifications():
-        data = request.get_json()
-        try:
-            SUPABASE_URL = os.getenv("SUPABASE_URL")
-            SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-            supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-
-            update = supabase.table("users").update({
-                "notifications": data,  # Supongamos que guardas un JSON en esta columna
-                "updated_at": datetime.utcnow().isoformat()
-            }).eq("email", current_user.email).execute()
-
-            if not update.data:
-                return jsonify({"success": False, "message": "Error al guardar las notificaciones."}), 500
-
-            return jsonify({"success": True})
-        except Exception as e:
-            print(f"❌ Error guardando notificaciones: {e}")
-            return jsonify({"success": False, "message": "Error interno del servidor."}), 500
-
-
     @app.route("/get_notifications", methods=["GET"])
     @login_required
     def get_notifications():
@@ -859,14 +836,46 @@ def create_app():
             supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
             response = supabase.table("users").select("notifications").eq("email", current_user.email).single().execute()
+            print(f"📤 GET /get_notifications => {response.data}")  # 👀 Ver en logs
 
             if not response.data:
                 return jsonify({"success": False, "message": "Usuario no encontrado."}), 404
 
-            prefs = response.data.get("notifications", {})
+            prefs = response.data.get("notifications") or {}
+            if isinstance(prefs, str):  # a veces viene como texto JSON
+                import json
+                prefs = json.loads(prefs)
+
             return jsonify({"success": True, "notifications": prefs})
         except Exception as e:
             print(f"❌ Error al obtener notificaciones: {e}")
+            return jsonify({"success": False, "message": "Error interno."}), 500
+
+
+    @app.route("/save_notifications", methods=["POST"])
+    @login_required
+    def save_notifications():
+        try:
+            data = request.get_json(force=True)
+            print(f"📥 POST /save_notifications => {data}")  # 👀 Ver en logs
+
+            SUPABASE_URL = os.getenv("SUPABASE_URL")
+            SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+            supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+            update = supabase.table("users").update({
+                "notifications": json.dumps(data),
+                "updated_at": datetime.utcnow().isoformat()
+            }).eq("email", current_user.email).execute()
+
+            print(f"📤 Resultado Supabase => {update.data}")  # 👀 Ver en logs
+
+            if not update.data:
+                return jsonify({"success": False, "message": "Error al guardar preferencias."}), 500
+
+            return jsonify({"success": True})
+        except Exception as e:
+            print(f"❌ Error guardando notificaciones: {e}")
             return jsonify({"success": False, "message": "Error interno del servidor."}), 500
 
 
