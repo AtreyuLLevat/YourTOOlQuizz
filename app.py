@@ -290,10 +290,10 @@ def create_app():
                 </div>
                 """
 
-                msg = Message(subject, recipients={user.email})
+                msg = Message(subject, recipients={email})
                 msg.html = html_body
                 mail.send(msg)
-                print(f"✅ Correo de agradecimiento enviado a {user.email}")
+                print(f"✅ Correo de agradecimiento enviado a {email}")
             except Exception as e:
                 print(f"❌ Error enviando correo de agradecimiento: {e}")
 
