@@ -118,7 +118,12 @@ class UserPlan(db.Model):
     fecha_inicio = db.Column(db.DateTime, default=datetime.utcnow)
     fecha_fin = db.Column(db.DateTime)
     dinero_gastado = db.Column(db.Numeric(10, 2))
+    renewal_date = db.Column(db.DateTime, nullable=False)
     estado = db.Column(db.String(20), default="activo")
+    
+    user = db.relationship("User", backref=db.backref("plans", lazy=True))
+
+
 
     def __repr__(self):
         return f"<UserPlan User={self.user_id} Plan={self.plan_id}>"

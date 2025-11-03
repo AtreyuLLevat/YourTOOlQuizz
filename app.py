@@ -223,31 +223,103 @@ def create_app():
     @app.route("/webhook-stripe", methods=["POST"])
     def stripe_webhook():
         payload = request.data
-        sig_header = request.headers.get('Stripe-Signature')
-        event = None
+        sig_header = request.headers.get("Stripe-Signature")
 
-        # Validación del webhook
         try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, endpoint_secret
-            )
+            event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
         except ValueError:
             return jsonify({"success": False, "error": "Invalid payload"}), 400
         except stripe.error.SignatureVerificationError:
             return jsonify({"success": False, "error": "Invalid signature"}), 400
 
-        # Manejar el evento checkout.session.completed
-        if event['type'] == 'checkout.session.completed':
-            session = event['data']['object']
-            customer_email = session.get('customer_email')  # ✅ Email del cliente
-            amount = session.get('amount_total', 0) / 100
-            currency = session.get('currency', 'eur').upper()
+        # ----------------------------
+        # ✅ Compra completada
+        # ----------------------------
+        if event["type"] == "checkout.session.completed":
+            session = event["data"]["object"]
+            customer_email = session.get("customer_email")
+            subscription_id = session.get("subscription")
+            plan_stripe_price_id = session.get("metadata", {}).get("price_id")
 
-            # 🔹 Marca el plan como activo en tu DB
-            mark_plan_as_active(customer_email, session['id'], amount)
+            # Buscar el plan correspondiente al price_id de Stripe
+            plan = Plan.query.filter_by(stripe_price_id=plan_stripe_price_id).first()
 
-            
+            if subscription_id and customer_email:
+                subscription = stripe.Subscription.retrieve(subscription_id)
+                fecha_inicio = datetime.fromtimestamp(subscription["current_period_start"])
+                fecha_fin = datetime.fromtimestamp(subscription["current_period_end"])
+                renewal_date = fecha_fin
+
+                user = User.query.filter_by(email=customer_email).first()
+                if user and plan:
+                    existing_plan = UserPlan.query.filter_by(
+                        stripe_subscription_id=subscription_id
+                    ).first()
+
+                    if existing_plan:
+                        existing_plan.fecha_inicio = fecha_inicio
+                        existing_plan.fecha_fin = fecha_fin
+                        existing_plan.renewal_date = renewal_date
+                        existing_plan.estado = "activo"
+                    else:
+                        new_plan = UserPlan(
+                            user_id=user.id,
+                            plan_id=plan.id,
+                            stripe_subscription_id=subscription_id,
+                            fecha_inicio=fecha_inicio,
+                            fecha_fin=fecha_fin,
+                            renewal_date=renewal_date,
+                            dinero_gastado=plan.precio,
+                            estado="activo",
+                        )
+                        db.session.add(new_plan)
+
+                    # Actualizar plan actual del usuario
+                    user.current_plan_id = plan.id
+                    user.plan_expiration = fecha_fin
+
+                    db.session.commit()
+                    print(f"✅ Suscripción registrada para {user.email}")
+
+        # ----------------------------
+        # 🔁 Renovación automática
+        # ----------------------------
+        elif event["type"] == "invoice.payment_succeeded":
+            subscription_id = event["data"]["object"]["subscription"]
+            subscription = stripe.Subscription.retrieve(subscription_id)
+
+            user_plan = UserPlan.query.filter_by(
+                stripe_subscription_id=subscription_id
+            ).first()
+            if user_plan:
+                user_plan.fecha_inicio = datetime.fromtimestamp(
+                    subscription["current_period_start"]
+                )
+                user_plan.fecha_fin = datetime.fromtimestamp(
+                    subscription["current_period_end"]
+                )
+                user_plan.renewal_date = datetime.fromtimestamp(
+                    subscription["current_period_end"]
+                )
+                user_plan.estado = "activo"
+                db.session.commit()
+                print(f"🔁 Suscripción renovada: {subscription_id}")
+
+        # ----------------------------
+        # 🚫 Cancelación
+        # ----------------------------
+        elif event["type"] == "customer.subscription.deleted":
+            subscription_id = event["data"]["object"]["id"]
+            user_plan = UserPlan.query.filter_by(
+                stripe_subscription_id=subscription_id
+            ).first()
+            if user_plan:
+                user_plan.estado = "cancelado"
+                db.session.commit()
+                print(f"🚫 Suscripción cancelada: {subscription_id}")
+
         return jsonify({"success": True})
+
 
 
     def mark_plan_as_active(email, stripe_session_id, amount_paid):
