@@ -246,58 +246,7 @@ def create_app():
             # 🔹 Marca el plan como activo en tu DB
             mark_plan_as_active(customer_email, session['id'], amount)
 
-            # 🔹 Envía correo de agradecimiento al cliente
-            try:
-                subject = "🎉 Gracias por tu compra en YourToolQuizz"
-                html_body = f"""
-                <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
-                <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-
-                    <div style="text-align:center; margin-bottom: 25px;">
-                    <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
-                    </div>
-
-                    <h2 style="color:#111827; text-align:center;">¡Gracias por tu compra! 🎉</h2>
-
-                    <p style="color:#374151; font-size:15px;">
-                    Hola, nos alegra mucho que hayas confiado en <strong>YourToolQuizz</strong>.
-                    Tu pago de <strong>{amount} {currency}</strong> se ha procesado correctamente.
-                    </p>
-
-                    <p style="color:#374151; font-size:15px;">
-                    Ya puedes disfrutar de tu servicio o plan adquirido. Si tienes alguna duda, contáctanos en cualquier momento.
-                    </p>
-
-                    <div style="text-align:center; margin:30px 0;">
-                    <a href="https://yourtoolquizz.site/account" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
-                        Ir a mi cuenta
-                    </a>
-                    </div>
-
-                    <p style="font-size:13px; color:#6b7280;">
-                    Este mensaje se ha generado automáticamente para confirmar tu compra. 
-                    Si no reconoces este pago, contáctanos inmediatamente.
-                    </p>
-
-                    <hr style="margin:25px 0; border:none; border-top:1px solid #e5e7eb;" />
-
-                    <p style="font-size:12px; color:#9ca3af; text-align:center;">
-                    © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
-                    </p>
-
-                </div>
-                </div>
-                """
-
-                # Enviar correo al email del cliente
-                msg = Message(subject, recipients=[customer_email])
-                msg.html = html_body
-                mail.send(msg)
-                print(f"✅ Correo de agradecimiento enviado a {customer_email}")
-
-            except Exception as e:
-                print(f"❌ Error enviando correo de agradecimiento: {e}")
-
+            
         return jsonify({"success": True})
 
 
