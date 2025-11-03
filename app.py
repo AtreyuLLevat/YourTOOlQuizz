@@ -471,9 +471,39 @@ def create_app():
     @app.route("/success.html")
     @login_required
     def success():
-        # Solo accesible si el usuario está logueado
         user_email = current_user.email
         message = f"🎉 ¡Gracias por tu compra, {user_email}! Tu pago se ha procesado correctamente."
+
+        # Enviar correo de confirmación de compra
+        try:
+            subject = "🎉 Tu pago ha sido procesado - YourToolQuizz"
+            html_body = f"""
+            <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+                <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="text-align:center; margin-bottom: 25px;">
+                        <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                    </div>
+                    <h2 style="color:#111827; text-align:center;">¡Gracias por tu compra! 🎉</h2>
+                    <p style="color:#374151; font-size:15px;">
+                        Hola {current_user.name}, tu pago ha sido procesado correctamente. Ya puedes disfrutar de tu servicio o plan adquirido.
+                    </p>
+                    <div style="text-align:center; margin:30px 0;">
+                        <a href="https://yourtoolquizz.site/account" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                            Ir a mi cuenta
+                        </a>
+                    </div>
+                    <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                        © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
+                    </p>
+                </div>
+            </div>
+            """
+            msg = Message(subject, recipients=[user_email])
+            msg.html = html_body
+            mail.send(msg)
+            print(f"✅ Correo de confirmación de pago enviado a {user_email}")
+        except Exception as e:
+            print(f"❌ Error enviando correo de confirmación: {e}")
 
         return render_template("success.html", message=message)
 
@@ -484,7 +514,39 @@ def create_app():
         user_email = current_user.email
         message = f"⚠️ Hola {user_email}, tu pago ha sido cancelado. No se ha procesado ningún cargo."
 
+        # Enviar correo de cancelación
+        try:
+            subject = "⚠️ Tu pago fue cancelado - YourToolQuizz"
+            html_body = f"""
+            <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+                <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                    <div style="text-align:center; margin-bottom: 25px;">
+                        <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                    </div>
+                    <h2 style="color:#111827; text-align:center;">Pago cancelado ⚠️</h2>
+                    <p style="color:#374151; font-size:15px;">
+                        Hola {current_user.name}, tu intento de pago fue cancelado o no se pudo procesar. No se ha realizado ningún cargo en tu tarjeta.
+                    </p>
+                    <div style="text-align:center; margin:30px 0;">
+                        <a href="https://yourtoolquizz.site/serviciosquizz" style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                            Reintentar pago
+                        </a>
+                    </div>
+                    <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                        © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
+                    </p>
+                </div>
+            </div>
+            """
+            msg = Message(subject, recipients=[user_email])
+            msg.html = html_body
+            mail.send(msg)
+            print(f"✅ Correo de cancelación enviado a {user_email}")
+        except Exception as e:
+            print(f"❌ Error enviando correo de cancelación: {e}")
+
         return render_template("cancel.html", message=message)
+
 
     # -----------------------------
     # FORMULARIOS Y CONTACTO
