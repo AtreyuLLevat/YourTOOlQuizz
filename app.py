@@ -1,3 +1,6 @@
+from gevent import monkey
+monkey.patch_all() # debe ir **antes** de cualquier import de Flask
+
 import os
 import json
 import io
@@ -26,6 +29,10 @@ from flask import render_template_string
 from flask_bcrypt import Bcrypt
 from apscheduler.schedulers.background import BackgroundScheduler
 from extensions import mail
+from flask_socketio import SocketIO, emit
+from extensions import db, login_manager, bcrypt, mail, socketio
+from blueprints.chat_bp.routes import chat_bp
+from flask_sqlalchemy import SQLAlchemy
 
 
 
@@ -33,7 +40,7 @@ from extensions import mail
 
 
 
-
+db = SQLAlchemy()
 load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
@@ -65,6 +72,7 @@ def create_app():
     app = Flask(__name__)
     api = Blueprint('api', __name__)
     name = User.name
+    socketio = SocketIO(app, cors_allowed_origins="*")
     bcrypt = Bcrypt(app)
     app.register_blueprint(account_bp)
     stripe.api_key = os.getenv("STRIPE_API_KEY")
@@ -92,9 +100,11 @@ def create_app():
     mail.init_app(app)
     db.init_app(app)
     Migrate(app, db)
-    login_manager = LoginManager(app)
-    login_manager.login_view = 'login'
-    
+    login_manager.init_app(app)
+    bcrypt.init_app(app)
+    mail.init_app(app)
+    socketio.init_app(app)
+
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -109,7 +119,7 @@ def create_app():
 
     iniciar_tareas(app)
     
-
+    app.register_blueprint(chat_bp)
 
 
     @app.after_request
@@ -364,21 +374,21 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
   
-    @app.route('/Servicio_2')
-    def Servicio_2():
-        return render_template('Servicio_2.html')
+    @app.route('/listadodecosas')
+    def explorador():
+        return render_template('listadodecosas.html')
     
     @app.route('/Servicio_1')
     def servicio():
         return render_template('Servicio_1.html')
 
 
-    @app.route('/serviciosblogs')
-    def serviciosblogs():
-        return render_template('serviciosblogs.html')
-    @app.route('/serviciosquizz')
-    def serviciosquizz():
-        return render_template('serviciosquizz.html')
+    @app.route('/Preview')
+    def preview():
+        return render_template('Preview.html')
+    @app.route('/chat')
+    def chat():
+        return render_template('chat.html')
 
 
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
@@ -888,6 +898,7 @@ def create_app():
         # Este endpoint sirve la página HTML / plantilla
         return render_template("Menúpublicitario.html")
 
+
     @app.route("/account")
     @login_required
     def dashboard():
@@ -1101,6 +1112,18 @@ def create_app():
             return redirect(url_for(rutas_blog[slug]))
         abort(404)
 
+    @socketio.on("send_message")
+    def handle_send_message(data):
+        # Reenvía el mensaje a todos los clientes conectados
+        emit("receive_message", data, broadcast=True)
+
+    @socketio.on("reaction")
+    def handle_reaction(data):
+        emit("update_reaction", data, broadcast=True)
+
+    @socketio.on("rating")
+    def handle_rating(data):
+        emit("update_rating", data, broadcast=True)
 
 
     # -----------------------------
@@ -1134,6 +1157,7 @@ if __name__ == "__main__":
             print("Conexión a la base de datos exitosa!")
     except Exception as e:
         print(f"Error de conexión: {e}")
-
     port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    socketio = SocketIO(app, async_mode='gevent')
+    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+
