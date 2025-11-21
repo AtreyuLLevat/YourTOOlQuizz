@@ -5,7 +5,6 @@ from flask_bcrypt import Bcrypt
 from flask_mail import Mail
 from flask_socketio import SocketIO
 
-db = SQLAlchemy()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
 mail = Mail()
