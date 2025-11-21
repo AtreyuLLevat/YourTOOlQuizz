@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Preview - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --subtext: #64748b;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --radius: 14px;
+  --shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+  --transition: all 0.25s ease;
+}
+
+
+main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.5rem; }
+
+.app-header { display: flex; align-items: center; gap: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem; }
+.app-header img { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: var(--shadow); }
+.app-info h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+.app-info p { color: var(--subtext); margin-bottom: 1rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; }
+.tag { background: rgba(37, 99, 235, 0.08); color: var(--primary); font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.7rem; border-radius: 8px; }
+.actions { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.btn { display: inline-block; font-weight: 600; font-size: 0.95rem; text-decoration: none; padding: 0.85rem 1.4rem; border-radius: 10px; transition: var(--transition); text-align: center; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-outline { border: 1.5px solid var(--primary); color: var(--primary); background: transparent; }
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.tabs { display: flex; gap: 2rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.tab { padding: 0.8rem 1.2rem; cursor: pointer; font-weight: 600; transition: var(--transition); border-bottom: 3px solid transparent; }
+.tab.active { border-color: var(--primary); color: var(--primary); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.app-description { margin-bottom: 1.5rem; text-align: center; }
+.app-description h2 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text); }
+.app-description p { font-size: 1.05rem; color: var(--subtext); }
+
+.carousel-container { position: relative; border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; margin-bottom: 2rem; }
+.carousel-slide { display: flex; transition: transform 0.4s ease-in-out; gap: 10px; }
+.carousel-slide img { width: 100%; height: 400px; object-fit: cover; border-radius: var(--radius); }
+.carousel-desc { padding: 1rem 0; text-align: center; font-size: 1.05rem; color: var(--subtext); }
+.carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(37, 99, 235, 0.7); border: none; color: #fff; font-size: 1.5rem; padding: 0.5rem 1rem; border-radius: 50%; cursor: pointer; transition: var(--transition); }
+.carousel-btn:hover { background: var(--primary); }
+#prev { left: 10px; }
+#next { right: 10px; }
+.indicators { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; }
+.indicator { width: 10px; height: 10px; background: var(--border); border-radius: 50%; cursor: pointer; transition: var(--transition); }
+.indicator.active { background: var(--primary); }
+
+.ratings { margin-top: 1rem; }
+.rating-average { font-weight: 600; font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem; }
+.comment { background: var(--surface-soft); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+.comment strong { color: var(--primary); display: block; margin-bottom: 0.3rem; }
+.add-rating { text-align: center; margin-top: 1.3rem; }
+
+.team-container { display: flex; flex-direction: column; gap: 1rem; }
+.team-member-horizontal { display: flex; align-items: center; gap: 1.2rem; background: var(--surface-soft); padding: 1rem 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.team-member-horizontal img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+.team-info h3 { font-size: 1.1rem; margin-bottom: 0.2rem; }
+.team-info p { font-size: 0.9rem; color: var(--subtext); margin: 0.1rem 0; }
+.team-info .username { font-style: italic; color: var(--primary); }
+.team-info .socials a { text-decoration: none; color: var(--primary); font-size: 0.85rem; margin-right: 0.5rem; transition: var(--transition); }
+.team-info .socials a:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .carousel-slide img { height: 250px; }
+  .team-member-horizontal { flex-direction: column; align-items: flex-start; }
+  .team-info .socials { margin-top: 0.5rem; }
+}
+</style>
+{% endblock %}
+{% block content %}
+
+
+<main>
+  <section class="app-header">
+    <img src="https://picsum.photos/200?random=9" alt="Logo de MindFlow" />
+    <div class="app-info">
+      <h1>MindFlow</h1>
+      <p>Organiza tus ideas y colabora con tu comunidad de usuarios.</p>
+      <div class="tags">
+        <span class="tag">Productividad</span>
+        <span class="tag">IA</span>
+        <span class="tag">En desarrollo</span>
+      </div>
+      <div class="actions">
+        <a href="#" class="btn btn-primary">Probar app</a>
+        <a href="#" class="btn btn-outline">Entrar en comunidad</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑAS -->
+  <div class="tabs">
+    <div class="tab active" data-tab="description">Inicio / Descripción</div>
+    <div class="tab" data-tab="reviews">Reseñas</div>
+    <div class="tab" data-tab="team">Equipo</div>
+  </div>
+
+  <!-- CONTENIDO DE LAS PESTAÑAS -->
+  <div class="tab-content active" id="description">
+    <div class="app-description">
+      <h2>Descripción</h2>
+      <p>MindFlow es una plataforma que conecta a desarrolladores y usuarios para mejorar productos de manera colaborativa. Permite crear encuestas, recibir sugerencias, compartir avances y colaborar en tiempo real para lograr mejores experiencias.</p>
+    </div>
+
+    <div class="carousel-container">
+      <div class="carousel-slide">
+        <img src="https://picsum.photos/800/400?random=11" alt="Pantalla 1">
+        <img src="https://picsum.photos/800/400?random=12" alt="Pantalla 2">
+        <img src="https://picsum.photos/800/400?random=13" alt="Pantalla 3">
+      </div>
+      <p class="carousel-desc" id="carousel-desc">Conecta a desarrolladores y usuarios reales para mejorar productos colaborativamente.</p>
+      <button class="carousel-btn" id="prev">‹</button>
+      <button class="carousel-btn" id="next">›</button>
+      <div class="indicators" id="indicators"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="reviews">
+    <div class="ratings">
+      <p class="rating-average">⭐ 4.8 / 5 — basado en 214 opiniones</p>
+
+      <div class="comment">
+        <strong>@LauraUX</strong>
+        Una herramienta excelente para gestionar ideas con usuarios reales.
+      </div>
+
+      <div class="comment">
+        <strong>@DevMario</strong>
+        La comunidad de MindFlow es de las más activas que he visto.
+      </div>
+
+      <div class="add-rating">
+        <a href="#" class="btn btn-outline">Añadir valoración</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="team">
+    <div class="team-container">
+      <div class="team-member-horizontal">
+        <img src="https://picsum.photos/80?random=21" alt="Alice">
+        <div class="team-info">
+          <h3>Alice Gómez</h3>
+          <p>CEO & Co-fundadora</p>
+          <p class="username">@alice</p>
+          <div class="socials">
+            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="team-member-horizontal">
+        <img src="https://picsum.photos/80?random=22" alt="Carlos">
+        <div class="team-info">
+          <h3>Carlos Ruiz</h3>
+          <p>CTO & Co-fundador</p>
+          <p class="username">@carlos</p>
+          <div class="socials">
+            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="team-member-horizontal">
+        <img src="https://picsum.photos/80?random=23" alt="Sofía">
+        <div class="team-info">
+          <h3>Sofía Martínez</h3>
+          <p>Diseñadora UX/UI</p>
+          <p class="username">@sofia</p>
+          <div class="socials">
+            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+      <div class="team-member-horizontal">
+        <img src="https://picsum.photos/80?random=24" alt="Miguel">
+        <div class="team-info">
+          <h3>Miguel Torres</h3>
+          <p>Desarrollador Fullstack</p>
+          <p class="username">@miguel</p>
+          <div class="socials">
+            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='java/preview.js') }}"defer> </script>{% endblock %}

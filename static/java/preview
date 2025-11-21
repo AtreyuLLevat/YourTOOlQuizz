@@ -1,0 +1,55 @@
+// PESTAÑAS
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    tabContents.forEach(tc => tc.classList.toggle('active', tc.id === target));
+  });
+});
+
+// CARRUSEL
+const slide = document.querySelector('.carousel-slide');
+const slides = document.querySelectorAll('.carousel-slide img');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const indicators = document.getElementById('indicators');
+const desc = document.getElementById('carousel-desc');
+
+const descriptions = [
+  "Conecta a desarrolladores y usuarios reales para mejorar productos colaborativamente.",
+  "Permite crear encuestas, recibir sugerencias y compartir avances de forma directa.",
+  "Función de colaboración en tiempo real con feedback instantáneo."
+];
+
+let currentIndex = 0;
+slides.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.classList.add('indicator');
+  if(i === 0) dot.classList.add('active');
+  dot.addEventListener('click', () => {
+    currentIndex = i;
+    updateCarousel();
+  });
+  indicators.appendChild(dot);
+});
+
+function updateCarousel() {
+  slide.style.transform = `translateX(-${currentIndex * 100}%)`;
+  desc.textContent = descriptions[currentIndex];
+  document.querySelectorAll('.indicator').forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentIndex);
+  });
+}
+
+prevBtn.addEventListener('click', () => {
+  currentIndex = (currentIndex === 0) ? slides.length - 1 : currentIndex - 1;
+  updateCarousel();
+});
+
+nextBtn.addEventListener('click', () => {
+  currentIndex = (currentIndex === slides.length - 1) ? 0 : currentIndex + 1;
+  updateCarousel();
+});

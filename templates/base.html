@@ -4,14 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}YourToolQuizz{% endblock %}</title>
-<meta http-equiv="Content-Security-Policy" 
-      content="
-        default-src 'self';
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
-        font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;
-        img-src 'self' https://images.unsplash.com https://i.pravatar.cc data:;
-        object-src 'none';
-      ">
+<meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://cdn.socket.io 'unsafe-inline' 'unsafe-eval';
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
+    style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com;
+    font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;
+    img-src 'self' https://images.unsplash.com https://i.pravatar.cc data:;
+    connect-src 'self' https://cdn.socket.io;
+    media-src 'self';
+    object-src 'none';
+    frame-src 'self';
+">
+
+
 
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">

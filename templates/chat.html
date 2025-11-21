@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Homepage - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;} 
+body{display:flex;height:100vh;background:#f3f4f6;color:#111827;} 
+
+/* SIDEBAR */
+.sidebar{width:320px;background:#ffffff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;overflow:hidden;} 
+.sidebar-header{position:relative;height:160px;background:url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1000&q=80') center/cover;padding:16px;display:flex;align-items:flex-end;} 
+.sidebar-logo{width:72px;height:72px;border-radius:16px;background:#fff;border:4px solid #fff;position:absolute;bottom:-36px;left:20px;} 
+.sidebar-title{margin-left:92px;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,0.4);} 
+
+.sidebar-content{margin-top:48px;padding:24px;display:flex;flex-direction:column;gap:24px;overflow-y:auto;} 
+.section-title{font-size:13px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;} 
+.info-item{display:flex;justify-content:space-between;font-size:15px;font-weight:500;color:#374151;} 
+
+.rating{display:flex;gap:6px;cursor:pointer;font-size:20px;color:#fbbf24;} 
+.rating span{transition:transform .2s;} 
+.rating span:hover{transform:scale(1.2);} 
+
+/* Action Buttons */
+.actions{display:flex;flex-direction:column;gap:14px;} 
+.action-btn{display:flex;align-items:center;gap:12px;padding:12px 18px;background:#f3f4f6;border-radius:14px;font-weight:500;cursor:pointer;transition:0.25s;} 
+.action-btn:hover{background:#e5e7eb;transform:translateX(4px);} 
+.action-btn i{color:#2563eb;} 
+
+/* CHAT */
+.chat{flex:1;display:flex;flex-direction:column;background:#f7f7f7;} 
+.chat-header{padding:16px;font-size:18px;font-weight:600;background:#fff;border-bottom:1px solid #e5e7eb;} 
+.chat-messages{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;} 
+.message{max-width:70%;padding:12px 16px;border-radius:14px;line-height:1.45;font-size:15px;animation:fadeIn .25s ease;} 
+.message.admin{align-self:flex-start;background:#ffffff;font-weight:600;color:#111827;box-shadow:0 1px 4px rgba(0,0,0,0.1);} 
+.message.user{align-self:flex-end;background:#2563eb;color:#fff;} 
+.reaction{margin-left:6px;cursor:pointer;font-size:17px;} 
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);} }
+
+/* INPUT */
+.chat-input{display:flex;padding:14px;background:#fff;border-top:1px solid #e5e7eb;gap:12px;} 
+.chat-input input{flex:1;padding:12px 18px;border-radius:24px;border:1px solid #d1d5db;font-size:15px;outline:none;transition:border .2s;} 
+.chat-input input:focus{border-color:#2563eb;} 
+.chat-input button{padding:12px 22px;border-radius:24px;background:#2563eb;color:#fff;border:none;font-weight:600;cursor:pointer;transition:.25s;} 
+.chat-input button:hover{background:#1e40af;} 
+
+::-webkit-scrollbar{width:8px;} 
+::-webkit-scrollbar-thumb{background:#2563eb;border-radius:4px;} 
+</style>
+{% endblock %}
+{% block content %}
+
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <img src="https://i.pravatar.cc/72" class="sidebar-logo" />
+    <div class="sidebar-title">MiAppX</div>
+  </div>
+
+  <div class="sidebar-content">
+    <div>
+      <div class="section-title">Información del grupo</div>
+      <div class="info-item"><span>Admin:</span><span>AdminQuizz</span></div>
+      <div class="info-item"><span>Usuarios conectados:</span><span>5</span></div>
+      <div class="info-item"><span>Valoración:</span>
+        <div class="rating">
+          <span onclick="rate(1)">★</span>
+          <span onclick="rate(2)">★</span>
+          <span onclick="rate(3)">★</span>
+          <span onclick="rate(4)">★</span>
+          <span onclick="rate(5)">★</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <div class="action-btn"><i class="material-icons">poll</i> Ver encuestas</div>
+      <div class="action-btn"><i class="material-icons">chat_bubble</i> Comentarios</div>
+      <div class="action-btn"><i class="material-icons">insights</i> Estadísticas</div>
+    </div>
+  </div>
+</div>
+
+<div class="chat">
+  <div class="chat-header">Chat de MiAppX</div>
+
+  <div class="chat-messages" id="messages">
+    <div class="message admin">Admin: ¡Bienvenidos al grupo oficial de MiAppX! <span class="reaction" onclick="addReaction(this)">👍</span></div>
+    <div class="message user">Usuario1: ¡Hola! Muy buena app.</div>
+  </div>
+
+  <div class="chat-input">
+    <input type="text" id="input" placeholder="Escribe un mensaje..." />
+    <button onclick="sendMessage()">Enviar</button>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    socket.on("receive_message", data => {
+        appendMessage(data.text, data.sender);
+    });
+
+    socket.on("update_reaction", data => {
+        console.log("Reacción actualizada:", data);
+    });
+
+    socket.on("update_rating", data => {
+        console.log("Rating recibido:", data);
+    });
+</script>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Socket.IO desde CDN -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
+
+<script src="{{ url_for('static', filename='java/chat.js') }}"defer> </script>{% endblock %}
+

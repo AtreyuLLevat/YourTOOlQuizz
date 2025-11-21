@@ -28,7 +28,7 @@
     }
 
     .container{
-      max-width:var(--max-width);
+      max-width:1600px;
       margin:0 auto;
       padding:60px 40px;
     }
@@ -54,7 +54,7 @@
     /* SECCIONES DE PLANES */
     .section{
       margin-bottom:100px;
-      position:relative;
+      position:crelative;
     }
     .section h2{
       margin:0 0 20px 0;
@@ -86,27 +86,47 @@
     }
 
     /* GRID DE PLANES */
-    .plans{
-      display:flex;
-      flex-wrap:wrap;
-      gap:28px;
-    }
-    .plan{
-      flex:1 1 320px;
-      background:var(--card);
-      border:1px solid rgba(15,23,42,0.08);
-      border-radius:var(--radius);
-      padding:36px;
-      box-shadow:var(--shadow);
-      transition:transform 0.3s ease, box-shadow 0.3s ease;
-      display:flex;
-      flex-direction:column;
-      min-height:480px;
-    }
-    .plan:hover{
-      transform:translateY(-8px);
-      box-shadow:var(--shadow-hover);
-    }
+.plans-section {
+  display: flex;
+  justify-content: center;  /* espacia uniformemente las tarjetas */
+  align-items: flex-start;
+  width: 100%;
+  min-width: 1600px; /* mínimo 1600px */
+  padding: 40px 60px;
+  box-sizing: border-box;
+  gap: 40px; /* espacio entre tarjetas */
+}
+
+.plan {
+  flex: 0 0 350px; /* ancho fijo de cada tarjeta */
+  background: var(--card);
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+
+.plans-section::-webkit-scrollbar {
+  height: 10px;
+}
+
+.plans-section::-webkit-scrollbar-thumb {
+  background-color: rgba(37, 99, 235, 0.3);
+  border-radius: 10px;
+}
+
+
+
     .plan h3{
       margin:0;
       font-size:1.5rem;
@@ -575,6 +595,16 @@
         margin-bottom: 60px;
       }
     }
+    @media (max-width: 1600px) {
+  .plans-section {
+    flex-wrap: wrap; /* permite que las tarjetas bajen a otra fila si no caben */
+    justify-content: center;
+  }
+  .plan {
+    flex: 0 0 300px; /* tarjetas más pequeñas en pantallas medianas */
+  }
+}
+
   </style>
   
 {% endblock %}
@@ -599,153 +629,107 @@
     Más información.
   </a>
 </p>
-    <!-- QUIZZES -->
-    <div class="section">
-      <h2>Promociona con Quizzes Interactivos 🧠</h2>
-      <p>
-        Atrae usuarios, recopila datos útiles y haz que tu herramienta destaque mediante quizzes personalizados y optimizados para generar impacto real.
-      </p>
 
-      <div class="plans">
+    <!-- PLANES -->
+    <div class="section">
+          <h2>Nuestros Planes</h2>
+      <div class="plans-section">
+                <div class="plan">
+          <h3>GRATUITO</h3>
+          <div class="price">0€/mes</div>
+          <ul>
+            <li>✔ Actualizaciones avisos</li>
+            <li>✔ Comunidad con 100 usuarios máximo</li>
+            <li>✔ Chat solo para admins</li>
+            <li>✔ 1 admin</li>
+            <li>✔ Actualizaciones básicas</li>
+
+          </ul>
+          <span class="badge">Para probar o apps pequeñas</span>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+            <input type="hidden" name="lookup_key" value="free_monthly">
+            <button type="submit" class="btn btn-secondary">Probar gratis</button>
+          </form>
+        </div>
         <div class="plan">
-          <h3>Starter</h3>
+          <h3>BASIC</h3>
           <div class="price">9€/mes</div>
           <ul>
-            <li>1 quiz activo</li>
-            <li>Estadísticas básicas</li>
-            <li>Soporte por email</li>
-            <li>Hasta 100 respuestas/mes</li>
+            <li>✔ Actualizaciones avisos</li>
+            <li>✔ 1 comunidad por app</li>
+            <li>✔ Chat básico (mensajes de administradores → visibles para todos)</li>
+            <li>✔ Usuarios ilimitados</li>
+            <li>✔ 1 administrador</li>
+            <li>✔ Publicación de actualizaciones básicas</li>
+            <li>✔ Encuestas simples (sin segmentación)</li>
+            <li>✔ Valoraciones y comentarios</li>
+            <li>✔ Página pública de la app</li>
+            <li>✔ Control mínimo de usuarios (verificados/no verificados)</li>
+
           </ul>
           <span class="badge">Ideal para comenzar</span>
           <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
+            <input type="hidden" name="lookup_key" value="basic_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
         </div>
 
         <div class="plan">
-          <h3>Growth</h3>
-          <div class="price">19€/mes</div>
+          <h3>GROWTH</h3>
+          <div class="price">29€/mes</div>
           <ul>
-            <li>3 quizzes activos</li>
-            <li>Análisis avanzado</li>
-            <li>Sugerencias de optimización</li>
-            <li>Hasta 500 respuestas/mes</li>
+            <li>✔ Todo lo del plan BASIC</li>
+            <li>✔ Newsletter</li>
+            <li>✔ Hasta 5 administradores</li>
+            <li>✔ Chats con roles (Admin, Tester, Usuario)</li>
+            <li>✔ Encuestas con segmentación básica (solo testers / solo usuarios activos)</li>
+            <li>✔ Control de visibilidad: “mostrar / no mostrar”</li>
+            <li>✔ Limitar quién entra al grupo (verificación obligatoria)</li>
+            <li>✔ Analíticas intermedias: actividad semanal e interacción en encuestas</li>
+            <li>✔ Moderación mejorada</li>
+            <li>✔ Contenido fijado (noticias prioritarias)</li>
+
           </ul>
-          <span class="badge">Más popular</span>
+          <span class="badge">Ideal para apps que crecen rápido</span>
           <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
+            <input type="hidden" name="lookup_key" value="growth_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
         </div>
 
         <div class="plan">
-          <h3>Pro Impact</h3>
-          <div class="price">39€/mes</div>
+          <h3>PRO</h3>
+          <div class="price">79€/mes</div>
           <ul>
-            <li>Quizzes ilimitados</li>
-            <li>Asesoría personalizada</li>
-            <li>Posicionamiento destacado</li>
-            <li>Respuestas ilimitadas</li>
+            <li>✔ Todo lo del plan GROWTH</li>
+            <li>✔ Segmentación avanzada (grupos, roles personalizados, testers especializados)</li>
+            <li>✔ Lógica completa de visibilidad</li>
+            <li>✔ Notificaciones inteligentes</li>
+            <li>✔ API completa</li>
+            <li>✔ Dashboard avanzado con métricas (retención, engagement, usuarios activos diarios, rutas más visitadas)</li>
+            <li>✔ Integración con login externo</li>
+            <li>✔ Encuestas premium (varias preguntas, multietapa)</li>
+            <li>✔ 10 administradores</li>
+            <li>✔ Moderación avanzada</li>
+            <li>✔ Reglas automáticas</li>
+            <li>✔ Historial completo del chat</li>
           </ul>
-          <span class="badge">Para destacar</span>
+          <span class="badge">Ideal para empresas medianas</span>
           <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
+            <input type="hidden" name="lookup_key" value="pro_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
         </div>
-      </div>
-
-      <!-- ENLACE CÓMO FUNCIONA QUIZZES -->
-      <div class="how-it-works-link">
-        <a href="{{ url_for('Servicio_2') }}">
-          <span>¿Cómo funciona?</span>
-          <span>→</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- SEPARADOR -->
-    <div class="section-divider"></div>
-
-    <!-- BLOGS -->
-    <div class="section">
-      <h2>Destaca con Blogs Promocionales ✍️</h2>
-      <p>
-        Publica artículos sobre tu herramienta y conecta con una audiencia interesada.  
-        Ideal para mejorar tu SEO, ganar visibilidad y reforzar tu marca.
-      </p>
-
-      <div class="plans">
-        <div class="plan">
-          <h3>Artículo Estándar</h3>
-          <div class="price">25€ / publicación</div>
-          <ul>
-            <li>Redacción profesional</li>
-            <li>Optimización SEO básica</li>
-            <li>Hasta 800 palabras</li>
-            <li>1 imagen incluida</li>
-          </ul>
-          <span class="badge">Perfecto para comenzar</span>
-          <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
-        </div>
-
-        <div class="plan">
-          <h3>Artículo Premium</h3>
-          <div class="price">50€ / publicación</div>
-          <ul>
-            <li>Redacción + SEO avanzado</li>
-            <li>Promoción en redes</li>
-            <li>Hasta 1500 palabras</li>
-            <li>Hasta 3 imágenes</li>
-          </ul>
-          <span class="badge">Mayor exposición</span>
-          <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
-        </div>
-
-        <div class="plan">
-          <h3>Colaboración Editorial</h3>
-          <div class="price">70€ / publicación</div>
-          <ul>
-            <li>Co-creación con nuestro equipo</li>
-            <li>Difusión y seguimiento</li>
-            <li>Contenido extenso y detallado</li>
-            <li>Múltiples formatos de contenido</li>
-          </ul>
-          <span class="badge">Experiencia completa</span>
-          <form action="{{ url_for('create_checkout_session') }}" method="POST">
-    <input type="hidden" name="lookup_key" value="starter_monthly">
-    <button type="submit" class="btn">Comenzar ahora</button>
-</form>
-
-
-        </div>
-      </div>
-
-      <!-- ENLACE CÓMO FUNCIONA BLOGS -->
-      <div class="how-it-works-link">
-        <a href="{{ url_for('Servicio_2') }}">
-          <span>¿Cómo funciona?</span>
-          <span>→</span>
-        </a>
       </div>
     </div>
+ </div>
+
+
+
+        </div>
+      </div>
+
+
 
     <!-- RESEÑAS MINIMALISTAS -->
     <div class="testimonials-section">
