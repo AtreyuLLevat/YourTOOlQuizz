@@ -41,6 +41,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 db = SQLAlchemy()
+migrate = Migrate()
 load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
