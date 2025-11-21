@@ -96,7 +96,9 @@ def create_app():
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 
-
+    
+    migrate = Migrate()
+    migrate.init_app(app, db)
     mail.init_app(app)
     db.init_app(app)
     Migrate(app, db)
