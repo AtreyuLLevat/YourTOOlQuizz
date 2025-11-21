@@ -32,7 +32,6 @@ from extensions import mail
 from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
-from flask_sqlalchemy import SQLAlchemy
 
 
 
@@ -40,8 +39,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 
-db = SQLAlchemy()
-migrate = Migrate()
+
+
 load_dotenv()
 print(f"MAIL_USERNAME: '{os.getenv('MAIL_USERNAME')}'")
 print(f"MAIL_PASSWORD: '{os.getenv('MAIL_PASSWORD')}'")
