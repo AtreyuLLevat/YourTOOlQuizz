@@ -97,15 +97,14 @@ def create_app():
 
 
     
-    migrate = Migrate()
-    migrate.init_app(app, db)
-    mail.init_app(app)
+# Inicializar extensiones correctamente
     db.init_app(app)
-    Migrate(app, db)
+    migrate = Migrate(app, db)        # Solo una vez, ya vinculado con db
     login_manager.init_app(app)
     bcrypt.init_app(app)
     mail.init_app(app)
-    socketio.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")  # Solo una vez, no redefinir socketio
+
 
 
     @login_manager.user_loader
