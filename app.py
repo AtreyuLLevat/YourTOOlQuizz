@@ -12,7 +12,7 @@ from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import db, User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
+from models import User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
@@ -110,7 +110,6 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-
 
     # -----------------------------
     # CONTEXTO DE LA APP

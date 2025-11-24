@@ -5,10 +5,10 @@ from sqlalchemy import event
 import unicodedata, re
 from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
+from extensions import db
 
 
 
-db = SQLAlchemy()
 
 # -------------------------
 # Funciones para slug
