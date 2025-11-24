@@ -1,72 +1,106 @@
 // chat.js
+
 const messagesContainer = document.getElementById('messages');
 const inputField = document.getElementById('input');
+const sendBtn = document.getElementById('send-btn');
 
-// Función para agregar mensaje al DOM
+// -------------------------------------------------------
+// SOCKET.IO
+// -------------------------------------------------------
+const socket = io();
+
+// -------------------------------------------------------
+// Añadir mensaje al DOM (sin inline handlers)
+// -------------------------------------------------------
 function appendMessage(text, sender, messageId = null) {
     const msg = document.createElement('div');
     msg.classList.add('message', sender);
 
-    // Asignamos un id si lo recibimos
     if (messageId) msg.dataset.id = messageId;
 
     if (sender === 'admin') {
-        msg.innerHTML = `${text} <span class='reaction' onclick='addReaction(this)' data-id='${messageId}'>👍</span>`;
+        msg.textContent = text + " ";
+
+        // Crear reacción sin inline JS
+        const reaction = document.createElement('span');
+        reaction.classList.add('reaction');
+        reaction.dataset.id = messageId;
+        reaction.textContent = "👍";
+
+        reaction.addEventListener("click", () => addReaction(reaction));
+
+        msg.appendChild(reaction);
     } else {
-        msg.innerText = text;
+        msg.textContent = text;
     }
 
     messagesContainer.appendChild(msg);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Enviar reacción al servidor
+// -------------------------------------------------------
+// Enviar reacción
+// -------------------------------------------------------
 function addReaction(el) {
     const messageId = el.dataset.id || null;
     socket.emit("reaction", { message_id: messageId });
 }
 
+// -------------------------------------------------------
 // Enviar mensaje
+// -------------------------------------------------------
 function sendMessage() {
     const text = inputField.value.trim();
     if (!text) return;
 
-    // Append local user message
     appendMessage(text, 'user');
 
-    // Emitir al servidor
     socket.emit("send_message", { text, sender: "user" });
 
     inputField.value = "";
 }
 
-// Calificar estrella
+// -------------------------------------------------------
+// Rate (estrellas)
+// -------------------------------------------------------
 function rate(star) {
-    // Emitimos al servidor la calificación
     socket.emit('rate', { value: star });
-    // Feedback visual opcional
     alert(`Has dado ${star} estrella(s)`);
 }
 
-// Socket.IO
-const socket = io();
-
-// Recibir mensaje del servidor
+// -------------------------------------------------------
+// Listeners de Socket.IO
+// -------------------------------------------------------
 socket.on("receive_message", data => {
     appendMessage(data.text, data.sender, data.id);
 });
 
-// Recibir actualización de reacción
 socket.on("update_reaction", data => {
     console.log("Reacción actualizada:", data);
 });
 
-// Recibir actualización de rating
 socket.on("update_rating", data => {
     console.log("Rating recibido:", data);
 });
 
-// Enviar mensaje con Enter
+// -------------------------------------------------------
+// UI Listeners
+// -------------------------------------------------------
+sendBtn.addEventListener("click", sendMessage);
+
 inputField.addEventListener('keypress', e => {
     if (e.key === 'Enter') sendMessage();
+});
+
+// Estrellas (rating)
+document.querySelectorAll(".rate").forEach(star => {
+    star.addEventListener("click", () => {
+        const value = star.dataset.rate;
+        rate(value);
+    });
+});
+
+// Reacciones iniciales del HTML
+document.querySelectorAll(".reaction").forEach(r => {
+    r.addEventListener("click", () => addReaction(r));
 });

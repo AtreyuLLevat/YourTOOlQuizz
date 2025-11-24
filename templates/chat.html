@@ -49,8 +49,8 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
 ::-webkit-scrollbar-thumb{background:#2563eb;border-radius:4px;} 
 </style>
 {% endblock %}
-{% block content %}
 
+{% block content %}
 
 <div class="sidebar">
   <div class="sidebar-header">
@@ -65,11 +65,11 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
       <div class="info-item"><span>Usuarios conectados:</span><span>5</span></div>
       <div class="info-item"><span>Valoración:</span>
         <div class="rating">
-          <span onclick="rate(1)">★</span>
-          <span onclick="rate(2)">★</span>
-          <span onclick="rate(3)">★</span>
-          <span onclick="rate(4)">★</span>
-          <span onclick="rate(5)">★</span>
+          <span class="rate" data-rate="1">★</span>
+          <span class="rate" data-rate="2">★</span>
+          <span class="rate" data-rate="3">★</span>
+          <span class="rate" data-rate="4">★</span>
+          <span class="rate" data-rate="5">★</span>
         </div>
       </div>
     </div>
@@ -86,38 +86,23 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
   <div class="chat-header">Chat de MiAppX</div>
 
   <div class="chat-messages" id="messages">
-    <div class="message admin">Admin: ¡Bienvenidos al grupo oficial de MiAppX! <span class="reaction" onclick="addReaction(this)">👍</span></div>
+    <div class="message admin" data-id="1">
+        Admin: ¡Bienvenidos al grupo oficial de MiAppX! 
+        <span class="reaction" data-id="1">👍</span>
+    </div>
     <div class="message user">Usuario1: ¡Hola! Muy buena app.</div>
   </div>
 
   <div class="chat-input">
     <input type="text" id="input" placeholder="Escribe un mensaje..." />
-    <button onclick="sendMessage()">Enviar</button>
+    <button id="send-btn">Enviar</button>
   </div>
 </div>
 
+<!-- Cargar Socket.IO primero -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-    const socket = io();
 
-    socket.on("receive_message", data => {
-        appendMessage(data.text, data.sender);
-    });
-
-    socket.on("update_reaction", data => {
-        console.log("Reacción actualizada:", data);
-    });
-
-    socket.on("update_rating", data => {
-        console.log("Rating recibido:", data);
-    });
-</script>
+<!-- Cargar JS del chat después -->
+<script src="{{ url_for('static', filename='java/chat.js') }}" defer></script>
 
 {% endblock %}
-
-{% block extra_js %}
-<!-- Socket.IO desde CDN -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
-
-<script src="{{ url_for('static', filename='java/chat.js') }}"defer> </script>{% endblock %}
-
