@@ -100,7 +100,8 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
 </div>
 
 <!-- Cargar Socket.IO primero -->
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
+
 
 <!-- Cargar JS del chat después -->
 <script src="{{ url_for('static', filename='java/chat.js') }}" defer></script>
