@@ -1146,18 +1146,3 @@ def create_app():
     return app
 
 
-
-# -----------------------------
-# EJECUCIÓN PRINCIPAL
-# -----------------------------
-if __name__ == "__main__":
-    app = create_app()
-    try:
-        with db.engine.connect() as conn:
-            print("Conexión a la base de datos exitosa!")
-    except Exception as e:
-        print(f"Error de conexión: {e}")
-    port = int(os.environ.get('PORT', 8080))
-    socketio = SocketIO(app, async_mode='gevent')
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
-
