@@ -9,4 +9,5 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
 mail = Mail()
-socketio = SocketIO()
+socketio = SocketIO(cors_allowed_origins="*")   # SIN async_mode
+

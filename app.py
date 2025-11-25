@@ -103,7 +103,8 @@ def create_app():
     login_manager.init_app(app)
     bcrypt.init_app(app)
     mail.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")  # Solo una vez, no redefinir socketio
+    socketio.init_app(app, cors_allowed_origins="*")
+ # Solo una vez, no redefinir socketio
 
 
 
