@@ -122,6 +122,33 @@ def create_app():
     
     app.register_blueprint(chat_bp)
 
+    # Conexión
+    @socketio.on("connect")
+    def handle_connect():
+        print(f"Cliente conectado: {request.sid}")
+
+    # Mensajes
+    @socketio.on("send_message")
+    def handle_message(data):
+        # data debe contener: text, sender, id (messageId) y opcional senderId
+        message = {
+            "text": data["text"],
+            "sender": data["sender"],
+            "id": data["id"],       # el mismo ID que envió el cliente
+            "senderId": request.sid # identifica al emisor
+        }
+        # Enviar a todos menos al emisor
+        socketio.emit("receive_message", message, broadcast=True, include_self=False)
+
+    # Reacciones
+    @socketio.on("reaction")
+    def handle_reaction(data):
+        emit("update_reaction", data, broadcast=True)
+
+    # Rating
+    @socketio.on("rate")
+    def handle_rate(data):
+        emit("update_rating", data, broadcast=True)
 
     @app.after_request
     def add_csp(response):
