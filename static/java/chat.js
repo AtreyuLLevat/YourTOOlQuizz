@@ -4,15 +4,22 @@ const messagesContainer = document.getElementById('messages');
 const inputField = document.getElementById('input');
 const sendBtn = document.getElementById('send-btn');
 
+// Mantener IDs de mensajes para evitar duplicados
+const messagesMap = new Map();
+
 // -------------------------------------------------------
 // SOCKET.IO
 // -------------------------------------------------------
 const socket = io();
 
 // -------------------------------------------------------
-// Añadir mensaje al DOM (sin inline handlers)
+// Añadir mensaje al DOM
 // -------------------------------------------------------
 function appendMessage(text, sender, messageId = null) {
+    // Evitar duplicados
+    if (messageId && messagesMap.has(messageId)) return;
+    if (messageId) messagesMap.set(messageId, true);
+
     const msg = document.createElement('div');
     msg.classList.add('message', sender);
 
@@ -53,9 +60,14 @@ function sendMessage() {
     const text = inputField.value.trim();
     if (!text) return;
 
-    appendMessage(text, 'user');
+    // Crear ID único para el mensaje
+    const messageId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
 
-    socket.emit("send_message", { text, sender: "user" });
+    // Optimistic update: agregar localmente
+    appendMessage(text, 'user', messageId);
+
+    // Enviar al servidor
+    socket.emit("send_message", { text, sender: "user", id: messageId });
 
     inputField.value = "";
 }
