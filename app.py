@@ -146,29 +146,7 @@ def create_app():
         emit("receive_message", data, broadcast=True)
 
 
-    # Reacciones
-    @socketio.on("reaction")
-    def handle_reaction(data):
-        emit("update_reaction", data, broadcast=True)
 
-    # Rating
-    @socketio.on("rate")
-    def handle_rate(data):
-        emit("update_rating", data, broadcast=True)
-
-    @app.route("/get_messages")
-    def get_messages():
-        result = supabase.table("messages").select("*").order("created_at").execute()
-        return jsonify(result.data)
-
-    @app.after_request
-    def add_csp(response):
-        response.headers['Content-Security-Policy'] = (
-            "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com"
-        )
-        return response
 
     # -----------------------------
     SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -407,6 +385,29 @@ def create_app():
         # Aquí tu función de envío de correo
         send_email(email, subject, body)
 
+    # Reacciones
+    @socketio.on("reaction")
+    def handle_reaction(data):
+        emit("update_reaction", data, broadcast=True)
+
+    # Rating
+    @socketio.on("rate")
+    def handle_rate(data):
+        emit("update_rating", data, broadcast=True)
+
+    @app.route("/get_messages")
+    def get_messages():
+        result = supabase.table("messages").select("*").order("created_at").execute()
+        return jsonify(result.data)
+
+    @app.after_request
+    def add_csp(response):
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com"
+        )
+        return response
 # -----------------------------
 
     # RUTAS
