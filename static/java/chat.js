@@ -21,7 +21,9 @@ async function loadHistory() {
         const messages = await res.json();
 
         messages.forEach(m => {
-            appendMessage(m.content, m.sender_id, m.id, m.sender_name);
+            // Determinar tipo de mensaje: user = yo, admin = otro
+            const senderType = m.user_id === CURRENT_USER_ID ? 'user' : 'admin';
+            appendMessage(m.content, senderType, m.id, m.sender_name);
         });
 
         console.log("Historial cargado:", messages.length, "mensajes");
@@ -36,26 +38,42 @@ loadHistory();
 // -------------------------------------------------------
 // Añadir mensaje al DOM
 // -------------------------------------------------------
-function appendMessage(text, senderId, messageId = null, senderName = '') {
+function appendMessage(text, sender, messageId = null, senderName = null) {
     if (messageId && messagesMap.has(messageId)) return;
     if (messageId) messagesMap.set(messageId, true);
 
     const msg = document.createElement('div');
-    msg.classList.add('message');
-
-    // Asignar clase según remitente
-    if (senderId === CURRENT_USER_ID) {
-        msg.classList.add('user'); // Tus mensajes
-        msg.textContent = text;
-    } else {
-        msg.classList.add('admin'); // Mensajes de otros
-        msg.textContent = senderName + ": " + text;
-    }
+    msg.classList.add('message', sender);
 
     if (messageId) msg.dataset.id = messageId;
 
+    if (!senderName) senderName = sender === 'user' ? CURRENT_USER_NAME : "Otro";
+
+    if (sender === 'admin') {
+        msg.textContent = `${senderName}: ${text} `;
+
+        const reaction = document.createElement('span');
+        reaction.classList.add('reaction');
+        reaction.dataset.id = messageId;
+        reaction.textContent = "👍";
+
+        reaction.addEventListener("click", () => addReaction(reaction));
+
+        msg.appendChild(reaction);
+    } else {
+        msg.textContent = `${senderName}: ${text}`;
+    }
+
     messagesContainer.appendChild(msg);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// -------------------------------------------------------
+// Enviar reacción
+// -------------------------------------------------------
+function addReaction(el) {
+    const messageId = el.dataset.id || null;
+    socket.emit("reaction", { message_id: messageId });
 }
 
 // -------------------------------------------------------
@@ -65,15 +83,16 @@ function sendMessage() {
     const text = inputField.value.trim();
     if (!text) return;
 
-    // ID temporal único
     const messageId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
 
-    appendMessage(text, CURRENT_USER_ID, messageId);
+    appendMessage(text, 'user', messageId, CURRENT_USER_NAME);
 
+    // Emitir al servidor
     socket.emit("send_message", {
+        text,
+        sender: 'user',
         id: messageId,
-        text: text,
-        sender_id: CURRENT_USER_ID,
+        user_id: CURRENT_USER_ID,
         sender_name: CURRENT_USER_NAME
     });
 
@@ -81,16 +100,25 @@ function sendMessage() {
 }
 
 // -------------------------------------------------------
+// Rate (estrellas)
+// -------------------------------------------------------
+function rate(star) {
+    socket.emit('rate', { value: star });
+    alert(`Has dado ${star} estrella(s)`);
+}
+
+// -------------------------------------------------------
 // Listeners de Socket.IO
 // -------------------------------------------------------
 socket.on("receive_message", data => {
-    appendMessage(data.text, data.sender_id, data.id, data.sender_name);
+    const senderType = data.user_id === CURRENT_USER_ID ? 'user' : 'admin';
+    appendMessage(data.text, senderType, data.id, data.sender_name);
 });
 
-// Reacciones y rating (opcional)
 socket.on("update_reaction", data => {
     console.log("Reacción actualizada:", data);
 });
+
 socket.on("update_rating", data => {
     console.log("Rating recibido:", data);
 });
@@ -99,6 +127,20 @@ socket.on("update_rating", data => {
 // UI Listeners
 // -------------------------------------------------------
 sendBtn.addEventListener("click", sendMessage);
+
 inputField.addEventListener('keypress', e => {
     if (e.key === 'Enter') sendMessage();
+});
+
+// Estrellas
+document.querySelectorAll(".rate").forEach(star => {
+    star.addEventListener("click", () => {
+        const value = star.dataset.rate;
+        rate(value);
+    });
+});
+
+// Reacciones iniciales del HTML
+document.querySelectorAll(".reaction").forEach(r => {
+    r.addEventListener("click", () => addReaction(r));
 });
