@@ -17,7 +17,7 @@ const socket = io();
 // -------------------------------------------------------
 async function loadHistory() {
     try {
-        const res = await fetch("/get_messages");
+        const res = await fetch("/messages");
         const messages = await res.json();
 
         messages.forEach(m => {
