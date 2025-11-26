@@ -12,7 +12,7 @@ from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
+from models import User, Message, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
@@ -396,10 +396,6 @@ def create_app():
     def handle_rate(data):
         emit("update_rating", data, broadcast=True)
 
-    @app.route("/get_messages")
-    def get_messages():
-        result = supabase.table("messages").select("*").order("created_at").execute()
-        return jsonify(result.data)
 
     @app.after_request
     def add_csp(response):
@@ -409,6 +405,64 @@ def create_app():
             "font-src 'self' https://fonts.gstatic.com"
         )
         return response
+    
+    @app.route("/messages/send", methods=["POST"])
+    @login_required
+    def send_message():
+        data = request.json
+        recipient_id = data.get("recipient_id")
+        content = data.get("content")
+
+        # Validaciones básicas
+        if not recipient_id or not content:
+            return jsonify({"error": "Faltan datos"}), 400
+
+        recipient = User.query.get(recipient_id)
+        if not recipient:
+            return jsonify({"error": "Usuario destinatario no encontrado"}), 404
+
+        # Crear mensaje
+        message = Message(
+            sender_id=current_user.id,
+            recipient_id=recipient.id,
+            content=content
+        )
+        db.session.add(message)
+        db.session.commit()
+
+        return jsonify({"success": True, "message_id": message.id})
+    
+    @app.route("/messages", methods=["GET"])
+    @login_required
+    def get_messages():
+        messages = Message.query.filter(
+            (Message.sender_id == current_user.id) | 
+            (Message.recipient_id == current_user.id)
+        ).order_by(Message.created_at.desc()).all()
+
+        messages_list = [{
+            "id": m.id,
+            "from": m.sender.name,
+            "to": m.recipient.name,
+            "content": m.content,
+            "created_at": m.created_at.isoformat(),
+            "read": m.read
+        } for m in messages]
+
+        return jsonify(messages_list)
+
+    @app.route("/messages/read/<int:message_id>", methods=["POST"])
+    @login_required
+    def mark_read(message_id):
+        message = Message.query.get_or_404(message_id)
+        if message.recipient_id != current_user.id:
+            return jsonify({"error": "No tienes permiso"}), 403
+
+        message.read = True
+        db.session.commit()
+        return jsonify({"success": True})
+
+
 # -----------------------------
 
     # RUTAS
