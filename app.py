@@ -413,56 +413,87 @@ def create_app():
         recipient_id = data.get("recipient_id")
         content = data.get("content")
 
+        print("DEBUG: Send Message called")
+        print("DEBUG: Current user ID:", getattr(current_user, "id", None))
+        print("DEBUG: Recipient ID:", recipient_id)
+        print("DEBUG: Content:", content)
+
         # Validaciones básicas
         if not recipient_id or not content:
             return jsonify({"error": "Faltan datos"}), 400
 
         recipient = User.query.get(recipient_id)
         if not recipient:
+            print("DEBUG: Recipient not found")
             return jsonify({"error": "Usuario destinatario no encontrado"}), 404
 
-        # Crear mensaje
-        message = Message(
-            sender_id=current_user.id,
-            recipient_id=recipient.id,
-            content=content
-        )
-        db.session.add(message)
-        db.session.commit()
+        try:
+            # Crear mensaje
+            message = Message(
+                sender_id=current_user.id,
+                recipient_id=recipient.id,
+                content=content
+            )
+            db.session.add(message)
+            db.session.commit()
+            print("DEBUG: Message saved with ID:", message.id)
+            return jsonify({"success": True, "message_id": message.id})
+        except Exception as e:
+            db.session.rollback()
+            print("ERROR saving message:", e)
+            return jsonify({"error": str(e)}), 500
 
-        return jsonify({"success": True, "message_id": message.id})
-    
+    # -------------------------
+    # Obtener mensajes del usuario
+    # -------------------------
     @app.route("/messages", methods=["GET"])
     @login_required
     def get_messages():
-        messages = Message.query.filter(
-            (Message.sender_id == current_user.id) | 
-            (Message.recipient_id == current_user.id)
-        ).order_by(Message.created_at.desc()).all()
+        print("DEBUG: Get Messages called for user:", current_user.id)
 
-        messages_list = [{
-            "id": m.id,
-            "from": m.sender.name,
-            "to": m.recipient.name,
-            "content": m.content,
-            "created_at": m.created_at.isoformat(),
-            "read": m.read
-        } for m in messages]
+        try:
+            messages = Message.query.filter(
+                (Message.sender_id == current_user.id) |
+                (Message.recipient_id == current_user.id)
+            ).order_by(Message.created_at.desc()).all()
 
-        return jsonify(messages_list)
+            messages_list = [{
+                "id": m.id,
+                "from": getattr(m.sender, "name", None),
+                "to": getattr(m.recipient, "name", None),
+                "content": m.content,
+                "created_at": m.created_at.isoformat(),
+                "read": m.read
+            } for m in messages]
 
+            print(f"DEBUG: Found {len(messages_list)} messages")
+            return jsonify(messages_list)
+        except Exception as e:
+            print("ERROR fetching messages:", e)
+            return jsonify({"error": str(e)}), 500
+
+    # -------------------------
+    # Marcar mensaje como leído
+    # -------------------------
     @app.route("/messages/read/<int:message_id>", methods=["POST"])
     @login_required
     def mark_read(message_id):
-        message = Message.query.get_or_404(message_id)
-        if message.recipient_id != current_user.id:
-            return jsonify({"error": "No tienes permiso"}), 403
+        print("DEBUG: Mark read called for message:", message_id)
 
-        message.read = True
-        db.session.commit()
-        return jsonify({"success": True})
+        try:
+            message = Message.query.get_or_404(message_id)
+            if message.recipient_id != current_user.id:
+                print("DEBUG: User does not have permission")
+                return jsonify({"error": "No tienes permiso"}), 403
 
-
+            message.read = True
+            db.session.commit()
+            print("DEBUG: Message marked as read")
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            print("ERROR marking message as read:", e)
+            return jsonify({"error": str(e)}), 500
 # -----------------------------
 
     # RUTAS
