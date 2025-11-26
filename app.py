@@ -33,7 +33,7 @@ from extensions import mail
 from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
-from supabase_client import supabase
+from extensions import supabase
 
 
 
