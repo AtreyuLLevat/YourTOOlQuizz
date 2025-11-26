@@ -83,8 +83,7 @@ function rate(star) {
 // -------------------------------------------------------
 // Listeners de Socket.IO
 // -------------------------------------------------------
-socket.on("receive_message", data => {
-    if (data.senderId === myUserId) return; // ignorar tu propio mensaje
+socket.on("receive_message", data => {// ignorar tu propio mensaje
     appendMessage(data.text, data.sender, data.id);
 });
 
@@ -118,4 +117,3 @@ document.querySelectorAll(".rate").forEach(star => {
 document.querySelectorAll(".reaction").forEach(r => {
     r.addEventListener("click", () => addReaction(r));
 });
-

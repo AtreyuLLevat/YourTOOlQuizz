@@ -121,11 +121,7 @@ def create_app():
     iniciar_tareas(app)
     
     app.register_blueprint(chat_bp)
-    let myUserId = null;
 
-    socket.on("connect", () => {
-        myUserId = socket.id;
-    });
     
     # Conexión
     @socketio.on("connect")
@@ -159,9 +155,11 @@ def create_app():
     def add_csp(response):
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com"
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; "
+            "style-src-elem 'self' https://use.fontawesome.com; "
+            "font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com;"
         )
+
         return response
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
