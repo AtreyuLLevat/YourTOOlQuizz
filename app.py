@@ -1,6 +1,7 @@
 from gevent import monkey
 monkey.patch_all() # debe ir **antes** de cualquier import de Flask
 
+import traceback
 import os
 import json
 import io
@@ -32,7 +33,7 @@ from extensions import mail
 from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
-
+from supabase_client import supabase
 
 
 
@@ -148,11 +149,7 @@ def create_app():
 
 
 
-    # -----------------------------
-    SUPABASE_URL = os.getenv("SUPABASE_URL")
-    SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-    supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
 
     # Cliente admin (para actualizar usuarios, sin restricciones RLS)
     supabase_admin = create_client(
@@ -409,26 +406,19 @@ def create_app():
     @app.route("/messages/send", methods=["POST"])
     @login_required
     def send_message():
-        data = request.json
-        recipient_id = data.get("recipient_id")
-        content = data.get("content")
-
-        print("DEBUG: Send Message called")
-        print("DEBUG: Current user ID:", getattr(current_user, "id", None))
-        print("DEBUG: Recipient ID:", recipient_id)
-        print("DEBUG: Content:", content)
-
-        # Validaciones básicas
-        if not recipient_id or not content:
-            return jsonify({"error": "Faltan datos"}), 400
-
-        recipient = User.query.get(recipient_id)
-        if not recipient:
-            print("DEBUG: Recipient not found")
-            return jsonify({"error": "Usuario destinatario no encontrado"}), 404
-
         try:
-            # Crear mensaje
+            data = request.json
+            recipient_id = data.get("recipient_id")
+            content = data.get("content")
+
+            if not recipient_id or not content:
+                return jsonify({"error": "Faltan datos"}), 400
+
+            recipient = User.query.get(recipient_id)
+            if not recipient:
+                return jsonify({"error": "Usuario destinatario no encontrado"}), 404
+
+            # Guardar en DB local (SQLAlchemy)
             message = Message(
                 sender_id=current_user.id,
                 recipient_id=recipient.id,
@@ -436,41 +426,49 @@ def create_app():
             )
             db.session.add(message)
             db.session.commit()
-            print("DEBUG: Message saved with ID:", message.id)
-            return jsonify({"success": True, "message_id": message.id})
-        except Exception as e:
-            db.session.rollback()
-            print("ERROR saving message:", e)
-            return jsonify({"error": str(e)}), 500
 
-    # -------------------------
-    # Obtener mensajes del usuario
-    # -------------------------
+            # Guardar en Supabase
+            response = supabase.table("messages").insert({
+                "sender_id": current_user.id,
+                "recipient_id": recipient.id,
+                "content": content
+            }).execute()
+
+            if response.status_code != 201 and response.status_code != 200:
+                return jsonify({"error": "No se pudo guardar en Supabase", "details": response.data}), 500
+
+            return jsonify({"success": True, "message_id": message.id})
+
+        except Exception as e:
+            # Captura cualquier error
+            return jsonify({"error": "Error al enviar mensaje", "details": str(e), "trace": traceback.format_exc()}), 500
+
+    # ---------------------------
+    # Obtener mensajes
+    # ---------------------------
     @app.route("/messages", methods=["GET"])
     @login_required
     def get_messages():
-        print("DEBUG: Get Messages called for user:", current_user.id)
-
         try:
+            # Desde SQLAlchemy
             messages = Message.query.filter(
-                (Message.sender_id == current_user.id) |
+                (Message.sender_id == current_user.id) | 
                 (Message.recipient_id == current_user.id)
             ).order_by(Message.created_at.desc()).all()
 
             messages_list = [{
                 "id": m.id,
-                "from": getattr(m.sender, "name", None),
-                "to": getattr(m.recipient, "name", None),
+                "from": m.sender.name,
+                "to": m.recipient.name,
                 "content": m.content,
                 "created_at": m.created_at.isoformat(),
                 "read": m.read
             } for m in messages]
 
-            print(f"DEBUG: Found {len(messages_list)} messages")
             return jsonify(messages_list)
+
         except Exception as e:
-            print("ERROR fetching messages:", e)
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "Error al cargar mensajes", "details": str(e), "trace": traceback.format_exc()}), 500
 
     # -------------------------
     # Marcar mensaje como leído
