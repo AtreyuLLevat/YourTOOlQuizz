@@ -3,12 +3,26 @@ const chatContainer = document.getElementById('chat');
 const CURRENT_USER_ID = chatContainer.dataset.userId;
 const CURRENT_USER_NAME = chatContainer.dataset.userName;
 
-const messagesContainer = document.getElementById('messages');
+const messagesContainer = document.getElementById('messages') || document.createElement('div');
+messagesContainer.id = 'messages';
+if (!document.getElementById('messages')) chatContainer.appendChild(messagesContainer);
+
 const inputField = document.getElementById('input');
 const sendBtn = document.getElementById('send-btn');
 
 // Mantener IDs de mensajes para evitar duplicados
 const messagesMap = new Map();
+
+// Colores por usuario
+const userColors = {};
+
+function getColorForUser(username) {
+    if (!userColors[username]) {
+        const hue = Math.floor(Math.random() * 360);
+        userColors[username] = `hsl(${hue}, 70%, 50%)`;
+    }
+    return userColors[username];
+}
 
 // -------------------------------------------------------
 // SOCKET.IO
@@ -24,7 +38,6 @@ async function loadHistory() {
         const messages = await res.json();
 
         messages.forEach(m => {
-            // Determinar tipo de mensaje: user = yo, admin = otro
             const senderType = m.user_id === CURRENT_USER_ID ? 'user' : 'admin';
             appendMessage(m.content, senderType, m.id, m.sender_name);
         });
@@ -35,7 +48,6 @@ async function loadHistory() {
     }
 }
 
-// Llamar al cargar la página
 loadHistory();
 
 // -------------------------------------------------------
@@ -45,32 +57,42 @@ function appendMessage(text, sender, messageId = null, senderName = null) {
     if (messageId && messagesMap.has(messageId)) return;
     if (messageId) messagesMap.set(messageId, true);
 
-    const msg = document.createElement('div');
-    msg.classList.add('message', sender);
-
-    if (messageId) msg.dataset.id = messageId;
-
     if (!senderName) senderName = sender === 'user' ? CURRENT_USER_NAME : "Otro";
 
-    if (sender === 'admin') {
-        msg.textContent = `${senderName}: ${text} `;
+    // Contenedor del mensaje
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('message-wrapper', sender);
+    if (messageId) wrapper.dataset.id = messageId;
 
+    // Nombre del usuario encima
+    const nameEl = document.createElement('div');
+    nameEl.classList.add('username');
+    nameEl.textContent = senderName;
+    nameEl.style.color = getColorForUser(senderName);
+
+    // Mensaje
+    const msgEl = document.createElement('div');
+    msgEl.classList.add('message');
+    msgEl.textContent = text;
+
+    if (sender === 'user') msgEl.style.background = '#2563eb';
+    else msgEl.style.background = '#fff';
+
+    // Añadir reacción si es admin
+    if (sender === 'admin') {
         const reaction = document.createElement('span');
         reaction.classList.add('reaction');
         reaction.dataset.id = messageId;
-
-
         reaction.addEventListener("click", () => addReaction(reaction));
-
-        msg.appendChild(reaction);
-    } else {
-        msg.textContent = `${senderName}: ${text}`;
+        msgEl.appendChild(reaction);
     }
 
-    messagesContainer.appendChild(msg);
+    wrapper.appendChild(nameEl);
+    wrapper.appendChild(msgEl);
+    messagesContainer.appendChild(wrapper);
+
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
-
 
 // -------------------------------------------------------
 // Enviar reacción
@@ -91,7 +113,6 @@ function sendMessage() {
 
     appendMessage(text, 'user', messageId, CURRENT_USER_NAME);
 
-    // Emitir al servidor
     socket.emit("send_message", {
         text,
         sender: 'user',
