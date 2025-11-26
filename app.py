@@ -130,16 +130,21 @@ def create_app():
 
     # Mensajes
     @socketio.on("send_message")
-    def handle_message(data):
-        # data debe contener: text, sender, id (messageId) y opcional senderId
-        message = {
-            "text": data["text"],
-            "sender": data["sender"],
-            "id": data["id"],       # el mismo ID que envió el cliente
-            "senderId": request.sid # identifica al emisor
-        }
-        # Enviar a todos menos al emisor
-        socketio.emit("receive_message", message, broadcast=True, include_self=False)
+    def handle_send_message(data):
+        text = data["text"]
+        sender = data["sender"]
+        message_id = data["id"]
+
+        # Guardar en Supabase
+        supabase.table("messages").insert({
+            "id": message_id,
+            "text": text,
+            "sender": sender
+        }).execute()
+
+        # Emitir a todos
+        emit("receive_message", data, broadcast=True)
+
 
     # Reacciones
     @socketio.on("reaction")
@@ -150,6 +155,11 @@ def create_app():
     @socketio.on("rate")
     def handle_rate(data):
         emit("update_rating", data, broadcast=True)
+
+    @app.route("/get_messages")
+    def get_messages():
+        result = supabase.table("messages").select("*").order("created_at").execute()
+        return jsonify(result.data)
 
     @app.after_request
     def add_csp(response):

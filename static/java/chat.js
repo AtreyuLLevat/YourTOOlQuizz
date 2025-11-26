@@ -13,10 +13,30 @@ const messagesMap = new Map();
 const socket = io();
 
 // -------------------------------------------------------
+// Cargar historial desde el backend
+// -------------------------------------------------------
+async function loadHistory() {
+    try {
+        const res = await fetch("/get_messages");
+        const messages = await res.json();
+
+        messages.forEach(m => {
+            appendMessage(m.text, m.sender, m.id);
+        });
+
+        console.log("Historial cargado:", messages.length, "mensajes");
+    } catch (err) {
+        console.error("Error cargando historial:", err);
+    }
+}
+
+// Llamar al cargar la página
+loadHistory();
+
+// -------------------------------------------------------
 // Añadir mensaje al DOM
 // -------------------------------------------------------
 function appendMessage(text, sender, messageId = null) {
-    // Evitar duplicados
     if (messageId && messagesMap.has(messageId)) return;
     if (messageId) messagesMap.set(messageId, true);
 
@@ -28,7 +48,6 @@ function appendMessage(text, sender, messageId = null) {
     if (sender === 'admin') {
         msg.textContent = text + " ";
 
-        // Crear reacción sin inline JS
         const reaction = document.createElement('span');
         reaction.classList.add('reaction');
         reaction.dataset.id = messageId;
@@ -60,13 +79,10 @@ function sendMessage() {
     const text = inputField.value.trim();
     if (!text) return;
 
-    // Crear ID único para el mensaje
     const messageId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
 
-    // Optimistic update: agregar localmente
     appendMessage(text, 'user', messageId);
 
-    // Enviar al servidor
     socket.emit("send_message", { text, sender: "user", id: messageId });
 
     inputField.value = "";
@@ -83,10 +99,9 @@ function rate(star) {
 // -------------------------------------------------------
 // Listeners de Socket.IO
 // -------------------------------------------------------
-socket.on("receive_message", data => {// ignorar tu propio mensaje
+socket.on("receive_message", data => {
     appendMessage(data.text, data.sender, data.id);
 });
-
 
 socket.on("update_reaction", data => {
     console.log("Reacción actualizada:", data);
@@ -105,7 +120,7 @@ inputField.addEventListener('keypress', e => {
     if (e.key === 'Enter') sendMessage();
 });
 
-// Estrellas (rating)
+// Estrellas
 document.querySelectorAll(".rate").forEach(star => {
     star.addEventListener("click", () => {
         const value = star.dataset.rate;
