@@ -1,4 +1,7 @@
 // chat.js
+const chatContainer = document.getElementById('chat');
+const CURRENT_USER_ID = chatContainer.dataset.userId;
+const CURRENT_USER_NAME = chatContainer.dataset.userName;
 
 const messagesContainer = document.getElementById('messages');
 const inputField = document.getElementById('input');

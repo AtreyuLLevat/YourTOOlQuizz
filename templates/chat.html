@@ -93,6 +93,11 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
     <button id="send-btn">Enviar</button>
   </div>
 </div>
+<div id="chat" 
+     data-user-id="{{ current_user.id }}" 
+     data-user-name="{{ current_user.name }}">
+</div>
+
 
 <!-- Cargar Socket.IO -->
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
