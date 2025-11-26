@@ -153,12 +153,14 @@ def create_app():
 
     @app.after_request
     def add_csp(response):
-            response.headers['Content-Security-Policy'] = (
-                "default-src 'self'; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' https://fonts.gstatic.com"
-            )
+        response.headers['Content-Security-Policy'] = (
+            "default-src 'self'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com"
+        )
         return response
+
+    # -----------------------------
     SUPABASE_URL = os.getenv("SUPABASE_URL")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
     SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
