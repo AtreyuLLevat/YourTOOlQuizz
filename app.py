@@ -121,7 +121,12 @@ def create_app():
     iniciar_tareas(app)
     
     app.register_blueprint(chat_bp)
+    let myUserId = null;
 
+    socket.on("connect", () => {
+        myUserId = socket.id;
+    });
+    
     # Conexión
     @socketio.on("connect")
     def handle_connect():
