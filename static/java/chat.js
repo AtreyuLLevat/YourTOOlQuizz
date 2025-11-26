@@ -41,25 +41,31 @@ loadHistory();
 // -------------------------------------------------------
 // Añadir mensaje al DOM
 // -------------------------------------------------------
-function appendMessage(text, sender, messageId = null) {
+function appendMessage(text, sender, messageId = null, senderName = null) {
     if (messageId && messagesMap.has(messageId)) return;
     if (messageId) messagesMap.set(messageId, true);
 
     const msg = document.createElement('div');
-
-    // Establecer clase según sender
-    if (sender === 'self') {
-        msg.classList.add('message', 'user');  // tus mensajes
-    } else if (sender === 'admin') {
-        msg.classList.add('message', 'admin'); // admin
-    } else {
-        msg.classList.add('message', 'other'); // mensajes externos
-    }
+    msg.classList.add('message', sender);
 
     if (messageId) msg.dataset.id = messageId;
 
-    // Solo texto, sin emojis
-    msg.textContent = text;
+    if (!senderName) senderName = sender === 'user' ? CURRENT_USER_NAME : "Otro";
+
+    if (sender === 'admin') {
+        msg.textContent = `${senderName}: ${text} `;
+
+        const reaction = document.createElement('span');
+        reaction.classList.add('reaction');
+        reaction.dataset.id = messageId;
+
+
+        reaction.addEventListener("click", () => addReaction(reaction));
+
+        msg.appendChild(reaction);
+    } else {
+        msg.textContent = `${senderName}: ${text}`;
+    }
 
     messagesContainer.appendChild(msg);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
