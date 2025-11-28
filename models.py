@@ -52,18 +52,17 @@ class Page(db.Model):
 class Message(db.Model):
     __tablename__ = "messages"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)  # mismo tipo que Supabase
     sender_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    recipient_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    sender_name = db.Column(db.String(150), nullable=False)  # necesario para el chat
+    text = db.Column(db.Text, nullable=False)  # unifica ambos sistemas (antes "content")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    read = db.Column(db.Boolean, default=False)
 
     sender = db.relationship("User", foreign_keys=[sender_id], backref="sent_messages")
-    recipient = db.relationship("User", foreign_keys=[recipient_id], backref="received_messages")
 
     def __repr__(self):
-        return f"<Message {self.id} from {self.sender_id} to {self.recipient_id}>"
+        return f"<Message {self.id} from {self.sender_name}>"
+
 
 
 # -------------------------
