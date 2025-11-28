@@ -446,8 +446,11 @@
   </div>
 
 </div>
+<div id="chat" data-user-id="{{ current_user.id }}" data-user-name="{{ current_user.name }}"></div>
 
+<!-- --- SCRIPTS --- -->
 <script src="{{ url_for('static', filename='java/menupublicitario.js') }}" defer></script>
+<script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/chat.js') }}" defer></script>
 </body>
 </html>
