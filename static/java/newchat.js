@@ -1,14 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const newChatBtn = document.getElementById("new-chat-btn");
-    if (newChatBtn) {
-        newChatBtn.addEventListener("click", createChat);
-    }
-
     const chatContainer = document.getElementById('chat');
-    const CURRENT_USER_ID = chatContainer ? chatContainer.dataset.userId : null;
-    const CURRENT_USER_NAME = chatContainer ? chatContainer.dataset.userName : null;
+    if (!chatContainer) return console.error("No se encontró el contenedor de chat");
 
-    if (!chatContainer) return;
+    const CURRENT_USER_ID = chatContainer.dataset.userId;
+    const CURRENT_USER_NAME = chatContainer.dataset.userName;
 
     // Contenedor de mensajes
     const messagesContainer = document.getElementById('messages') || (() => {
@@ -19,25 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return div;
     })();
 
+    // Input y botones
     const inputField = document.getElementById('input');
     const sendBtn = document.getElementById('send-btn');
+    const newChatBtn = document.getElementById("new-chat-btn");
 
     let CURRENT_CHAT_ID = null;
     const messagesMap = new Map();
-    const userColors = {};
 
-    function getColorForUser(username) {
-        if (!userColors[username]) {
-            const hue = Math.floor(Math.random() * 360);
-            userColors[username] = `hsl(${hue}, 70%, 50%)`;
-        }
-        return userColors[username];
-    }
-
+    // Inicializa socket
     const socket = io();
 
-    // -------------------------------------------------------
+    // -----------------------------
     // Crear nuevo chat
+    // -----------------------------
     async function createChat() {
         try {
             const res = await fetch("/chat/create", {
@@ -47,25 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             if (!res.ok) throw new Error(`Error creando chat: ${res.status}`);
-
             const data = await res.json();
             CURRENT_CHAT_ID = data.chat_id;
+
+            // Limpiar mensajes anteriores
             messagesContainer.innerHTML = "";
             messagesMap.clear();
-            socket.emit("join_chat", { chat_id: CURRENT_CHAT_ID });
 
+            // Unirse a la sala
+            socket.emit("join_chat", { chat_id: CURRENT_CHAT_ID });
         } catch (err) {
             console.error(err);
-            alert("Error creando chat. Revisa la consola.");
         }
     }
 
-    // -------------------------------------------------------
+    // -----------------------------
     // Añadir mensaje al DOM
+    // -----------------------------
     function appendMessage(text, sender, messageId = null, senderName = null) {
+        if (!text) return;
         if (messageId && messagesMap.has(messageId)) return;
         if (messageId) messagesMap.set(messageId, true);
-        if (!senderName) senderName = sender === 'user' ? CURRENT_USER_NAME : "Otro";
+        senderName = senderName || (sender === 'user' ? CURRENT_USER_NAME : "Otro");
 
         const wrapper = document.createElement('div');
         wrapper.classList.add('message-wrapper', sender);
@@ -74,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const nameEl = document.createElement('div');
         nameEl.classList.add('username');
         nameEl.textContent = senderName;
-        nameEl.style.color = getColorForUser(senderName);
 
         const msgEl = document.createElement('div');
         msgEl.classList.add('message');
@@ -88,33 +80,42 @@ document.addEventListener("DOMContentLoaded", () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
+    // -----------------------------
+    // Enviar mensaje
+    // -----------------------------
     function sendMessage() {
-        const text = inputField.value.trim();
-        if (!text || !CURRENT_CHAT_ID) return;
+        if (!inputField || !inputField.value.trim() || !CURRENT_CHAT_ID) return;
 
-        const messageId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
+        const messageId = Date.now().toString() + Math.random().toString(36).substring(2,5);
+        const text = inputField.value.trim();
+
         appendMessage(text, 'user', messageId, CURRENT_USER_NAME);
 
         socket.emit("send_message", {
+            chat_id: CURRENT_CHAT_ID,
             text,
             sender: 'user',
             id: messageId,
             user_id: CURRENT_USER_ID,
-            sender_name: CURRENT_USER_NAME,
-            chat_id: CURRENT_CHAT_ID
+            sender_name: CURRENT_USER_NAME
         });
 
         inputField.value = "";
     }
 
-    // -------------------------------------------------------
-    // Listeners Socket.IO
+    // -----------------------------
+    // Socket.IO events
+    // -----------------------------
     socket.on("receive_message", data => {
-        if (data.chat_id !== CURRENT_CHAT_ID) return;
-        const senderType = data.user_id === Number(CURRENT_USER_ID) ? 'user' : 'admin';
+        if (!CURRENT_CHAT_ID || data.chat_id !== CURRENT_CHAT_ID) return;
+        const senderType = data.user_id == CURRENT_USER_ID ? 'user' : 'admin';
         appendMessage(data.text, senderType, data.id, data.sender_name);
     });
 
+    // -----------------------------
+    // Event listeners
+    // -----------------------------
     sendBtn?.addEventListener("click", sendMessage);
     inputField?.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    newChatBtn?.addEventListener("click", createChat);
 });

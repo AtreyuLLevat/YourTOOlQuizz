@@ -135,17 +135,20 @@ def create_app():
     # Mensajes
     @socketio.on("send_message")
     def handle_send_message(data):
-        chat_id = data["chat_id"]
+        chat_id = data.get("chat_id")
+        if chat_id:
+            # Guardar mensaje en DB
+            supabase.table("messages").insert({
+                "id": data.get("id"),
+                "chat_id": chat_id,
+                "user_id": data.get("user_id"),
+                "sender_name": data.get("sender_name"),
+                "text": data.get("text")
+            }).execute()
 
-        supabase.table("messages").insert({
-            "id": data["id"],
-            "text": data["text"],
-            "sender_id": data["user_id"],
-            "sender_name": data["sender_name"],
-            "chat_id": chat_id
-        }).execute()
+            # Emitir a todos en la sala
+            emit("receive_message", data, room=chat_id)
 
-        emit("receive_message", data, room=chat_id)
 
 
 
@@ -494,25 +497,25 @@ def create_app():
             print("ERROR marking message as read:", e)
             return jsonify({"error": str(e)}), 500
 
-    @app.route("/chat/create", methods=["POST"])
-    @login_required
-    def create_chat():
-        try:
-            data = request.json
-            chat_id = str(uuid.uuid4())
-            title = data.get("title", "Nuevo chat")
-            
-            response = supabase.table("chats").insert({
-                "id": chat_id,
-                "user_id": str(current_user.id),  # asegurarse de que sea string
-                "title": title
-            }).execute()
-            
-            print(response)  # Para depuración
-            return jsonify({"chat_id": chat_id, "title": title})
-        except Exception as e:
-            print("Error creando chat:", e)
-            return jsonify({"error": str(e)}), 500
+        @app.route("/chat/create", methods=["POST"])
+        @login_required
+        def create_chat():
+            try:
+                data = request.json
+                chat_id = str(uuid.uuid4())
+                title = data.get("title", "Nuevo chat")
+                
+                response = supabase.table("chats").insert({
+                    "id": chat_id,
+                    "user_id": str(current_user.id),  # asegurarse de que sea string
+                    "title": title
+                }).execute()
+                
+                print(response)  # Para depuración
+                return jsonify({"chat_id": chat_id, "title": title})
+            except Exception as e:
+                print("Error creando chat:", e)
+                return jsonify({"error": str(e)}), 500
 
 
     @app.route("/chat/list", methods=["GET"])
