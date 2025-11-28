@@ -33,7 +33,7 @@ from extensions import mail
 from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
-from extensions import supabase
+
 
 
 
@@ -453,20 +453,19 @@ def create_app():
     @app.route("/messages", methods=["GET"])
     @login_required
     def get_messages():
-        msgs = Message.query.filter(
-            (Message.sender_id == current_user.id) | 
-            (Message.recipient_id == current_user.id)
-        ).order_by(Message.created_at.asc()).all()
+        try:
+            # cargar historial desde Supabase (ya que tu chat usa Supabase)
+            response = supabase.table("messages") \
+                .select("*") \
+                .order("created_at", desc=False) \
+                .execute()
 
-        return jsonify([
-            {
-                "id": m.id,
-                "content": m.content,
-                "user_id": m.sender_id,
-                "sender_name": m.sender.name
-            }
-            for m in msgs
-        ])
+            return jsonify(response.data if response.data else [])
+
+        except Exception as e:
+            print("❌ Error en /messages:", e)
+            return jsonify([])
+
 
 
     # -------------------------
