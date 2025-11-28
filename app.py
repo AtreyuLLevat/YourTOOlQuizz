@@ -132,19 +132,19 @@ def create_app():
     # Mensajes
     @socketio.on("send_message")
     def handle_send_message(data):
-        text = data["text"]
-        sender = data["sender"]
-        message_id = data["id"]
+        try:
+            response = supabase.table("messages").insert({
+                "id": data["id"],
+                "text": data["text"],
+                "sender_id": data["user_id"],
+                "sender_name": data["sender_name"]
+            }).execute()
 
-        # Guardar en Supabase
-        supabase.table("messages").insert({
-            "id": message_id,
-            "text": text,
-            "sender": sender
-        }).execute()
+            emit("receive_message", data, broadcast=True)
 
-        # Emitir a todos
-        emit("receive_message", data, broadcast=True)
+        except Exception as e:
+            print("ERROR guardando mensaje en Supabase:", e)
+
 
 
 
@@ -453,26 +453,21 @@ def create_app():
     @app.route("/messages", methods=["GET"])
     @login_required
     def get_messages():
-        try:
-            # Desde SQLAlchemy
-            messages = Message.query.filter(
-                (Message.sender_id == current_user.id) | 
-                (Message.recipient_id == current_user.id)
-            ).order_by(Message.created_at.desc()).all()
+        msgs = Message.query.filter(
+            (Message.sender_id == current_user.id) | 
+            (Message.recipient_id == current_user.id)
+        ).order_by(Message.created_at.asc()).all()
 
-            messages_list = [{
+        return jsonify([
+            {
                 "id": m.id,
-                "from": m.sender.name,
-                "to": m.recipient.name,
                 "content": m.content,
-                "created_at": m.created_at.isoformat(),
-                "read": m.read
-            } for m in messages]
+                "user_id": m.sender_id,
+                "sender_name": m.sender.name
+            }
+            for m in msgs
+        ])
 
-            return jsonify(messages_list)
-
-        except Exception as e:
-            return jsonify({"error": "Error al cargar mensajes", "details": str(e), "trace": traceback.format_exc()}), 500
 
     # -------------------------
     # Marcar mensaje como leído
@@ -517,6 +512,7 @@ def create_app():
     def preview():
         return render_template('Preview.html')
     @app.route('/chat')
+    @login_required
     def chat():
         return render_template('chat.html')
 
@@ -1242,18 +1238,7 @@ def create_app():
             return redirect(url_for(rutas_blog[slug]))
         abort(404)
 
-    @socketio.on("send_message")
-    def handle_send_message(data):
-        # Reenvía el mensaje a todos los clientes conectados
-        emit("receive_message", data, broadcast=True)
 
-    @socketio.on("reaction")
-    def handle_reaction(data):
-        emit("update_reaction", data, broadcast=True)
-
-    @socketio.on("rating")
-    def handle_rating(data):
-        emit("update_rating", data, broadcast=True)
 
 
     # -----------------------------
