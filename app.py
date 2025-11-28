@@ -34,6 +34,8 @@ from extensions import mail
 from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
+from flask_socketio import join_room, leave_room, emit
+
 
 
 
@@ -528,8 +530,11 @@ def create_app():
 
     @socketio.on("join_chat")
     def join_chat(data):
-        chat_id = data["chat_id"]
-        join_room(chat_id)
+        chat_id = data.get("chat_id")
+        if chat_id:
+            join_room(chat_id)
+            print(f"Usuario {request.sid} se unió a la sala {chat_id}")
+
 
 
 
