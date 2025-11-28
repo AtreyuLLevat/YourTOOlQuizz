@@ -132,18 +132,18 @@ def create_app():
     # Mensajes
     @socketio.on("send_message")
     def handle_send_message(data):
-        try:
-            response = supabase.table("messages").insert({
-                "id": data["id"],
-                "text": data["text"],
-                "sender_id": data["user_id"],
-                "sender_name": data["sender_name"]
-            }).execute()
+        chat_id = data["chat_id"]
 
-            emit("receive_message", data, broadcast=True)
+        supabase.table("messages").insert({
+            "id": data["id"],
+            "text": data["text"],
+            "sender_id": data["user_id"],
+            "sender_name": data["sender_name"],
+            "chat_id": chat_id
+        }).execute()
 
-        except Exception as e:
-            print("ERROR guardando mensaje en Supabase:", e)
+        emit("receive_message", data, room=chat_id)
+
 
 
 
@@ -490,6 +490,42 @@ def create_app():
             db.session.rollback()
             print("ERROR marking message as read:", e)
             return jsonify({"error": str(e)}), 500
+
+    @app.route("/chat/create", methods=["POST"])
+    @login_required
+    def create_chat():
+        data = request.json
+        chat_id = str(uuid.uuid4())
+        title = data.get("title", "Nuevo chat")
+        
+        supabase.table("chats").insert({
+            "id": chat_id,
+            "user_id": current_user.id,
+            "title": title
+        }).execute()
+        
+        return jsonify({"chat_id": chat_id, "title": title})
+
+    @app.route("/chat/list", methods=["GET"])
+    @login_required
+    def list_chats():
+        res = supabase.table("chats").select("*").eq("user_id", current_user.id).order("created_at").execute()
+        return jsonify(res.data)
+
+
+    @app.route("/chat/<chat_id>/messages", methods=["GET"])
+    @login_required
+    def chat_messages(chat_id):
+        res = supabase.table("messages").select("*").eq("chat_id", chat_id).order("created_at").execute()
+        return jsonify(res.data)
+
+    @socketio.on("join_chat")
+    def join_chat(data):
+        chat_id = data["chat_id"]
+        join_room(chat_id)
+
+
+
 # -----------------------------
 
     # RUTAS

@@ -3,7 +3,7 @@ const chatContainer = document.getElementById('chat');
 const CURRENT_USER_ID = chatContainer.dataset.userId;
 const CURRENT_USER_NAME = chatContainer.dataset.userName;
 
-// Crear contenedor de mensajes si no existe
+// Contenedores
 const messagesContainer = document.getElementById('messages') || (() => {
     const div = document.createElement('div');
     div.id = 'messages';
@@ -11,15 +11,18 @@ const messagesContainer = document.getElementById('messages') || (() => {
     chatContainer.appendChild(div);
     return div;
 })();
-
+const chatList = document.getElementById('chat-list'); // sidebar para chats
 const inputField = document.getElementById('input');
 const sendBtn = document.getElementById('send-btn');
 
-// IDs de mensajes para evitar duplicados
+// Variables globales
+let CURRENT_CHAT_ID = null;
 const messagesMap = new Map();
-
-// Colores identificadores por usuario
 const userColors = {};
+
+// -------------------------------------------------------
+// Funciones auxiliares
+// -------------------------------------------------------
 function getColorForUser(username) {
     if (!userColors[username]) {
         const hue = Math.floor(Math.random() * 360);
@@ -34,23 +37,66 @@ function getColorForUser(username) {
 const socket = io();
 
 // -------------------------------------------------------
-// Cargar historial desde el backend
+// Cargar chats del usuario
 // -------------------------------------------------------
-async function loadHistory() {
-    try {
-        const res = await fetch("/messages");
-        const messages = await res.json();
-        messages.forEach(m => {
-            const senderType = m.sender_id === Number(CURRENT_USER_ID) ? 'user' : 'admin';
-            appendMessage(m.text, senderType, m.id, m.sender_name);
-        });
-
-        console.log("Historial cargado:", messages.length, "mensajes");
-    } catch (err) {
-        console.error("Error cargando historial:", err);
-    }
+async function loadChats() {
+    const res = await fetch("/chat/list");
+    const chats = await res.json();
+    chatList.innerHTML = "";
+    chats.forEach(c => addChatToSidebar(c.id, c.title));
 }
-loadHistory();
+
+// Añade chat al sidebar
+function addChatToSidebar(chatId, title) {
+    const div = document.createElement("div");
+    div.classList.add("chat-item");
+    div.dataset.chatId = chatId;
+    div.textContent = title;
+    div.addEventListener("click", () => loadChat(chatId));
+    chatList.appendChild(div);
+}
+
+// Resalta chat activo
+function highlightActiveChat(chatId) {
+    document.querySelectorAll(".chat-item").forEach(el => el.classList.remove("active"));
+    const active = document.querySelector(`.chat-item[data-chat-id='${chatId}']`);
+    if (active) active.classList.add("active");
+}
+
+// -------------------------------------------------------
+// Cargar mensajes de un chat
+// -------------------------------------------------------
+async function loadChat(chatId) {
+    CURRENT_CHAT_ID = chatId;
+    highlightActiveChat(chatId);
+
+    messagesContainer.innerHTML = "";
+    messagesMap.clear();
+
+    socket.emit("join_chat", { chat_id: chatId });
+
+    const res = await fetch(`/chat/${chatId}/messages`);
+    const messages = await res.json();
+
+    messages.forEach(m => {
+        const senderType = m.sender_id === Number(CURRENT_USER_ID) ? 'user' : 'admin';
+        appendMessage(m.text, senderType, m.id, m.sender_name);
+    });
+}
+
+// -------------------------------------------------------
+// Crear nuevo chat
+// -------------------------------------------------------
+async function createChat() {
+    const res = await fetch("/chat/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "Nuevo chat" })
+    });
+    const data = await res.json();
+    addChatToSidebar(data.chat_id, data.title);
+    loadChat(data.chat_id);
+}
 
 // -------------------------------------------------------
 // Añadir mensaje al DOM
@@ -60,25 +106,21 @@ function appendMessage(text, sender, messageId = null, senderName = null) {
     if (messageId) messagesMap.set(messageId, true);
     if (!senderName) senderName = sender === 'user' ? CURRENT_USER_NAME : "Otro";
 
-    // Contenedor del mensaje
     const wrapper = document.createElement('div');
     wrapper.classList.add('message-wrapper', sender);
     if (messageId) wrapper.dataset.id = messageId;
 
-    // Nombre encima del mensaje
     const nameEl = document.createElement('div');
     nameEl.classList.add('username');
     nameEl.textContent = senderName;
     nameEl.style.color = getColorForUser(senderName);
 
-    // Burbuja del mensaje
     const msgEl = document.createElement('div');
     msgEl.classList.add('message');
     msgEl.textContent = text;
     msgEl.style.background = sender === 'user' ? '#2563eb' : '#fff';
     msgEl.style.color = sender === 'user' ? '#fff' : '#111827';
 
-    // Reacción para mensajes admin
     if (sender === 'admin') {
         const reaction = document.createElement('span');
         reaction.classList.add('reaction');
@@ -90,7 +132,6 @@ function appendMessage(text, sender, messageId = null, senderName = null) {
     wrapper.appendChild(nameEl);
     wrapper.appendChild(msgEl);
     messagesContainer.appendChild(wrapper);
-
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
@@ -107,7 +148,7 @@ function addReaction(el) {
 // -------------------------------------------------------
 function sendMessage() {
     const text = inputField.value.trim();
-    if (!text) return;
+    if (!text || !CURRENT_CHAT_ID) return;
 
     const messageId = Date.now().toString() + Math.random().toString(36).substring(2, 5);
     appendMessage(text, 'user', messageId, CURRENT_USER_NAME);
@@ -117,35 +158,24 @@ function sendMessage() {
         sender: 'user',
         id: messageId,
         user_id: CURRENT_USER_ID,
-        sender_name: CURRENT_USER_NAME
+        sender_name: CURRENT_USER_NAME,
+        chat_id: CURRENT_CHAT_ID
     });
 
     inputField.value = "";
 }
 
 // -------------------------------------------------------
-// Rate (estrellas)
-// -------------------------------------------------------
-function rate(star) {
-    socket.emit('rate', { value: star });
-    alert(`Has dado ${star} estrella(s)`);
-}
-
-// -------------------------------------------------------
-// Listeners de Socket.IO
+// Listeners Socket.IO
 // -------------------------------------------------------
 socket.on("receive_message", data => {
-    const senderType = data.user_id === CURRENT_USER_ID ? 'user' : 'admin';
+    if (data.chat_id !== CURRENT_CHAT_ID) return;
+    const senderType = data.user_id === Number(CURRENT_USER_ID) ? 'user' : 'admin';
     appendMessage(data.text, senderType, data.id, data.sender_name);
 });
 
-socket.on("update_reaction", data => {
-    console.log("Reacción actualizada:", data);
-});
-
-socket.on("update_rating", data => {
-    console.log("Rating recibido:", data);
-});
+socket.on("update_reaction", data => console.log("Reacción actualizada:", data));
+socket.on("update_rating", data => console.log("Rating recibido:", data));
 
 // -------------------------------------------------------
 // UI Listeners
@@ -153,16 +183,8 @@ socket.on("update_rating", data => {
 sendBtn.addEventListener("click", sendMessage);
 inputField.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 
-// Estrellas
-document.querySelectorAll(".rate").forEach(star => {
-    star.addEventListener("click", () => {
-        const value = star.dataset.rate;
-        rate(value);
-    });
-});
+// Botón nuevo chat
+document.getElementById("new-chat-btn")?.addEventListener("click", createChat);
 
-// Reacciones iniciales del HTML
-document.querySelectorAll(".reaction").forEach(r => {
-    r.addEventListener("click", () => addReaction(r));
-});
-
+// Inicializa chats al cargar
+loadChats();

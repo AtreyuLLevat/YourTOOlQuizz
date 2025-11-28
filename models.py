@@ -46,6 +46,26 @@ class Page(db.Model):
     def __repr__(self):
         return f"<Page {self.name}>"
 
+
+
+
+# -------------------------
+# MODELO DE CHATS
+# -------------------------
+class Chat(db.Model):
+    __tablename__ = "chats"
+
+    id = db.Column(db.String(100), primary_key=True)  # usamos string como en Supabase
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False, default="Nuevo chat")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref=db.backref("chats", lazy=True))
+    messages = db.relationship("Message", backref="chat", lazy=True)
+
+    def __repr__(self):
+        return f"<Chat {self.title} User={self.user_id}>"
+
 # -------------------------
 # MODELO DE MENSAJES
 # -------------------------
@@ -56,12 +76,14 @@ class Message(db.Model):
     sender_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     sender_name = db.Column(db.String(150), nullable=False)  # necesario para el chat
     text = db.Column(db.Text, nullable=False)  # unifica ambos sistemas (antes "content")
+    chat_id = db.Column(db.String(100), db.ForeignKey("chats.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     sender = db.relationship("User", foreign_keys=[sender_id], backref="sent_messages")
 
     def __repr__(self):
         return f"<Message {self.id} from {self.sender_name}>"
+
 
 
 
