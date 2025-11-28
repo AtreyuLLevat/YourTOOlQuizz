@@ -497,25 +497,25 @@ def create_app():
             print("ERROR marking message as read:", e)
             return jsonify({"error": str(e)}), 500
 
-        @app.route("/chat/create", methods=["POST"])
-        @login_required
-        def create_chat():
-            try:
-                data = request.json
-                chat_id = str(uuid.uuid4())
-                title = data.get("title", "Nuevo chat")
+    @app.route("/chat/create", methods=["POST"])
+     @login_required
+    def create_chat():
+        try:
+            data = request.json
+            chat_id = str(uuid.uuid4())
+            title = data.get("title", "Nuevo chat")
                 
-                response = supabase.table("chats").insert({
-                    "id": chat_id,
-                    "user_id": str(current_user.id),  # asegurarse de que sea string
-                    "title": title
-                }).execute()
+            response = supabase.table("chats").insert({
+                "id": chat_id,
+                "user_id": str(current_user.id),  # asegurarse de que sea string
+                "title": title
+            }).execute()
                 
-                print(response)  # Para depuración
-                return jsonify({"chat_id": chat_id, "title": title})
-            except Exception as e:
-                print("Error creando chat:", e)
-                return jsonify({"error": str(e)}), 500
+            print(response)  # Para depuración
+            return jsonify({"chat_id": chat_id, "title": title})
+        except Exception as e:
+            print("Error creando chat:", e)
+            return jsonify({"error": str(e)}), 500
 
 
     @app.route("/chat/list", methods=["GET"])
