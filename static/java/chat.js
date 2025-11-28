@@ -41,9 +41,10 @@ async function loadHistory() {
         const res = await fetch("/messages");
         const messages = await res.json();
         messages.forEach(m => {
-            const senderType = m.user_id === CURRENT_USER_ID ? 'user' : 'admin';
-            appendMessage(m.content, senderType, m.id, m.sender_name);
+            const senderType = m.sender_id === Number(CURRENT_USER_ID) ? 'user' : 'admin';
+            appendMessage(m.text, senderType, m.id, m.sender_name);
         });
+
         console.log("Historial cargado:", messages.length, "mensajes");
     } catch (err) {
         console.error("Error cargando historial:", err);
@@ -164,3 +165,4 @@ document.querySelectorAll(".rate").forEach(star => {
 document.querySelectorAll(".reaction").forEach(r => {
     r.addEventListener("click", () => addReaction(r));
 });
+
