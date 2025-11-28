@@ -32,34 +32,21 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
     margin-left:80px;font-size:20px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.4);
 }
 .sidebar-content{
-    margin-top:40px;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;
+    margin-top:40px;padding:20px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;
 }
-.chat-list{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    margin-top:16px;
-}
-.chat-item{
-    padding:10px;
-    border-radius:8px;
-    cursor:pointer;
-    background:#f3f4f6;
-    transition:0.2s;
-}
-.chat-item.active{
-    background:#dbeafe;
-    font-weight:600;
-}
+.section-title{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.info-item{display:flex;justify-content:space-between;font-size:14px;font-weight:500;color:#374151;}
+.rating{display:flex;gap:6px;cursor:pointer;font-size:18px;color:#fbbf24;}
+.rating span{transition:transform .2s;}
+.rating span:hover{transform:scale(1.2);}
+.actions{display:flex;flex-direction:column;gap:12px;}
+.action-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;background:#f3f4f6;border-radius:12px;font-weight:500;cursor:pointer;transition:0.2s;}
+.action-btn:hover{background:#e5e7eb;transform:translateX(2px);}
+.action-btn i{color:#2563eb;}
 
 /* --- CHAT --- */
 .chat{
     flex:1;display:flex;flex-direction:column;background:#f7f7f7;position:relative;
-}
-.chat-header{
-    padding:16px;
-    font-weight:600;
-    border-bottom:1px solid #e5e7eb;
 }
 .chat-messages{
     flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;
@@ -74,8 +61,13 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
     padding:10px 16px;border-radius:16px;line-height:1.45;font-size:14px;word-wrap:break-word;
     position:relative;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:0.2s;
 }
-.message.user{background:#2563eb;color:#fff;}
-.message.admin{background:#fff;color:#111827;}
+.message.user{
+    background:#909ff3;color:#000000;border-bottom-right-radius:4px;border-bottom-left-radius:16px;
+}
+.message.admin{
+    background:#2563eb;color:#ffffff;border-bottom-left-radius:4px;border-bottom-right-radius:16px;
+}
+.message:hover{box-shadow:0 3px 6px rgba(0,0,0,0.15);}
 .reaction{margin-left:6px;cursor:pointer;font-size:16px;}
 
 /* --- INPUT --- */
@@ -101,6 +93,7 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
 </style>
 {% endblock %}
 
+
 {% block content %}
 <div class="sidebar">
   <div class="sidebar-header">
@@ -109,18 +102,34 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
   </div>
 
   <div class="sidebar-content">
-    <button id="new-chat-btn" class="action-btn" style="margin-bottom:12px;">+ Nuevo chat</button>
+    <div>
+      <div class="section-title">Información del grupo</div>
+      <div class="info-item"><span>Admin:</span><span>AdminQuizz</span></div>
+      <div class="info-item"><span>Usuarios conectados:</span><span>5</span></div>
+      <div class="info-item"><span>Valoración:</span>
+        <div class="rating">
+          <span class="rate" data-rate="1">★</span>
+          <span class="rate" data-rate="2">★</span>
+          <span class="rate" data-rate="3">★</span>
+          <span class="rate" data-rate="4">★</span>
+          <span class="rate" data-rate="5">★</span>
+        </div>
+      </div>
+    </div>
 
-    <div class="chat-list" id="chat-list">
-      <!-- Chats se cargarán aquí dinámicamente -->
+    <div class="actions">
+      <div class="action-btn"><i class="material-icons">poll</i> Ver encuestas</div>
+      <div class="action-btn"><i class="material-icons">chat_bubble</i> Comentarios</div>
+      <div class="action-btn"><i class="material-icons">insights</i> Estadísticas</div>
     </div>
   </div>
 </div>
 
 <div class="chat">
-  <div class="chat-header" id="chat-header">Selecciona un chat</div>
+  <div class="chat-header">Chat de MiAppX</div>
 
   <div class="chat-messages" id="messages">
+
     <div class="message user">Chat activo.</div>
   </div>
 
@@ -129,14 +138,14 @@ body{display:flex;height:100vh;background:#f3f4f6;color:#111827;}
     <button id="send-btn">Enviar</button>
   </div>
 </div>
-
 <div id="chat" 
      data-user-id="{{ current_user.id }}" 
      data-user-name="{{ current_user.name }}">
 </div>
 
+
 <!-- Cargar Socket.IO -->
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
-<!-- JS del chat -->
+<!-- JS del chat separado -->
 <script src="{{ url_for('static', filename='java/chat.js') }}" defer></script>
 {% endblock %}
