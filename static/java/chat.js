@@ -1,7 +1,18 @@
-// chat.js
+
+document.addEventListener("DOMContentLoaded", () => {
+    const newChatBtn = document.getElementById("new-chat-btn");
+    if (newChatBtn) {
+        newChatBtn.addEventListener("click", createChat);
+    }
+
+
 const chatContainer = document.getElementById('chat');
-const CURRENT_USER_ID = chatContainer.dataset.userId;
-const CURRENT_USER_NAME = chatContainer.dataset.userName;
+const CURRENT_USER_ID = chatContainer ? chatContainer.dataset.userId : null;
+const CURRENT_USER_NAME = chatContainer ? chatContainer.dataset.userName : null;
+
+if(chatContainer) {
+    // resto del código que depende de chatContainer
+}
 
 // Contenedores
 const messagesContainer = document.getElementById('messages') || (() => {
@@ -14,6 +25,7 @@ const messagesContainer = document.getElementById('messages') || (() => {
 const chatList = document.getElementById('chat-list'); // sidebar para chats
 const inputField = document.getElementById('input');
 const sendBtn = document.getElementById('send-btn');
+
 
 // Variables globales
 let CURRENT_CHAT_ID = null;
@@ -188,3 +200,4 @@ document.getElementById("new-chat-btn")?.addEventListener("click", createChat);
 
 // Inicializa chats al cargar
 loadChats();
+});
