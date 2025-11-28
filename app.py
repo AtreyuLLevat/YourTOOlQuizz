@@ -498,7 +498,7 @@ def create_app():
             return jsonify({"error": str(e)}), 500
 
     @app.route("/chat/create", methods=["POST"])
-     @login_required
+    @login_required
     def create_chat():
         try:
             data = request.json
