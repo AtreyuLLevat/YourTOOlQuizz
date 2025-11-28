@@ -8,6 +8,7 @@ import io
 import pyotp
 import qrcode
 import stripe
+import uuid
 from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint, render_template_string
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
