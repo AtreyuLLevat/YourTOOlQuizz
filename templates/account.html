@@ -542,7 +542,12 @@ input[type="checkbox"] {
 
 {% block extra_js %}
 <!-- Coloca esto en tu base.html antes de tus scripts de dashboard -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0/dist/supabase.js"></script>
+
+<script>
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+</script>
+
 <script type="module" src="{{ url_for('static', filename='java/supabaseClient.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/verificarPlan.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/overlayCompra.js') }}" defer></script>
