@@ -14,10 +14,10 @@ from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+# En app.py - Actualiza los imports
 from models import (
-    User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics,
-    App, GroupMember, GroupMessage, MessageReaction, PollVote, 
-    AppRating, AppAnalytics, SecurityLog, Result
+    User, Quiz, Question, Blog, Page, Plan, UserPlan, 
+    App, GroupMember, GroupMessage, SecurityLog, Result
 )
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
