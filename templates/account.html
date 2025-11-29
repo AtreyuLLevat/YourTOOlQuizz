@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Centro de Cuenta | YourToolQuizz{% endblock %}
 
-
 {% block extra_css %}
 <style>
 :root {
@@ -15,7 +14,7 @@
   --danger: #dc2626;
   --radius: 10px;
   --shadow: 0 2px 6px rgba(0,0,0,0.04);
-  --sidebar-width: 200px;
+  --sidebar-width: 220px;
   --transition: all 0.2s ease;
   font-family: "Inter", "Segoe UI", sans-serif;
 }
@@ -23,13 +22,44 @@
 /* === ESTRUCTURA GENERAL DEL ÁREA PRINCIPAL === */
 .dashboard-container {
   display: flex;
-  height: calc(100vh - 120px); /* resta header + footer aproximados */
+  height: calc(100vh - 120px);
   background: var(--bg);
   overflow: hidden;
 }
 
 /* === SIDEBAR === */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--card-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
+.sidebar h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.sidebar .menu-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 6px;
+  transition: var(--transition);
+}
+
+.sidebar .menu-item:hover,
+.sidebar .menu-item.active {
+  background: var(--primary);
+  color: #fff;
+}
 
 /* === CONTENIDO PRINCIPAL === */
 .main {
@@ -175,6 +205,60 @@ input[type="checkbox"] {
   text-decoration: underline;
 }
 
+/* === CLASE PARA OCULTAR ELEMENTOS === */
+.hidden {
+  display: none !important;
+}
+
+/* === MODAL === */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.modal-btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: #f1f5f9;
+  color: var(--text);
+}
+
 /* === SCROLL === */
 .main::-webkit-scrollbar {
   width: 8px;
@@ -200,218 +284,250 @@ input[type="checkbox"] {
     gap: 32px;
   }
 }
-.hidden { display: none; }
-
-.notif-message {
-  margin-top: 15px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-weight: 500;
-  animation: fadeIn 0.4s ease;
+/* Apps - cabecera */
+.apps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.notif-message.success {
-  background: #e0f2fe;
-  color: #0369a1;
-  border-left: 4px solid #0284c7;
+/* Lista de apps */
+.apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.notif-message.error {
-  background: #fee2e2;
-  color: #991b1b;
-  border-left: 4px solid #ef4444;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(17, 24, 39, 0.55);
+/* Cada app como botón completo */
+.app-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   background: #fff;
-  border-radius: 16px;
-  padding: 28px 32px;
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.35s ease;
-}
-
-.modal-content h3 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 12px;
-}
-
-.modal-content p {
-  font-size: 1rem;
-  color: #374151;
-  margin-bottom: 22px;
-  line-height: 1.6;
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.modal-btn {
-  padding: 10px 22px;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
-  border: none;
-  transition: all 0.25s ease;
+  text-align: left;
+  gap: 12px;
+  transition: all 0.2s ease;
 }
 
-.modal-btn.primary {
-  background: #2563eb;
-  color: #fff;
-}
-.modal-btn.primary:hover {
-  background: #1d4ed8;
-  transform: translateY(-2px);
+.app-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
-.modal-btn.secondary {
-  background: #f3f4f6;
+/* Imagen de la app */
+.app-img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Nombre de la app */
+.app-name {
+  font-size: 1rem;
+  font-weight: 500;
   color: #1e293b;
 }
-.modal-btn.secondary:hover {
-  background: #e2e8f0;
-  transform: translateY(-2px);
+#createAppForm textarea,
+#createAppForm select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition);
 }
 
-.hidden { display: none; }
-
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+#createAppForm textarea:focus,
+#createAppForm select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
 }
-@keyframes slideUp {
-  from {transform: translateY(40px); opacity: 0;}
-  to {transform: translateY(0); opacity: 1;}
-}
-
 
 
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3>Menú</h3>
+    <div class="menu-item active" data-target="configuracion">Configuración</div>
+    <div class="menu-item" data-target="apps">Apps</div>
+  </aside>
 
+  <!-- Contenido principal -->
+  <main class="main">
+    <div class="content-inner">
 
-<main class="main">
-  <div class="content-inner">
-    <h1>Centro de Cuenta</h1>
-    <div class="sub">Administra tu información personal, seguridad y preferencias de privacidad.</div>
+      <!-- CONFIGURACIÓN -->
+      <div id="configuracion">
+        <h1>Centro de Cuenta</h1>
+        <div class="sub">Administra tu información personal, seguridad y preferencias de privacidad.</div>
 
-    <!-- Perfil general -->
-    <section class="section" id="perfil">
-      <h2>Perfil general</h2>
-      <p>Tu información personal se usa para gestionar tu cuenta y ofrecerte una mejor experiencia.</p>
+        <!-- Perfil general -->
+        <section class="section" id="perfil">
+          <h2>Perfil general</h2>
+          <p>Tu información personal se usa para gestionar tu cuenta y ofrecerte una mejor experiencia.</p>
 
-      <div class="field">
-        <label for="name">Nombre</label>
-      <input id="name" type="text" value="{{ usuario.name or usuario.email.split('@')[0] }}">
+          <div class="field">
+            <label for="name">Nombre</label>
+            <input id="name" type="text" value="{{ usuario.name or usuario.email.split('@')[0] }}">
+          </div>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" value="{{ usuario.email }}">
+          </div>
+          <div class="actions">
+            <button class="btn primary hidden" id="saveProfile">Guardar cambios</button>
+          </div>
+        </section>
 
+        <!-- Seguridad -->
+        <section class="section">
+          <h2>Seguridad y Contraseña</h2>
+          <p>Protege tu cuenta cambiando tu contraseña o activando la verificación en dos pasos.</p>
+          <form id="changePasswordForm">
+            <div class="field">
+              <label for="current_password">Contraseña actual</label>
+              <input id="current_password" type="password" required>
+            </div>
+            <div class="field">
+              <label for="new_password">Nueva contraseña</label>
+              <input id="new_password" type="password" required>
+            </div>
+            <div class="field">
+              <label for="confirm_password">Confirmar nueva contraseña</label>
+              <input id="confirm_password" type="password" required>
+            </div>
+            <div class="actions">
+              <button type="submit" class="btn primary">Actualizar contraseña</button>
+            </div>
+          </form>
+          <div id="passwordFeedback" style="margin-top:10px;color:green;display:none;"></div>
+        </section>
+
+        <!-- Notificaciones -->
+        <section class="section" id="notificaciones">
+          <h2>Notificaciones</h2>
+          <p>Elige los tipos de notificaciones que deseas recibir.</p>
+          <div class="field">
+            <label><input type="checkbox" checked id="newsletters"> Boletines informativos</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="reminders"> Recordatorios de actividades</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="offers"> Ofertas y novedades</label>
+          </div>
+          <div class="actions">
+            <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
+          </div>
+          <div id="notifMessage" class="notif-message" style="display:none;"></div>
+        </section>
+
+        <!-- Menú publicitario -->
+        <section class="section" id="privacidad">
+          <h2>Menú publicitario</h2>
+          <p>Controla tus servicios contratados en este menú.</p>
+          <div class="actions">
+            <a href="{{ url_for('menupublicitario') }}" class="btn primary" style="text-decoration: none;">Acceder al menú</a>
+          </div>
+        </section>
+
+        <!-- Cerrar sesión -->
+        <form action="{{ url_for('logout') }}" method="GET">
+          <button type="submit" class="logout-btn">Cerrar sesión</button>
+        </form>
       </div>
-      <div class="field">
-        <label for="email">Correo electrónico</label>
-        <input id="email" type="email" value="{{ usuario.email }}">
-      </div>
-      <div class="actions">
-        <button class="btn primary hidden" id="saveProfile">Guardar cambios</button>
-      </div>
-    </section>
 
-    <!-- Seguridad -->
-<section class="section">
-  <h2>Seguridad y Contraseña</h2>
-  <p>Protege tu cuenta cambiando tu contraseña o activando la verificación en dos pasos.</p>
+      <!-- APPS -->
+      <!-- APPS -->
+      <div id="apps" class="hidden">
+        <div class="apps-header">
+          <h1>Apps</h1>
+          <div class="actions" style="justify-content:flex-end;margin-bottom:20px;">
+          <button id="newAppBtn" class="btn primary">Nueva App</button>
+        </div>
+        </div>
+        <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
 
-  <!-- Cambio de contraseña dinámico -->
-  <form id="changePasswordForm">
-      <div class="field">
-        <label for="current_password">Contraseña actual</label>
-        <input id="current_password" type="password" required>
-      </div>
-      <div class="field">
-        <label for="new_password">Nueva contraseña</label>
-        <input id="new_password" type="password" required>
-      </div>
-      <div class="field">
-        <label for="confirm_password">Confirmar nueva contraseña</label>
-        <input id="confirm_password" type="password" required>
-      </div>
-      <div class="actions">
-        <button type="submit" class="btn primary">Actualizar contraseña</button>
-      </div>
-  </form>
-
-  <div id="passwordFeedback" style="margin-top:10px;color:green;display:none;"></div>
-</section>
-
-
-    <!-- Notificaciones -->
-<section class="section" id="notificaciones">
-  <h2>Notificaciones</h2>
-  <p>Elige los tipos de notificaciones que deseas recibir.</p>
-
-  <div class="field">
-    <label><input type="checkbox" checked id="newsletters"> Boletines informativos</label>
-  </div>
-  <div class="field">
-    <label><input type="checkbox" id="reminders"> Recordatorios de actividades</label>
-  </div>
-  <div class="field">
-    <label><input type="checkbox" id="offers"> Ofertas y novedades</label>
-  </div>
-
-  <div class="actions">
-    <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
-  </div>
-
-  <div id="notifMessage" class="notif-message" style="display:none;"></div>
-</section>
-
-    
-
-    <!-- Privacidad -->
-    <section class="section" id="privacidad">
-      <h2>Menú publicitario</h2>
-      <p>Controla tus servicios contratados en este menú.</p>
-      <div class="actions">
-      <a href="{{ url_for('menupublicitario') }}" class="btn primary"style="text-decoration: none;">
-        Acceder al menú.
-      </a>
+        <div id="appsList" class="apps-list">
+          <!-- Lista de apps se insertará aquí dinámicamente -->
+          <!-- Ejemplo estático -->
+          <button class="app-item">
+            <img src="{{ url_for('static', filename='images/app-placeholder.png') }}" alt="App" class="app-img">
+            <span class="app-name">App de ejemplo</span>
+          </button>
+        </div>
       </div>
 
-    </section>
 
-    <!-- Cerrar sesión -->
-    <form action="{{ url_for('logout') }}" method="GET">
-      <button type="submit" class="logout-btn">Cerrar sesión</button>
-    </form>
-  </div>
-</main>
+
+<!-- Modal Crear App -->
+    <div id="createAppModal" class="modal-backdrop hidden">
+      <div class="modal-content">
+        <h3>Crear Nueva App</h3>
+        <form id="createAppForm">
+          <div class="field">
+            <label for="appName">Nombre</label>
+            <input id="appName" type="text" required>
+          </div>
+          <div class="field">
+            <label for="appDescription">Descripción</label>
+            <textarea id="appDescription" rows="3" required></textarea>
+          </div>
+          <div class="field">
+            <label for="appImage">Foto de la App</label>
+            <input id="appImage" type="file" accept="image/*">
+          </div>
+          <div class="field">
+            <label for="appTeam">Creadores / Equipo</label>
+            <input id="appTeam" type="text">
+          </div>
+          <div class="field">
+            <label for="appTheme">Tema</label>
+            <input id="appTheme" type="text">
+          </div>
+          <div class="field">
+            <label for="appCreationDate">Fecha de creación</label>
+            <input id="appCreationDate" type="date">
+          </div>
+          <div class="field">
+            <label for="appStatus">Estado</label>
+            <select id="appStatus">
+              <option value="desarrollo">En desarrollo</option>
+              <option value="finalizada">Finalizada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="appOfficialId">Identificación / Propiedad</label>
+            <input id="appOfficialId" type="text">
+          </div>
+
+          <div class="modal-buttons">
+            <button type="submit" class="modal-btn primary">Guardar</button>
+            <button type="button" id="cancelAppBtn" class="modal-btn secondary">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal sin guardar -->
 <div id="unsavedModal" class="modal-backdrop hidden">
   <div class="modal-content">
     <h3>⚠️ Cambios sin guardar</h3>
@@ -425,6 +541,68 @@ input[type="checkbox"] {
 {% endblock %}
 
 {% block extra_js %}
+<script>
+// Cambiar sección visible al hacer click en la sidebar
+document.addEventListener('DOMContentLoaded', function() {
+  const menuItems = document.querySelectorAll('.sidebar .menu-item');
+  const sections = {
+    configuracion: document.getElementById('configuracion'),
+    apps: document.getElementById('apps')
+  };
+
+  // Función para cambiar de sección
+  function changeSection(targetId) {
+    // Ocultar todas las secciones
+    Object.values(sections).forEach(section => {
+      if (section) section.classList.add('hidden');
+    });
+    
+    // Mostrar la sección seleccionada
+    if (sections[targetId]) {
+      sections[targetId].classList.remove('hidden');
+    }
+    
+    // Actualizar estado activo en la sidebar
+    menuItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.dataset.target === targetId) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  // Agregar event listeners a los elementos del menú
+  menuItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const target = item.dataset.target;
+      changeSection(target);
+    });
+  });
+
+  // Inicializar con la sección de configuración visible
+  changeSection('configuracion');
+});
+</script>
+<script>
+const newAppBtn = document.getElementById('newAppBtn');
+const createAppModal = document.getElementById('createAppModal');
+const cancelAppBtn = document.getElementById('cancelAppBtn');
+
+newAppBtn.addEventListener('click', () => {
+  createAppModal.classList.remove('hidden');
+});
+
+cancelAppBtn.addEventListener('click', () => {
+  createAppModal.classList.add('hidden');
+});
+
+// Cerrar modal al hacer click fuera del contenido
+createAppModal.addEventListener('click', (e) => {
+  if(e.target === createAppModal){
+    createAppModal.classList.add('hidden');
+  }
+});
+</script>
 <script type="module" src="{{ url_for('static', filename='java/supabaseClient.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/verificarPlan.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/overlayCompra.js') }}" defer></script>
@@ -433,5 +611,5 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/cuenta.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
 <script src="{{ url_for('static', filename='java/notifications.js') }}"></script>
-
+<script src="{{ url_for('static', filename='java/app.js') }}"></script>
 {% endblock %}

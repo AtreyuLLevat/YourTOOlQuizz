@@ -6,6 +6,7 @@ import unicodedata, re
 from sqlalchemy.dialects.postgresql import UUID, JSON
 import uuid
 from extensions import db
+from sqlalchemy import Column, String, Date, DateTime, ForeignKey, func
 
 # -------------------------
 # Funciones para slug
@@ -26,6 +27,32 @@ def unique_slug(model, base_slug):
 # -------------------------
 # MODELO DE USUARIOS (SIMPLIFICADO)
 # -------------------------
+
+class SupabaseApp(db.Model):
+    __tablename__ = "supabase_apps"
+
+    # Primary Key
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    # Campos de la app
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    image_url = db.Column(db.String(500))
+    team = db.Column(db.Text)
+    theme = db.Column(db.String(100))
+    creation_date = db.Column(Date)
+    status = db.Column(db.String(50))
+    official_id = db.Column(db.String(200))
+
+    # Usuario que la creó (FK a supabase_id del usuario)
+    created_by = db.Column(UUID(as_uuid=True), ForeignKey("users.supabase_id"), nullable=False)
+
+    # Timestamp de creación
+    created_at = db.Column(DateTime, server_default=func.now())
+
+    def __repr__(self):
+        return f"<SupabaseApp {self.name} (Created by {self.created_by})>"
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
