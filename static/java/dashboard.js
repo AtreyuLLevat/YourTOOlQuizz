@@ -1,3 +1,11 @@
+   document.addEventListener('DOMContentLoaded', () => {
+  const createAppForm = document.getElementById('createAppForm');
+  if(createAppForm){
+    createAppForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      // tu lógica de submit aquí
+
+
    // === Mostrar modal de contraseña ===
     const changeBtn = document.getElementById('changeBtn');
     const modal = document.getElementById('modal');
@@ -35,3 +43,6 @@
     document.getElementById('logoutBtn').addEventListener('click',()=>{
       if(confirm('¿Seguro que quieres cerrar sesión?')) alert('Sesión cerrada.');
     });
+        });
+  }
+});

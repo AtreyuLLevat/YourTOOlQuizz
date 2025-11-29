@@ -541,7 +541,8 @@ input[type="checkbox"] {
 {% endblock %}
 
 {% block extra_js %}
-
+<!-- Coloca esto en tu base.html antes de tus scripts de dashboard -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.76.1/dist/supabase.min.js"></script>
 <script type="module" src="{{ url_for('static', filename='java/supabaseClient.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/verificarPlan.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/overlayCompra.js') }}" defer></script>
@@ -551,7 +552,8 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
 <script src="{{ url_for('static', filename='java/notifications.js') }}"></script>
 <script type="module" src="{{ url_for('static', filename='java/app.js') }}"></script>
-<script type="module" src="{{ url_for('static', filename='java/supabase.min.js') }}" defer></script>
+ 
+
 <script>
 // Cambiar sección visible al hacer click en la sidebar
 document.addEventListener('DOMContentLoaded', function() {
