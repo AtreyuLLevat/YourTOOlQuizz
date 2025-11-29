@@ -197,7 +197,7 @@ def create_app():
             return jsonify({"error": "No se pudieron obtener las estadísticas"}), 500
 
     app.register_blueprint(api)
-    app.register_blueprint(chat_bp)
+
 
 
 
