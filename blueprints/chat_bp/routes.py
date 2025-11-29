@@ -34,27 +34,31 @@ def chat_page():
 
 # ----------------------------------------------------
 # 📌 2) Crear un chat nuevo
-# ----------------------------------------------------
 @chat_bp.route("/chat/create", methods=["POST"])
 @login_required
 def create_chat():
+    print("➡️ /chat/create fue llamado")
     try:
         data = request.json
-        title = data.get("title", "Nuevo chat")
+        print("🟦 Datos recibidos:", data)
 
         chat_id = str(uuid.uuid4())
 
-        supabase.table("chats").insert({
+        print("🟪 Insertando en Supabase...")
+        res = supabase.table("chats").insert({
             "id": chat_id,
             "user_id": str(current_user.id),
-            "title": title
+            "title": data.get("title", "Nuevo chat")
         }).execute()
 
-        return jsonify({"chat_id": chat_id, "title": title})
+        print("🟩 Resultado Supabase:", res)
+
+        return jsonify({"chat_id": chat_id})
 
     except Exception as e:
-        print("Error creando chat:", e)
+        print("❌ ERROR:", e)
         return jsonify({"error": str(e)}), 500
+
 
 
 # ----------------------------------------------------
