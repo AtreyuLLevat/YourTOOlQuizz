@@ -127,32 +127,6 @@ def create_app():
     app.register_blueprint(chat_bp)
 
     
-    # Conexión
-    @socketio.on("connect")
-    def handle_connect():
-        print(f"Cliente conectado: {request.sid}")
-
-    # Mensajes
-    @socketio.on("send_message")
-    def handle_send_message(data):
-        chat_id = data.get("chat_id")
-        if chat_id:
-            # Guardar mensaje en DB
-            supabase.table("messages").insert({
-                "id": data.get("id"),
-                "chat_id": chat_id,
-                "user_id": data.get("user_id"),
-                "sender_name": data.get("sender_name"),
-                "text": data.get("text")
-            }).execute()
-
-            # Emitir a todos en la sala
-            emit("receive_message", data, room=chat_id)
-
-
-
-
-
 
 
 
@@ -223,6 +197,8 @@ def create_app():
             return jsonify({"error": "No se pudieron obtener las estadísticas"}), 500
 
     app.register_blueprint(api)
+    app.register_blueprint(chat_bp)
+
 
 
     @app.route('/logo.png')
@@ -392,151 +368,6 @@ def create_app():
         """
         # Aquí tu función de envío de correo
         send_email(email, subject, body)
-
-    # Reacciones
-    @socketio.on("reaction")
-    def handle_reaction(data):
-        emit("update_reaction", data, broadcast=True)
-
-    # Rating
-    @socketio.on("rate")
-    def handle_rate(data):
-        emit("update_rating", data, broadcast=True)
-
-
-    @app.after_request
-    def add_csp(response):
-        response.headers['Content-Security-Policy'] = (
-            "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-            "font-src 'self' https://fonts.gstatic.com"
-        )
-        return response
-    
-    @app.route("/messages/send", methods=["POST"])
-    @login_required
-    def send_message():
-        try:
-            data = request.json
-            recipient_id = data.get("recipient_id")
-            content = data.get("content")
-
-            if not recipient_id or not content:
-                return jsonify({"error": "Faltan datos"}), 400
-
-            recipient = User.query.get(recipient_id)
-            if not recipient:
-                return jsonify({"error": "Usuario destinatario no encontrado"}), 404
-
-            # Guardar en DB local (SQLAlchemy)
-            message = Message(
-                sender_id=current_user.id,
-                recipient_id=recipient.id,
-                content=content
-            )
-            db.session.add(message)
-            db.session.commit()
-
-            # Guardar en Supabase
-            response = supabase.table("messages").insert({
-                "sender_id": current_user.id,
-                "recipient_id": recipient.id,
-                "content": content
-            }).execute()
-
-            if response.status_code != 201 and response.status_code != 200:
-                return jsonify({"error": "No se pudo guardar en Supabase", "details": response.data}), 500
-
-            return jsonify({"success": True, "message_id": message.id})
-
-        except Exception as e:
-            # Captura cualquier error
-            return jsonify({"error": "Error al enviar mensaje", "details": str(e), "trace": traceback.format_exc()}), 500
-
-    # ---------------------------
-    # Obtener mensajes
-    # ---------------------------
-    @app.route("/messages", methods=["GET"])
-    @login_required
-    def get_messages():
-        try:
-            # cargar historial desde Supabase (ya que tu chat usa Supabase)
-            response = supabase.table("messages") \
-                .select("*") \
-                .order("created_at", desc=False) \
-                .execute()
-
-            return jsonify(response.data if response.data else [])
-
-        except Exception as e:
-            print("❌ Error en /messages:", e)
-            return jsonify([])
-
-
-
-    # -------------------------
-    # Marcar mensaje como leído
-    # -------------------------
-    @app.route("/messages/read/<int:message_id>", methods=["POST"])
-    @login_required
-    def mark_read(message_id):
-        print("DEBUG: Mark read called for message:", message_id)
-
-        try:
-            message = Message.query.get_or_404(message_id)
-            if message.recipient_id != current_user.id:
-                print("DEBUG: User does not have permission")
-                return jsonify({"error": "No tienes permiso"}), 403
-
-            message.read = True
-            db.session.commit()
-            print("DEBUG: Message marked as read")
-            return jsonify({"success": True})
-        except Exception as e:
-            db.session.rollback()
-            print("ERROR marking message as read:", e)
-            return jsonify({"error": str(e)}), 500
-
-    @app.route("/chat/create", methods=["POST"])
-    @login_required
-    def create_chat():
-        try:
-            data = request.json
-            chat_id = str(uuid.uuid4())
-            title = data.get("title", "Nuevo chat")
-                
-            response = supabase.table("chats").insert({
-                "id": chat_id,
-                "user_id": str(current_user.id),  # asegurarse de que sea string
-                "title": title
-            }).execute()
-                
-            print(response)  # Para depuración
-            return jsonify({"chat_id": chat_id, "title": title})
-        except Exception as e:
-            print("Error creando chat:", e)
-            return jsonify({"error": str(e)}), 500
-
-
-    @app.route("/chat/list", methods=["GET"])
-    @login_required
-    def list_chats():
-        res = supabase.table("chats").select("*").eq("user_id", current_user.id).order("created_at").execute()
-        return jsonify(res.data)
-
-
-    @app.route("/chat/<chat_id>/messages", methods=["GET"])
-    @login_required
-    def chat_messages(chat_id):
-        res = supabase.table("messages").select("*").eq("chat_id", chat_id).order("created_at").execute()
-        return jsonify(res.data)
-
-    @socketio.on("join_chat")
-    def join_chat(data):
-        chat_id = data.get("chat_id")
-        if chat_id:
-            join_room(chat_id)
-            print(f"Usuario {request.sid} se unió a la sala {chat_id}")
 
 
 
