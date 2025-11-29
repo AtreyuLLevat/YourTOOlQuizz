@@ -14,7 +14,11 @@ from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from models import User, Message, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics
+from models import (
+    User, Quiz, Question, Blog, Page, Plan, UserPlan, QuizAnalytics,
+    App, GroupMember, GroupMessage, MessageReaction, PollVote, 
+    AppRating, AppAnalytics, SecurityLog, Result
+)
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
 from sqlalchemy.pool import NullPool
