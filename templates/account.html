@@ -541,6 +541,17 @@ input[type="checkbox"] {
 {% endblock %}
 
 {% block extra_js %}
+
+<script type="module" src="{{ url_for('static', filename='java/supabaseClient.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/verificarPlan.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/overlayCompra.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/main.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/cuenta.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
+<script src="{{ url_for('static', filename='java/notifications.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='java/app.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='java/supabase.min.js') }}" defer></script>
 <script>
 // Cambiar sección visible al hacer click en la sidebar
 document.addEventListener('DOMContentLoaded', function() {
@@ -603,13 +614,4 @@ createAppModal.addEventListener('click', (e) => {
   }
 });
 </script>
-<script type="module" src="{{ url_for('static', filename='java/supabaseClient.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/verificarPlan.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/overlayCompra.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/main.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/cuenta.js') }}" defer></script>
-<script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
-<script src="{{ url_for('static', filename='java/notifications.js') }}"></script>
-<script src="{{ url_for('static', filename='java/app.js') }}"></script>
 {% endblock %}
