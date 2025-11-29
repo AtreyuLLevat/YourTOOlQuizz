@@ -37,17 +37,16 @@ class App(db.Model):
     description = db.Column(db.Text)
     website_url = db.Column(db.String(300))
     logo_url = db.Column(db.String(300))
-    category = db.Column(db.String(50))  # 'app', 'extension', 'tool', 'service'
+    category = db.Column(db.String(50))
     verification_required = db.Column(db.Boolean, default=True)
     is_public = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     
-    # Relación con el dueño (empresa/desarrollador)
+    # Relación con el dueño
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     
-    # Relaciones
-    owner = db.relationship("User", backref=db.backref("owned_apps", lazy=True))
+    # ✅ CORREGIDO: Relaciones sin backref duplicado
     group_members = db.relationship("GroupMember", backref="app", lazy=True)
     group_messages = db.relationship("GroupMessage", backref="app", lazy=True)
     app_ratings = db.relationship("AppRating", backref="app", lazy=True)
@@ -223,7 +222,7 @@ class User(UserMixin, db.Model):
     avatar_url = db.Column(db.String(300))
     
     # Roles y permisos
-    role = db.Column(db.String(20), default='user')  # 'user', 'admin', 'moderator'
+    role = db.Column(db.String(20), default='user')
     is_developer = db.Column(db.Boolean, default=False)
     
     # Autenticación externa
@@ -248,19 +247,19 @@ class User(UserMixin, db.Model):
         "marketing": False
     })
     
-    # Relaciones existentes (mantenidas para compatibilidad)
+    # Relaciones existentes
     quizzes = db.relationship("Quiz", backref="creator", lazy=True)
     results = db.relationship("Result", backref="user", lazy=True)
     current_plan = db.relationship("Plan", foreign_keys=[current_plan_id])
     user_plans = db.relationship("UserPlan", backref="user", lazy=True)
     
-    # Nuevas relaciones para el sistema de grupos
-    owned_apps = db.relationship("App", backref="owner_obj", lazy=True, foreign_keys=[App.owner_id])
-    group_memberships = db.relationship("GroupMember", backref="member_user", lazy=True)
-    group_messages = db.relationship("GroupMessage", backref="author", lazy=True)
-    message_reactions = db.relationship("MessageReaction", backref="reacting_user", lazy=True)
-    poll_votes = db.relationship("PollVote", backref="voting_user", lazy=True)
-    app_ratings = db.relationship("AppRating", backref="rating_user", lazy=True)
+    # ✅ CORREGIDO: Relaciones con nombres únicos
+    created_apps = db.relationship("App", backref="owner", lazy=True, foreign_keys="App.owner_id")
+    group_memberships = db.relationship("GroupMember", backref="user", lazy=True)
+    sent_group_messages = db.relationship("GroupMessage", backref="user", lazy=True)
+    message_reactions = db.relationship("MessageReaction", backref="user", lazy=True)
+    poll_votes = db.relationship("PollVote", backref="user", lazy=True)
+    app_ratings = db.relationship("AppRating", backref="user", lazy=True)
 
     def __repr__(self):
         return f"<User {self.name} ({self.email})>"
@@ -277,7 +276,6 @@ class User(UserMixin, db.Model):
             user_id=self.id, 
             is_active=True
         ).first() is not None
-
 # -------------------------
 # MODELOS EXISTENTES (MANTENIDOS PARA COMPATIBILIDAD)
 # -------------------------
