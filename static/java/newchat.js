@@ -26,6 +26,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------------------------------------------
     // Cargar chats existentes
     // ---------------------------------------------------
+
+    function addChatToSidebar(chatId, title) {
+    if (!chatList) return;
+
+    const div = document.createElement("div");
+    div.classList.add("chat-item");
+    div.dataset.chatId = chatId;
+    div.textContent = title;
+    div.addEventListener("click", () => loadChat(chatId));
+    chatList.appendChild(div);
+}
+
     async function loadChats() {
         const res = await fetch("/chat/list");
         const chats = await res.json();
@@ -166,3 +178,4 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inicializa lista de chats al cargar
     loadChats();
 });
+
