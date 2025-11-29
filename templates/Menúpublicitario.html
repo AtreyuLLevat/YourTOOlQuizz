@@ -3,24 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<title>Dashboard - Chats</title>
+
+<!-- CSS mínimo para sidebar y botón -->
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    height: 100vh;
+    background: #fafafa;
+  }
+
+  .sidebar {
+    width: 220px;
+    padding: 25px;
+    background: rgba(255,255,255,0.85);
+    border-right: 1px solid #e6e6e6;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  #chat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .chat-item {
+    padding: 10px 15px;
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: background 0.2s;
+  }
+
+  .chat-item:hover {
+    background: #f0f3f9;
+  }
+
+  .chat-item.active {
+    background: #4a7efc33;
+    border-color: #4a7efc;
+    font-weight: 600;
+  }
+
+  #new-chat-btn {
+    margin-top: 15px;
+    padding: 12px;
+    background: #4a7efc;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  #new-chat-btn:hover {
+    background: #3b66d9;
+  }
+</style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>Dashboard</h2>
-    <div id="chat-list-container">
-      <h3>Tus Chats</h3>
-      <div id="chat-list"></div>
-      <button id="new-chat-btn" class="button">+ Nuevo chat</button>
-    </div>
-  </div>
 
-  <div class="main">
-    <h1>Bienvenido, {{ current_user.name }}</h1>
-    <p>Selecciona un chat o crea uno nuevo.</p>
-  </div>
+<div class="sidebar">
+  <h2>Chats</h2>
 
+  <!-- Lista de chats -->
+  <div id="chat" data-user-id="{{ current_user.id }}" data-user-name="{{ current_user.name }}">
+    <div id="chat-list"></div>
+    <button id="new-chat-btn">+ Nuevo chat</button>
+  </div>
+</div>
+
+<!-- Contenedor para el chat abierto (fuera del dashboard) -->
+<div id="chat-messages-container" style="flex:1; padding:20px; overflow-y:auto;">
+  <div id="messages"></div>
+  <input type="text" id="input" placeholder="Escribe un mensaje..." style="width:80%; padding:10px;"/>
+  <button id="send-btn">Enviar</button>
+</div>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/newchat.js') }}" defer></script>
+
 </body>
 </html>
