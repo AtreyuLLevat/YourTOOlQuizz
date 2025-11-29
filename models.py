@@ -233,6 +233,19 @@ class Page(db.Model):
     def __repr__(self):
         return f"<Page {self.name}>"
 
+class Chat(db.Model):
+    __tablename__ = "chats"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    title = db.Column(db.String(200), default="Nuevo chat")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User")
+
+    def __repr__(self):
+        return f"<Chat {self.id} Title={self.title}>"
+
 # -------------------------
 # EVENTOS PARA SLUGS
 # -------------------------
