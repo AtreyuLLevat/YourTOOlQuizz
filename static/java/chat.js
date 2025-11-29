@@ -152,4 +152,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Inicializa chats existentes
     loadChats();
+    
 });
