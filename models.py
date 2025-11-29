@@ -247,6 +247,27 @@ class Chat(db.Model):
         return f"<Chat {self.id} Title={self.title}>"
 
 # -------------------------
+# MODELO DE MENSAJES DEL CHAT
+# -------------------------
+class Message(db.Model):
+    __tablename__ = "messages"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    chat_id = db.Column(UUID(as_uuid=True), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    sender_name = db.Column(db.String(150), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    # Relación con usuario
+    user = db.relationship("User")
+
+    def __repr__(self):
+        return f"<Message {self.id} Chat={self.chat_id} User={self.user_id}>"
+
+
+# -------------------------
 # EVENTOS PARA SLUGS
 # -------------------------
 @event.listens_for(Quiz, "before_insert")
