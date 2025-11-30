@@ -146,7 +146,7 @@ def create_app():
     supabaseUrl = os.getenv("supabaseUrl")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")  # o SERVICE_ROLE_KEY si es backend seguro
     SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    supabase = create_client(supabaseUrl, SUPABASE_ANON_KEY)
 
     # Cliente admin (para actualizar usuarios, sin restricciones RLS)
     supabase_admin = create_client(
