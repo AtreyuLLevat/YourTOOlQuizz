@@ -1,6 +1,11 @@
 from gevent import monkey
 monkey.patch_all() # debe ir **antes** de cualquier import de Flask
+# app.py - Al inicio del archivo
+from dotenv import load_dotenv
+load_dotenv()  # Carga las variables del archivo .env
 
+
+# ... resto del código
 import traceback
 import os
 import json
@@ -9,7 +14,7 @@ import pyotp
 import qrcode
 import stripe
 import uuid
-from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint, render_template_string
+from flask import Flask, render_template, request, redirect, url_for, flash, current_app, jsonify, send_file, abort, Blueprint, render_template_string, send_from_directory
 from flask_mail import Mail, Message
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -102,6 +107,7 @@ def create_app():
     CANCEL_URL = os.getenv("STRIPE_CANCEL_URLpost")
     STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+    
 
 
     
@@ -115,7 +121,11 @@ def create_app():
  # Solo una vez, no redefinir socketio
 
 
-
+    @app.route('/static/java/<path:filename>')
+    def serve_js_modules(filename):
+        response = send_from_directory('static/java', filename)
+        response.headers['Content-Type'] = 'application/javascript'
+        return response
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
