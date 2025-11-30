@@ -143,7 +143,7 @@ def create_app():
 
 
 
-    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_URL = os.getenv("supabaseUrl")
     SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")  # o SERVICE_ROLE_KEY si es backend seguro
     SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
     supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
@@ -923,7 +923,7 @@ def create_app():
     @app.route("/account")
     @login_required
     def dashboard():
-        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_URL = os.getenv("supabaseUrl")
         SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
         SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")   # ← Añadido
 

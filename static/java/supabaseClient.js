@@ -6,7 +6,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // ⚠️ IMPORTANTE: NO pongas la anon key directa aquí en producción.
 // Flask debe inyectarla desde el backend.
-const SUPABASE_URL = "{{ SUPABASE_URL }}";
+const SUPABASE_URL = "{{ supabaseUrl }}";
 const SUPABASE_KEY = "{{ SUPABASE_KEY }}";
 
 // Crear cliente

@@ -543,7 +543,7 @@ input[type="checkbox"] {
 
 {% block extra_js %}
 <script>
-    const SUPABASE_URL = "{{ SUPABASE_URL | safe }}";
+    const SUPABASE_URL = "{{ supabaseUrl | safe }}";
     const SUPABASE_KEY = "{{ SUPABASE_KEY | safe }}";
 </script>
 
