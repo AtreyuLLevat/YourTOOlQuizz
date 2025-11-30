@@ -10,7 +10,7 @@ const SUPABASE_URL = "{{ supabaseUrl }}";
 const SUPABASE_KEY = "{{ SUPABASE_KEY }}";
 
 // Crear cliente
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+export const supabase = createClient(supabaseUrl, SUPABASE_KEY);
 
 // Prueba de conexión
 supabase.auth.getSession().then(({ data, error }) => {
@@ -20,3 +20,4 @@ supabase.auth.getSession().then(({ data, error }) => {
         console.log("✅ Supabase conectado");
     }
 });
+
