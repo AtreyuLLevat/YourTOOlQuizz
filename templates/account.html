@@ -545,11 +545,11 @@ input[type="checkbox"] {
 
 <!-- Carga correcta del cliente de Supabase (en tu archivo) -->
 <script type="module">
-    import { supabase } from "/static/java/supabaseClient.js";
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/esm/supabase.js";
 
-    // Ejemplo simple
-    supabase.auth.getUser().then(console.log);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
+
 
 
 <!-- El resto de tus scripts, todos como módulos -->
