@@ -150,7 +150,7 @@ def create_app():
 
     # Cliente admin (para actualizar usuarios, sin restricciones RLS)
     supabase_admin = create_client(
-        SUPABASE_URL,
+        supabaseUrl,
         SUPABASE_SERVICE_KEY,
         options=ClientOptions(
             auto_refresh_token=False,
@@ -160,7 +160,7 @@ def create_app():
 
     # Cliente público (para operaciones normales de usuario)
     supabase_public = create_client(
-        SUPABASE_URL,
+        supabaseUrl,
         SUPABASE_ANON_KEY
     )
 
