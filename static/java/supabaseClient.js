@@ -2,7 +2,7 @@
 // Versión compatible con navegador sin bundler ✔
 
 // Import ESM desde CDN (supabase-js v2)
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/esm/supabase.js";
 
 // ⚠️ IMPORTANTE: NO pongas la anon key directa aquí en producción.
 // Flask debe inyectarla desde el backend.
@@ -20,3 +20,4 @@ supabase.auth.getSession().then(({ data, error }) => {
         console.log("✅ Supabase conectado");
     }
 });
+
