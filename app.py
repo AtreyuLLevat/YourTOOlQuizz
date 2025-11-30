@@ -1116,7 +1116,7 @@ def create_app():
         return redirect(url_for("reset_password", token=reset_token))
 
 
-    @app_routes.route("/crear_app", methods=["POST"])
+    @app_route("/crear_app", methods=["POST"])
     @login_required
     def crear_app():
         data = request.json  # Espera un JSON con los datos de la app
