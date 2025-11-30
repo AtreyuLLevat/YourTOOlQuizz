@@ -357,6 +357,7 @@ input[type="checkbox"] {
 {% endblock %}
 
 {% block content %}
+<body data-supabase-url="{{ supabaseUrl | safe }}" data-supabase-key="{{ SUPABASE_KEY | safe }}"></body>
 <div class="dashboard-container">
   <!-- Sidebar -->
   <aside class="sidebar">
