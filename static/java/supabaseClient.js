@@ -20,5 +20,3 @@ supabase.auth.getSession().then(({ data, error }) => {
         console.log("✅ Supabase conectado");
     }
 });
-
-

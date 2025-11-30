@@ -542,14 +542,13 @@ input[type="checkbox"] {
 
 
 {% block extra_js %}
-
-<!-- Carga correcta del cliente de Supabase (en tu archivo) -->
-<script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0/+esm";
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+<script>
+    const SUPABASE_URL = "{{ SUPABASE_URL | safe }}";
+    const SUPABASE_KEY = "{{ SUPABASE_KEY | safe }}";
 </script>
 
+<!-- Carga correcta del cliente de Supabase (en tu archivo) -->
+<script type="module"> import supabasesupabaseJs from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.0/+esm' </script>
 
 
 <!-- El resto de tus scripts, todos como módulos -->
