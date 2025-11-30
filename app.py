@@ -1116,7 +1116,28 @@ def create_app():
         return redirect(url_for("reset_password", token=reset_token))
 
 
+    @app_routes.route("/crear_app", methods=["POST"])
+    @login_required
+    def crear_app():
+        data = request.json  # Espera un JSON con los datos de la app
+        if not data.get("name"):
+            return jsonify({"error": "El nombre de la app es obligatorio"}), 400
 
+        nueva_app = App(
+            name=data.get("name"),
+            description=data.get("description"),
+            image_url=data.get("image_url"),
+            team=data.get("team"),
+            theme=data.get("theme"),
+            creation_date=data.get("creation_date"),
+            status=data.get("status", "desarrollo"),
+            official_id=data.get("official_id"),
+            owner_id=current_user.id
+        )
+        db.session.add(nueva_app)
+        db.session.commit()
+
+        return jsonify({"success": True, "app_id": nueva_app.id}), 201
 
 
 
