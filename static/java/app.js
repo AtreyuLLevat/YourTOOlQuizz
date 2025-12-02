@@ -8,16 +8,26 @@ const newAppBtn = document.getElementById('newAppBtn');
 const appsList = document.getElementById('appsList');
 
 // ===========================
-// Función para refrescar lista de apps
+// Obtener usuario actual con await
+// ===========================
+async function getUserId() {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.id;
+}
+
+// ===========================
+// Cargar apps
 // ===========================
 async function loadApps() {
-    appsList.innerHTML = ''; // limpiar lista
+    appsList.innerHTML = '';
 
-    const user = supabase.auth.getUser(); // obtener usuario actual
+    const userId = await getUserId();
+    if (!userId) return;
+
     const { data: apps, error } = await supabase
         .from('apps')
         .select('*')
-        .eq('created_by', user.data.user.id)
+        .eq('created_by', userId)
         .order('created_at', { ascending: false });
 
     if (error) {
@@ -29,7 +39,7 @@ async function loadApps() {
         const btn = document.createElement('button');
         btn.className = 'app-item';
         btn.innerHTML = `
-            <img src="${app.image_url || '/static/images/app-placeholder.png'}" alt="App" class="app-img">
+            <img src="${app.image_url || '/static/images/app-placeholder.png'}" class="app-img">
             <span class="app-name">${app.name}</span>
         `;
         appsList.appendChild(btn);
@@ -37,19 +47,28 @@ async function loadApps() {
 }
 
 // ===========================
-// Mostrar / ocultar modal
+// Subir imagen a Storage
 // ===========================
-newAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.remove('hidden');
-});
+async function uploadImage(file) {
+    if (!file) return "";
 
-cancelAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.add('hidden');
-});
+    const fileName = `${Date.now()}_${file.name}`;
 
-createAppModal?.addEventListener('click', (e) => {
-    if (e.target === createAppModal) createAppModal.classList.add('hidden');
-});
+    const { data, error } = await supabase.storage
+        .from('app-images')
+        .upload(fileName, file);
+
+    if (error) {
+        console.error("Error subiendo imagen:", error.message);
+        return "";
+    }
+
+    const { data: publicUrl } = supabase.storage
+        .from('app-images')
+        .getPublicUrl(fileName);
+
+    return publicUrl.publicUrl;
+}
 
 // ===========================
 // Crear nueva app
@@ -57,63 +76,39 @@ createAppModal?.addEventListener('click', (e) => {
 createAppForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById('appName').value;
-    const description = document.getElementById('appDescription').value;
+    const userId = await getUserId();
+    if (!userId) return alert("Debes iniciar sesión.");
+
     const file = document.getElementById('appImage').files[0];
-    const team = document.getElementById('appTeam').value;
-    const theme = document.getElementById('appTheme').value;
-    const creationDate = document.getElementById('appCreationDate').value;
-    const status = document.getElementById('appStatus').value;
-    const officialId = document.getElementById('appOfficialId').value;
+    const imageUrl = await uploadImage(file);
 
-    // Subir imagen a Storage
-    let imageUrl = '';
-    if (file) {
-        const fileName = `${Date.now()}_${file.name}`;
-        const { data, error } = await supabase.storage
-            .from('app-images')
-            .upload(fileName, file);
+    const payload = {
+        name: document.getElementById('appName').value,
+        description: document.getElementById('appDescription').value,
+        image_url: imageUrl,
+        team: document.getElementById('appTeam').value,
+        theme: document.getElementById('appTheme').value,
+        creation_date: document.getElementById('appCreationDate').value,
+        status: document.getElementById('appStatus').value,
+        official_id: document.getElementById('appOfficialId').value,
+        created_by: userId
+    };
 
-        if (error) return alert('Error al subir imagen: ' + error.message);
+    const { error } = await supabase
+        .from('apps')
+        .insert([payload]);
 
-        const { publicUrl, error: urlError } = supabase.storage
-            .from('app-images')
-            .getPublicUrl(fileName);
-
-        if (urlError) return alert('Error obteniendo URL pública: ' + urlError.message);
-
-        imageUrl = publicUrl;
+    if (error) {
+        alert('❌ Error al crear app: ' + error.message);
+        return;
     }
 
-    // Insertar en tabla apps
-    const user = supabase.auth.getUser();
-    const { data: insertData, error: insertError } = await supabase
-        .from('apps')
-        .insert([{
-            name,
-            description,
-            image_url: imageUrl,
-            team,
-            theme,
-            creation_date: creationDate,
-            status,
-            official_id: officialId,
-            created_by: user.data.user.id
-        }]);
-
-    if (insertError) return alert('Error al crear app: ' + insertError.message);
-
-    alert('App creada con éxito!');
+    alert('✅ App creada!');
     createAppForm.reset();
     createAppModal.classList.add('hidden');
 
-    // Refrescar lista
     loadApps();
 });
 
 // ===========================
-// Cargar apps al inicio
-// ===========================
-document.addEventListener('DOMContentLoaded', () => {
-    loadApps();
-});
+document.addEventListener('DOMContentLoaded', loadApps);
