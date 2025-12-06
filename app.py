@@ -45,7 +45,12 @@ from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
 from flask_socketio import join_room, leave_room, emit
 from slugify import slugify
-from models import unique_slug  # Tu función propia
+from models import unique_slug
+
+
+
+
+
 
 
 
@@ -917,7 +922,34 @@ def create_app():
         # Este endpoint sirve la página HTML / plantilla
         return render_template("Menúpublicitario.html")
 
-  # usando tus funciones de models.py
+
+    @app.route("/account")
+    @login_required
+    def dashboard():
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")   # ← Añadido
+
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+        response = (
+            supabase
+            .table("users")
+            .select("*")
+            .eq("email", current_user.email)
+            .single()
+            .execute()
+        )
+        usuario = response.data if response.data else {}
+
+        return render_template(
+            "account.html",
+            usuario=current_user,
+            SUPABASE_URL=SUPABASE_URL,           # ← Añadido
+            SUPABASE_KEY=SUPABASE_ANON_KEY       # ← Añadido
+        )
+
+
 
     @app.route("/create_app", methods=["GET", "POST"])
     @login_required
@@ -965,6 +997,7 @@ def create_app():
         # GET → mostrar formulario
         return render_template("create_app.html")
 
+    
     @app.route("/get_notifications", methods=["GET"])
     @login_required
     def get_notifications():
