@@ -413,7 +413,7 @@ def create_app():
 
         return {"success": True, "apps": data}
     @app.route("/preview/<int:app_id>")
-    def preview(app_id):
+    def previewing(app_id):
         app_data = App.query.filter_by(id=app_id).first()
 
         if not app_data:
@@ -442,9 +442,10 @@ def create_app():
         return render_template('Servicio_1.html')
 
 
-    @app.route('/Preview')
+    @app.route('/Preview', endpoint='preview_static')
     def preview():
         return render_template('Preview.html')
+
     @app.route('/chat')
     @login_required
     def chat():
