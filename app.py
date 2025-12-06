@@ -46,7 +46,7 @@ from blueprints.chat_bp.routes import chat_bp
 from flask_socketio import join_room, leave_room, emit
 from slugify import slugify
 from models import unique_slug
-
+from uuid import UUID
 
 
 
@@ -415,18 +415,20 @@ def create_app():
         
     @app.route("/preview/<string:app_id>")
     def previewing(app_id):
-        # Buscar la app por UUID
-        app_data = App.query.filter_by(id=app_id).first()
+        try:
+            # Validar que el string sea un UUID válido
+            uuid_obj = UUID(app_id, version=4)
+        except ValueError:
+            abort(404)  # No es un UUID válido
 
+        # Buscar la app por UUID
+        app_data = App.query.filter_by(id=uuid_obj).first()
         if not app_data:
             abort(404)
 
-        # Obtener reviews y miembros del equipo asociados
         reviews = Review.query.filter_by(app_id=app_id).order_by(Review.created_at.desc()).all()
         team = TeamMember.query.filter_by(app_id=app_id).all()
-
-        # Convertir tags en lista
-        tags = app_data.tags.split(",") if app_data.tags else []
+        tags = app_data.tags.split(",") if getattr(app_data, "tags", None) else []
 
         return render_template(
             "preview.html",
@@ -435,7 +437,6 @@ def create_app():
             reviews=reviews,
             team=team
         )
-
 
     @app.route('/listadodecosas')
     def explorador():
