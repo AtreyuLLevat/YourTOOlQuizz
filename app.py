@@ -413,7 +413,7 @@ def create_app():
 
         return {"success": True, "apps": data}
 
-  
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')

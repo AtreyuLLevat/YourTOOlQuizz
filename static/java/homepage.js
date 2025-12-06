@@ -33,10 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="tag">${app.theme || "General"}</span>
               <span class="tag">${app.creation_date || "Fecha desconocida"}</span>
             </div>
-
-            <div class="more-info">
-              <p>Haz clic para ver detalles, reseñas y comunidades.</p>
-            </div>
+            <a href="/preview/${app.id}" class="view-btn">Ver más</a>
           </div>
         `;
 

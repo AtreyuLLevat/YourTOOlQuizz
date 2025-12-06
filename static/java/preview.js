@@ -1,62 +1,90 @@
+document.addEventListener("DOMContentLoaded", async () => {
+  const preview = document.getElementById("preview");
+  const appId = preview.dataset.appId;
 
-  const products = [
-    { id: "price_1ABC", name: "Stubborn Attachments", price: 20, img: "https://i.imgur.com/EHyR2nP.png" },
-    { id: "price_2DEF", name: "Another Book", price: 15, img: "https://i.imgur.com/EHyR2nP.png" },
-    { id: "price_3GHI", name: "Curso Python", price: 50, img: "https://i.imgur.com/EHyR2nP.png" }
-  ];
-
-  let cart = [];
-
-  function addToCart(productId) {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      cart.push(product);
-      renderCart();
-    }
+  if (!appId) {
+    console.error("No se encontró el ID de la app.");
+    return;
   }
 
-  function renderCart() {
-    const cartDiv = document.getElementById("cart");
-    cartDiv.innerHTML = "";
-    let total = 0;
-
-    cart.forEach((item, index) => {
-      total += item.price;
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "product";
-      itemDiv.innerHTML = `
-        <img src="${item.img}" alt="${item.name}" />
-        <div class="description">
-          <h3>${item.name}</h3>
-          <h5>$${item.price.toFixed(2)}</h5>
-          <button onclick="removeFromCart(${index})">Eliminar</button>
-        </div>
-      `;
-      cartDiv.appendChild(itemDiv);
-    });
-
-    const totalDiv = document.getElementById("total");
-    totalDiv.textContent = "Total: $" + total.toFixed(2);
-  }
-
-  function removeFromCart(index) {
-    cart.splice(index, 1);
-    renderCart();
-  }
-
-  async function checkout() {
-    if (cart.length === 0) return alert("Tu carrito está vacío");
-
-    const lineItems = cart.map(item => ({ price: item.id, quantity: 1 }));
-
-    const response = await fetch("/create-checkout-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ line_items: lineItems })
-    });
-
+  try {
+    const response = await fetch(`/account/get_app/${appId}`);
     const data = await response.json();
-    if (data.url) window.location.href = data.url;
-    else alert("Error al iniciar el pago: " + data.error);
-  }
 
+    if (!data.success) {
+      console.error("No se pudieron cargar los datos:", data);
+      return;
+    }
+
+    const app = data.app;
+
+    // --- ELEMENTOS DEL DOM ---
+    const logo = document.querySelector(".app-header img");
+    const name = document.querySelector(".app-info h1");
+    const description = document.querySelector(".app-info > p");
+    const tagsContainer = document.querySelector(".tags");
+
+    const longDescription = document.querySelector("#description .app-description p");
+
+    const reviewsAvg = document.querySelector(".rating-average");
+    const reviewsList = document.querySelector("#reviews .ratings");
+
+    const teamContainer = document.querySelector(".team-container");
+
+
+    // --- RELLENAR DATOS BÁSICOS ---
+    logo.src = app.image_url || "https://picsum.photos/200?random=99";
+    name.textContent = app.name;
+    description.textContent = app.short_description || "Sin descripción breve.";
+
+    // Tags
+    tagsContainer.innerHTML = "";
+    (app.tags || []).forEach(t => {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = t;
+      tagsContainer.appendChild(span);
+    });
+
+    // --- DESCRIPCIÓN LARGA ---
+    longDescription.textContent = app.description || "Sin descripción larga disponible.";
+
+    // --- RESEÑAS ---
+    reviewsAvg.textContent = `⭐ ${app.rating || 0} / 5 — basado en ${app.reviews_count || 0} opiniones`;
+
+    if (app.reviews) {
+      app.reviews.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "comment";
+        div.innerHTML = `
+          <strong>@${r.username}</strong>
+          ${r.comment}
+        `;
+        reviewsList.appendChild(div);
+      });
+    }
+
+    // --- EQUIPO ---
+    teamContainer.innerHTML = "";
+    if (app.team && app.team.length > 0) {
+      app.team.forEach(member => {
+        const div = document.createElement("div");
+        div.className = "team-member-horizontal";
+        div.innerHTML = `
+          <img src="${member.avatar || 'https://picsum.photos/80'}" />
+          <div class="team-info">
+            <h3>${member.name}</h3>
+            <p>${member.role}</p>
+            <p class="username">@${member.username}</p>
+          </div>
+        `;
+        teamContainer.appendChild(div);
+      });
+    }
+
+    // Puedes personalizar más si tu backend incluye más datos
+
+  } catch (err) {
+    console.error("Error cargando el preview de la app:", err);
+  }
+});
