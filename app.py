@@ -924,54 +924,122 @@ def create_app():
 
 
 
-    @app.route("/account", methods=["GET", "POST"])
-    @login_required
-    def dashboard():
-        if request.method == "POST":
-            name = request.form.get("appName", "").strip()
-            if not name:
-                flash("El nombre de la app es obligatorio.", "error")
-                return redirect(url_for("dashboard"))
+@app.route("/account", methods=["GET", "POST"])
+@login_required
+def dashboard():
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-            description = request.form.get("appDescription", "").strip()
-            team = request.form.get("appTeam", "").strip()
-            theme = request.form.get("appTheme", "").strip()
-            creation_date = request.form.get("appCreationDate", "").strip()
-            if creation_date:
-                creation_date = datetime.strptime(creation_date, "%Y-%m-%d")
-            status = request.form.get("appStatus", "").strip()
-            official_id = request.form.get("appOfficialId", "").strip()
+    # --- Manejo POST para crear app ---
+    if request.method == "POST":
+        name = request.form.get("appName", "").strip()
+        description = request.form.get("appDescription", "").strip()
+        team = request.form.get("appTeam", "").strip()
+        theme = request.form.get("appTheme", "").strip()
+        creation_date_str = request.form.get("appCreationDate", "").strip()
+        status = request.form.get("appStatus", "").strip()
+        official_id = request.form.get("appOfficialId", "").strip()
+        image_file = request.files.get("appImage")
+        
+        # Conversion fecha
+        creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
 
-            image_file = request.files.get("appImage")
-            image_url = None
-            if image_file and image_file.filename:
-                upload_path = os.path.join("static", "uploads", image_file.filename)
-                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-                image_file.save(upload_path)
-                image_url = f"/{upload_path}"
+        # Imagen
+        image_url = None
+        if image_file and image_file.filename:
+            upload_path = os.path.join("static", "uploads", image_file.filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
+            image_url = f"/{upload_path}"
 
-            slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
-
-            new_app = App(
-                name=name,
-                description=description,
-                team=team,
-                theme=theme,
-                creation_date=creation_date,
-                status=status,
-                official_id=official_id,
-                image_url=image_url,
-                slug=slug,
-                owner_id=current_user.id,
-                created_at=datetime.utcnow()
-            )
-
-            db.session.add(new_app)
-            db.session.commit()
-            flash("App creada correctamente", "success")
+        if not name:
+            flash("El nombre de la app es obligatorio.", "error")
             return redirect(url_for("dashboard"))
 
-        return render_template("account.html", usuario=current_user)
+        # Slug
+        slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
+
+        # Guardar app
+        new_app = App(
+            name=name,
+            description=description,
+            team=team,
+            theme=theme,
+            creation_date=creation_date,
+            status=status,
+            official_id=official_id,
+            image_url=image_url,
+            slug=slug,
+            owner_id=current_user.id,
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_app)
+        db.session.commit()
+        flash("App creada correctamente", "success")
+        return redirect(url_for("dashboard"))
+
+    # --- GET: traer apps del usuario ---
+    user_apps = App.query.filter_by(owner_id=current_user.id).order_by(App.created_at.desc()).all()
+
+    return render_template(
+        "account.html",
+        usuario=current_user,
+        apps=user_apps,
+        SUPABASE_URL=SUPABASE_URL,
+        SUPABASE_KEY=SUPABASE_ANON_KEY
+    )
+
+    @app.route("/account/create_app", methods=["POST"])
+    @login_required
+    def create_app_ajax():
+        data = request.form
+        name = data.get("appName", "").strip()
+        description = data.get("appDescription", "").strip()
+        team = data.get("appTeam", "").strip()
+        theme = data.get("appTheme", "").strip()
+        creation_date_str = data.get("appCreationDate", "").strip()
+        status = data.get("appStatus", "").strip()
+        official_id = data.get("appOfficialId", "").strip()
+        image_file = request.files.get("appImage")
+
+        if not name:
+            return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
+
+        creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
+
+        image_url = None
+        if image_file and image_file.filename:
+            upload_path = os.path.join("static", "uploads", image_file.filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
+            image_url = f"/{upload_path}"
+
+        slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
+
+        new_app = App(
+            name=name,
+            description=description,
+            team=team,
+            theme=theme,
+            creation_date=creation_date,
+            status=status,
+            official_id=official_id,
+            image_url=image_url,
+            slug=slug,
+            owner_id=current_user.id,
+            created_at=datetime.utcnow()
+        )
+
+        db.session.add(new_app)
+        db.session.commit()
+
+        return {
+            "success": True,
+            "app": {
+                "name": new_app.name,
+                "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png')
+            }
+        }
 
     
     @app.route("/get_notifications", methods=["GET"])

@@ -1,43 +1,52 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // === Formulario crear app ===
+  // === Variables comunes ===
   const createAppForm = document.getElementById('createAppForm');
-  if (createAppForm) {
-    createAppForm.addEventListener('submit', async (e) => {
-      // Si quieres enviar con JS sin recargar, usa fetch:
-      e.preventDefault();
+  const appsList = document.getElementById('appsList');
+  const createAppModal = document.getElementById('createAppModal');
+  const cancelAppBtn = document.getElementById('cancelAppBtn');
+  const newAppBtn = document.getElementById('newAppBtn');
 
-      const formData = new FormData(createAppForm);
-
-      try {
-        const response = await fetch('/account', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (response.redirected) {
-          // Redirige tras POST
-          window.location.href = response.url;
-        } else {
-          // Mensaje de éxito opcional si no hay redirect
-          alert('App creada correctamente');
-          createAppForm.reset();
-          document.getElementById('createAppModal').classList.add('hidden');
-        }
-
-      } catch (err) {
-        console.error(err);
-        alert('Ocurrió un error al crear la app.');
-      }
-    });
-  }
-
-  // === Modal de contraseña ===
   const changeBtn = document.getElementById('changeBtn');
   const modal = document.getElementById('modal');
   const cancelModal = document.getElementById('cancelModal');
   const saveModal = document.getElementById('saveModal');
 
+  // === Modal crear app ===
+  newAppBtn?.addEventListener('click', () => createAppModal.classList.remove('hidden'));
+  cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
+  createAppModal?.addEventListener('click', (e) => { if (e.target === createAppModal) createAppModal.classList.add('hidden'); });
+
+  // === Crear app AJAX ===
+  createAppForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(createAppForm);
+
+    try {
+      const response = await fetch('/account/create_app', { method: 'POST', body: formData });
+      const data = await response.json();
+
+      if (data.success) {
+        const appBtn = document.createElement('button');
+        appBtn.className = 'app-item';
+        appBtn.innerHTML = `
+          <img src="${data.app.image_url}" alt="App" class="app-img">
+          <span class="app-name">${data.app.name}</span>
+        `;
+        appsList.prepend(appBtn);
+
+        createAppForm.reset();
+        createAppModal.classList.add('hidden');
+      } else {
+        alert(data.message || 'Error al crear la app.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Ocurrió un error al crear la app.');
+    }
+  });
+
+  // === Modal de contraseña ===
   if (changeBtn && modal && cancelModal && saveModal) {
     changeBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
     cancelModal.addEventListener('click', () => { modal.style.display = 'none'; });
@@ -53,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === Mostrar botones de guardar solo al cambiar algo ===
+  // === Detectar cambios y mostrar botones de guardar ===
   const setupChangeDetection = (selectors, buttonId) => {
     const button = document.getElementById(buttonId);
     if (!button) return;
@@ -80,22 +89,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // === Modal crear app ===
-  const newAppBtn = document.getElementById('newAppBtn');
-  const createAppModal = document.getElementById('createAppModal');
-  const cancelAppBtn = document.getElementById('cancelAppBtn');
-
-  newAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.remove('hidden');
-  });
-
-  cancelAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.add('hidden');
-  });
-
-  createAppModal?.addEventListener('click', (e) => {
-    if (e.target === createAppModal) createAppModal.classList.add('hidden');
-  });
 
 });
