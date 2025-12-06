@@ -459,6 +459,113 @@ input[type="checkbox"] {
   cursor: pointer;
 }
 
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content.large {
+  width: 80%;
+  max-width: 1000px;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.app-basic {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.app-logo {
+  position: relative;
+  width: 150px; height: 150px;
+}
+
+.app-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.edit-btn {
+  background: #eee;
+  border: none;
+  margin-left: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.app-info h2, .app-info p {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.tab-btn.active {
+  background: #2563eb;
+  color: white;
+}
+
+.tab-content {
+  margin-top: 15px;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 </style>
 {% endblock %}
@@ -583,60 +690,64 @@ input[type="checkbox"] {
         </div>
 <!-- Modal de Detalle de App -->
 <div id="appDetailModal" class="modal-backdrop hidden">
-  <div class="modal-content app-detail-modal">
-    
-    <!-- 1. Información básica -->
-    <div class="app-basic-info">
+  <div class="modal-content large">
+    <button id="closeAppDetail" class="close-btn">&times;</button>
+
+    <!-- Sección básica -->
+    <div class="app-basic">
       <div class="app-logo">
-        <img src="{{ url_for('static', filename='images/app-placeholder.png') }}" alt="Logo App">
+        <img src="/static/images/app-placeholder.png" alt="Logo App">
+        <button class="edit-btn" title="Editar imagen">🖼️</button>
       </div>
-      <div class="app-main-info">
-        <h2 class="app-name">Nombre de la App</h2>
-        <p class="app-description">Descripción breve de la app</p>
-        <p class="app-meta">
-          <span class="app-date">Fecha: 06/12/2025</span> | 
-          <span class="app-theme">Tema: Educación</span>
+      <div class="app-info">
+        <h2>
+          <span class="app-name">Nombre App</span>
+          <button class="edit-btn" title="Editar nombre">✏️</button>
+        </h2>
+        <p>
+          <span class="app-description">Descripción de la app</span>
+          <button class="edit-btn" title="Editar descripción">✏️</button>
+        </p>
+        <p>
+          <span class="app-date">Fecha: 01/01/2025</span>
+          <button class="edit-btn" title="Editar fecha">✏️</button>
+        </p>
+        <p>
+          <span class="app-theme">Tema: General</span>
+          <button class="edit-btn" title="Editar tema">✏️</button>
         </p>
       </div>
-      <button class="btn-icon edit-app-btn" title="Editar información">
-        ✏️
-      </button>
     </div>
 
-    <!-- 2. Cajones / Secciones inferiores -->
-    <div class="app-sections">
-
-      <!-- Reseñas -->
-      <div class="app-section reviews-section">
-        <div class="section-header">
-          <h3>Reseñas</h3>
-          <button class="btn-small view-all-btn">Ver todas</button>
-        </div>
-        <div class="reviews-summary">
-          <span class="stars">⭐⭐⭐⭐☆</span>
-          <span class="reviews-count">(24)</span>
-        </div>
-      </div>
-
-      <!-- Comunidades -->
-      <div class="app-section communities-section">
-        <div class="section-header">
-          <h3>Comunidades</h3>
-          <button class="btn-small new-community-btn">+ Nueva</button>
-        </div>
-        <ul class="community-list">
-          <li>Testers</li>
-          <li>Beta Users</li>
-          <li>Marketing Team</li>
-        </ul>
-      </div>
-
+    <!-- Pestañas reseñas / comunidades -->
+    <div class="app-tabs">
+      <button class="tab-btn active" data-tab="reviews">Reseñas</button>
+      <button class="tab-btn" data-tab="communities">Comunidades</button>
     </div>
 
-    <!-- Botón cerrar modal -->
-    <button id="closeAppDetail" class="close-modal">✖</button>
+    <!-- Cajones -->
+    <div class="tab-content" id="reviews">
+      <div class="reviews-summary">
+        <div class="stars">⭐⭐⭐⭐☆</div>
+        <div class="reviews-count">(24)</div>
+        <button class="view-all-btn">Ver todas las reseñas</button>
+      </div>
+    </div>
+
+    <div class="tab-content hidden" id="communities">
+      <div class="community-header">
+        <h3>Comunidades</h3>
+        <button class="create-community-btn">Crear nueva comunidad</button>
+      </div>
+      <ul class="community-list">
+        <li>Testers</li>
+        <li>Beta Users</li>
+      </ul>
+    </div>
+
   </div>
 </div>
+
 
       </div>
 

@@ -13,6 +13,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalReviewsCount = appDetailModal.querySelector(".reviews-summary .reviews-count");
   const modalCommunitiesList = appDetailModal.querySelector(".community-list");
 
+  // Pestañas
+  const tabs = appDetailModal.querySelectorAll(".tab-btn");
+  const tabContents = appDetailModal.querySelectorAll(".tab-content");
+
+  // Función para cambiar pestaña
+  function showTab(tabName) {
+    tabs.forEach(t => t.classList.remove("active"));
+    tabContents.forEach(c => c.classList.add("hidden"));
+
+    const activeTab = appDetailModal.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    const activeContent = document.getElementById(tabName);
+
+    if (activeTab && activeContent) {
+      activeTab.classList.add("active");
+      activeContent.classList.remove("hidden");
+    }
+  }
+
+  // Eventos pestañas
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => showTab(tab.dataset.tab));
+  });
+
   // Abrir modal al hacer click en una app
   appsList.addEventListener("click", async (e) => {
     const appBtn = e.target.closest(".app-item");
@@ -39,7 +62,8 @@ document.addEventListener("DOMContentLoaded", () => {
       modalTheme.textContent = `Tema: ${app.theme || "General"}`;
 
       // Reseñas
-      modalStars.textContent = "⭐".repeat(Math.round(app.rating || 0)) + "☆".repeat(5 - Math.round(app.rating || 0));
+      const rating = Math.round(app.rating || 0);
+      modalStars.textContent = "⭐".repeat(rating) + "☆".repeat(5 - rating);
       modalReviewsCount.textContent = `(${app.reviews_count || 0})`;
 
       // Comunidades
@@ -50,7 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
         modalCommunitiesList.appendChild(li);
       });
 
-      // Mostrar modal
+      // Mostrar modal y pestaña por defecto (reseñas)
+      showTab("reviews");
       appDetailModal.classList.remove("hidden");
 
     } catch (err) {
@@ -67,5 +92,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Cerrar modal haciendo clic fuera del contenido
   appDetailModal.addEventListener("click", (e) => {
     if (e.target === appDetailModal) appDetailModal.classList.add("hidden");
+  });
+
+  // Iconos de edición (solo frontend, no funcional aún)
+  appDetailModal.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      alert("Función de edición aún no implementada");
+    });
   });
 });
