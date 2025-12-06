@@ -477,58 +477,41 @@ input[type="checkbox"] {
   <div id="createAppModal" class="modal-backdrop hidden">
     <div class="modal-content">
       <h3>Crear Nueva App</h3>
-      <form id="createAppForm" method="POST" enctype="multipart/form-data" action="{{ url_for('dashboard') }}">
-        
+      <form id="createAppForm" method="POST" enctype="multipart/form-data">
         <div class="field">
           <label for="appName">Nombre</label>
-          <input id="appName" name="name" type="text" required>
+          <input id="appName" name="appName" type="text" required>
         </div>
-
         <div class="field">
           <label for="appDescription">Descripción</label>
-          <textarea id="appDescription" name="description" rows="3" required></textarea>
+          <textarea id="appDescription" name="appDescription" rows="3" required></textarea>
         </div>
-
         <div class="field">
           <label for="appImage">Foto de la App</label>
-          <input id="appImage" name="image" type="file" accept="image/*">
+          <input id="appImage" name="appImage" type="file" accept="image/*">
         </div>
-
         <div class="field">
           <label for="appTeam">Creadores / Equipo</label>
-          <input id="appTeam" name="team" type="text">
+          <input id="appTeam" name="appTeam" type="text">
         </div>
-
         <div class="field">
           <label for="appTheme">Tema</label>
-          <input id="appTheme" name="theme" type="text">
+          <input id="appTheme" name="appTheme" type="text">
         </div>
-
         <div class="field">
           <label for="appCreationDate">Fecha de creación</label>
-          <input id="appCreationDate" name="creation_date" type="date">
+          <input id="appCreationDate" name="appCreationDate" type="date">
         </div>
-
         <div class="field">
           <label for="appStatus">Estado</label>
-          <select id="appStatus" name="status">
+          <select id="appStatus" name="appStatus">
             <option value="desarrollo">En desarrollo</option>
             <option value="finalizada">Finalizada</option>
           </select>
         </div>
-
         <div class="field">
           <label for="appOfficialId">Identificación / Propiedad</label>
-          <input id="appOfficialId" name="official_id" type="text">
-        </div>
-
-        <!-- Contenedor de feedback -->
-        <div id="appFeedback" style="margin-top:10px;color:red;">
-          {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-              <p class="{{ category }}">{{ message }}</p>
-            {% endfor %}
-          {% endwith %}
+          <input id="appOfficialId" name="appOfficialId" type="text">
         </div>
 
         <div class="modal-buttons">
@@ -536,6 +519,7 @@ input[type="checkbox"] {
           <button type="button" id="cancelAppBtn" class="modal-btn secondary">Cancelar</button>
         </div>
       </form>
+
     </div>
   </div>
 
