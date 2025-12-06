@@ -33,7 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="tag">${app.theme || "General"}</span>
               <span class="tag">${app.creation_date || "Fecha desconocida"}</span>
             </div>
-            <a href="/Preview/${app.id}" class="view-btn">Ver más</a>
+            <a href="/preview/${app.id}" class="view-btn">Ver más</a>
+
           </div>
         `;
 
@@ -46,4 +47,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
-
