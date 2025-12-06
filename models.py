@@ -88,25 +88,33 @@ class App(db.Model):
     __tablename__ = "apps"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = db.Column(db.String(100), nullable=False)
+    
+    # Campos del formulario
+    name = db.Column(db.String(100), nullable=False)              # appName
     slug = db.Column(db.String(150), unique=True, index=True, nullable=False)
-    description = db.Column(db.Text)
-    website_url = db.Column(db.String(300))
-    logo_url = db.Column(db.String(300))
-    category = db.Column(db.String(50))
+    description = db.Column(db.Text)                              # appDescription
+    team = db.Column(db.String(200))                               # appTeam
+    theme = db.Column(db.String(100))                              # appTheme
+    creation_date = db.Column(db.DateTime)                         # appCreationDate
+    status = db.Column(db.String(50))                              # appStatus
+    official_id = db.Column(db.String(100))                        # appOfficialId
+    image_url = db.Column(db.String(300))                          # appImage
+
+    # Campos adicionales de la tabla original
     verification_required = db.Column(db.Boolean, default=True)
     is_public = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     owner_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    # Relaciones SIN backref para evitar conflictos
+    # Relaciones
     owner = db.relationship("User", foreign_keys=[owner_id])
     group_members = db.relationship("GroupMember", back_populates="app")
     group_messages = db.relationship("GroupMessage", back_populates="app")
 
     def __repr__(self):
         return f"<App {self.name}>"
+
 
 # -------------------------
 # MODELO DE MIEMBROS DEL GRUPO
