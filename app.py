@@ -449,7 +449,7 @@ def create_app():
 
     @app.route('/preview', endpoint='preview_static')
     def preview():
-        return render_template('preview.html')
+        return render_template('Preview.html')
 
     @app.route('/chat')
     @login_required
