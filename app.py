@@ -923,24 +923,56 @@ def create_app():
         return render_template("Menúpublicitario.html")
 
 
-    @app.route("/account")
+
+    @app.route("/account", methods=["GET", "POST"])
     @login_required
     def dashboard():
         SUPABASE_URL = os.getenv("SUPABASE_URL")
         SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")   # ← Añadido
+        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)  
+        if request.method == "POST":
+            # Campos de texto
+            name = request.form.get("appName", "").strip()
+            description = request.form.get("appDescription", "").strip()
+            team = request.form.get("appTeam", "").strip()
+            theme = request.form.get("appTheme", "").strip()
+            creation_date = request.form.get("appCreationDate", "").strip()
+            status = request.form.get("appStatus", "").strip()
+            official_id = request.form.get("appOfficialId", "").strip()
 
-        response = (
-            supabase
-            .table("users")
-            .select("*")
-            .eq("email", current_user.email)
-            .single()
-            .execute()
-        )
-        usuario = response.data if response.data else {}
+            # Archivo (imagen)
+            image_file = request.files.get("appImage")
+            image_url = None
+            if image_file:
+                # Aquí debes subirlo a tu almacenamiento (Supabase Storage, S3, Cloudinary, etc.)
+                # Ejemplo simplificado:
+                image_url = f"/static/uploads/{image_file.filename}"
+                image_file.save(f"./static/uploads/{image_file.filename}")
+
+            # Validación mínima
+            if not name:
+                flash("El nombre de la app es obligatorio.", "error")
+                return redirect(url_for("create_app"))
+
+            # Crear slug único
+            base_slug = slugify(name)
+            slug = unique_slug(SupabaseApp, base_slug)
+
+            # Crear objeto App
+            new_app = SupabaseApp(
+                name=name,
+                description=description,
+                team=team,
+                theme=theme,
+                creation_date=creation_date if creation_date else None,
+                status=status,
+                official_id=official_id,
+                image_url=image_url,
+                created_by=current_user.supabase_id,  # usuario logueado
+                created_at=datetime.utcnow()
+            )
 
         return render_template(
             "account.html",
@@ -948,55 +980,6 @@ def create_app():
             SUPABASE_URL=SUPABASE_URL,           # ← Añadido
             SUPABASE_KEY=SUPABASE_ANON_KEY       # ← Añadido
         )
-
-
-
-    @app.route("/create_app", methods=["GET", "POST"])
-    @login_required
-    def create_app():
-        if request.method == "POST":
-            name = request.form.get("name", "").strip()
-            description = request.form.get("description", "").strip()
-            website_url = request.form.get("website_url", "").strip()
-            logo_url = request.form.get("logo_url", "").strip()
-            category = request.form.get("category", "").strip()
-            is_public = bool(request.form.get("is_public"))
-
-            if not name:
-                flash("El nombre de la app es obligatorio.", "error")
-                return redirect(url_for("create_app"))
-
-            # Generar slug único
-            base_slug = slugify(name)
-            slug = unique_slug(App, base_slug)
-
-            # Crear objeto App
-            new_app = App(
-                name=name,
-                slug=slug,
-                description=description,
-                website_url=website_url,
-                logo_url=logo_url,
-                category=category,
-                is_public=is_public,
-                owner_id=current_user.id,
-                created_at=datetime.utcnow()
-            )
-
-            try:
-                db.session.add(new_app)
-                db.session.commit()
-                flash("App creada correctamente.", "success")
-                return redirect(url_for("dashboard"))
-            except Exception as e:
-                db.session.rollback()
-                current_app.logger.exception("Error creando la app")
-                flash("No se pudo crear la app. Intenta más tarde.", "error")
-                return redirect(url_for("create_app"))
-
-        # GET → mostrar formulario
-        return render_template("create_app.html")
-
     
     @app.route("/get_notifications", methods=["GET"])
     @login_required
