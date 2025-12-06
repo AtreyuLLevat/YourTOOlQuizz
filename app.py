@@ -1041,7 +1041,28 @@ def create_app():
             }
         }
 
-    
+    @app.route("/account/get_app/<uuid:app_id>")
+    @login_required
+    def get_app(app_id):
+        app = App.query.filter_by(id=app_id, owner_id=current_user.id).first()
+        if not app:
+            return jsonify({"success": False, "message": "App no encontrada"})
+
+        return jsonify({
+            "success": True,
+            "app": {
+                "id": str(app.id),
+                "name": app.name,
+                "description": app.description,
+                "creation_date": app.creation_date.strftime("%d/%m/%Y") if app.creation_date else None,
+                "theme": app.theme,
+                "image_url": app.image_url,
+                "rating": 4.2,  # Temporal, reemplaza con datos reales
+                "reviews_count": 24,  # Temporal
+                "communities": [{"name": gm.group.name} for gm in app.group_members]  # Ajusta según tu modelo
+            }
+        })
+
     @app.route("/get_notifications", methods=["GET"])
     @login_required
     def get_notifications():

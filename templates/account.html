@@ -351,6 +351,113 @@ input[type="checkbox"] {
   outline: none;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
 }
+/* Modal base */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-backdrop.hidden { display: none; }
+
+.modal-content.app-detail-modal {
+  background: #fff;
+  width: 600px;
+  max-width: 95%;
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Información básica */
+.app-basic-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+}
+
+.app-logo img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.app-main-info {
+  flex-grow: 1;
+}
+
+.edit-app-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* Cajones / secciones */
+.app-sections {
+  display: flex;
+  gap: 20px;
+}
+
+.app-section {
+  flex: 1;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reviews-summary {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.community-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+.community-list li {
+  background: #e0e0e0;
+  margin-bottom: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+/* Botones */
+.btn-small {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
 
 
 </style>
@@ -464,16 +571,72 @@ input[type="checkbox"] {
         <div id="appsList" class="apps-list">
           {% if apps %}
             {% for app in apps %}
-              <button class="app-item">
-                <img src="{{ app.image_url or url_for('static', filename='images/app-placeholder.png') }}" 
-                    alt="App" class="app-img">
-                <span class="app-name">{{ app.name }}</span>
-              </button>
+          <button class="app-item" data-app-id="{{ app.id }}">
+            <img src="{{ app.image_url or url_for('static', filename='images/app-placeholder.png') }}" class="app-img">
+            <span class="app-name">{{ app.name }}</span>
+          </button>
+
             {% endfor %}
           {% else %}
             <p>No tienes aplicaciones creadas.</p>
           {% endif %}
         </div>
+<!-- Modal de Detalle de App -->
+<div id="appDetailModal" class="modal-backdrop hidden">
+  <div class="modal-content app-detail-modal">
+    
+    <!-- 1. Información básica -->
+    <div class="app-basic-info">
+      <div class="app-logo">
+        <img src="{{ url_for('static', filename='images/app-placeholder.png') }}" alt="Logo App">
+      </div>
+      <div class="app-main-info">
+        <h2 class="app-name">Nombre de la App</h2>
+        <p class="app-description">Descripción breve de la app</p>
+        <p class="app-meta">
+          <span class="app-date">Fecha: 06/12/2025</span> | 
+          <span class="app-theme">Tema: Educación</span>
+        </p>
+      </div>
+      <button class="btn-icon edit-app-btn" title="Editar información">
+        ✏️
+      </button>
+    </div>
+
+    <!-- 2. Cajones / Secciones inferiores -->
+    <div class="app-sections">
+
+      <!-- Reseñas -->
+      <div class="app-section reviews-section">
+        <div class="section-header">
+          <h3>Reseñas</h3>
+          <button class="btn-small view-all-btn">Ver todas</button>
+        </div>
+        <div class="reviews-summary">
+          <span class="stars">⭐⭐⭐⭐☆</span>
+          <span class="reviews-count">(24)</span>
+        </div>
+      </div>
+
+      <!-- Comunidades -->
+      <div class="app-section communities-section">
+        <div class="section-header">
+          <h3>Comunidades</h3>
+          <button class="btn-small new-community-btn">+ Nueva</button>
+        </div>
+        <ul class="community-list">
+          <li>Testers</li>
+          <li>Beta Users</li>
+          <li>Marketing Team</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Botón cerrar modal -->
+    <button id="closeAppDetail" class="close-modal">✖</button>
+  </div>
+</div>
 
       </div>
 
@@ -559,7 +722,7 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/notifications.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
-
+<script type="module" src="{{ url_for('static', filename='java/modal.js') }}" defer></script>
 <!-- Scripts normales que no usan módulos -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
