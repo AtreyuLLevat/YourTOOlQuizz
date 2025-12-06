@@ -412,17 +412,20 @@ def create_app():
             })
 
         return {"success": True, "apps": data}
-    @app.route("/preview/<int:app_id>")
+        
+    @app.route("/preview/<string:app_id>")
     def previewing(app_id):
+        # Buscar la app por UUID
         app_data = App.query.filter_by(id=app_id).first()
 
         if not app_data:
             abort(404)
 
+        # Obtener reviews y miembros del equipo asociados
         reviews = Review.query.filter_by(app_id=app_id).order_by(Review.created_at.desc()).all()
         team = TeamMember.query.filter_by(app_id=app_id).all()
 
-        # Ejemplo: convertir tags "IA, Productividad" → lista para Jinja
+        # Convertir tags en lista
         tags = app_data.tags.split(",") if app_data.tags else []
 
         return render_template(
@@ -432,6 +435,7 @@ def create_app():
             reviews=reviews,
             team=team
         )
+
 
     @app.route('/listadodecosas')
     def explorador():
