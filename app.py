@@ -396,6 +396,22 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
+    @app.route("/account/get_all_apps")
+    def get_all_apps():
+        apps = App.query.all()
+        data = []
+
+        for a in apps:
+            data.append({
+                "id": a.id,
+                "name": a.name,
+                "description": a.description,
+                "image_url": a.image_url,
+                "theme": a.theme,
+            })
+
+        return {"success": True, "apps": data}
+
   
     @app.route('/listadodecosas')
     def explorador():
