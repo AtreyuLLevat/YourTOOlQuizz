@@ -1,0 +1,21 @@
+<form method="POST" action="{{ url_for('create_app') }}">
+    <label for="name">Nombre de la app:</label>
+    <input type="text" name="name" required>
+
+    <label for="description">Descripción:</label>
+    <textarea name="description"></textarea>
+
+    <label for="website_url">URL del sitio web:</label>
+    <input type="url" name="website_url">
+
+    <label for="logo_url">URL del logo:</label>
+    <input type="url" name="logo_url">
+
+    <label for="category">Categoría:</label>
+    <input type="text" name="category">
+
+    <label for="is_public">¿Es pública?</label>
+    <input type="checkbox" name="is_public" checked>
+
+    <button type="submit">Crear App</button>
+</form>

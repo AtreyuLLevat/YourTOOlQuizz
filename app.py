@@ -44,9 +44,7 @@ from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
 from flask_socketio import join_room, leave_room, emit
-
-
-
+from slugify import slugify, unique_slug
 
 
 
@@ -919,34 +917,54 @@ def create_app():
         # Este endpoint sirve la página HTML / plantilla
         return render_template("Menúpublicitario.html")
 
+  # usando tus funciones de models.py
 
-    @app.route("/account")
+    @app.route("/create_app", methods=["GET", "POST"])
     @login_required
-    def dashboard():
-        SUPABASE_URL = os.getenv("SUPABASE_URL")
-        SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")   # ← Añadido
+    def create_app():
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            description = request.form.get("description", "").strip()
+            website_url = request.form.get("website_url", "").strip()
+            logo_url = request.form.get("logo_url", "").strip()
+            category = request.form.get("category", "").strip()
+            is_public = bool(request.form.get("is_public"))
 
-        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+            if not name:
+                flash("El nombre de la app es obligatorio.", "error")
+                return redirect(url_for("create_app"))
 
-        response = (
-            supabase
-            .table("users")
-            .select("*")
-            .eq("email", current_user.email)
-            .single()
-            .execute()
-        )
-        usuario = response.data if response.data else {}
+            # Generar slug único
+            base_slug = slugify(name)
+            slug = unique_slug(App, base_slug)
 
-        return render_template(
-            "account.html",
-            usuario=current_user,
-            SUPABASE_URL=SUPABASE_URL,           # ← Añadido
-            SUPABASE_KEY=SUPABASE_ANON_KEY       # ← Añadido
-        )
+            # Crear objeto App
+            new_app = App(
+                name=name,
+                slug=slug,
+                description=description,
+                website_url=website_url,
+                logo_url=logo_url,
+                category=category,
+                is_public=is_public,
+                owner_id=current_user.id,
+                created_at=datetime.utcnow()
+            )
 
-    
+            try:
+                db.session.add(new_app)
+                db.session.commit()
+                flash("App creada correctamente.", "success")
+                return redirect(url_for("dashboard"))
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.exception("Error creando la app")
+                flash("No se pudo crear la app. Intenta más tarde.", "error")
+                return redirect(url_for("create_app"))
+
+        # GET → mostrar formulario
+        return render_template("create_app.html")
+
     @app.route("/get_notifications", methods=["GET"])
     @login_required
     def get_notifications():
