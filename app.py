@@ -44,8 +44,8 @@ from flask_socketio import SocketIO, emit
 from extensions import db, login_manager, bcrypt, mail, socketio
 from blueprints.chat_bp.routes import chat_bp
 from flask_socketio import join_room, leave_room, emit
-from slugify import slugify, unique_slug
-
+from slugify import slugify
+from models import unique_slug  # Tu función propia
 
 
 
