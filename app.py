@@ -931,9 +931,8 @@ def create_app():
         SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
         SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-        supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)  
         if request.method == "POST":
-            # Campos de texto
+            # --- Campos de texto ---
             name = request.form.get("appName", "").strip()
             description = request.form.get("appDescription", "").strip()
             team = request.form.get("appTeam", "").strip()
@@ -942,25 +941,25 @@ def create_app():
             status = request.form.get("appStatus", "").strip()
             official_id = request.form.get("appOfficialId", "").strip()
 
-            # Archivo (imagen)
+            # --- Archivo (imagen) ---
             image_file = request.files.get("appImage")
             image_url = None
-            if image_file:
-                # Aquí debes subirlo a tu almacenamiento (Supabase Storage, S3, Cloudinary, etc.)
-                # Ejemplo simplificado:
-                image_url = f"/static/uploads/{image_file.filename}"
-                image_file.save(f"./static/uploads/{image_file.filename}")
+            if image_file and image_file.filename:
+                upload_path = os.path.join("static", "uploads", image_file.filename)
+                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+                image_file.save(upload_path)
+                image_url = f"/{upload_path}"
 
-            # Validación mínima
+            # --- Validación mínima ---
             if not name:
                 flash("El nombre de la app es obligatorio.", "error")
                 return redirect(url_for("dashboard"))
 
-            # Crear slug único
+            # --- Crear slug único ---
             base_slug = slugify(name)
-            slug = unique_slug(SupabaseApp, base_slug)
+            slug = f"{base_slug}-{int(datetime.utcnow().timestamp())}"
 
-            # Crear objeto App
+            # --- Crear objeto App ---
             new_app = SupabaseApp(
                 name=name,
                 description=description,
@@ -970,15 +969,23 @@ def create_app():
                 status=status,
                 official_id=official_id,
                 image_url=image_url,
-                created_by=current_user.supabase_id,  # usuario logueado
+                slug=slug,
+                created_by=current_user.id,  # Asegúrate que tu modelo tenga esta columna
                 created_at=datetime.utcnow()
             )
 
+            # --- Guardar en DB ---
+            db.session.add(new_app)
+            db.session.commit()
+            flash("App creada correctamente", "success")
+            return redirect(url_for("dashboard"))
+
+        # GET
         return render_template(
             "account.html",
             usuario=current_user,
-            SUPABASE_URL=SUPABASE_URL,           # ← Añadido
-            SUPABASE_KEY=SUPABASE_ANON_KEY       # ← Añadido
+            SUPABASE_URL=SUPABASE_URL,
+            SUPABASE_KEY=SUPABASE_ANON_KEY
         )
     
     @app.route("/get_notifications", methods=["GET"])
