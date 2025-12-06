@@ -452,20 +452,30 @@ input[type="checkbox"] {
 
       <!-- APPS -->
       <!-- APPS -->
-<div id="appsList" class="apps-list">
-  {% if apps %}
-    {% for app in apps %}
-      <button class="app-item">
-        <img src="{{ app.image_url or url_for('static', filename='images/app-placeholder.png') }}" 
-             alt="App" class="app-img">
-        <span class="app-name">{{ app.name }}</span>
-      </button>
-    {% endfor %}
-  {% else %}
-    <p>No tienes aplicaciones creadas.</p>
-  {% endif %}
-</div>
+      <div id="apps" class="hidden">
+        <div class="apps-header">
+          <h1>Apps</h1>
+          <div class="actions" style="justify-content:flex-end;margin-bottom:20px;">
+          <button id="newAppBtn" class="btn primary">Nueva App</button>
+        </div>
+        </div>
+        <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
 
+        <div id="appsList" class="apps-list">
+          {% if apps %}
+            {% for app in apps %}
+              <button class="app-item">
+                <img src="{{ app.image_url or url_for('static', filename='images/app-placeholder.png') }}" 
+                    alt="App" class="app-img">
+                <span class="app-name">{{ app.name }}</span>
+              </button>
+            {% endfor %}
+          {% else %}
+            <p>No tienes aplicaciones creadas.</p>
+          {% endif %}
+        </div>
+
+      </div>
 
 
 
