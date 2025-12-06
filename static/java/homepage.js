@@ -1,108 +1,51 @@
-// =======================
-// 🔵 CARGA DE DATOS DINÁMICOS
-// =======================
+document.addEventListener("DOMContentLoaded", () => {
+  const appsList = document.getElementById("appsList");
 
-async function fetchData() {
-  try {
-    const res = await fetch("/homepage/data");
-    const data = await res.json();
-    return data.success ? data : { apps: [], extensions: [], communities: [], quizzes: [] };
-  } catch (err) {
-    console.error("Error cargando datos:", err);
-    return { apps: [], extensions: [], communities: [], quizzes: [] };
+  // Cargar apps al inicio
+  loadApps();
+
+  async function loadApps() {
+    try {
+      const response = await fetch("/account/get_all_apps");
+      const data = await response.json();
+
+      if (!data.success) {
+        appsList.innerHTML = "<p>No se pudieron cargar las aplicaciones.</p>";
+        return;
+      }
+
+      const apps = data.apps;
+      appsList.innerHTML = "";
+
+      apps.forEach(app => {
+        const item = document.createElement("div");
+        item.className = "item app-item";
+        item.dataset.appId = app.id;
+
+        item.innerHTML = `
+          <img src="${app.image_url || '/static/images/app-placeholder.png'}" alt="App">
+
+          <div class="info">
+            <h3>${app.name}</h3>
+            <p>${app.description || "Sin descripción"}</p>
+
+            <div class="tags">
+              <span class="tag">${app.theme || "General"}</span>
+              <span class="tag">${app.creation_date || "Fecha desconocida"}</span>
+            </div>
+
+            <div class="more-info">
+              <p>Haz clic para ver detalles, reseñas y comunidades.</p>
+            </div>
+          </div>
+        `;
+
+        appsList.appendChild(item);
+      });
+
+    } catch (error) {
+      console.error(error);
+      appsList.innerHTML = "<p>Error al cargar apps.</p>";
+    }
   }
-}
-
-
-// =======================
-// 🔵 RENDER CARDS (Apps + Extensiones)
-// =======================
-
-function renderCards(items, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = ""; // Limpieza antes de renderizar
-
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `
-      <img src="${item.img || item.image_url || "/static/images/app-placeholder.png"}" alt="${item.title}">
-      <div class="info">
-        <h3>${item.title || item.name}</h3>
-        <p>${item.desc || item.description || ""}</p>
-
-        <div class="tags">
-          ${(item.tags || item.tag_list || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
-        </div>
-
-        <div class="more-info">${item.extra || ""}</div>
-
-        <a href="#" class="view-btn">Ver más</a>
-      </div>
-    `;
-
-    container.appendChild(div);
-  });
-}
-
-
-// =======================
-// 🔵 RENDER COMUNIDADES
-// =======================
-
-function renderCommunities(items, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "community-item";
-    div.innerHTML = `
-      <h4>${item.title}</h4>
-      <p>${item.desc}</p>
-      <div class="tags">
-        ${(item.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-
-// =======================
-// 🔵 RENDER QUIZZES
-// =======================
-
-function renderQuizzes(items, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = "";
-
-  items.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "quiz-item";
-    div.innerHTML = `
-      <h4>${item.title}</h4>
-      <p>${item.desc}</p>
-      <div class="tags">
-        ${(item.tags || []).map(tag => `<span class="tag">${tag}</span>`).join("")}
-      </div>
-    `;
-    container.appendChild(div);
-  });
-}
-
-
-// =======================
-// 🔵 EJECUCIÓN GENERAL
-// =======================
-
-async function initHomepage() {
-  const data = await fetchData();
-
-  renderCards(data.apps, "appsList");
-  renderCards(data.extensions, "extensionsList");
-  renderCommunities(data.communities, "communitiesList");
-  renderQuizzes(data.quizzes, "quizzesList");
-}
-
-document.addEventListener("DOMContentLoaded", initHomepage);
+});
