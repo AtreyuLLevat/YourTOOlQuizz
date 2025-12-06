@@ -954,7 +954,7 @@ def create_app():
             # Validación mínima
             if not name:
                 flash("El nombre de la app es obligatorio.", "error")
-                return redirect(url_for("create_app"))
+                return redirect(url_for("dashboard"))
 
             # Crear slug único
             base_slug = slugify(name)
