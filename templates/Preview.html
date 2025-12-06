@@ -83,19 +83,25 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
 {% block content %}
 
 
-<main>
+<main id="preview" data-app-id="{{ app.id }}">
+
+  <!-- HEADER DE LA APP -->
   <section class="app-header">
-    <img src="https://picsum.photos/200?random=9" alt="Logo de MindFlow" />
+    <img src="{{ app.image_url or 'https://picsum.photos/200?random=9' }}" alt="Logo" />
+
     <div class="app-info">
-      <h1>MindFlow</h1>
-      <p>Organiza tus ideas y colabora con tu comunidad de usuarios.</p>
+      <h1>{{ app.name }}</h1>
+
+      <p>{{ app.description }}</p>
+
       <div class="tags">
-        <span class="tag">Productividad</span>
-        <span class="tag">IA</span>
-        <span class="tag">En desarrollo</span>
+        {% for tag in tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
       </div>
+
       <div class="actions">
-        <a href="#" class="btn btn-primary">Probar app</a>
+        <a href="{{ app.website_url or '#' }}" class="btn btn-primary">Probar app</a>
         <a href="#" class="btn btn-outline">Entrar en comunidad</a>
       </div>
     </div>
@@ -112,16 +118,23 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
   <div class="tab-content active" id="description">
     <div class="app-description">
       <h2>Descripción</h2>
-      <p>MindFlow es una plataforma que conecta a desarrolladores y usuarios para mejorar productos de manera colaborativa. Permite crear encuestas, recibir sugerencias, compartir avances y colaborar en tiempo real para lograr mejores experiencias.</p>
+      <p>{{ app.long_description or 'Esta aplicación todavía no tiene una descripción completa.' }}</p>
     </div>
 
+    <!-- CAROUSEL DE PANTALLAS -->
     <div class="carousel-container">
       <div class="carousel-slide">
-        <img src="https://picsum.photos/800/400?random=11" alt="Pantalla 1">
-        <img src="https://picsum.photos/800/400?random=12" alt="Pantalla 2">
-        <img src="https://picsum.photos/800/400?random=13" alt="Pantalla 3">
+        {% if app.screenshots %}
+          {% for shot in app.screenshots %}
+            <img src="{{ shot.url }}" alt="Screenshot {{ loop.index }}">
+          {% endfor %}
+        {% else %}
+          <img src="https://picsum.photos/800/400?random=11" alt="Screenshot 1">
+          <img src="https://picsum.photos/800/400?random=12" alt="Screenshot 2">
+          <img src="https://picsum.photos/800/400?random=13" alt="Screenshot 3">
+        {% endif %}
       </div>
-      <p class="carousel-desc" id="carousel-desc">Conecta a desarrolladores y usuarios reales para mejorar productos colaborativamente.</p>
+      <p class="carousel-desc" id="carousel-desc">{{ app.carousel_desc or 'Mejora productos colaborativamente con tu comunidad.' }}</p>
       <button class="carousel-btn" id="prev">‹</button>
       <button class="carousel-btn" id="next">›</button>
       <div class="indicators" id="indicators"></div>
@@ -130,17 +143,21 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
 
   <div class="tab-content" id="reviews">
     <div class="ratings">
-      <p class="rating-average">⭐ 4.8 / 5 — basado en 214 opiniones</p>
 
-      <div class="comment">
-        <strong>@LauraUX</strong>
-        Una herramienta excelente para gestionar ideas con usuarios reales.
-      </div>
+      <p class="rating-average">
+        ⭐ {{ app.rating_average or 0 }}/5 — basado en {{ reviews|length }} opiniones
+      </p>
 
-      <div class="comment">
-        <strong>@DevMario</strong>
-        La comunidad de MindFlow es de las más activas que he visto.
-      </div>
+      {% if reviews %}
+          {% for r in reviews %}
+          <div class="comment">
+            <strong>@{{ r.username }}</strong>
+            {{ r.comment }}
+          </div>
+          {% endfor %}
+      {% else %}
+          <p class="subtext">Todavía no hay reseñas.</p>
+      {% endif %}
 
       <div class="add-rating">
         <a href="#" class="btn btn-outline">Añadir valoración</a>
@@ -150,53 +167,33 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
 
   <div class="tab-content" id="team">
     <div class="team-container">
-      <div class="team-member-horizontal">
-        <img src="https://picsum.photos/80?random=21" alt="Alice">
-        <div class="team-info">
-          <h3>Alice Gómez</h3>
-          <p>CEO & Co-fundadora</p>
-          <p class="username">@alice</p>
-          <div class="socials">
-            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
+
+      {% if team %}
+        {% for member in team %}
+        <div class="team-member-horizontal">
+          <img src="{{ member.avatar_url or 'https://picsum.photos/80?random=21' }}" alt="Profile">
+
+          <div class="team-info">
+            <h3>{{ member.name }}</h3>
+            <p>{{ member.role }}</p>
+            <p class="username">@{{ member.username }}</p>
+
+            <div class="socials">
+              {% if member.twitter %}<a href="{{ member.twitter }}">Twitter</a>{% endif %}
+              {% if member.linkedin %}<a href="{{ member.linkedin }}">LinkedIn</a>{% endif %}
+            </div>
           </div>
         </div>
-      </div>
-      <div class="team-member-horizontal">
-        <img src="https://picsum.photos/80?random=22" alt="Carlos">
-        <div class="team-info">
-          <h3>Carlos Ruiz</h3>
-          <p>CTO & Co-fundador</p>
-          <p class="username">@carlos</p>
-          <div class="socials">
-            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
-          </div>
-        </div>
-      </div>
-      <div class="team-member-horizontal">
-        <img src="https://picsum.photos/80?random=23" alt="Sofía">
-        <div class="team-info">
-          <h3>Sofía Martínez</h3>
-          <p>Diseñadora UX/UI</p>
-          <p class="username">@sofia</p>
-          <div class="socials">
-            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
-          </div>
-        </div>
-      </div>
-      <div class="team-member-horizontal">
-        <img src="https://picsum.photos/80?random=24" alt="Miguel">
-        <div class="team-info">
-          <h3>Miguel Torres</h3>
-          <p>Desarrollador Fullstack</p>
-          <p class="username">@miguel</p>
-          <div class="socials">
-            <a href="#">Twitter</a> | <a href="#">LinkedIn</a>
-          </div>
-        </div>
-      </div>
+        {% endfor %}
+      {% else %}
+        <p class="subtext">No se añadió ningún integrante del equipo.</p>
+      {% endif %}
+
     </div>
   </div>
+
 </main>
+
 {% endblock %}
 
 {% block extra_js %}
