@@ -408,6 +408,7 @@ def create_app():
                 "description": a.description,
                 "image_url": a.image_url,
                 "theme": a.theme,
+                "creation_date": a.creation_date.strftime("%Y-%m-%d") if a.creation_date else None
             })
 
         return {"success": True, "apps": data}
