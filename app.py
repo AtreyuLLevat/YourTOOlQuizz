@@ -413,18 +413,10 @@ def create_app():
 
         return {"success": True, "apps": data}
         
-    @app.route("/preview/<string:app_id>")
+    @app.route("/preview/<uuid:app_id>")
     def previewing(app_id):
-        try:
-            # Validar que el string sea un UUID válido
-            uuid_obj = UUID(app_id, version=4)
-        except ValueError:
-            abort(404)  # No es un UUID válido
-
-        # Buscar la app por UUID
-        app_data = App.query.filter_by(id=uuid_obj).first()
-        if not app_data:
-            abort(404)
+        # app_id YA VIENE como UUID, no necesitas validar
+        app_data = App.query.get_or_404(app_id)
 
         reviews = Review.query.filter_by(app_id=app_id).order_by(Review.created_at.desc()).all()
         team = TeamMember.query.filter_by(app_id=app_id).all()
@@ -437,6 +429,7 @@ def create_app():
             reviews=reviews,
             team=team
         )
+
 
     @app.route('/listadodecosas')
     def explorador():
