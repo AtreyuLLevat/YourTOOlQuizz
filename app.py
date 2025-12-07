@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 # En app.py - Actualiza los imports
 from models import (
     User, Quiz, Question, Blog, Page, Plan, UserPlan, 
-    App, GroupMember, GroupMessage, SecurityLog, Result
-    review, TeamMember, Tag
+    App, GroupMember, GroupMessage, SecurityLog, Result, 
+    Review, TeamMember, Tag
 )
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
@@ -32,7 +32,7 @@ from sqlalchemy import or_
 import base64
 from tu_modulo_de_formularios import Quizzproductividad
 from supabase import create_client, Client
-from forms import ChangePasswordForm
+from forms import ChangePasswordForm 
 from supabase.lib.client_options import ClientOptions
 from datetime import datetime, timedelta
 from account_routes import account_bp
