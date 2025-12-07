@@ -99,7 +99,7 @@ class App(db.Model):
     status = db.Column(db.String(50))                              # appStatus
     official_id = db.Column(db.String(100))                        # appOfficialId
     image_url = db.Column(db.String(300)) 
-    team_members = db.relationship("TeamMember", backref="app", cascade="all, delete-orphan")
+    team_members = db.relationship("TeamMember", back_populates="app", cascade="all, delete-orphan")
     tags = db.relationship("Tag", backref="app", cascade="all, delete-orphan")
     reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
                          # appImage
@@ -131,7 +131,8 @@ class TeamMember(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    app = db.relationship("App", backref="team_members")
+    app = db.relationship("App", back_populates="team_members")
+
 
 class Tag(db.Model):
     __tablename__ = "tags"
