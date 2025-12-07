@@ -418,7 +418,6 @@ def create_app():
         # app_id YA VIENE como UUID, no necesitas validar
         app_data = App.query.get_or_404(app_id)
 
-        reviews = Review.query.filter_by(app_id=app_id).order_by(Review.created_at.desc()).all()
         team = TeamMember.query.filter_by(app_id=app_id).all()
         tags = app_data.tags.split(",") if getattr(app_data, "tags", None) else []
 
@@ -426,7 +425,6 @@ def create_app():
             "preview.html",
             app=app_data,
             tags=tags,
-            reviews=reviews,
             team=team
         )
 
