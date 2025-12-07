@@ -88,23 +88,16 @@ class App(db.Model):
     __tablename__ = "apps"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    
-    # Campos del formulario
-    name = db.Column(db.String(100), nullable=False)              # appName
+    name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(150), unique=True, index=True, nullable=False)
-    description = db.Column(db.Text)                              # appDescription
-    team = db.Column(db.String(200))                               # appTeam
-    theme = db.Column(db.String(100))                              # appTheme
-    creation_date = db.Column(db.DateTime)                         # appCreationDate
-    status = db.Column(db.String(50))                              # appStatus
-    official_id = db.Column(db.String(100))                        # appOfficialId
-    image_url = db.Column(db.String(300)) 
-    team_members = db.relationship("TeamMember", back_populates="app", cascade="all, delete-orphan")
-    tags = db.relationship("Tag", backref="app", cascade="all, delete-orphan")
-    reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
-                         # appImage
-
-    # Campos adicionales de la tabla original
+    description = db.Column(db.Text)
+    team = db.Column(db.String(200))
+    theme = db.Column(db.String(100))
+    creation_date = db.Column(db.DateTime)
+    status = db.Column(db.String(50))
+    official_id = db.Column(db.String(100))
+    image_url = db.Column(db.String(300))
+    
     verification_required = db.Column(db.Boolean, default=True)
     is_public = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -113,25 +106,16 @@ class App(db.Model):
 
     # Relaciones
     owner = db.relationship("User", foreign_keys=[owner_id])
+    team_members = db.relationship("TeamMember", back_populates="app", cascade="all, delete-orphan")
+    reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
     group_members = db.relationship("GroupMember", back_populates="app")
     group_messages = db.relationship("GroupMessage", back_populates="app")
 
+    # Relación muchos a muchos con tags
+    tags = db.relationship("Tag", secondary="app_tags", back_populates="apps")
+
     def __repr__(self):
         return f"<App {self.name}>"
-
-class TeamMember(db.Model):
-    __tablename__ = "team_members"
-
-    id = db.Column(db.Integer, primary_key=True)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
-
-    name = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(100))
-    avatar_url = db.Column(db.String(300))
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    app = db.relationship("App", back_populates="team_members")
 
 
 class Tag(db.Model):
@@ -140,19 +124,32 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
+    # Relación muchos a muchos con apps
+    apps = db.relationship("App", secondary="app_tags", back_populates="tags")
+
 
 class AppTag(db.Model):
     __tablename__ = "app_tags"
 
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), primary_key=True)
+
+    app = db.relationship("App", backref=db.backref("app_tags_assoc"))
+    tag = db.relationship("Tag", backref=db.backref("app_tags_assoc"))
+
+
+class TeamMember(db.Model):
+    __tablename__ = "team_members"
+
     id = db.Column(db.Integer, primary_key=True)
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
-    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100))
+    avatar_url = db.Column(db.String(300))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    app = db.relationship("App", backref="app_tags")
-    tag = db.relationship("Tag")
-
-
-
+    app = db.relationship("App", back_populates="team_members")
+    
 class Review(db.Model):
     __tablename__ = "reviews"
 
