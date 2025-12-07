@@ -415,71 +415,91 @@ def create_app():
 
         return {"success": True, "apps": data}
         
-    @app.route("/preview/<string:app_id>")
-    def previewing(app_id):
-        try:
-            uuid_obj = UUID(app_id, version=4)
-        except ValueError:
-            abort(404)
+@app.route("/preview/<string:app_id>")
+def previewing(app_id):
+    try:
+        uuid_obj = UUID(app_id, version=4)
+    except ValueError:
+        abort(404)
 
-        app_data = App.query.filter_by(id=uuid_obj).first()
-        if not app_data:
-            abort(404)
+    app_data = App.query.filter_by(id=uuid_obj).first()
+    if not app_data:
+        abort(404)
 
-        # Reviews reales
-        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+    # Reviews de la app
+    reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
 
-        # Equipo real
-        team_members = TeamMember.query.filter_by(app_id=app_data.id).all()
+    # Equipo de la app
+    team_members = TeamMember.query.filter_by(app_id=app_data.id).all()
 
-        # Tags reales
-        tags = Tag.query.filter_by(app_id=app_data.id).all()
+    # Tags asociados a la app (muchos a muchos)
+    tags = app_data.tags
 
-        return render_template(
-            "preview.html",
-            app=app_data,
-            reviews=reviews,
-            team_members=team_members,
-            tags=tags
-        )
+    return render_template(
+        "preview.html",
+        app=app_data,
+        reviews=reviews,
+        team_members=team_members,
+        tags=tags
+    )
 
-    @app.route("/app/<id>/team/add", methods=["POST"])
-    @login_required
-    def add_team_member(id):
-        member = TeamMember(
-            app_id=id,
-            name=request.form["name"],
-            role=request.form["role"]
-        )
-        db.session.add(member)
-        db.session.commit()
-        return redirect(f"/preview/{id}")
-    
-    @app.route("/app/<id>/tags/add", methods=["POST"])
-    @login_required
-    def add_tag(id):
-        tag = Tag(
-            app_id=id,
-            name=request.form["name"]
-        )
+@app.route("/app/<id>/team/add", methods=["POST"])
+@login_required
+def add_team_member(id):
+    app_data = App.query.get(id)
+    if not app_data:
+        abort(404)
+
+    member = TeamMember(
+        app_id=id,
+        name=request.form["name"],
+        role=request.form["role"]
+    )
+    db.session.add(member)
+    db.session.commit()
+    return redirect(f"/preview/{id}")
+
+@app.route("/app/<id>/tags/add", methods=["POST"])
+@login_required
+def add_tag(id):
+    app_data = App.query.get(id)
+    if not app_data:
+        abort(404)
+
+    tag_name = request.form["name"].strip()
+    if not tag_name:
+        abort(400)
+
+    # Buscar si el tag ya existe
+    tag = Tag.query.filter_by(name=tag_name).first()
+    if not tag:
+        tag = Tag(name=tag_name)
         db.session.add(tag)
+        db.session.commit()  # Necesario para obtener ID
+
+    # Asociar tag a la app si aún no está
+    if tag not in app_data.tags:
+        app_data.tags.append(tag)
         db.session.commit()
-        return redirect(f"/preview/{id}")
 
-    @app.route("/app/<id>/reviews/add", methods=["POST"])
-    @login_required
-    def add_review(id):
-        review = Review(
-            app_id=id,
-            user_id=current_user.id,
-            text=request.form["text"],
-            rating=int(request.form["rating"])
-        )
-        db.session.add(review)
-        db.session.commit()
-        return redirect(f"/preview/{id}")
+    return redirect(f"/preview/{id}")
 
+@app.route("/app/<id>/reviews/add", methods=["POST"])
+@login_required
+def add_review(id):
+    app_data = App.query.get(id)
+    if not app_data:
+        abort(404)
 
+    review = Review(
+        app_id=id,
+        user_id=current_user.id,
+        text=request.form["text"],
+        rating=int(request.form["rating"])
+    )
+    db.session.add(review)
+    db.session.commit()
+    return redirect(f"/preview/{id}")
 
     @app.route('/listadodecosas')
     def explorador():
