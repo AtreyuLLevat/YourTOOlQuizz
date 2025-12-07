@@ -23,6 +23,7 @@ from dotenv import load_dotenv
 from models import (
     User, Quiz, Question, Blog, Page, Plan, UserPlan, 
     App, GroupMember, GroupMessage, SecurityLog, Result
+    review, TeamMember, Tag
 )
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
@@ -47,6 +48,7 @@ from flask_socketio import join_room, leave_room, emit
 from slugify import slugify
 from models import unique_slug
 from uuid import UUID
+
 
 
 
@@ -416,27 +418,68 @@ def create_app():
     @app.route("/preview/<string:app_id>")
     def previewing(app_id):
         try:
-            # Validar que el string sea un UUID válido
             uuid_obj = UUID(app_id, version=4)
         except ValueError:
-            abort(404)  # No es un UUID válido
+            abort(404)
 
-        # Buscar la app por UUID
         app_data = App.query.filter_by(id=uuid_obj).first()
         if not app_data:
             abort(404)
 
-        reviews = Review.query.filter_by(app_id=app_id).order_by(Review.created_at.desc()).all()
-        team = TeamMember.query.filter_by(app_id=app_id).all()
-        tags = app_data.tags.split(",") if getattr(app_data, "tags", None) else []
+        # Reviews reales
+        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+
+        # Equipo real
+        team_members = TeamMember.query.filter_by(app_id=app_data.id).all()
+
+        # Tags reales
+        tags = Tag.query.filter_by(app_id=app_data.id).all()
 
         return render_template(
             "preview.html",
             app=app_data,
-            tags=tags,
             reviews=reviews,
-            team=team
+            team_members=team_members,
+            tags=tags
         )
+
+    @app.route("/app/<id>/team/add", methods=["POST"])
+    @login_required
+    def add_team_member(id):
+        member = TeamMember(
+            app_id=id,
+            name=request.form["name"],
+            role=request.form["role"]
+        )
+        db.session.add(member)
+        db.session.commit()
+        return redirect(f"/preview/{id}")
+    
+    @app.route("/app/<id>/tags/add", methods=["POST"])
+    @login_required
+    def add_tag(id):
+        tag = Tag(
+            app_id=id,
+            name=request.form["name"]
+        )
+        db.session.add(tag)
+        db.session.commit()
+        return redirect(f"/preview/{id}")
+
+    @app.route("/app/<id>/reviews/add", methods=["POST"])
+    @login_required
+    def add_review(id):
+        review = Review(
+            app_id=id,
+            user_id=current_user.id,
+            text=request.form["text"],
+            rating=int(request.form["rating"])
+        )
+        db.session.add(review)
+        db.session.commit()
+        return redirect(f"/preview/{id}")
+
+
 
     @app.route('/listadodecosas')
     def explorador():

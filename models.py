@@ -98,7 +98,11 @@ class App(db.Model):
     creation_date = db.Column(db.DateTime)                         # appCreationDate
     status = db.Column(db.String(50))                              # appStatus
     official_id = db.Column(db.String(100))                        # appOfficialId
-    image_url = db.Column(db.String(300))                          # appImage
+    image_url = db.Column(db.String(300)) 
+    team_members = db.relationship("TeamMember", backref="app", cascade="all, delete-orphan")
+    tags = db.relationship("Tag", backref="app", cascade="all, delete-orphan")
+    reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
+                         # appImage
 
     # Campos adicionales de la tabla original
     verification_required = db.Column(db.Boolean, default=True)
@@ -115,6 +119,47 @@ class App(db.Model):
     def __repr__(self):
         return f"<App {self.name}>"
 
+class TeamMember(db.Model):
+    __tablename__ = "team_members"
+
+    id = db.Column(db.Integer, primary_key=True)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100))
+    avatar_url = db.Column(db.String(300))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    app = db.relationship("App", backref="team_members")
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+
+
+class AppTag(db.Model):
+    __tablename__ = "app_tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), nullable=False)
+
+    app = db.relationship("App", backref="app_tags")
+    tag = db.relationship("Tag")
+
+
+
+class Review(db.Model):
+    __tablename__ = "reviews"
+
+    id = db.Column(db.Integer, primary_key=True)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"))
+    content = db.Column(db.Text)
+    rating = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # -------------------------
 # MODELO DE MIEMBROS DEL GRUPO
