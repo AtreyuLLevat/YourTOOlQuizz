@@ -23,10 +23,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const name = document.querySelector(".app-info h1");
     const description = document.querySelector(".app-info > p");
     const tagsContainer = document.querySelector(".tags");
-
     const longDescription = document.querySelector("#description .app-description p");
 
-    // --- RELLENAR DATOS BÁSICOS ---
     logo.src = app.image_url || "https://picsum.photos/200?random=99";
     name.textContent = app.name;
     description.textContent = app.short_description || app.long_description || "Sin descripción.";
@@ -53,21 +51,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const halfStar = rating - fullStars >= 0.5;
       const totalStars = 5;
 
-      for (let i = 0; i < fullStars; i++) {
-        const star = document.createElement("span");
-        star.textContent = "★";
-        container.appendChild(star);
-      }
-      if (halfStar) {
-        const star = document.createElement("span");
-        star.textContent = "☆"; // media estrella visual
-        container.appendChild(star);
-      }
-      for (let i = fullStars + (halfStar ? 1 : 0); i < totalStars; i++) {
-        const star = document.createElement("span");
-        star.textContent = "☆";
-        container.appendChild(star);
-      }
+      for (let i = 0; i < fullStars; i++) container.innerHTML += "★";
+      if (halfStar) container.innerHTML += "☆";
+      for (let i = fullStars + (halfStar ? 1 : 0); i < totalStars; i++) container.innerHTML += "☆";
     }
 
     function renderReviews() {
@@ -89,20 +75,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     renderReviews();
 
-    // --- Funcionalidad añadir reseña ---
+    // --- Formulario estilo Amazon ---
     const addReviewBtn = document.getElementById("add-review-btn");
     const reviewForm = document.getElementById("review-form");
     const submitReview = document.getElementById("submit-review");
+    const starPicker = document.getElementById("star-picker");
+    let selectedRating = 0;
 
+    // Mostrar/ocultar formulario
     addReviewBtn.addEventListener("click", () => {
       reviewForm.style.display = reviewForm.style.display === "none" ? "block" : "none";
     });
 
+    // Interactividad de las estrellas
+    starPicker.querySelectorAll("span").forEach(star => {
+      star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
+      star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
+    });
+    starPicker.addEventListener("mouseout", () => highlightStars(selectedRating));
+
+    function highlightStars(rating) {
+      starPicker.querySelectorAll("span").forEach(star => {
+        star.textContent = parseInt(star.dataset.value) <= rating ? "★" : "☆";
+      });
+    }
+
+    // Enviar reseña
     submitReview.addEventListener("click", async () => {
       const text = document.getElementById("review-text").value.trim();
-      const rating = document.getElementById("review-rating").value.trim();
 
-      if (!text || !rating) {
+      if (!text || selectedRating === 0) {
         alert("Por favor completa ambos campos.");
         return;
       }
@@ -110,23 +112,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       try {
         const formData = new FormData();
         formData.append("content", text);
-        formData.append("rating", rating);
+        formData.append("rating", selectedRating);
 
-        const res = await fetch(`/app/${appId}/reviews/add`, {
-          method: "POST",
-          body: formData
-        });
-
+        const res = await fetch(`/app/${appId}/reviews/add`, { method: "POST", body: formData });
         const data = await res.json();
 
         if (data.success) {
-          // Añadir la nueva reseña al array y refrescar
           app.reviews.push(data.review);
           renderReviews();
-
-          // Limpiar formulario
           document.getElementById("review-text").value = "";
-          document.getElementById("review-rating").value = "";
+          selectedRating = 0;
+          highlightStars(0);
           reviewForm.style.display = "none";
         } else {
           alert(data.error || "Error al enviar la reseña.");
@@ -146,7 +142,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         const targetId = btn.dataset.tab;
         tabContents.forEach(tc => tc.classList.remove("active"));
         document.getElementById(targetId).classList.add("active");
-
         tabButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
       });
