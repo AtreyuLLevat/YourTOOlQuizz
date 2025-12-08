@@ -489,34 +489,25 @@ def create_app():
     def add_review(id):
         app_data = App.query.get(id)
         if not app_data:
-            return jsonify({"success": False, "error": "App no encontrada"}), 404
-
-        text = request.form.get("text")
-        rating = request.form.get("rating")
-
-        if not text or not rating:
-            return jsonify({"success": False, "error": "Campos vacíos"}), 400
-
-        try:
-            rating = int(rating)
-        except ValueError:
-            return jsonify({"success": False, "error": "Rating inválido"}), 400
+            abort(404)
 
         review = Review(
             app_id=id,
-            user_id=current_user.id,
-            text=text,
-            rating=rating
+            user_id=current_user.id,  # si agregaste el campo user_id
+            content=request.form["text"],  # usa "content" en lugar de "text"
+            rating=int(request.form["rating"])
         )
+
         db.session.add(review)
         db.session.commit()
 
+        # Devolver JSON para AJAX
         return jsonify({
             "success": True,
             "review": {
                 "username": current_user.username,
-                "text": text,
-                "rating": rating
+                "text": review.content,
+                "rating": review.rating
             }
         })
 
