@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Preview - YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --subtext: #64748b;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --radius: 14px;
+  --shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+  --transition: all 0.25s ease;
+}
+
+
+main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.5rem; }
+
+.app-header { display: flex; align-items: center; gap: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2rem; }
+.app-header img { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: var(--shadow); }
+.app-info h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+.app-info p { color: var(--subtext); margin-bottom: 1rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.2rem; }
+.tag { background: rgba(37, 99, 235, 0.08); color: var(--primary); font-size: 0.85rem; font-weight: 500; padding: 0.35rem 0.7rem; border-radius: 8px; }
+.actions { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+.btn { display: inline-block; font-weight: 600; font-size: 0.95rem; text-decoration: none; padding: 0.85rem 1.4rem; border-radius: 10px; transition: var(--transition); text-align: center; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-outline { border: 1.5px solid var(--primary); color: var(--primary); background: transparent; }
+.btn-outline:hover { background: var(--primary); color: white; }
+
+.tabs { display: flex; gap: 2rem; margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.tab { padding: 0.8rem 1.2rem; cursor: pointer; font-weight: 600; transition: var(--transition); border-bottom: 3px solid transparent; }
+.tab.active { border-color: var(--primary); color: var(--primary); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.app-description { margin-bottom: 1.5rem; text-align: center; }
+.app-description h2 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text); }
+.app-description p { font-size: 1.05rem; color: var(--subtext); }
+
+.carousel-container { position: relative; border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; margin-bottom: 2rem; }
+.carousel-slide { display: flex; transition: transform 0.4s ease-in-out; gap: 10px; }
+.carousel-slide img { width: 100%; height: 400px; object-fit: cover; border-radius: var(--radius); }
+.carousel-desc { padding: 1rem 0; text-align: center; font-size: 1.05rem; color: var(--subtext); }
+.carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(37, 99, 235, 0.7); border: none; color: #fff; font-size: 1.5rem; padding: 0.5rem 1rem; border-radius: 50%; cursor: pointer; transition: var(--transition); }
+.carousel-btn:hover { background: var(--primary); }
+#prev { left: 10px; }
+#next { right: 10px; }
+.indicators { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; }
+.indicator { width: 10px; height: 10px; background: var(--border); border-radius: 50%; cursor: pointer; transition: var(--transition); }
+.indicator.active { background: var(--primary); }
+
+.ratings { margin-top: 1rem; }
+.rating-average { font-weight: 600; font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem; }
+.comment { background: var(--surface-soft); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+.comment strong { color: var(--primary); display: block; margin-bottom: 0.3rem; }
+.add-rating { text-align: center; margin-top: 1.3rem; }
+
+.team-container { display: flex; flex-direction: column; gap: 1rem; }
+.team-member-horizontal { display: flex; align-items: center; gap: 1.2rem; background: var(--surface-soft); padding: 1rem 1.2rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.team-member-horizontal img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
+.team-info h3 { font-size: 1.1rem; margin-bottom: 0.2rem; }
+.team-info p { font-size: 0.9rem; color: var(--subtext); margin: 0.1rem 0; }
+.team-info .username { font-style: italic; color: var(--primary); }
+.team-info .socials a { text-decoration: none; color: var(--primary); font-size: 0.85rem; margin-right: 0.5rem; transition: var(--transition); }
+.team-info .socials a:hover { text-decoration: underline; }
+
+@media (max-width: 720px) {
+  .carousel-slide img { height: 250px; }
+  .team-member-horizontal { flex-direction: column; align-items: flex-start; }
+  .team-info .socials { margin-top: 0.5rem; }
+}
+.reviews-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.avg-stars {
+  font-size: 1.5rem;
+  color: #facc15; /* amarillo para estrellas */
+}
+
+.reviews-list .comment {
+  background: var(--surface-soft);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.reviews-list .comment strong {
+  color: var(--primary);
+}
+
+</style>
+{% endblock %}
+{% block content %}
+
+
+<main id="preview" data-app-id="{{ app.id }}">
+
+  <!-- HEADER DE LA APP -->
+  <section class="app-header">
+    <img src="{{ app.image_url or 'https://picsum.photos/200?random=9' }}" alt="Logo" />
+
+    <div class="app-info">
+      <h1>{{ app.name }}</h1>
+
+      <p>{{ app.long_description or 'Esta aplicación todavía no tiene una descripción completa.' }}</p>
+
+      <div class="tags">
+        {% for tag in tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="actions">
+        <a href="{{ app.website_url or '#' }}" class="btn btn-primary">Probar app</a>
+        <a href="#" class="btn btn-outline">Entrar en comunidad</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑAS -->
+  <div class="tabs">
+    <div class="tab active" data-tab="description">Inicio / Descripción</div>
+    <div class="tab" data-tab="reviews">Reseñas</div>
+    <div class="tab" data-tab="team">Equipo</div>
+  </div>
+
+  <!-- CONTENIDO DE LAS PESTAÑAS -->
+  <div class="tab-content active" id="description">
+    <div class="app-description">
+      <h2>Descripción</h2>
+      <p>{{ app.long_description or 'Esta aplicación todavía no tiene una descripción completa.' }}</p>
+    </div>
+
+    <!-- CAROUSEL DE PANTALLAS -->
+    <div class="carousel-container">
+      <div class="carousel-slide">
+        {% if app.screenshots %}
+          {% for shot in app.screenshots %}
+            <img src="{{ shot.url }}" alt="Screenshot {{ loop.index }}">
+          {% endfor %}
+        {% else %}
+          <img src="https://picsum.photos/800/400?random=11" alt="Screenshot 1">
+          <img src="https://picsum.photos/800/400?random=12" alt="Screenshot 2">
+          <img src="https://picsum.photos/800/400?random=13" alt="Screenshot 3">
+        {% endif %}
+      </div>
+      <p class="carousel-desc" id="carousel-desc">{{ app.carousel_desc or 'Mejora productos colaborativamente con tu comunidad.' }}</p>
+      <button class="carousel-btn" id="prev">‹</button>
+      <button class="carousel-btn" id="next">›</button>
+      <div class="indicators" id="indicators"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="reviews">
+  <div class="ratings">
+    <div class="reviews-header" style="display:flex; align-items:center; gap:1rem;">
+      <div class="avg-stars" id="avg-stars">
+        <!-- Aquí se generarán las estrellas globales -->
+      </div>
+
+      <button id="add-review-btn" class="btn btn-outline">Añadir reseña</button>
+    </div>
+
+    <!-- FORMULARIO DE RESEÑA -->
+    <div id="review-form" style="display:none; margin-top:1rem;">
+      <textarea id="review-text" placeholder="Escribe tu reseña..." rows="3" style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid #ccc;"></textarea>
+      <select id="review-rating" style="margin-top:0.5rem; padding:0.4rem; border-radius:8px; width:100%;">
+        <option value="">Selecciona puntuación</option>
+        <option value="1">1 ⭐</option>
+        <option value="2">2 ⭐</option>
+        <option value="3">3 ⭐</option>
+        <option value="4">4 ⭐</option>
+        <option value="5">5 ⭐</option>
+      </select>
+      <button id="submit-review" class="btn btn-primary" style="margin-top:0.5rem;">Enviar</button>
+    </div>
+
+    <p id="reviews-count" class="reviews-count" style="margin-top:0.5rem;"></p>
+
+    <div id="reviews-list" class="reviews-list" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+
+
+
+
+    </div>
+  </div>
+
+  <div class="tab-content" id="team">
+    <div class="team-container">
+
+      {% if team %}
+        {% for member in team %}
+        <div class="team-member-horizontal">
+          <img src="{{ member.avatar_url or 'https://picsum.photos/80?random=21' }}" alt="Profile">
+
+          <div class="team-info">
+            <h3>{{ member.name }}</h3>
+            <p>{{ member.role }}</p>
+            <p class="username">@{{ member.username }}</p>
+
+            <div class="socials">
+              {% if member.twitter %}<a href="{{ member.twitter }}">Twitter</a>{% endif %}
+              {% if member.linkedin %}<a href="{{ member.linkedin }}">LinkedIn</a>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="subtext">No se añadió ningún integrante del equipo.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+</main>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='java/preview.js') }}"defer> </script>{% endblock %}

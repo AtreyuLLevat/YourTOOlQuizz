@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados de la búsqueda | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ---------------- MAIN ---------------- */
+main {
+  max-width: 960px;
+  margin: 80px auto;
+  padding: 0 40px;
+  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+}
+
+/* ---------------- TITULO ---------------- */
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 60px;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+h1::after {
+  content: "";
+  display: block;
+  width: 90px;
+  height: 4px;
+  background: #2563eb;
+  margin: 18px auto 0;
+  border-radius: 2px;
+}
+
+/* ---------------- SEARCH RESULTS ---------------- */
+.results-list { 
+  list-style: none; 
+  padding: 0; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 50px;
+  border-top: 1px solid #e5e7eb;
+  align-items: center;
+}
+
+.result-item { 
+  width: 90%;
+  max-width: 720px;
+  padding: 40px 0;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+  text-align: center;
+}
+.result-item:hover {
+  background-color: #f9fafb;
+  transform: translateY(-2px);
+}
+
+/* ---------------- IMÁGENES ---------------- */
+.result-item img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+/* ---------------- ENLACE PRINCIPAL ---------------- */
+.result-link {
+  color: #1e40af;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 10px;
+  transition: color 0.2s ease;
+}
+.result-link:hover { 
+  color: #facc15;
+  text-decoration: underline; 
+}
+
+/* ---------------- DESCRIPCIÓN ---------------- */
+.result-content { 
+  color: #334155; 
+  font-size: 1.05rem;
+  line-height: 1.7; 
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ---------------- SIN RESULTADOS ---------------- */
+.no-results { 
+  text-align: center; 
+  color: #475569; 
+  font-size: 1.15rem; 
+  padding: 80px 0; 
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  margin: 60px auto;
+  max-width: 600px;
+}
+
+/* ---------------- BOTÓN VOLVER ---------------- */
+.back-link {
+  display: block;
+  width: 90%;
+  max-width: 720px;
+  margin: 60px auto 0;
+  padding: 14px 0;
+  text-align: center;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+}
+.back-link:hover {
+  background: #facc15;
+  color: #0f172a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Resultados para "{{ q }}"</h1>
+
+<div class="results-container">
+  {% if resultados_quiz or resultados_blog or resultados_page %}
+    <ul class="results-list">
+
+      {# --- QUIZZES --- #}
+      {% for item in resultados_quiz %}
+      <li class="result-item">
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.titulo }}">
+        {% endif %}
+        <a class="result-link" href="{{ url_for('quiz_por_slug', slug=item.slug) }}">
+           {{ item.titulo }}
+        </a>
+        <p class="result-content">{{ item.contenido }}</p>
+      </li>
+      {% endfor %}
+
+      {# --- BLOGS --- #}
+      {% for item in resultados_blog %}
+      <li class="result-item">
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.titulo }}">
+        {% endif %}
+        <a class="result-link" href="{{ url_for('blog_por_slug', slug=item.slug) }}">
+           {{ item.titulo }}
+        </a>
+        <p class="result-content">{{ item.contenido }}</p>
+      </li>
+      {% endfor %}
+
+      {# --- PÁGINAS (sin imagen) --- #}
+      {% for item in resultados_page %}
+      <li class="result-item">
+        <a class="result-link" href="/{{ item.slug }}">
+          📄 {{ item.title or item.name }}
+        </a>
+        <p class="result-content">{{ item.description }}</p>
+      </li>
+      {% endfor %}
+
+    </ul>
+  {% else %}
+    <p class="no-results">No se encontraron resultados para "{{ q }}"</p>
+  {% endif %}
+</div>
+
+<a href="/" class="back-link">
+  <i class="fas fa-arrow-left"></i> Volver al inicio
+</a>
+{% endblock %}

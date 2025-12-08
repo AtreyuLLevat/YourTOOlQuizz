@@ -1,0 +1,1026 @@
+{% extends "base.html" %}
+
+{% block title %}Servicios | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --accent-dark:#1e40af;
+      --accent-light:#dbeafe;
+      --muted:#6b7280;
+      --radius:16px;
+      --max-width:1200px;
+      --shadow:0 8px 30px rgba(16,24,40,0.08);
+      --shadow-hover:0 15px 35px rgba(16,24,40,0.12);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:#0f172a;
+      line-height:1.45;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .container{
+      max-width:1600px;
+      margin:0 auto;
+      padding:60px 40px;
+    }
+
+    /* CABECERA */
+    .header{
+      text-align:center;
+      margin-bottom:70px;
+    }
+    .header h1{
+      margin:0 0 25px 0;
+      font-size:2.8rem;
+      font-weight:700;
+    }
+    .header p{
+      color:var(--muted);
+      margin:0 auto;
+      max-width:800px;
+      line-height:1.6;
+      font-size:1.2rem;
+    }
+
+    /* SECCIONES DE PLANES */
+    .section{
+      margin-bottom:100px;
+      position:crelative;
+    }
+    .section h2{
+      margin:0 0 20px 0;
+      font-size:2.2rem;
+      font-weight:700;
+    }
+    .section p{
+      color:var(--muted);
+      margin-bottom:40px;
+      line-height:1.6;
+      font-size:1.1rem;
+      max-width:900px;
+    }
+
+    /* SEPARADOR ENTRE SECCIONES */
+    .section-divider {
+      position: relative;
+      margin: 80px 0;
+      text-align: center;
+    }
+    .section-divider::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(15,23,42,0.1) 20%, rgba(15,23,42,0.1) 80%, transparent 100%);
+    }
+
+    /* GRID DE PLANES */
+.plans-section {
+  display: flex;
+  justify-content: center;  /* espacia uniformemente las tarjetas */
+  align-items: flex-start;
+  width: 100%;
+  min-width: 1600px; /* mínimo 1600px */
+  padding: 40px 60px;
+  box-sizing: border-box;
+  gap: 40px; /* espacio entre tarjetas */
+}
+
+.plan {
+  flex: 0 0 350px; /* ancho fijo de cada tarjeta */
+  background: var(--card);
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+}
+
+
+.plans-section::-webkit-scrollbar {
+  height: 10px;
+}
+
+.plans-section::-webkit-scrollbar-thumb {
+  background-color: rgba(37, 99, 235, 0.3);
+  border-radius: 10px;
+}
+
+
+
+    .plan h3{
+      margin:0;
+      font-size:1.5rem;
+      font-weight:700;
+    }
+    .plan .price{
+      font-size:1.8rem;
+      font-weight:800;
+      color:var(--accent-dark);
+      margin-top:12px;
+      margin-bottom:16px;
+    }
+    .plan ul{
+      margin:0 0 28px 0;
+      padding-left:22px;
+      color:var(--muted);
+      font-size:1.05rem;
+      flex-grow:1;
+    }
+    .plan li {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .badge{
+      display:inline-block;
+      margin-top:12px;
+      padding:8px 14px;
+      font-size:0.9rem;
+      background:rgba(37,99,235,0.1);
+      color:var(--accent);
+      border-radius:10px;
+      font-weight:600;
+    }
+
+    /* BOTONES DE ACCIÓN */
+    .btn {
+      display: inline-block;
+      padding: 16px 32px;
+      background-color: var(--accent);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+      font-size: 1.05rem;
+      margin-top: auto;
+    }
+    
+    .btn:hover {
+      background-color: var(--accent-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+    
+    .btn-secondary:hover {
+      background-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(37, 99, 235, 0.2);
+    }
+
+    /* ENLACE CÓMO FUNCIONA */
+    .how-it-works-link {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .how-it-works-link a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      padding: 12px 24px;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+    }
+    .how-it-works-link a:hover {
+      background-color: var(--accent-light);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
+    /* RESEÑAS MINIMALISTAS */
+    .testimonials-section {
+      margin: 100px 0;
+      padding: 0;
+    }
+    .testimonials-section h2 {
+      margin: 0 0 80px 0;
+      font-size: 2.6rem;
+      font-weight: 800;
+      text-align: center;
+      color: #000000;
+    }
+    .testimonials-minimal {
+      display: flex;
+      max-width: 1000px;
+      margin: 0 auto;
+      gap: 0;
+    }
+    .testimonial-minimal {
+      flex: 1;
+      padding: 0 50px;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+    }
+    .testimonial-minimal:first-child {
+      border-right: 1px solid rgba(15,23,42,0.1);
+      padding-left: 0;
+    }
+    .testimonial-minimal:last-child {
+      padding-right: 0;
+    }
+    .testimonial-company {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 24px;
+      letter-spacing: 0.5px;
+    }
+    .testimonial-content {
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 1.1rem;
+      margin-bottom: 32px;
+      font-style: normal;
+    }
+    .testimonial-author {
+      margin-top: auto;
+    }
+    .testimonial-stars {
+      color: #f59e0b;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .testimonial-name {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* TABLAS COMPARATIVAS MINIMALISTAS */
+    .comparison-section {
+      margin: 100px 0;
+    }
+    .comparison-section h2 {
+      margin: 0 0 50px 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-align: center;
+      color: #000000;
+    }
+    .comparison-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 60px;
+      gap: 8px;
+      background: rgba(15,23,42,0.02);
+      padding: 8px;
+      border-radius: 12px;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+    }
+    .tab-btn.active {
+      background: white;
+      color: var(--accent);
+      box-shadow: 0 2px 8px rgba(16,24,40,0.08);
+    }
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+    .comparison-table th {
+      padding: 24px 20px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #0f172a;
+      border-bottom: 2px solid rgba(15,23,42,0.1);
+    }
+    .comparison-table th:first-child {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .comparison-table td {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(15,23,42,0.05);
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .comparison-table td:first-child {
+      text-align: left;
+      font-weight: 500;
+      color: #0f172a;
+    }
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+    .check-mark {
+      color: #10b981;
+      font-size: 1.2rem;
+    }
+    .cross-mark {
+      color: rgba(107,114,128,0.3);
+      font-size: 1.2rem;
+    }
+    .price-cell {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .table-container {
+      display: none;
+    }
+    .table-container.active {
+      display: block;
+    }
+
+    /* FAQ - ACORDEÓN INTEGRADO */
+    .faq-section {
+      margin: 100px 0 80px 0;
+      padding: 60px 0;
+      border-top: 1px solid rgba(15,23,42,0.08);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+    .faq-section h2 {
+      margin: 0 0 50px 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      background: var(--card);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+    .faq-item:hover {
+      box-shadow: var(--shadow-hover);
+    }
+    .faq-question {
+      padding: 24px 28px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .faq-question:hover {
+      color: var(--accent);
+    }
+    .faq-icon {
+      font-size: 1.5rem;
+      font-weight: 300;
+      transition: transform 0.3s ease;
+      color: var(--muted);
+      min-width: 24px;
+      text-align: center;
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .faq-answer-content {
+      padding: 0 28px 24px 28px;
+    }
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+    }
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+    .faq-item.active .faq-question {
+      color: var(--accent);
+    }
+
+    /* CÓMO FUNCIONA */
+    .how-it-works {
+      margin-bottom: 80px;
+    }
+    .how-it-works h2{
+      margin:0 0 25px 0;
+      font-size:2.2rem;
+      font-weight:700;
+    }
+    .how-it-works ol{
+      padding-left:24px;
+      color:var(--muted);
+      line-height:1.6;
+      font-size:1.1rem;
+      max-width:900px;
+    }
+    .how-it-works li {
+      margin-bottom: 16px;
+    }
+
+    /* CONTACTO */
+    .contact {
+      text-align: center;
+      padding: 50px 0;
+      border-top: 1px solid rgba(15,23,42,0.08);
+    }
+    .contact h2{
+      margin:0 0 20px 0;
+      font-size:2.2rem;
+      font-weight:700;
+    }
+    .contact p{
+      color:var(--muted);
+      margin:0 auto 30px auto;
+      line-height:1.6;
+      font-size:1.1rem;
+      max-width:700px;
+    }
+
+    footer{
+      text-align:center;
+      margin-top:60px;
+      color:var(--muted);
+      font-size:1rem;
+    }
+
+    @media(max-width:768px){
+      .container{
+        padding:40px 24px;
+      }
+      .header{
+        margin-bottom:50px;
+      }
+      .header h1{
+        font-size:2.2rem;
+      }
+      .header p{
+        font-size:1.1rem;
+      }
+      .section{
+        margin-bottom:80px;
+      }
+      .section h2{
+        font-size:1.8rem;
+      }
+      .section-divider {
+        margin: 60px 0;
+      }
+      .plans{
+        flex-direction:column;
+        gap:24px;
+      }
+      .plan{
+        min-height:auto;
+        padding:28px;
+      }
+      .how-it-works-link {
+        margin-top: 30px;
+      }
+      .how-it-works-link a {
+        font-size: 1rem;
+        padding: 10px 20px;
+      }
+      .testimonials-section {
+        margin: 80px 0;
+      }
+      .testimonials-section h2 {
+        font-size: 2.2rem;
+        margin-bottom: 60px;
+      }
+      .testimonials-minimal {
+        flex-direction: column;
+        gap: 50px;
+      }
+      .testimonial-minimal {
+        padding: 0;
+        text-align: center;
+      }
+      .testimonial-minimal:first-child {
+        border-right: none;
+        border-bottom: 1px solid rgba(15,23,42,0.1);
+        padding-bottom: 50px;
+      }
+      .testimonial-minimal:last-child {
+        padding-top: 50px;
+      }
+      .comparison-section {
+        margin: 80px 0;
+      }
+      .comparison-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 40px;
+      }
+      .comparison-tabs {
+        max-width: 280px;
+      }
+      .tab-btn {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+      .comparison-table {
+        display: block;
+        overflow-x: auto;
+      }
+      .comparison-table th,
+      .comparison-table td {
+        padding: 16px 12px;
+        font-size: 0.9rem;
+      }
+      .price-cell {
+        font-size: 1.1rem;
+      }
+      .faq-section {
+        margin: 80px 0 60px 0;
+        padding: 40px 0;
+      }
+      .faq-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 40px;
+      }
+      .faq-question {
+        font-size: 1rem;
+        padding: 20px 24px;
+      }
+      .faq-answer-content {
+        padding: 0 24px 20px 24px;
+      }
+      .how-it-works {
+        margin-bottom: 60px;
+      }
+    }
+    @media (max-width: 1600px) {
+  .plans-section {
+    flex-wrap: wrap; /* permite que las tarjetas bajen a otra fila si no caben */
+    justify-content: center;
+  }
+  .plan {
+    flex: 0 0 300px; /* tarjetas más pequeñas en pantallas medianas */
+  }
+}
+
+  </style>
+  
+{% endblock %}
+{% block content %}
+
+
+<main>
+ <div class="container">
+
+    <!-- CABECERA -->
+    <div class="header">
+      <h1>Planes y Servicios</h1>
+      <p>
+        En <strong>YourToolQuizz</strong> creemos en impulsar la visibilidad de los proyectos digitales.  
+        Te ofrecemos dos formas de hacerlo: con <strong>quizzes interactivos</strong> que generan engagement  
+        y <strong>blogs estratégicos</strong> que construyen autoridad y tráfico.
+      </p>
+    </div>
+<p>
+  Usamos Stripe para procesar los pagos de forma segura y sencilla.
+  <a href="" style="color:#2563eb; font-weight:600; text-decoration:none; margin-left:4px;">
+    Más información.
+  </a>
+</p>
+
+    <!-- PLANES -->
+    <div class="section">
+          <h2>Nuestros Planes</h2>
+      <div class="plans-section">
+                <div class="plan">
+          <h3>GRATUITO</h3>
+          <div class="price">0€/mes</div>
+          <ul>
+            <li>✔ Actualizaciones avisos</li>
+            <li>✔ Comunidad con 100 usuarios máximo</li>
+            <li>✔ Chat solo para admins</li>
+            <li>✔ 1 admin</li>
+            <li>✔ Actualizaciones básicas</li>
+
+          </ul>
+          <span class="badge">Para probar o apps pequeñas</span>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+            <input type="hidden" name="lookup_key" value="free_monthly">
+            <button type="submit" class="btn btn-secondary">Probar gratis</button>
+          </form>
+        </div>
+        <div class="plan">
+          <h3>BASIC</h3>
+          <div class="price">9€/mes</div>
+          <ul>
+            <li>✔ Actualizaciones avisos</li>
+            <li>✔ 1 comunidad por app</li>
+            <li>✔ Chat básico (mensajes de administradores → visibles para todos)</li>
+            <li>✔ Usuarios ilimitados</li>
+            <li>✔ 1 administrador</li>
+            <li>✔ Publicación de actualizaciones básicas</li>
+            <li>✔ Encuestas simples (sin segmentación)</li>
+            <li>✔ Valoraciones y comentarios</li>
+            <li>✔ Página pública de la app</li>
+            <li>✔ Control mínimo de usuarios (verificados/no verificados)</li>
+
+          </ul>
+          <span class="badge">Ideal para comenzar</span>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+            <input type="hidden" name="lookup_key" value="basic_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
+        </div>
+
+        <div class="plan">
+          <h3>GROWTH</h3>
+          <div class="price">29€/mes</div>
+          <ul>
+            <li>✔ Todo lo del plan BASIC</li>
+            <li>✔ Newsletter</li>
+            <li>✔ Hasta 5 administradores</li>
+            <li>✔ Chats con roles (Admin, Tester, Usuario)</li>
+            <li>✔ Encuestas con segmentación básica (solo testers / solo usuarios activos)</li>
+            <li>✔ Control de visibilidad: “mostrar / no mostrar”</li>
+            <li>✔ Limitar quién entra al grupo (verificación obligatoria)</li>
+            <li>✔ Analíticas intermedias: actividad semanal e interacción en encuestas</li>
+            <li>✔ Moderación mejorada</li>
+            <li>✔ Contenido fijado (noticias prioritarias)</li>
+
+          </ul>
+          <span class="badge">Ideal para apps que crecen rápido</span>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+            <input type="hidden" name="lookup_key" value="growth_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
+        </div>
+
+        <div class="plan">
+          <h3>PRO</h3>
+          <div class="price">79€/mes</div>
+          <ul>
+            <li>✔ Todo lo del plan GROWTH</li>
+            <li>✔ Segmentación avanzada (grupos, roles personalizados, testers especializados)</li>
+            <li>✔ Lógica completa de visibilidad</li>
+            <li>✔ Notificaciones inteligentes</li>
+            <li>✔ API completa</li>
+            <li>✔ Dashboard avanzado con métricas (retención, engagement, usuarios activos diarios, rutas más visitadas)</li>
+            <li>✔ Integración con login externo</li>
+            <li>✔ Encuestas premium (varias preguntas, multietapa)</li>
+            <li>✔ 10 administradores</li>
+            <li>✔ Moderación avanzada</li>
+            <li>✔ Reglas automáticas</li>
+            <li>✔ Historial completo del chat</li>
+          </ul>
+          <span class="badge">Ideal para empresas medianas</span>
+          <form action="{{ url_for('create_checkout_session') }}" method="POST">
+            <input type="hidden" name="lookup_key" value="pro_monthly">
+            <button type="submit" class="btn">Comenzar ahora</button>
+          </form>
+        </div>
+      </div>
+    </div>
+ </div>
+
+
+
+        </div>
+      </div>
+
+
+
+    <!-- RESEÑAS MINIMALISTAS -->
+    <div class="testimonials-section">
+      <h2>Lo que dicen nuestros clientes</h2>
+      <div class="testimonials-minimal">
+        <div class="testimonial-minimal">
+          <div class="testimonial-company">TechSolutions Inc.</div>
+          <div class="testimonial-content">
+            "Los quizzes han transformado completamente nuestra estrategia de engagement. En solo 2 meses hemos duplicado el tiempo de permanencia en nuestra web y captado más de 500 leads cualificados. La inversión se recuperó en el primer mes."
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-name">María Rodríguez, CMO</div>
+          </div>
+        </div>
+        
+        <div class="testimonial-minimal">
+          <div class="testimonial-company">StartupFlow</div>
+          <div class="testimonial-content">
+            "El artículo premium que nos escribieron se posicionó en primera página de Google en 3 semanas. Generó más de 2,000 visitas cualificadas y 15 clientes directos. El ROI ha sido extraordinario, superando todas nuestras expectativas."
+          </div>
+          <div class="testimonial-author">
+            <div class="testimonial-stars">★★★★★</div>
+            <div class="testimonial-name">Carlos Méndez, Fundador</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLAS COMPARATIVAS MINIMALISTAS -->
+    <div class="comparison-section">
+      <h2>Comparativa de Planes</h2>
+      <div class="comparison-tabs">
+        <button class="tab-btn active" data-tab="quizzes">Quizzes</button>
+        <button class="tab-btn" data-tab="blogs">Blogs</button>
+      </div>
+
+      <!-- Tabla Quizzes -->
+      <div class="table-container active" id="quizzes-table">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Características</th>
+              <th>Starter</th>
+              <th>Growth</th>
+              <th>Pro Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Precio mensual</td>
+              <td class="price-cell">9€</td>
+              <td class="price-cell">19€</td>
+              <td class="price-cell">39€</td>
+            </tr>
+            <tr>
+              <td>Quizzes activos</td>
+              <td>1</td>
+              <td>3</td>
+              <td>Ilimitados</td>
+            </tr>
+            <tr>
+              <td>Respuestas/mes</td>
+              <td>100</td>
+              <td>500</td>
+              <td>Ilimitadas</td>
+            </tr>
+            <tr>
+              <td>Estadísticas básicas</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Análisis avanzado</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Sugerencias de optimización</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Asesoría personalizada</td>
+              <td class="cross-mark">—</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Posicionamiento destacado</td>
+              <td class="cross-mark">—</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tabla Blogs -->
+      <div class="table-container" id="blogs-table">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Características</th>
+              <th>Artículo Estándar</th>
+              <th>Artículo Premium</th>
+              <th>Colaboración Editorial</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Precio por publicación</td>
+              <td class="price-cell">25€</td>
+              <td class="price-cell">50€</td>
+              <td class="price-cell">70€</td>
+            </tr>
+            <tr>
+              <td>Longitud del artículo</td>
+              <td>Hasta 800 palabras</td>
+              <td>Hasta 1500 palabras</td>
+              <td>Contenido extenso</td>
+            </tr>
+            <tr>
+              <td>Redacción profesional</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Optimización SEO básica</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>SEO avanzado</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Imágenes incluidas</td>
+              <td>1</td>
+              <td>Hasta 3</td>
+              <td>Múltiples formatos</td>
+            </tr>
+            <tr>
+              <td>Promoción en redes</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+              <td class="check-mark">✓</td>
+            </tr>
+            <tr>
+              <td>Co-creación con equipo</td>
+              <td class="cross-mark">—</td>
+              <td class="cross-mark">—</td>
+              <td class="check-mark">✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- FAQ INTEGRADO -->    
+    <div class="faq-section">
+      <h2>Preguntas Frecuentes</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Como funcionan los Quizzes?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Proporcionamos un código embed simple que puedes copiar y pegar en cualquier parte de tu sitio web. También ofrecemos integración directa mediante API para casos más avanzados que requieran sincronización en tiempo real con tus sistemas.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Como funcionan los Bloggs?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Sí, puedes cambiar entre planes en cualquier momento. Al cambiar a un plan superior, el cambio será inmediato y solo pagarás la diferencia proporcional. Al cambiar a un plan inferior, el cambio se aplicará en tu próximo ciclo de facturación.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Qué métodos de pago puedo usar?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Todos los planes incluyen estadísticas básicas de participación, tasas de finalización y respuestas por pregunta. Los planes Growth y Pro Impact añaden análisis avanzado de comportamiento, segmentación por audiencia, y datos de rendimiento comparativo.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Puedo usar los servicios en mi país?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Todos los planes incluyen estadísticas básicas de participación, tasas de finalización y respuestas por pregunta. Los planes Growth y Pro Impact añaden análisis avanzado de comportamiento, segmentación por audiencia, y datos de rendimiento comparativo.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Puedo cambiar mi método de pago?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Los artículos estándar se entregan en 3-5 días hábiles, mientras que los artículos premium y colaboraciones editoriales toman entre 5-7 días hábiles. Este tiempo incluye investigación, redacción, revisión y optimización SEO.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Como usais mi información?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Los artículos estándar se entregan en 3-5 días hábiles, mientras que los artículos premium y colaboraciones editoriales toman entre 5-7 días hábiles. Este tiempo incluye investigación, redacción, revisión y optimización SEO.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿Puedo cancelar mi plan?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Sí, ofrecemos un 20% de descuento en todos nuestros planes para organizaciones educativas certificadas y organizaciones sin fines de lucro registradas. Contáctanos con la documentación correspondiente para aplicar al descuento.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            ¿El plan se renueva automaticamente?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Te notificaremos cuando te acerques al límite y podrás actualizar tu plan o pagar por respuestas adicionales. En el plan Starter, las respuestas adicionales cuestan 0.10€ cada una. No cortamos el servicio abruptamente.</p>
+            </div>
+                <div class="faq-item">
+          <div class="faq-question">
+            ¿Puedo cambiar de plan o servicio?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Te notificaremos cuando te acerques al límite y podrás actualizar tu plan o pagar por respuestas adicionales. En el plan Starter, las respuestas adicionales cuestan 0.10€ cada una. No cortamos el servicio abruptamente.</p>
+            </div>
+                <div class="faq-item">
+          <div class="faq-question">
+            ¿El plan se renueva automaticamente?
+            <span class="faq-icon">+</span>
+          </div>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p>Te notificaremos cuando te acerques al límite y podrás actualizar tu plan o pagar por respuestas adicionales. En el plan Starter, las respuestas adicionales cuestan 0.10€ cada una. No cortamos el servicio abruptamente.</p>
+            </div>
+          </div>
+        </div>
+         <p>¿No ves tu pregunta? <a href="#contacto" style="color: var(--accent); text-decoration: underline;">Contáctanos</a> y estaremos encantados de ayudarte.</p>
+      </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='java/Servicios.js') }}"defer> </script>
+
+{% endblock %}
