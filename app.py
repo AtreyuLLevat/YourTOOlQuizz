@@ -436,7 +436,7 @@ def create_app():
         tags = app_data.tags
 
         return render_template(
-            "preview.html",
+            "Preview.html",
             app=app_data,
             reviews=reviews,
             team_members=team_members,
