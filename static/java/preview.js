@@ -109,4 +109,58 @@ tabButtons.forEach(btn => {
   });
 });
 
+// --- Funcionalidad añadir reseña ---
+const addReviewBtn = document.getElementById("add-review-btn");
+const reviewForm = document.getElementById("review-form");
+const submitReview = document.getElementById("submit-review");
+
+addReviewBtn.addEventListener("click", () => {
+  reviewForm.style.display = reviewForm.style.display === "none" ? "block" : "none";
+});
+
+submitReview.addEventListener("click", async () => {
+  const text = document.getElementById("review-text").value.trim();
+  const rating = document.getElementById("review-rating").value.trim();
+  const appId = document.getElementById("preview").dataset.appId;
+
+  if (!text || !rating) {
+    alert("Por favor completa ambos campos.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("text", text);
+    formData.append("rating", rating);
+
+    const res = await fetch(`/app/${appId}/reviews/add`, {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Añadir al DOM
+      const reviewsList = document.querySelector("#reviews .ratings");
+      const div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = `<strong>@${data.review.username}</strong>⭐ ${data.review.rating}<br>${data.review.text}`;
+      reviewsList.appendChild(div);
+
+      // Limpiar formulario
+      document.getElementById("review-text").value = "";
+      document.getElementById("review-rating").value = "";
+      reviewForm.style.display = "none";
+    } else {
+      alert(data.error || "Error al enviar la reseña.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error enviando la reseña.");
+  }
+});
+
+
+
 });

@@ -489,17 +489,36 @@ def create_app():
     def add_review(id):
         app_data = App.query.get(id)
         if not app_data:
-            abort(404)
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
+
+        text = request.form.get("text")
+        rating = request.form.get("rating")
+
+        if not text or not rating:
+            return jsonify({"success": False, "error": "Campos vacíos"}), 400
+
+        try:
+            rating = int(rating)
+        except ValueError:
+            return jsonify({"success": False, "error": "Rating inválido"}), 400
 
         review = Review(
             app_id=id,
             user_id=current_user.id,
-            text=request.form["text"],
-            rating=int(request.form["rating"])
+            text=text,
+            rating=rating
         )
         db.session.add(review)
         db.session.commit()
-        return redirect(f"/preview/{id}")
+
+        return jsonify({
+            "success": True,
+            "review": {
+                "username": current_user.username,
+                "text": text,
+                "rating": rating
+            }
+        })
 
     @app.route('/listadodecosas')
     def explorador():
