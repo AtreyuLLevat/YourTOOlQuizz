@@ -159,15 +159,16 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
           <p class="subtext">Todavía no hay reseñas.</p>
       {% endif %}
 
-<div class="add-rating">
-  <button id="add-review-btn" class="btn btn-outline">Añadir valoración</button>
+      <div class="add-rating">
+        <button id="add-review-btn" class="btn btn-outline">Añadir valoración</button>
 
-  <div id="review-form" style="display:none; margin-top:1rem;">
-    <input type="text" id="review-username" placeholder="Tu nombre de usuario" style="padding:0.5rem; width:100%; margin-bottom:0.5rem;" />
-    <textarea id="review-comment" placeholder="Tu comentario" style="padding:0.5rem; width:100%; margin-bottom:0.5rem;"></textarea>
-    <button id="submit-review" class="btn btn-primary">Enviar</button>
-  </div>
-</div>
+        <div id="review-form" style="display:none; margin-top:1rem;">
+          <input type="number" id="review-rating" placeholder="Rating (1-5)" min="1" max="5"/>
+          <textarea id="review-text" placeholder="Tu comentario"></textarea>
+          <button type="button" id="submit-review" class="btn btn-primary">Enviar</button>
+        </div>
+      </div>
+
 
     </div>
   </div>
