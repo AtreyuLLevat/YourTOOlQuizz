@@ -92,7 +92,7 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
     <div class="app-info">
       <h1>{{ app.name }}</h1>
 
-      <p>{{ app.description }}</p>
+      <p>{{ app.long_description or 'Esta aplicación todavía no tiene una descripción completa.' }}</p>
 
       <div class="tags">
         {% for tag in tags %}

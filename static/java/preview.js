@@ -87,4 +87,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error("Error cargando el preview de la app:", err);
   }
+
+
+
+
+  // --- CAMBIO DE PESTAÑAS ---
+const tabButtons = document.querySelectorAll(".tab");
+const tabContents = document.querySelectorAll(".tab-content");
+
+tabButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.dataset.tab;
+
+    // Activar la pestaña
+    tabContents.forEach(tc => tc.classList.remove("active"));
+    document.getElementById(targetId).classList.add("active");
+
+    // Activar botón
+    tabButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
+
 });
