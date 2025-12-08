@@ -119,10 +119,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (data.success) {
           const reviewsList = document.querySelector("#reviews .ratings");
           if (reviewsList) {
-            const div = document.createElement("div");
-            div.className = "comment";
-            div.innerHTML = `<strong>@${data.review.username}</strong>⭐ ${data.review.rating}<br>${data.review.text}`;
-            reviewsList.appendChild(div);
+              const div = document.createElement("div");
+              div.className = "comment";
+              div.innerHTML = `<strong>@${data.review.username}</strong>⭐ ${data.review.rating}<br>${data.review.text}`;
+              reviewsList.appendChild(div);
+
           }
 
           // Limpiar formulario

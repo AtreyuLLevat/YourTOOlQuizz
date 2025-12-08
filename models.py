@@ -152,12 +152,17 @@ class TeamMember(db.Model):
     
 class Review(db.Model):
     __tablename__ = "reviews"
-
+    
     id = db.Column(db.Integer, primary_key=True)
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)  # nuevo campo
     content = db.Column(db.Text)
     rating = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relación opcional para acceder al usuario desde la review
+    user = db.relationship("User", backref="reviews")
+
 
 # -------------------------
 # MODELO DE MIEMBROS DEL GRUPO
