@@ -91,21 +91,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (starPicker) {
-      const stars = starPicker.querySelectorAll("span");
-      stars.forEach(star => {
-        star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
-        star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
-      });
-      starPicker.addEventListener("mouseout", () => highlightStars(selectedRating));
-    }
+        const starPicker = document.getElementById("star-picker");
+        let selectedRating = 0;
 
-    function highlightStars(rating) {
-      if (!starPicker) return;
-      starPicker.querySelectorAll(".star").forEach(star => {
-      star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
-      star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
-    });
-    }
+        // Función para actualizar visualmente las estrellas
+        function highlightStars(rating) {
+          starPicker.querySelectorAll(".star").forEach(star => {
+            star.textContent = parseInt(star.dataset.value) <= rating ? "★" : "☆";
+          });
+        }
+
+        // Hover sobre estrellas
+        starPicker.querySelectorAll(".star").forEach(star => {
+          star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
+          star.addEventListener("click", () => {
+            selectedRating = parseInt(star.dataset.value);
+            highlightStars(selectedRating); // fijar la selección
+          });
+        });
+}
+        // Quitar hover: vuelve al rating seleccionado
+        starPicker.addEventListener("mouseout", () => highlightStars(selectedRating));
+
 
     if (submitReview) {
       submitReview.addEventListener("click", async () => {
