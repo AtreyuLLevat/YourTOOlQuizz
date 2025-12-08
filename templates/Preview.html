@@ -78,6 +78,29 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
   .team-member-horizontal { flex-direction: column; align-items: flex-start; }
   .team-info .socials { margin-top: 0.5rem; }
 }
+.reviews-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.avg-stars {
+  font-size: 1.5rem;
+  color: #facc15; /* amarillo para estrellas */
+}
+
+.reviews-list .comment {
+  background: var(--surface-soft);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.reviews-list .comment strong {
+  color: var(--primary);
+}
+
 </style>
 {% endblock %}
 {% block content %}
@@ -142,32 +165,39 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
   </div>
 
   <div class="tab-content" id="reviews">
-    <div class="ratings">
-
-      <p class="rating-average">
-        ⭐ {{ app.rating_average or 0 }}/5 — basado en {{ reviews|length }} opiniones
-      </p>
-
-      {% if reviews %}
-          {% for r in reviews %}
-          <div class="comment">
-            <strong>@{{ r.username }}</strong>
-            {{ r.comment }}
-          </div>
-          {% endfor %}
-      {% else %}
-          <p class="subtext">Todavía no hay reseñas.</p>
-      {% endif %}
-
-      <div class="add-rating">
-        <button id="add-review-btn" class="btn btn-outline">Añadir valoración</button>
-
-        <div id="review-form" style="display:none; margin-top:1rem;">
+<div class="ratings">
+  <div class="reviews-header">
+    <div class="avg-stars" id="avg-stars">
+      <!-- Aquí se generarán las estrellas globales -->
+    </div>
+    <button id="add-review-btn" class="btn btn-outline">Añadir reseña</button>
+            <div id="review-form" style="display:none; margin-top:1rem;">
           <input type="number" id="review-rating" placeholder="Rating (1-5)" min="1" max="5"/>
           <textarea id="review-text" placeholder="Tu comentario"></textarea>
           <button type="button" id="submit-review" class="btn btn-primary">Enviar</button>
         </div>
       </div>
+  </div>
+
+  <p id="reviews-count" class="reviews-count"></p>
+
+  <div id="review-form" style="display:none; margin-top:1rem;">
+    <textarea id="review-text" placeholder="Escribe tu reseña..." rows="3" style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid #ccc;"></textarea>
+    <select id="review-rating" style="margin-top:0.5rem; padding:0.4rem; border-radius:8px;">
+      <option value="">Selecciona puntuación</option>
+      <option value="1">1 ⭐</option>
+      <option value="2">2 ⭐</option>
+      <option value="3">3 ⭐</option>
+      <option value="4">4 ⭐</option>
+      <option value="5">5 ⭐</option>
+    </select>
+    <button id="submit-review" class="btn btn-primary" style="margin-top:0.5rem;">Enviar</button>
+  </div>
+
+  <div id="reviews-list" class="reviews-list" style="margin-top:1rem;"></div>
+</div>
+
+
 
 
     </div>
