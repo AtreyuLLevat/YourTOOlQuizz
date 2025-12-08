@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const preview = document.getElementById("preview");
-  const appId = preview.dataset.appId;
+  const appId = preview?.dataset?.appId;
 
   if (!appId) {
     console.error("No se encontró el ID de la app.");
@@ -29,7 +29,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     name.textContent = app.name;
     description.textContent = app.short_description || app.long_description || "Sin descripción.";
 
-    // Tags
     tagsContainer.innerHTML = "";
     (app.tags || []).forEach(t => {
       const span = document.createElement("span");
@@ -46,6 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const reviewsList = document.getElementById("reviews-list");
 
     function renderStars(container, rating) {
+      if (!container) return;
       container.innerHTML = "";
       const fullStars = Math.floor(rating);
       const halfStar = rating - fullStars >= 0.5;
@@ -57,6 +57,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function renderReviews() {
+      if (!reviewsList || !reviewsCount) return;
+
       reviewsList.innerHTML = "";
       if (app.reviews && app.reviews.length > 0) {
         app.reviews.forEach(r => {
@@ -82,56 +84,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     const starPicker = document.getElementById("star-picker");
     let selectedRating = 0;
 
-    // Mostrar/ocultar formulario
-    addReviewBtn.addEventListener("click", () => {
-      reviewForm.style.display = reviewForm.style.display === "none" ? "block" : "none";
-    });
-
-    // Interactividad de las estrellas
-    starPicker.querySelectorAll("span").forEach(star => {
-      star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
-      star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
-    });
-    starPicker.addEventListener("mouseout", () => highlightStars(selectedRating));
-
-    function highlightStars(rating) {
-      starPicker.querySelectorAll("span").forEach(star => {
-        star.textContent = parseInt(star.dataset.value) <= rating ? "★" : "☆";
+    if (addReviewBtn && reviewForm) {
+      addReviewBtn.addEventListener("click", () => {
+        reviewForm.style.display = reviewForm.style.display === "none" ? "block" : "none";
       });
     }
 
-    // Enviar reseña
-    submitReview.addEventListener("click", async () => {
-      const text = document.getElementById("review-text").value.trim();
+    if (starPicker) {
+      const stars = starPicker.querySelectorAll("span");
+      stars.forEach(star => {
+        star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
+        star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
+      });
+      starPicker.addEventListener("mouseout", () => highlightStars(selectedRating));
+    }
 
-      if (!text || selectedRating === 0) {
-        alert("Por favor completa ambos campos.");
-        return;
-      }
-
-      try {
-        const formData = new FormData();
-        formData.append("content", text);
-        formData.append("rating", selectedRating);
-
-        const res = await fetch(`/app/${appId}/reviews/add`, { method: "POST", body: formData });
-        const data = await res.json();
-
-        if (data.success) {
-          app.reviews.push(data.review);
-          renderReviews();
-          document.getElementById("review-text").value = "";
-          selectedRating = 0;
-          highlightStars(0);
-          reviewForm.style.display = "none";
-        } else {
-          alert(data.error || "Error al enviar la reseña.");
-        }
-      } catch (err) {
-        console.error(err);
-        alert("Error enviando la reseña.");
-      }
+    function highlightStars(rating) {
+      if (!starPicker) return;
+      starPicker.querySelectorAll(".star").forEach(star => {
+      star.addEventListener("mouseover", () => highlightStars(parseInt(star.dataset.value)));
+      star.addEventListener("click", () => selectedRating = parseInt(star.dataset.value));
     });
+    }
+
+    if (submitReview) {
+      submitReview.addEventListener("click", async () => {
+        const textArea = document.getElementById("review-text");
+        const text = textArea?.value.trim();
+
+        if (!text || selectedRating === 0) {
+          alert("Por favor completa ambos campos.");
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append("content", text);
+          formData.append("rating", selectedRating);
+
+          const res = await fetch(`/app/${appId}/reviews/add`, { method: "POST", body: formData });
+          const data = await res.json();
+
+          if (data.success) {
+            app.reviews.push(data.review);
+            renderReviews();
+            if (textArea) textArea.value = "";
+            selectedRating = 0;
+            highlightStars(0);
+            if (reviewForm) reviewForm.style.display = "none";
+          } else {
+            alert(data.error || "Error al enviar la reseña.");
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Error enviando la reseña.");
+        }
+      });
+    }
 
     // --- Cambio de pestañas ---
     const tabButtons = document.querySelectorAll(".tab");
@@ -141,7 +150,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       btn.addEventListener("click", () => {
         const targetId = btn.dataset.tab;
         tabContents.forEach(tc => tc.classList.remove("active"));
-        document.getElementById(targetId).classList.add("active");
+        const targetTab = document.getElementById(targetId);
+        if (targetTab) targetTab.classList.add("active");
+
         tabButtons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
       });
