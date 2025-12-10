@@ -398,22 +398,42 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
-    @app.route("/account/get_all_apps")
-    def get_all_apps():
-        apps = App.query.all()
-        data = []
+    @app.route("/account/get_app/<string:id>")
+    def get_app(id):
+        try:
+            uuid_obj = UUID(id, version=4)
+        except ValueError:
+            return jsonify({"success": False, "error": "ID inválido"}), 400
 
-        for a in apps:
-            data.append({
-                "id": a.id,
-                "name": a.name,
-                "description": a.description,
-                "image_url": a.image_url,
-                "theme": a.theme,
-                "creation_date": a.creation_date.strftime("%Y-%m-%d") if a.creation_date else None
-            })
+        app_data = App.query.filter_by(id=uuid_obj).first()
+        if not app_data:
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-        return {"success": True, "apps": data}
+        # Obtener reviews
+        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+
+        # Obtener tags
+        tags = [t.name for t in app_data.tags]
+
+        return jsonify({
+            "success": True,
+            "app": {
+                "id": str(app_data.id),
+                "name": app_data.name,
+                "image_url": app_data.image_url,
+                "short_description": app_data.description,
+                "long_description": app_data.long_description,
+                "tags": tags,
+                "reviews": [
+                    {
+                        "username": r.user.name,
+                        "content": r.content,
+                        "rating": r.rating
+                    }
+                    for r in reviews
+                ]
+            }
+        })
         
     @app.route("/preview/<string:app_id>")
     def previewing(app_id):
@@ -521,6 +541,8 @@ def create_app():
                 "content": review.content
             }
         })
+        
+
 
 
     @app.route('/listadodecosas')
