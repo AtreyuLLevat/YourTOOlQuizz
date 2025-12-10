@@ -90,32 +90,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-    if (starPicker) {
-  function updateStars(rating) {
-    starPicker.querySelectorAll(".star").forEach(star => {
+if (starPicker) {
+  const stars = starPicker.querySelectorAll(".star");
+
+  function updateStars() {
+    stars.forEach(star => {
       const value = parseInt(star.dataset.value);
-      star.classList.remove("hover");
-      star.classList.remove("selected");
-      if (value <= selectedRating) star.classList.add("selected");
+      star.textContent = value <= selectedRating ? "★" : "☆";
+      star.classList.toggle("selected", value <= selectedRating);
     });
   }
 
-  starPicker.querySelectorAll(".star").forEach(star => {
+  stars.forEach(star => {
     star.addEventListener("mouseover", () => {
-      const value = parseInt(star.dataset.value);
-      starPicker.querySelectorAll(".star").forEach(s => {
-        s.classList.toggle("hover", parseInt(s.dataset.value) <= value);
+      const hoverValue = parseInt(star.dataset.value);
+      stars.forEach(s => {
+        const val = parseInt(s.dataset.value);
+        s.textContent = val <= hoverValue ? "★" : "☆";
+        s.classList.toggle("hover", val <= hoverValue);
       });
     });
 
     star.addEventListener("click", () => {
       selectedRating = parseInt(star.dataset.value);
-      updateStars(selectedRating);
+      updateStars();
     });
   });
 
-  starPicker.addEventListener("mouseout", () => updateStars(selectedRating));
+  starPicker.addEventListener("mouseout", updateStars);
 }
+
 
     if (submitReview) {
       submitReview.addEventListener("click", async () => {
