@@ -491,8 +491,8 @@ def create_app():
         if not app_data:
             return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-        # Recoger datos del formulario
-        content = request.form.get("text", "").strip()
+        # Recoger datos correctos
+        content = request.form.get("content", "").strip()
         rating = request.form.get("rating", "").strip()
 
         if not content or not rating:
@@ -503,25 +503,25 @@ def create_app():
         except ValueError:
             return jsonify({"success": False, "error": "Rating inválido"}), 400
 
-        # Crear la review
         review = Review(
             app_id=id,
             user_id=current_user.id,
             content=content,
             rating=rating
         )
+
         db.session.add(review)
         db.session.commit()
 
-        # Devolver JSON con la review ya incluida
         return jsonify({
             "success": True,
             "review": {
-                "username": current_user.name,  # o current_user.email si no tienes name
+                "username": current_user.name,
                 "rating": review.rating,
-                "text": review.content
+                "content": review.content
             }
         })
+
 
     @app.route('/listadodecosas')
     def explorador():
