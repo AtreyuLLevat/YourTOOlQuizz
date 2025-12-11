@@ -225,31 +225,31 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
   </div>
 
   <div class="tab-content" id="team">
-    <div class="team-container">
+  <div class="team-container">
 
-      {% if team %}
-        {% for member in team %}
-        <div class="team-member-horizontal">
-          <img src="{{ member.avatar_url or 'https://picsum.photos/80?random=21' }}" alt="Profile">
+    {% if team_members %}
+      {% for member in team_members %}
+      <div class="team-member-horizontal">
+        <img src="{{ member.avatar_url or 'https://picsum.photos/80?random=21' }}" alt="Profile">
 
-          <div class="team-info">
-            <h3>{{ member.name }}</h3>
-            <p>{{ member.role }}</p>
-            <p class="username">@{{ member.username }}</p>
+        <div class="team-info">
+          <h3>{{ member.name }}</h3>
+          <p>{{ member.role }}</p>
+          <p class="username">@{{ member.username }}</p>
 
-            <div class="socials">
-              {% if member.twitter %}<a href="{{ member.twitter }}">Twitter</a>{% endif %}
-              {% if member.linkedin %}<a href="{{ member.linkedin }}">LinkedIn</a>{% endif %}
-            </div>
+          <div class="socials">
+            {% if member.twitter %}<a href="{{ member.twitter }}">Twitter</a>{% endif %}
+            {% if member.linkedin %}<a href="{{ member.linkedin }}">LinkedIn</a>{% endif %}
           </div>
         </div>
-        {% endfor %}
-      {% else %}
-        <p class="subtext">No se añadió ningún integrante del equipo.</p>
-      {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="subtext">No se añadió ningún integrante del equipo.</p>
+    {% endif %}
 
-    </div>
   </div>
+</div>
 
 </main>
 

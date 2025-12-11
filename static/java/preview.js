@@ -189,6 +189,34 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
+// --- Renderizar equipo ---
+const teamContainer = document.querySelector("#team .team-container");
+if (teamContainer && app.team_members) {
+  teamContainer.innerHTML = "";
+  if (app.team_members.length > 0) {
+    app.team_members.forEach(member => {
+      const div = document.createElement("div");
+      div.className = "team-member-horizontal";
+      div.innerHTML = `
+        <img src="${member.avatar_url || 'https://picsum.photos/80?random=21'}" alt="Profile">
+        <div class="team-info">
+          <h3>${member.name || "Sin nombre"}</h3>
+          <p>${member.role || ""}</p>
+          <p class="username">@${member.username || "usuario"}</p>
+          <div class="socials">
+            ${member.twitter ? `<a href="${member.twitter}">Twitter</a>` : ""}
+            ${member.linkedin ? `<a href="${member.linkedin}">LinkedIn</a>` : ""}
+          </div>
+        </div>
+      `;
+      teamContainer.appendChild(div);
+    });
+  } else {
+    teamContainer.innerHTML = `<p class="subtext">No se añadió ningún integrante del equipo.</p>`;
+  }
+}
+
+
   } catch (err) {
     console.error("Error cargando el preview de la app:", err);
   }
