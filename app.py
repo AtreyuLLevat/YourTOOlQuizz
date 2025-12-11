@@ -398,9 +398,8 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
-
     @app.route("/account/get_app/<string:id>")
-    def api_get_app(id):
+    def get_app(id):
         try:
             uuid_obj = UUID(id, version=4)
         except ValueError:
