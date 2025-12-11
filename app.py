@@ -398,49 +398,49 @@ def create_app():
     @app.route('/')
     def homepage():
         return render_template('homepage.html')
-@app.route("/account/get_app/<string:id>")
-def get_app(id):
-    try:
-        uuid_obj = UUID(id, version=4)
-    except ValueError:
-        return jsonify({"success": False, "error": "ID inválido"}), 400
-
-    app_data = App.query.filter_by(id=uuid_obj).first()
-    if not app_data:
-        return jsonify({"success": False, "error": "App no encontrada"}), 404
-
-    # Obtener reviews
-    reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
-
-    # Obtener tags
-    tags = [t.name for t in app_data.tags] if app_data.tags else []
-
-    # Construir lista de reviews de forma segura
-    reviews_list = []
-    for r in reviews:
+    @app.route("/account/get_app/<string:id>")
+    def get_app(id):
         try:
-            username = r.user.name if r.user else "Usuario eliminado"
-            reviews_list.append({
-                "username": username,
-                "content": r.content,
-                "rating": r.rating
-            })
-        except Exception as e:
-            # Ignorar review si falla
-            continue
+            uuid_obj = UUID(id, version=4)
+        except ValueError:
+            return jsonify({"success": False, "error": "ID inválido"}), 400
 
-    return jsonify({
-        "success": True,
-        "app": {
-            "id": str(app_data.id),
-            "name": app_data.name,
-            "image_url": app_data.image_url,
-            "short_description": app_data.description,
-            "long_description": app_data.long_description,
-            "tags": tags,
-            "reviews": reviews_list
-        }
-    })
+        app_data = App.query.filter_by(id=uuid_obj).first()
+        if not app_data:
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
+
+        # Obtener reviews
+        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+
+        # Obtener tags
+        tags = [t.name for t in app_data.tags] if app_data.tags else []
+
+        # Construir lista de reviews de forma segura
+        reviews_list = []
+        for r in reviews:
+            try:
+                username = r.user.name if r.user else "Usuario eliminado"
+                reviews_list.append({
+                    "username": username,
+                    "content": r.content,
+                    "rating": r.rating
+                })
+            except Exception as e:
+                # Ignorar review si falla
+                continue
+
+        return jsonify({
+            "success": True,
+            "app": {
+                "id": str(app_data.id),
+                "name": app_data.name,
+                "image_url": app_data.image_url,
+                "short_description": app_data.description,
+                "long_description": app_data.long_description,
+                "tags": tags,
+                "reviews": reviews_list
+            }
+        })
         
     @app.route("/account/get_all_apps")
     def get_all_apps():
