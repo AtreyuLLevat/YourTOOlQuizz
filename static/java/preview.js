@@ -7,20 +7,61 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // Función segura para renderizar estrellas
+  function renderStars(container, rating) {
+    if (!container) return;
+    container.innerHTML = "";
+    const fullStars = Math.floor(rating);
+    const halfStar = rating - fullStars >= 0.5;
+    const totalStars = 5;
+
+    for (let i = 0; i < fullStars; i++) container.innerHTML += "★";
+    if (halfStar) container.innerHTML += "☆";
+    for (let i = fullStars + (halfStar ? 1 : 0); i < totalStars; i++) container.innerHTML += "☆";
+  }
+
+  // Función para renderizar las reviews
+  function renderReviews(app, reviewsList, reviewsCount, avgStarsContainer) {
+    if (!reviewsList || !reviewsCount) return;
+
+    reviewsList.innerHTML = "";
+    if (app.reviews && app.reviews.length > 0) {
+      app.reviews.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "comment";
+        div.innerHTML = `<strong>@${r.username || "Usuario"}</strong> ⭐ ${r.rating || 0}<br>${r.content || ""}`;
+        reviewsList.appendChild(div);
+      });
+    }
+    const avgRating = app.reviews && app.reviews.length > 0
+      ? app.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / app.reviews.length
+      : 0;
+
+    renderStars(avgStarsContainer, avgRating);
+    reviewsCount.textContent = `basado en ${app.reviews ? app.reviews.length : 0} opiniones`;
+  }
+
   try {
     const response = await fetch(`/account/get_app/${appId}`);
-    const data = await response.json();
+    let data;
+
+    try {
+      data = await response.json();
+    } catch (err) {
+      const text = await response.text();
+      console.error("Respuesta no es JSON:", text);
+      return;
+    }
 
     if (!data.success) {
-      console.error("No se pudieron cargar los datos:", data);
+      console.error("Error en backend:", data);
       return;
     }
 
     const app = data.app;
     app.reviews = app.reviews || [];
 
-
-    // --- ELEMENTOS DEL DOM ---
+    // --- Elementos del DOM ---
     const logo = document.querySelector(".app-header img");
     const name = document.querySelector(".app-info h1");
     const description = document.querySelector(".app-info > p");
@@ -28,58 +69,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     const longDescription = document.querySelector("#description .app-description p");
 
     logo.src = app.image_url || "https://picsum.photos/200?random=99";
-    name.textContent = app.name;
+    name.textContent = app.name || "Sin nombre";
     description.textContent = app.short_description || app.long_description || "Sin descripción.";
+    longDescription.textContent = app.long_description || "Sin descripción larga disponible.";
 
     tagsContainer.innerHTML = "";
     (app.tags || []).forEach(t => {
       const span = document.createElement("span");
       span.className = "tag";
-      span.textContent = t;
+      span.textContent = t || "General";
       tagsContainer.appendChild(span);
     });
 
-    longDescription.textContent = app.long_description || "Sin descripción larga disponible.";
-
-    // --- Reseñas ---
+    // --- Reviews ---
     const avgStarsContainer = document.getElementById("avg-stars");
     const reviewsCount = document.getElementById("reviews-count");
     const reviewsList = document.getElementById("reviews-list");
+    renderReviews(app, reviewsList, reviewsCount, avgStarsContainer);
 
-    function renderStars(container, rating) {
-      if (!container) return;
-      container.innerHTML = "";
-      const fullStars = Math.floor(rating);
-      const halfStar = rating - fullStars >= 0.5;
-      const totalStars = 5;
-
-      for (let i = 0; i < fullStars; i++) container.innerHTML += "★";
-      if (halfStar) container.innerHTML += "☆";
-      for (let i = fullStars + (halfStar ? 1 : 0); i < totalStars; i++) container.innerHTML += "☆";
-    }
-
-    function renderReviews() {
-      if (!reviewsList || !reviewsCount) return;
-
-      reviewsList.innerHTML = "";
-      if (app.reviews && app.reviews.length > 0) {
-        app.reviews.forEach(r => {
-          const div = document.createElement("div");
-          div.className = "comment";
-          div.innerHTML = `<strong>@${r.username}</strong> ⭐ ${r.rating}<br>${r.content}`;
-          reviewsList.appendChild(div);
-        });
-      }
-      const avgRating = app.reviews && app.reviews.length > 0
-        ? app.reviews.reduce((sum, r) => sum + r.rating, 0) / app.reviews.length
-        : 0;
-      renderStars(avgStarsContainer, avgRating);
-      reviewsCount.textContent = `basado en ${app.reviews ? app.reviews.length : 0} opiniones`;
-    }
-
-    renderReviews();
-
-    // --- Formulario estilo Amazon ---
+    // --- Formulario de reviews ---
     const addReviewBtn = document.getElementById("add-review-btn");
     const reviewForm = document.getElementById("review-form");
     const submitReview = document.getElementById("submit-review");
@@ -92,36 +100,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
 
-if (starPicker) {
-  const stars = starPicker.querySelectorAll(".star");
+    if (starPicker) {
+      const stars = starPicker.querySelectorAll(".star");
 
-  function updateStars() {
-    stars.forEach(star => {
-      const value = parseInt(star.dataset.value);
-      star.textContent = value <= selectedRating ? "★" : "☆";
-      star.classList.toggle("selected", value <= selectedRating);
-    });
-  }
+      function updateStars() {
+        stars.forEach(star => {
+          const value = parseInt(star.dataset.value);
+          star.textContent = value <= selectedRating ? "★" : "☆";
+          star.classList.toggle("selected", value <= selectedRating);
+        });
+      }
 
-  stars.forEach(star => {
-    star.addEventListener("mouseover", () => {
-      const hoverValue = parseInt(star.dataset.value);
-      stars.forEach(s => {
-        const val = parseInt(s.dataset.value);
-        s.textContent = val <= hoverValue ? "★" : "☆";
-        s.classList.toggle("hover", val <= hoverValue);
+      stars.forEach(star => {
+        star.addEventListener("mouseover", () => {
+          const hoverValue = parseInt(star.dataset.value);
+          stars.forEach(s => {
+            const val = parseInt(s.dataset.value);
+            s.textContent = val <= hoverValue ? "★" : "☆";
+            s.classList.toggle("hover", val <= hoverValue);
+          });
+        });
+
+        star.addEventListener("click", () => {
+          selectedRating = parseInt(star.dataset.value);
+          updateStars();
+        });
       });
-    });
 
-    star.addEventListener("click", () => {
-      selectedRating = parseInt(star.dataset.value);
-      updateStars();
-    });
-  });
-
-  starPicker.addEventListener("mouseout", updateStars);
-}
-
+      starPicker.addEventListener("mouseout", updateStars);
+    }
 
     if (submitReview) {
       submitReview.addEventListener("click", async () => {
@@ -139,17 +146,25 @@ if (starPicker) {
           formData.append("rating", selectedRating);
 
           const res = await fetch(`/app/${appId}/reviews/add`, { method: "POST", body: formData });
-          const data = await res.json();
+          let resData;
 
-          if (data.success) {
-            app.reviews.push(data.review);
-            renderReviews();
+          try {
+            resData = await res.json();
+          } catch (err) {
+            console.error("Respuesta no es JSON:", await res.text());
+            alert("Error en la respuesta del servidor.");
+            return;
+          }
+
+          if (resData.success) {
+            app.reviews.push(resData.review);
+            renderReviews(app, reviewsList, reviewsCount, avgStarsContainer);
             if (textArea) textArea.value = "";
             selectedRating = 0;
-            highlightStars(0);
+            updateStars();
             if (reviewForm) reviewForm.style.display = "none";
           } else {
-            alert(data.error || "Error al enviar la reseña.");
+            alert(resData.error || "Error al enviar la reseña.");
           }
         } catch (err) {
           console.error(err);
