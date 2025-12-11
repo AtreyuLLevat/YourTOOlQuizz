@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadApps() {
     try {
-      const response = await fetch("/account/get_all_apps");
+      const response = await fetch("/account/get_app/<id>");
       const data = await response.json();
 
       if (!data.success) {
