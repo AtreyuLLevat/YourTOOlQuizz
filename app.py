@@ -422,7 +422,7 @@ def create_app():
                     "name": app_data.name,
                     "image_url": app_data.image_url,
                     "short_description": app_data.description,
-                    "long_description": app_data.long_description,
+                    "long_description": getattr(app_data, "long_description", app_data.description),
                     "tags": tags,
                     "reviews": [
                         {
@@ -437,6 +437,7 @@ def create_app():
             import traceback
             print(traceback.format_exc())
             return jsonify({"success": False, "error": "Error interno del servidor"}), 500
+
 
 
         
