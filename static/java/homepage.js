@@ -1,23 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
   const appsList = document.getElementById("appsList");
 
-  // Cargar apps al inicio
   loadApps();
 
   async function loadApps() {
     try {
-      const response = await fetch("/account/get_app/<id>");
+      const response = await fetch("/account/get_all_apps");
+
+      if (!response.ok) {
+        appsList.innerHTML = "<p>Error al cargar apps: servidor respondió con error.</p>";
+        return;
+      }
+
       const data = await response.json();
 
-      if (!data.success) {
+      if (!data.success || !data.apps.length) {
         appsList.innerHTML = "<p>No se pudieron cargar las aplicaciones.</p>";
         return;
       }
 
-      const apps = data.apps;
       appsList.innerHTML = "";
 
-      apps.forEach(app => {
+      data.apps.forEach(app => {
         const item = document.createElement("div");
         item.className = "item app-item";
         item.dataset.appId = app.id;
@@ -30,11 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>${app.description || "Sin descripción"}</p>
 
             <div class="tags">
-              <span class="tag">${app.theme || "General"}</span>
-              <span class="tag">${app.creation_date || "Fecha desconocida"}</span>
+              <span class="tag">${app.theme}</span>
+              <span class="tag">${app.creation_date}</span>
             </div>
             <a href="/preview/${app.id}" class="view-btn">Ver más</a>
-
           </div>
         `;
 

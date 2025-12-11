@@ -435,6 +435,21 @@ def create_app():
             }
         })
         
+    @app.route("/account/get_all_apps")
+    def get_all_apps():
+        apps = App.query.all()
+        apps_list = []
+        for app_data in apps:
+            apps_list.append({
+                "id": str(app_data.id),
+                "name": app_data.name,
+                "image_url": app_data.image_url,
+                "description": app_data.description,
+                "theme": app_data.theme or "General",
+                "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else "Desconocida"
+            })
+        return jsonify({"success": True, "apps": apps_list})
+
     @app.route("/preview/<string:app_id>")
     def previewing(app_id):
         try:

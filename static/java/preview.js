@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const app = data.app;
+    app.reviews = app.reviews || [];
+
 
     // --- ELEMENTOS DEL DOM ---
     const logo = document.querySelector(".app-header img");
