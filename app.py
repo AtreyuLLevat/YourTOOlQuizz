@@ -429,8 +429,6 @@ def create_app():
                     "role": m.role,
                     "username": m.username if hasattr(m, "username") else None,
                     "avatar_url": m.avatar_url,
-                    "twitter": m.twitter,
-                    "linkedin": m.linkedin
                 }
                 for m in team
             ]
