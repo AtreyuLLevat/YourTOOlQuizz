@@ -423,6 +423,7 @@ def create_app():
                     "image_url": app_data.image_url,
                     "short_description": app_data.description,
                     "long_description": getattr(app_data, "long_description", app_data.description),
+                    "team": app_data.team or "",
                     "tags": tags,
                     "reviews": [
                         {
