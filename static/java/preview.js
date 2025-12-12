@@ -190,34 +190,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
 // --- Renderizar equipo ---
-const teamContainer = document.querySelector("#team .team-container");
-if (teamContainer && app.team_members) {
-  teamContainer.innerHTML = "";
-  if (app.team_members.length > 0) {
-    app.team_members.forEach(member => {
-      const div = document.createElement("div");
-      div.className = "team-member-horizontal";
-      div.innerHTML = `
-        <img src="${member.avatar_url || 'https://picsum.photos/80?random=21'}" alt="Profile">
-        <div class="team-info">
-          <h3>${member.name || "Sin nombre"}</h3>
-          <p>${member.role || ""}</p>
-          <p class="username">@${member.username || "usuario"}</p>
-          <div class="socials">
-            ${member.twitter ? `<a href="${member.twitter}">Twitter</a>` : ""}
-            ${member.linkedin ? `<a href="${member.linkedin}">LinkedIn</a>` : ""}
-          </div>
-        </div>
-      `;
-      teamContainer.appendChild(div);
-    });
-  } else {
-    teamContainer.innerHTML = `<p class="subtext">No se añadió ningún integrante del equipo.</p>`;
-  }
+// --- Team Members ---
+// --- Team Members ---
+// --- TEAM MEMBERS ---
+const teamContainer = document.getElementById("team-list");
+
+if (teamContainer) {
+    teamContainer.innerHTML = "";
+
+    const members = app.team_members || [];
+
+    if (members.length === 0) {
+        teamContainer.innerHTML = "<p>No hay miembros en el equipo.</p>";
+    } else {
+        members.forEach(m => {
+            const div = document.createElement("div");
+            div.className = "team-member-horizontal";
+            div.innerHTML = `
+                <img src="${m.avatar_url || 'https://picsum.photos/80?random=21'}" alt="Avatar">
+
+                <div class="team-info">
+                    <h3>${m.name}</h3>
+                    <p>${m.role || ""}</p>
+                    <p class="username">@${m.username || "anon"}</p>
+
+                    <div class="socials">
+                        ${m.twitter ? `<a href="${m.twitter}">Twitter</a>` : ""}
+                        ${m.linkedin ? `<a href="${m.linkedin}">LinkedIn</a>` : ""}
+                    </div>
+                </div>
+            `;
+            teamContainer.appendChild(div);
+        });
+    }
 }
 
 
-  } catch (err) {
-    console.error("Error cargando el preview de la app:", err);
+  } catch (error) {
+    console.error("Error fetching app data:", error);
   }
 });
