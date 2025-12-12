@@ -1179,41 +1179,34 @@ def create_app():
             SUPABASE_URL=SUPABASE_URL,
             SUPABASE_KEY=SUPABASE_ANON_KEY
         )
-
     @app.route("/account/create_app", methods=["POST"])
     @login_required
     def create_app_ajax():
+        data = request.form
+        name = data.get("appName", "").strip()
+        description = data.get("appDescription", "").strip()
+        team_json = data.get("appTeam", "[]")  # Lista JSON de miembros
+        theme = data.get("appTheme", "").strip()
+        creation_date_str = data.get("appCreationDate", "").strip()
+        status = data.get("appStatus", "").strip()
+        official_id = data.get("appOfficialId", "").strip()
+        image_file = request.files.get("appImage")
+
+        if not name:
+            return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
+
+        creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
+
+        image_url = None
+        if image_file and image_file.filename:
+            upload_path = os.path.join("static", "uploads", image_file.filename)
+            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+            image_file.save(upload_path)
+            image_url = f"/{upload_path}"
+
+        slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
+
         try:
-            data = request.form
-            name = data.get("appName", "").strip()
-            description = data.get("appDescription", "").strip()
-            theme = data.get("appTheme", "").strip()
-            creation_date_str = data.get("appCreationDate", "").strip()
-            status = data.get("appStatus", "").strip()
-            official_id = data.get("appOfficialId", "").strip()
-            image_file = request.files.get("appImage")
-
-            if not name:
-                return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
-
-            # Fecha de creación
-            creation_date = None
-            if creation_date_str:
-                try:
-                    creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d")
-                except ValueError:
-                    return {"success": False, "message": "Formato de fecha inválido."}, 400
-
-            # Imagen
-            image_url = None
-            if image_file and image_file.filename:
-                upload_path = os.path.join("static", "uploads", image_file.filename)
-                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-                image_file.save(upload_path)
-                image_url = f"/{upload_path}"
-
-            slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
-
             # Crear app
             new_app = App(
                 name=name,
@@ -1227,41 +1220,35 @@ def create_app():
                 owner_id=current_user.id,
                 created_at=datetime.utcnow()
             )
-
             db.session.add(new_app)
-            db.session.flush()  # Flush para obtener el ID de la app antes de agregar miembros
+            db.session.flush()  # Necesario para obtener new_app.id sin commit aún
 
-            # Crear miembros del equipo si vienen en el formulario JSON (opcional)
+            # Crear miembros del equipo
             import json
-            team_json = data.get("appTeam", "[]")
             try:
-                team_list = json.loads(team_json)
-            except Exception:
-                team_list = []
+                team_members = json.loads(team_json)  # Espera lista de dicts: [{"name": "X", "role": "Y"}]
+            except:
+                team_members = []
 
-            for member_data in team_list:
+            for m in team_members:
                 member = TeamMember(
                     app_id=new_app.id,
-                    name=member_data.get("name"),
-                    role=member_data.get("role"),
-                    avatar_url=member_data.get("avatar_url"),
-                    created_at=datetime.utcnow()
+                    name=m.get("name"),
+                    role=m.get("role"),
+                    avatar_url=m.get("avatar_url")
                 )
                 db.session.add(member)
 
-            db.session.commit()  # Commit final
-
+            db.session.commit()
             return {
                 "success": True,
                 "app": {
                     "name": new_app.name,
-                    "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png'),
-                    "id": str(new_app.id)
+                    "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png')
                 }
             }
-
         except Exception as e:
-            db.session.rollback()  # Siempre hacer rollback si falla algo
+            db.session.rollback()
             print("Error creando app:", e)
             return {"success": False, "message": "Error interno al crear la app."}, 500
 
