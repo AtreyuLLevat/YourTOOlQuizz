@@ -1183,73 +1183,87 @@ def create_app():
     @app.route("/account/create_app", methods=["POST"])
     @login_required
     def create_app_ajax():
-        data = request.form
-        name = data.get("appName", "").strip()
-        description = data.get("appDescription", "").strip()
-        theme = data.get("appTheme", "").strip()
-        creation_date_str = data.get("appCreationDate", "").strip()
-        status = data.get("appStatus", "").strip()
-        official_id = data.get("appOfficialId", "").strip()
-        image_file = request.files.get("appImage")
-
-        if not name:
-            return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
-
-        creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
-
-        # Guardar imagen
-        image_url = None
-        if image_file and image_file.filename:
-            upload_path = os.path.join("static", "uploads", image_file.filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = f"/{upload_path}"
-
-        slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
-
-        # Crear app
-        new_app = App(
-            name=name,
-            description=description,
-            theme=theme,
-            creation_date=creation_date,
-            status=status,
-            official_id=official_id,
-            image_url=image_url,
-            slug=slug,
-            owner_id=current_user.id,
-            created_at=datetime.utcnow()
-        )
-
-        db.session.add(new_app)
-        db.session.commit()  # Necesario para obtener ID
-
-        # === Crear miembros del equipo ===
-        members_json = data.get("members_json", "[]")
         try:
-            members = json.loads(members_json)
-        except json.JSONDecodeError:
-            members = []
+            data = request.form
+            name = data.get("appName", "").strip()
+            description = data.get("appDescription", "").strip()
+            theme = data.get("appTheme", "").strip()
+            creation_date_str = data.get("appCreationDate", "").strip()
+            status = data.get("appStatus", "").strip()
+            official_id = data.get("appOfficialId", "").strip()
+            image_file = request.files.get("appImage")
 
-        for m in members:
-            member = TeamMember(
-                app_id=new_app.id,
-                name=m.get("name"),
-                role=m.get("role"),
-                avatar_url=m.get("avatar_url")
+            if not name:
+                return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
+
+            # Fecha de creación
+            creation_date = None
+            if creation_date_str:
+                try:
+                    creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d")
+                except ValueError:
+                    return {"success": False, "message": "Formato de fecha inválido."}, 400
+
+            # Imagen
+            image_url = None
+            if image_file and image_file.filename:
+                upload_path = os.path.join("static", "uploads", image_file.filename)
+                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+                image_file.save(upload_path)
+                image_url = f"/{upload_path}"
+
+            slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
+
+            # Crear app
+            new_app = App(
+                name=name,
+                description=description,
+                theme=theme,
+                creation_date=creation_date,
+                status=status,
+                official_id=official_id,
+                image_url=image_url,
+                slug=slug,
+                owner_id=current_user.id,
+                created_at=datetime.utcnow()
             )
-            db.session.add(member)
 
-        db.session.commit()
+            db.session.add(new_app)
+            db.session.flush()  # Flush para obtener el ID de la app antes de agregar miembros
 
-        return {
-            "success": True,
-            "app": {
-                "name": new_app.name,
-                "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png')
+            # Crear miembros del equipo si vienen en el formulario JSON (opcional)
+            import json
+            team_json = data.get("appTeam", "[]")
+            try:
+                team_list = json.loads(team_json)
+            except Exception:
+                team_list = []
+
+            for member_data in team_list:
+                member = TeamMember(
+                    app_id=new_app.id,
+                    name=member_data.get("name"),
+                    role=member_data.get("role"),
+                    avatar_url=member_data.get("avatar_url"),
+                    created_at=datetime.utcnow()
+                )
+                db.session.add(member)
+
+            db.session.commit()  # Commit final
+
+            return {
+                "success": True,
+                "app": {
+                    "name": new_app.name,
+                    "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png'),
+                    "id": str(new_app.id)
+                }
             }
-        }
 
+    except Exception as e:
+        db.session.rollback()  # Siempre hacer rollback si falla algo
+        print("Error creando app:", e)
+        return {"success": False, "message": "Error interno al crear la app."}, 500
 
     @app.route("/get_notifications", methods=["GET"])
     @login_required
