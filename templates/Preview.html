@@ -226,40 +226,7 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
 
 <div class="tab-content" id="team">
   <div class="team-container" id="team-list">
-    {# Si la columna team (varchar) contiene datos, la usamos y la parseamos (#}
-    {% if team and team|trim %}
-      {% set members = team.split(',') if ',' in team else team.splitlines() %}
-      {% for raw in members %}
-        {% set name = raw.strip() %}
-        {% if name %}
-        <div class="team-member-horizontal">
-          <img src="https://picsum.photos/80?random={{ loop.index }}" alt="Profile">
-          <div class="team-info">
-            <h3>{{ name }}</h3>
-          </div>
-        </div>
-        {% endif %}
-      {% endfor %}
-
-    {# Si la columna team está vacía, fallback a team_members (relación) #}
-    {% elif team_members %}
-      {% for member in team_members %}
-      <div class="team-member-horizontal">
-        <img src="{{ member.avatar_url or 'https://picsum.photos/80?random=21' }}" alt="Profile">
-        <div class="team-info">
-          <h3>{{ member.name }}</h3>
-          <p>{{ member.role }}</p>
-          <p class="username">@{{ member.username }}</p>
-          <div class="socials">
-            {% if member.twitter %}<a href="{{ member.twitter }}">Twitter</a>{% endif %}
-            {% if member.linkedin %}<a href="{{ member.linkedin }}">LinkedIn</a>{% endif %}
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    {% else %}
-      <p class="subtext">No se añadió ningún integrante del equipo.</p>
-    {% endif %}
+      <!-- El JS introducirá aquí los miembros del equipo -->
   </div>
 </div>
 
