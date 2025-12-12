@@ -402,7 +402,7 @@ def create_app():
 
     @app.route("/account/get_app/<string:id>")
     def get_app(id):
-        # Validar que el ID sea un UUID v4
+        # Validar UUID
         try:
             uuid_obj = UUID(id, version=4)
         except ValueError:
@@ -421,25 +421,31 @@ def create_app():
             # Tags
             tags = [t.name for t in app_data.tags]
 
-            # Preparar respuesta
+            # Team Members
+            team = TeamMember.query.filter_by(app_id=app_data.id).all()
+            team_json = [
+                {
+                    "name": m.name,
+                    "role": m.role,
+                    "username": m.username if hasattr(m, "username") else None,
+                    "avatar_url": m.avatar_url,
+                    "twitter": m.twitter,
+                    "linkedin": m.linkedin
+                }
+                for m in team
+            ]
+
+            # JSON final
             return jsonify({
                 "success": True,
                 "app": {
                     "id": str(app_data.id),
                     "name": app_data.name,
                     "image_url": app_data.image_url,
-
-                    # short_description = description
                     "short_description": app_data.description,
-
-                    # long_description: evita error si no existe
                     "long_description": getattr(app_data, "long_description", app_data.description),
-
-                    # TEAM → columna VARCHAR
-                    "team": app_data.team or "",
-
                     "tags": tags,
-
+                    "team_members": team_json,
                     "reviews": [
                         {
                             "username": r.user.name if r.user else "Anónimo",
@@ -456,7 +462,8 @@ def create_app():
             print(traceback.format_exc())
             return jsonify({"success": False, "error": "Error interno del servidor"}), 500
 
-        
+
+            
     @app.route("/account/get_all_apps")
     def get_all_apps():
         apps = App.query.all()
