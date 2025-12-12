@@ -1260,10 +1260,10 @@ def create_app():
                 }
             }
 
-    except Exception as e:
-        db.session.rollback()  # Siempre hacer rollback si falla algo
-        print("Error creando app:", e)
-        return {"success": False, "message": "Error interno al crear la app."}, 500
+        except Exception as e:
+            db.session.rollback()  # Siempre hacer rollback si falla algo
+            print("Error creando app:", e)
+            return {"success": False, "message": "Error interno al crear la app."}, 500
 
     @app.route("/get_notifications", methods=["GET"])
     @login_required
