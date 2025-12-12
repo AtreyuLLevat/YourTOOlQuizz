@@ -6,9 +6,11 @@ const createAppModal = document.getElementById('createAppModal');
 const cancelAppBtn = document.getElementById('cancelAppBtn');
 const newAppBtn = document.getElementById('newAppBtn');
 const appsList = document.getElementById('appsList');
+const teamContainer = document.getElementById('team-members-container');
+const addMemberBtn = document.getElementById('addMemberBtn');
 
 // ===========================
-// Obtener usuario actual con await
+// Obtener usuario actual
 // ===========================
 async function getUserId() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -71,7 +73,27 @@ async function uploadImage(file) {
 }
 
 // ===========================
-// Crear nueva app
+// Añadir miembros dinámicamente
+// ===========================
+addMemberBtn?.addEventListener("click", () => {
+    const index = teamContainer.children.length;
+    const memberDiv = document.createElement("div");
+    memberDiv.className = "team-member-entry";
+    memberDiv.innerHTML = `
+        <input type="text" name="members[${index}][name]" placeholder="Nombre" required>
+        <input type="text" name="members[${index}][role]" placeholder="Rol">
+        <input type="url" name="members[${index}][avatar_url]" placeholder="URL Avatar">
+        <button type="button" class="remove-member-btn">Eliminar</button>
+    `;
+    teamContainer.appendChild(memberDiv);
+
+    memberDiv.querySelector(".remove-member-btn").addEventListener("click", () => {
+        memberDiv.remove();
+    });
+});
+
+// ===========================
+// Crear nueva app + miembros
 // ===========================
 createAppForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -82,11 +104,11 @@ createAppForm.addEventListener('submit', async (e) => {
     const file = document.getElementById('appImage').files[0];
     const imageUrl = await uploadImage(file);
 
+    // Crear app
     const payload = {
         name: document.getElementById('appName').value,
         description: document.getElementById('appDescription').value,
         image_url: imageUrl,
-        team: document.getElementById('appTeam').value,
         theme: document.getElementById('appTheme').value,
         creation_date: document.getElementById('appCreationDate').value,
         status: document.getElementById('appStatus').value,
@@ -94,17 +116,37 @@ createAppForm.addEventListener('submit', async (e) => {
         created_by: userId
     };
 
-    const { error } = await supabase
+    const { data: appData, error } = await supabase
         .from('apps')
-        .insert([payload]);
+        .insert([payload])
+        .select()  // importante para obtener el id generado
+        .single();
 
     if (error) {
         alert('❌ Error al crear app: ' + error.message);
         return;
     }
 
-    alert('✅ App creada!');
+    // Crear miembros del equipo
+    const memberInputs = document.querySelectorAll('.team-member-entry');
+    for (let memberDiv of memberInputs) {
+        const name = memberDiv.querySelector('input[name$="[name]"]').value;
+        const role = memberDiv.querySelector('input[name$="[role]"]').value;
+        const avatar_url = memberDiv.querySelector('input[name$="[avatar_url]"]').value;
+
+        if (!name) continue; // obligatorio
+
+        await supabase.from('team_members').insert([{
+            app_id: appData.id,
+            name,
+            role,
+            avatar_url
+        }]);
+    }
+
+    alert('✅ App creada con miembros!');
     createAppForm.reset();
+    teamContainer.innerHTML = '';
     createAppModal.classList.add('hidden');
 
     loadApps();

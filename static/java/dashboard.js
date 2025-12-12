@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const createAppModal = document.getElementById('createAppModal');
   const cancelAppBtn = document.getElementById('cancelAppBtn');
   const newAppBtn = document.getElementById('newAppBtn');
+  const teamContainer = document.getElementById('team-members-container');
+  const addMemberBtn = document.getElementById('addMemberBtn');
 
   const changeBtn = document.getElementById('changeBtn');
   const modal = document.getElementById('modal');
@@ -17,10 +19,40 @@ document.addEventListener('DOMContentLoaded', () => {
   cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
   createAppModal?.addEventListener('click', (e) => { if (e.target === createAppModal) createAppModal.classList.add('hidden'); });
 
-  // === Crear app AJAX ===
+  // === Añadir miembros dinámicamente ===
+  addMemberBtn?.addEventListener('click', () => {
+    const index = teamContainer.children.length;
+    const memberDiv = document.createElement("div");
+    memberDiv.className = "team-member-entry";
+    memberDiv.innerHTML = `
+      <input type="text" name="members[${index}][name]" placeholder="Nombre" required>
+      <input type="text" name="members[${index}][role]" placeholder="Rol">
+      <input type="url" name="members[${index}][avatar_url]" placeholder="URL Avatar">
+      <button type="button" class="remove-member-btn">Eliminar</button>
+    `;
+    teamContainer.appendChild(memberDiv);
+
+    memberDiv.querySelector(".remove-member-btn").addEventListener("click", () => {
+      memberDiv.remove();
+    });
+  });
+
+  // === Crear app AJAX con miembros ===
   createAppForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(createAppForm);
+
+    // Convertir miembros en JSON
+    const members = [];
+    const memberDivs = document.querySelectorAll('.team-member-entry');
+    memberDivs.forEach(div => {
+      const name = div.querySelector('input[name$="[name]"]').value;
+      const role = div.querySelector('input[name$="[role]"]').value;
+      const avatar_url = div.querySelector('input[name$="[avatar_url]"]').value;
+      if (name) members.push({ name, role, avatar_url });
+    });
+
+    formData.append('members_json', JSON.stringify(members));
 
     try {
       const response = await fetch('/account/create_app', { method: 'POST', body: formData });
@@ -36,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appsList.prepend(appBtn);
 
         createAppForm.reset();
+        teamContainer.innerHTML = '';
         createAppModal.classList.add('hidden');
       } else {
         alert(data.message || 'Error al crear la app.');

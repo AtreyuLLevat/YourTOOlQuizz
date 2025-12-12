@@ -461,7 +461,7 @@ def create_app():
             return jsonify({"success": False, "error": "Error interno del servidor"}), 500
 
 
-            
+
     @app.route("/account/get_all_apps")
     def get_all_apps():
         apps = App.query.all()
@@ -1186,7 +1186,6 @@ def create_app():
         data = request.form
         name = data.get("appName", "").strip()
         description = data.get("appDescription", "").strip()
-        team = data.get("appTeam", "").strip()
         theme = data.get("appTheme", "").strip()
         creation_date_str = data.get("appCreationDate", "").strip()
         status = data.get("appStatus", "").strip()
@@ -1198,6 +1197,7 @@ def create_app():
 
         creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
 
+        # Guardar imagen
         image_url = None
         if image_file and image_file.filename:
             upload_path = os.path.join("static", "uploads", image_file.filename)
@@ -1207,10 +1207,10 @@ def create_app():
 
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
+        # Crear app
         new_app = App(
             name=name,
             description=description,
-            team=team,
             theme=theme,
             creation_date=creation_date,
             status=status,
@@ -1222,6 +1222,24 @@ def create_app():
         )
 
         db.session.add(new_app)
+        db.session.commit()  # Necesario para obtener ID
+
+        # === Crear miembros del equipo ===
+        members_json = data.get("members_json", "[]")
+        try:
+            members = json.loads(members_json)
+        except json.JSONDecodeError:
+            members = []
+
+        for m in members:
+            member = TeamMember(
+                app_id=new_app.id,
+                name=m.get("name"),
+                role=m.get("role"),
+                avatar_url=m.get("avatar_url")
+            )
+            db.session.add(member)
+
         db.session.commit()
 
         return {
@@ -1231,7 +1249,6 @@ def create_app():
                 "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png')
             }
         }
-
 
 
     @app.route("/get_notifications", methods=["GET"])
