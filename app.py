@@ -402,44 +402,59 @@ def create_app():
 
     @app.route("/account/get_app/<string:id>")
     def get_app(id):
+        # Validar que el ID sea un UUID v4
         try:
             uuid_obj = UUID(id, version=4)
         except ValueError:
             return jsonify({"success": False, "error": "ID inválido"}), 400
 
         try:
+            # Obtener app
             app_data = App.query.filter_by(id=uuid_obj).first()
             if not app_data:
                 return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-            reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+            # Reviews
+            reviews = Review.query.filter_by(app_id=app_data.id) \
+                                .order_by(Review.created_at.desc()).all()
+
+            # Tags
             tags = [t.name for t in app_data.tags]
 
+            # Preparar respuesta
             return jsonify({
                 "success": True,
                 "app": {
                     "id": str(app_data.id),
                     "name": app_data.name,
                     "image_url": app_data.image_url,
+
+                    # short_description = description
                     "short_description": app_data.description,
+
+                    # long_description: evita error si no existe
                     "long_description": getattr(app_data, "long_description", app_data.description),
+
+                    # TEAM → columna VARCHAR
                     "team": app_data.team or "",
+
                     "tags": tags,
+
                     "reviews": [
                         {
                             "username": r.user.name if r.user else "Anónimo",
                             "content": r.content,
                             "rating": r.rating
-                        } for r in reviews
+                        }
+                        for r in reviews
                     ]
                 }
             })
-        except Exception as e:
+
+        except Exception:
             import traceback
             print(traceback.format_exc())
             return jsonify({"success": False, "error": "Error interno del servidor"}), 500
-
-
 
         
     @app.route("/account/get_all_apps")
