@@ -480,7 +480,7 @@ def create_app():
             "Preview.html",
             app=app_data,
             reviews=reviews,
-            team_members=team_members,
+            team=team_members,
             tags=tags
         )
 
