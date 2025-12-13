@@ -189,4 +189,36 @@ document.addEventListener('DOMContentLoaded', () => {
     appDetailModal.classList.add('hidden');
   });
 
+  const createCommunityBtns = document.querySelectorAll('.create-community-btn');
+  createCommunityBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const communityName = prompt('Nombre de la nueva comunidad:');
+      if (!communityName) return;
+
+      const appId = btn.closest('.modal-content').dataset.appId; // asegúrate de tener data-app-id
+      try {
+        const res = await fetch(`/apps/${appId}/create_community`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name: communityName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const communityList = btn.closest('.tab-content').querySelector('.community-list');
+          const li = document.createElement('li');
+          li.textContent = data.community.name;
+          communityList.appendChild(li);
+          alert('Comunidad creada correctamente ✅');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error al crear la comunidad.');
+      }
+    });
+  });
+
 });

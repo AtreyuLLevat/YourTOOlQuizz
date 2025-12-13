@@ -91,7 +91,6 @@ class App(db.Model):
     name = db.Column(db.String(100), nullable=False)
     slug = db.Column(db.String(150), unique=True, index=True, nullable=False)
     description = db.Column(db.Text)
-    team = db.Column(db.String(200))
     theme = db.Column(db.String(100))
     creation_date = db.Column(db.DateTime)
     status = db.Column(db.String(50))
@@ -164,6 +163,25 @@ class Review(db.Model):
     user = db.relationship("User", backref="reviews")
 
 
+class Community(db.Model):
+    __tablename__ = "communities"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relación con la app
+    app = db.relationship("App", backref=db.backref("communities", cascade="all, delete-orphan"))
+
+    # Relación con miembros y mensajes
+    members = db.relationship("GroupMember", backref="community", cascade="all, delete-orphan")
+    messages = db.relationship("GroupMessage", backref="community", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Community {self.name} App={self.app_id}>"
+
 # -------------------------
 # MODELO DE MIEMBROS DEL GRUPO
 # -------------------------
@@ -196,22 +214,21 @@ class GroupMessage(db.Model):
     __tablename__ = "group_messages"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    message_type = db.Column(db.String(20), default='user')
+    message_type = db.Column(db.String(20), default='user')  # admin / user / poll
     poll_question = db.Column(db.String(500))
     poll_options = db.Column(JSON)
     is_pinned = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # Relaciones usando back_populates
-    app = db.relationship("App", back_populates="group_messages")
     user = db.relationship("User")
 
     def __repr__(self):
-        return f"<GroupMessage {self.id} Type={self.message_type}>"
+        return f"<GroupMessage {self.id} Community={self.community_id} Type={self.message_type}>"
+
 
 # -------------------------
 # MODELOS EXISTENTES (MANTENIDOS)

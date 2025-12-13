@@ -690,30 +690,30 @@ input[type="checkbox"] {
         </div>
 <!-- Modal de Detalle de App -->
 <div id="appDetailModal" class="modal-backdrop hidden">
-  <div class="modal-content large">
+  <div class="modal-content large" data-app-id="{{ app.id }}">
     <button id="closeAppDetail" class="close-btn">&times;</button>
 
     <!-- Sección básica -->
     <div class="app-basic">
       <div class="app-logo">
-        <img src="/static/images/app-placeholder.png" alt="Logo App">
+        <img src="{{ app.image_url or '/static/images/app-placeholder.png' }}" alt="Logo App">
         <button class="edit-btn" title="Editar imagen">🖼️</button>
       </div>
       <div class="app-info">
         <h2>
-          <span class="app-name">Nombre App</span>
+          <span class="app-name">{{ app.name }}</span>
           <button class="edit-btn" title="Editar nombre">✏️</button>
         </h2>
         <p>
-          <span class="app-description">Descripción de la app</span>
+          <span class="app-description">{{ app.description }}</span>
           <button class="edit-btn" title="Editar descripción">✏️</button>
         </p>
         <p>
-          <span class="app-date">Fecha: 01/01/2025</span>
+          <span class="app-date">Fecha: {{ app.creation_date.strftime('%d/%m/%Y') if app.creation_date else '---' }}</span>
           <button class="edit-btn" title="Editar fecha">✏️</button>
         </p>
         <p>
-          <span class="app-theme">Tema: General</span>
+          <span class="app-theme">Tema: {{ app.theme or 'General' }}</span>
           <button class="edit-btn" title="Editar tema">✏️</button>
         </p>
       </div>
@@ -729,7 +729,7 @@ input[type="checkbox"] {
     <div class="tab-content" id="reviews">
       <div class="reviews-summary">
         <div class="stars">⭐⭐⭐⭐☆</div>
-        <div class="reviews-count">(24)</div>
+        <div class="reviews-count">({{ app.reviews|length }})</div>
         <button class="view-all-btn">Ver todas las reseñas</button>
       </div>
     </div>
@@ -740,8 +740,11 @@ input[type="checkbox"] {
         <button class="create-community-btn">Crear nueva comunidad</button>
       </div>
       <ul class="community-list">
-        <li>Testers</li>
-        <li>Beta Users</li>
+        {% for community in app.communities %}
+          <li>{{ community.name }}</li>
+        {% else %}
+          <li>No hay comunidades creadas.</li>
+        {% endfor %}
       </ul>
     </div>
 

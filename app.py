@@ -586,7 +586,32 @@ def create_app():
         
 
 
+    @app.route('/apps/<int:app_id>/create_community', methods=['POST'])
+    @login_required
+    def create_community(app_id):
+        app_obj = App.query.get_or_404(app_id)
+        data = request.json
+        community_name = data.get('name')
 
+        if not community_name or community_name.strip() == '':
+            return jsonify({"success": False, "error": "El nombre de la comunidad es obligatorio"}), 400
+
+        new_community = Community(
+            name=community_name,
+            app=app_obj
+        )
+        db.session.add(new_community)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "community": {
+                "id": new_community.id,
+                "name": new_community.name,
+                "created_at": new_community.created_at.isoformat()
+            }
+        })
+    
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
