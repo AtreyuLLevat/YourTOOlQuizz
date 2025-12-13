@@ -1183,9 +1183,10 @@ def create_app():
     @login_required
     def create_app_ajax():
         data = request.form
+
         name = data.get("appName", "").strip()
         description = data.get("appDescription", "").strip()
-        team_json = data.get("appTeam", "[]")  # Lista JSON de miembros
+        raw_team = data.get("appTeam", "").strip()  # 👈 aquí llegan
         theme = data.get("appTheme", "").strip()
         creation_date_str = data.get("appCreationDate", "").strip()
         status = data.get("appStatus", "").strip()
@@ -1195,7 +1196,10 @@ def create_app():
         if not name:
             return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
 
-        creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d") if creation_date_str else None
+        creation_date = (
+            datetime.strptime(creation_date_str, "%Y-%m-%d")
+            if creation_date_str else None
+        )
 
         image_url = None
         if image_file and image_file.filename:
@@ -1207,7 +1211,9 @@ def create_app():
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
         try:
-            # Crear app
+            # ==========================
+            # 1. Crear App
+            # ==========================
             new_app = App(
                 name=name,
                 description=description,
@@ -1220,17 +1226,35 @@ def create_app():
                 owner_id=current_user.id,
                 created_at=datetime.utcnow()
             )
-            db.session.add(new_app)
-            db.session.flush()  # Necesario para obtener new_app.id sin commit aún
 
-            # Crear miembros del equipo
+            db.session.add(new_app)
+            db.session.flush()  # 🔑 new_app.id disponible SIN commit
+
+            # ==========================
+            # 2. Crear Team Members
+            # ==========================
+            team_members = []
+
+            # Intentar JSON
             import json
             try:
-                team_members = json.loads(team_json)  # Espera lista de dicts: [{"name": "X", "role": "Y"}]
-            except:
-                team_members = []
+                team_members = json.loads(raw_team)
+                if not isinstance(team_members, list):
+                    team_members = []
+            except Exception:
+                # Fallback: texto simple
+                if raw_team:
+                    for item in raw_team.split(","):
+                        parts = item.split("-", 1)
+                        team_members.append({
+                            "name": parts[0].strip(),
+                            "role": parts[1].strip() if len(parts) > 1 else None
+                        })
 
             for m in team_members:
+                if not m.get("name"):
+                    continue
+
                 member = TeamMember(
                     app_id=new_app.id,
                     name=m.get("name"),
@@ -1239,18 +1263,25 @@ def create_app():
                 )
                 db.session.add(member)
 
+            # ==========================
+            # 3. Commit final
+            # ==========================
             db.session.commit()
+
             return {
                 "success": True,
                 "app": {
                     "name": new_app.name,
-                    "image_url": new_app.image_url or url_for('static', filename='images/app-placeholder.png')
+                    "image_url": new_app.image_url
+                        or url_for("static", filename="images/app-placeholder.png")
                 }
             }
+
         except Exception as e:
             db.session.rollback()
-            print("Error creando app:", e)
-            return {"success": False, "message": "Error interno al crear la app."}, 500
+            print("❌ Error creando app:", e)
+            return {"success": False, "message": "Error interno del servidor."}, 500
+
 
     @app.route("/get_notifications", methods=["GET"])
     @login_required
