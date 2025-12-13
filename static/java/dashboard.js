@@ -1,126 +1,192 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-  // === Variables comunes ===
+  /* ======================================================
+     VARIABLES
+  ====================================================== */
   const createAppForm = document.getElementById('createAppForm');
   const appsList = document.getElementById('appsList');
   const createAppModal = document.getElementById('createAppModal');
   const cancelAppBtn = document.getElementById('cancelAppBtn');
   const newAppBtn = document.getElementById('newAppBtn');
+
   const teamContainer = document.getElementById('team-members-container');
   const addMemberBtn = document.getElementById('addMemberBtn');
 
-  const changeBtn = document.getElementById('changeBtn');
-  const modal = document.getElementById('modal');
-  const cancelModal = document.getElementById('cancelModal');
-  const saveModal = document.getElementById('saveModal');
+  const appDetailModal = document.getElementById('appDetailModal');
+  const closeAppDetail = document.getElementById('closeAppDetail');
 
-  // === Modal crear app ===
-  newAppBtn?.addEventListener('click', () => createAppModal.classList.remove('hidden'));
-  cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
-  createAppModal?.addEventListener('click', (e) => { if (e.target === createAppModal) createAppModal.classList.add('hidden'); });
+  /* ======================================================
+     MODAL CREAR APP
+  ====================================================== */
+  newAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.remove('hidden');
+  });
 
-  // === Añadir miembros dinámicamente ===
+  cancelAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.add('hidden');
+  });
+
+  createAppModal?.addEventListener('click', (e) => {
+    if (e.target === createAppModal) {
+      createAppModal.classList.add('hidden');
+    }
+  });
+
+  /* ======================================================
+     AÑADIR TEAM MEMBERS (FORM)
+  ====================================================== */
   addMemberBtn?.addEventListener('click', () => {
-    const index = teamContainer.children.length;
-    const memberDiv = document.createElement("div");
-    memberDiv.className = "team-member-entry";
+    const memberDiv = document.createElement('div');
+    memberDiv.className = 'team-member-entry';
     memberDiv.innerHTML = `
-      <input type="text" name="members[${index}][name]" placeholder="Nombre" required>
-      <input type="text" name="members[${index}][role]" placeholder="Rol">
-      <input type="url" name="members[${index}][avatar_url]" placeholder="URL Avatar">
+      <input type="text" placeholder="Nombre" required>
+      <input type="text" placeholder="Rol">
+      <input type="url" placeholder="URL Avatar">
       <button type="button" class="remove-member-btn">Eliminar</button>
     `;
     teamContainer.appendChild(memberDiv);
 
-    memberDiv.querySelector(".remove-member-btn").addEventListener("click", () => {
-      memberDiv.remove();
-    });
+    memberDiv.querySelector('.remove-member-btn')
+      .addEventListener('click', () => memberDiv.remove());
   });
 
-  // === Crear app AJAX con miembros ===
+  /* ======================================================
+     CREAR APP (AJAX + TEAM MEMBERS)
+  ====================================================== */
   createAppForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const formData = new FormData(createAppForm);
 
-    // Convertir miembros en JSON
+    // TEAM MEMBERS → JSON
     const members = [];
-    const memberDivs = document.querySelectorAll('.team-member-entry');
-    memberDivs.forEach(div => {
-      const name = div.querySelector('input[name$="[name]"]').value;
-      const role = div.querySelector('input[name$="[role]"]').value;
-      const avatar_url = div.querySelector('input[name$="[avatar_url]"]').value;
+    document.querySelectorAll('.team-member-entry').forEach(div => {
+      const inputs = div.querySelectorAll('input');
+      const name = inputs[0].value.trim();
+      const role = inputs[1].value.trim();
+      const avatar_url = inputs[2].value.trim();
       if (name) members.push({ name, role, avatar_url });
     });
 
     formData.append('members_json', JSON.stringify(members));
 
     try {
-      const response = await fetch('/account/create_app', { method: 'POST', body: formData });
-      const data = await response.json();
+      const res = await fetch('/account/create_app', {
+        method: 'POST',
+        body: formData
+      });
 
-      if (data.success) {
-        const appBtn = document.createElement('button');
-        appBtn.className = 'app-item';
-        appBtn.innerHTML = `
-          <img src="${data.app.image_url}" alt="App" class="app-img">
-          <span class="app-name">${data.app.name}</span>
-        `;
-        appsList.prepend(appBtn);
+      const data = await res.json();
 
-        createAppForm.reset();
-        teamContainer.innerHTML = '';
-        createAppModal.classList.add('hidden');
-      } else {
-        alert(data.message || 'Error al crear la app.');
+      if (!data.success) {
+        alert(data.message || 'Error creando app');
+        return;
       }
+
+      // Añadir app a la lista
+      const appBtn = document.createElement('button');
+      appBtn.className = 'app-item';
+      appBtn.dataset.appId = data.app.id;
+      appBtn.innerHTML = `
+        <img src="${data.app.image_url}" class="app-img">
+        <span class="app-name">${data.app.name}</span>
+      `;
+
+      appBtn.addEventListener('click', () => {
+        openAppDetail(data.app.id);
+      });
+
+      appsList.prepend(appBtn);
+
+      // Reset
+      createAppForm.reset();
+      teamContainer.innerHTML = '';
+      createAppModal.classList.add('hidden');
+
     } catch (err) {
       console.error(err);
-      alert('Ocurrió un error al crear la app.');
+      alert('Error de red');
     }
   });
 
-  // === Modal de contraseña ===
-  if (changeBtn && modal && cancelModal && saveModal) {
-    changeBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
-    cancelModal.addEventListener('click', () => { modal.style.display = 'none'; });
-    saveModal.addEventListener('click', () => {
-      const newPwd = document.getElementById('newPwd').value;
-      const confirm = document.getElementById('confirmPwd').value;
-      if (!newPwd || newPwd !== confirm) {
-        alert('Las contraseñas no coinciden.');
+  /* ======================================================
+     ABRIR MODAL CON DATOS REALES
+  ====================================================== */
+  async function openAppDetail(appId) {
+    try {
+      const res = await fetch(`/account/get_app/${appId}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        alert('Error cargando app');
         return;
       }
-      alert('Contraseña actualizada correctamente.');
-      modal.style.display = 'none';
-    });
-  }
 
-  // === Detectar cambios y mostrar botones de guardar ===
-  const setupChangeDetection = (selectors, buttonId) => {
-    const button = document.getElementById(buttonId);
-    if (!button) return;
-    document.querySelectorAll(selectors).forEach(el => {
-      el.addEventListener('input', () => button.classList.remove('hidden'));
-      el.addEventListener('change', () => button.classList.remove('hidden'));
-    });
-    button.addEventListener('click', () => {
-      alert('Cambios guardados.');
-      button.classList.add('hidden');
-    });
-  };
+      const app = data.app;
 
-  setupChangeDetection('#email, #name', 'saveProfile');
-  setupChangeDetection('#publicProfile, #dataUsage', 'savePrivacy');
-  setupChangeDetection('#newsletters, #reminders, #offers', 'saveNotifications');
+      // === Datos básicos ===
+      document.querySelector('.app-name').textContent = app.name;
+      document.querySelector('.app-description').textContent = app.short_description || '';
+      document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
+      document.querySelector('.app-date').textContent =
+        `Fecha: ${app.creation_date || 'Desconocida'}`;
 
-  // === Botón cerrar sesión ===
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      if (confirm('¿Seguro que quieres cerrar sesión?')) {
-        window.location.href = logoutBtn.dataset.href || '/logout';
+      const img = document.querySelector('.app-logo img');
+      img.src = app.image_url || '/static/images/app-placeholder.png';
+
+      // === TEAM MEMBERS ===
+      const teamBox = document.getElementById('team-members-container');
+      teamBox.innerHTML = '';
+
+      if (app.team_members.length === 0) {
+        teamBox.innerHTML = '<p>Sin miembros</p>';
+      } else {
+        app.team_members.forEach(m => {
+          const div = document.createElement('div');
+          div.className = 'team-member-horizontal';
+          div.innerHTML = `
+            <img src="${m.avatar_url || 'https://picsum.photos/60'}">
+            <div>
+              <strong>${m.name}</strong>
+              <p>${m.role || ''}</p>
+            </div>
+          `;
+          teamBox.appendChild(div);
+        });
       }
-    });
+
+      // === REVIEWS ===
+      const reviewsBox = document.getElementById('reviews');
+      reviewsBox.innerHTML = '';
+
+      if (app.reviews.length === 0) {
+        reviewsBox.innerHTML = '<p>Sin reseñas</p>';
+      } else {
+        app.reviews.forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'review-item';
+          div.innerHTML = `
+            <strong>${r.username}</strong>
+            <span>⭐ ${r.rating}</span>
+            <p>${r.content}</p>
+          `;
+          reviewsBox.appendChild(div);
+        });
+      }
+
+      appDetailModal.classList.remove('hidden');
+
+    } catch (err) {
+      console.error(err);
+      alert('Error cargando datos');
+    }
   }
+
+  /* ======================================================
+     CERRAR MODAL DETALLE
+  ====================================================== */
+  closeAppDetail?.addEventListener('click', () => {
+    appDetailModal.classList.add('hidden');
+  });
 
 });
