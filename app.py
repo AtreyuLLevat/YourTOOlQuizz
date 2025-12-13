@@ -1179,39 +1179,30 @@ def create_app():
             SUPABASE_URL=SUPABASE_URL,
             SUPABASE_KEY=SUPABASE_ANON_KEY
         )
+
+
     @app.route("/account/create_app", methods=["POST"])
     @login_required
     def create_app_ajax():
         data = request.form
 
-        # ======================
-        # Campos del formulario
-        # ======================
         name = data.get("appName", "").strip()
         description = data.get("appDescription", "").strip()
-        raw_team = data.get("appTeam", "").strip()
         theme = data.get("appTheme", "").strip()
         creation_date_str = data.get("appCreationDate", "").strip()
         status = data.get("appStatus", "").strip()
         official_id = data.get("appOfficialId", "").strip()
         image_file = request.files.get("appImage")
 
-        if not name:
-            return {"success": False, "message": "El nombre es obligatorio."}, 400
+        members_json = data.get("members_json")
 
-        # ======================
-        # Fecha
-        # ======================
+        if not name:
+            return {"success": False, "message": "Nombre obligatorio"}, 400
+
         creation_date = None
         if creation_date_str:
-            try:
-                creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d")
-            except ValueError:
-                return {"success": False, "message": "Fecha inválida."}, 400
+            creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d")
 
-        # ======================
-        # Imagen
-        # ======================
         image_url = None
         if image_file and image_file.filename:
             upload_path = os.path.join("static", "uploads", image_file.filename)
@@ -1219,15 +1210,9 @@ def create_app():
             image_file.save(upload_path)
             image_url = f"/{upload_path}"
 
-        # ======================
-        # Slug
-        # ======================
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
         try:
-            # ======================
-            # Crear App
-            # ======================
             new_app = App(
                 name=name,
                 description=description,
@@ -1242,25 +1227,25 @@ def create_app():
             )
 
             db.session.add(new_app)
-            db.session.flush()  # 🔑 obtenemos new_app.id
+            db.session.flush()  # ⬅️ obtenemos new_app.id
 
-            # ======================
-            # Team → team_members
-            # ======================
-            if raw_team:
-                for item in raw_team.split(","):
-                    parts = item.split("-", 1)
+            # =====================
+            # TEAM MEMBERS (JSON)
+            # =====================
+            if members_json:
+                members = json.loads(members_json)
+                for m in members:
+                    if not m.get("name"):
+                        continue
 
                     member = TeamMember(
                         app_id=new_app.id,
-                        name=parts[0].strip(),
-                        role=parts[1].strip() if len(parts) > 1 else None
+                        name=m["name"],
+                        role=m.get("role"),
+                        avatar_url=m.get("avatar_url")
                     )
                     db.session.add(member)
 
-            # ======================
-            # Commit final
-            # ======================
             db.session.commit()
 
             return {
@@ -1274,8 +1259,9 @@ def create_app():
 
         except Exception as e:
             db.session.rollback()
-            print("❌ Error creando app:", e)
-            return {"success": False, "message": "Error interno del servidor."}, 500
+            print("ERROR:", e)
+            return {"success": False, "message": "Error interno"}, 500
+
 
 
 
