@@ -1184,9 +1184,12 @@ def create_app():
     def create_app_ajax():
         data = request.form
 
+        # ======================
+        # Campos del formulario
+        # ======================
         name = data.get("appName", "").strip()
         description = data.get("appDescription", "").strip()
-        raw_team = data.get("appTeam", "").strip()  # 👈 aquí llegan
+        raw_team = data.get("appTeam", "").strip()
         theme = data.get("appTheme", "").strip()
         creation_date_str = data.get("appCreationDate", "").strip()
         status = data.get("appStatus", "").strip()
@@ -1194,13 +1197,21 @@ def create_app():
         image_file = request.files.get("appImage")
 
         if not name:
-            return {"success": False, "message": "El nombre de la app es obligatorio."}, 400
+            return {"success": False, "message": "El nombre es obligatorio."}, 400
 
-        creation_date = (
-            datetime.strptime(creation_date_str, "%Y-%m-%d")
-            if creation_date_str else None
-        )
+        # ======================
+        # Fecha
+        # ======================
+        creation_date = None
+        if creation_date_str:
+            try:
+                creation_date = datetime.strptime(creation_date_str, "%Y-%m-%d")
+            except ValueError:
+                return {"success": False, "message": "Fecha inválida."}, 400
 
+        # ======================
+        # Imagen
+        # ======================
         image_url = None
         if image_file and image_file.filename:
             upload_path = os.path.join("static", "uploads", image_file.filename)
@@ -1208,12 +1219,15 @@ def create_app():
             image_file.save(upload_path)
             image_url = f"/{upload_path}"
 
+        # ======================
+        # Slug
+        # ======================
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
         try:
-            # ==========================
-            # 1. Crear App
-            # ==========================
+            # ======================
+            # Crear App
+            # ======================
             new_app = App(
                 name=name,
                 description=description,
@@ -1228,44 +1242,25 @@ def create_app():
             )
 
             db.session.add(new_app)
-            db.session.flush()  # 🔑 new_app.id disponible SIN commit
+            db.session.flush()  # 🔑 obtenemos new_app.id
 
-            # ==========================
-            # 2. Crear Team Members
-            # ==========================
-            team_members = []
+            # ======================
+            # Team → team_members
+            # ======================
+            if raw_team:
+                for item in raw_team.split(","):
+                    parts = item.split("-", 1)
 
-            # Intentar JSON
-            import json
-            try:
-                team_members = json.loads(raw_team)
-                if not isinstance(team_members, list):
-                    team_members = []
-            except Exception:
-                # Fallback: texto simple
-                if raw_team:
-                    for item in raw_team.split(","):
-                        parts = item.split("-", 1)
-                        team_members.append({
-                            "name": parts[0].strip(),
-                            "role": parts[1].strip() if len(parts) > 1 else None
-                        })
+                    member = TeamMember(
+                        app_id=new_app.id,
+                        name=parts[0].strip(),
+                        role=parts[1].strip() if len(parts) > 1 else None
+                    )
+                    db.session.add(member)
 
-            for m in team_members:
-                if not m.get("name"):
-                    continue
-
-                member = TeamMember(
-                    app_id=new_app.id,
-                    name=m.get("name"),
-                    role=m.get("role"),
-                    avatar_url=m.get("avatar_url")
-                )
-                db.session.add(member)
-
-            # ==========================
-            # 3. Commit final
-            # ==========================
+            # ======================
+            # Commit final
+            # ======================
             db.session.commit()
 
             return {
@@ -1281,6 +1276,7 @@ def create_app():
             db.session.rollback()
             print("❌ Error creando app:", e)
             return {"success": False, "message": "Error interno del servidor."}, 500
+
 
 
     @app.route("/get_notifications", methods=["GET"])
