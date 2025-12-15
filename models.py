@@ -171,6 +171,7 @@ class GroupMember(db.Model):
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)  # <-- esto
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
     verification_method = db.Column(db.String(50))
