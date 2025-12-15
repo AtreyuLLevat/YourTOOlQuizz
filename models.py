@@ -185,7 +185,7 @@ class GroupMember(db.Model):
     # Relaciones
     app = db.relationship("App", back_populates="group_members")
     user = db.relationship("User")
-
+    community = db.relationship("Community", back_populates="members")  
 # -------------------------
 # MENSAJES GRUPALES
 # -------------------------
