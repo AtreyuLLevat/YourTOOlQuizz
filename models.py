@@ -24,6 +24,9 @@ def unique_slug(model, base_slug):
         i += 1
     return slug
 
+
+
+
 # -------------------------
 # MODELO DE USUARIOS (SIMPLIFICADO)
 # -------------------------
@@ -83,7 +86,6 @@ class User(UserMixin, db.Model):
 
 # -------------------------
 # MODELO DE APLICACIONES
-# -------------------------
 class App(db.Model):
     __tablename__ = "apps"
 
@@ -108,7 +110,8 @@ class App(db.Model):
     team_members = db.relationship("TeamMember", back_populates="app", cascade="all, delete-orphan")
     reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
     group_members = db.relationship("GroupMember", back_populates="app")
-    group_messages = db.relationship("GroupMessage", back_populates="app")
+    group_messages = db.relationship("GroupMessage", back_populates="app", cascade="all, delete-orphan")
+    communities = db.relationship("Community", back_populates="app", cascade="all, delete-orphan")
 
     # Relación muchos a muchos con tags
     tags = db.relationship("Tag", secondary="app_tags", back_populates="apps")
@@ -163,28 +166,6 @@ class Review(db.Model):
     user = db.relationship("User", backref="reviews")
 
 
-class Community(db.Model):
-    __tablename__ = "communities"
-
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
-    name = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relación con la app
-    app = db.relationship("App", backref=db.backref("communities", cascade="all, delete-orphan"))
-
-    # Relación con miembros y mensajes
-    members = db.relationship("GroupMember", backref="community", cascade="all, delete-orphan")
-    messages = db.relationship("GroupMessage", backref="community", cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f"<Community {self.name} App={self.app_id}>"
-
-# -------------------------
-# MODELO DE MIEMBROS DEL GRUPO
-# -------------------------
 class GroupMember(db.Model):
     __tablename__ = "group_members"
 
@@ -200,20 +181,18 @@ class GroupMember(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relaciones usando back_populates
+    # Relaciones
     app = db.relationship("App", back_populates="group_members")
     user = db.relationship("User")
 
-    def __repr__(self):
-        return f"<GroupMember App={self.app_id} User={self.user_id}>"
-
 # -------------------------
-# MODELO DE MENSAJES GRUPALES
+# MENSAJES GRUPALES
 # -------------------------
 class GroupMessage(db.Model):
     __tablename__ = "group_messages"
-
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    
+    id = db.Column(UUID(as_uuid=True), primary_key=True)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
     community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -224,11 +203,27 @@ class GroupMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
+    # Relaciones
     user = db.relationship("User")
+    app = db.relationship("App", back_populates="group_messages")
+    community = db.relationship("Community", back_populates="messages")
 
-    def __repr__(self):
-        return f"<GroupMessage {self.id} Community={self.community_id} Type={self.message_type}>"
+# -------------------------
+# COMUNIDADES
+# -------------------------
+class Community(db.Model):
+    __tablename__ = "communities"
 
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    app = db.relationship("App", back_populates="communities")
+    members = db.relationship("GroupMember", backref="community", cascade="all, delete-orphan")
+    messages = db.relationship("GroupMessage", backref="community", cascade="all, delete-orphan")
 
 # -------------------------
 # MODELOS EXISTENTES (MANTENIDOS)
