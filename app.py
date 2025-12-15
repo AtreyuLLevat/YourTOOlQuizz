@@ -399,52 +399,45 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
 
-
     @app.route("/account/get_app/<string:id>")
-    @login_required
     def get_app(id):
+        # Validar que es UUID
         try:
-            # Validar que sea UUID
             uuid_obj = UUID(id, version=4)
         except ValueError:
             return jsonify({"success": False, "error": "ID inválido"}), 400
 
-        # Obtener la app
+        # Obtener la app con relaciones
         app_data = App.query.filter_by(id=uuid_obj).first()
         if not app_data:
             return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-        # Traer reviews relacionadas
-        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
-        reviews_json = [
-            {"username": r.user.name if r.user else "Anónimo",
-            "content": r.content,
-            "rating": r.rating}
-            for r in reviews
-        ]
-
-        # Traer comunidades relacionadas
-        communities = Community.query.filter_by(app_id=app_data.id).all()
-        communities_json = [{"id": str(c.id), "name": c.name} for c in communities]
-
-        # Traer team members
-        team_members = TeamMember.query.filter_by(app_id=app_data.id).all()
-        team_json = [{"name": t.name, "role": t.role, "avatar_url": t.avatar_url} for t in team_members]
-
-        # Construir JSON final
+        # Construir JSON
         app_json = {
             "id": str(app_data.id),
             "name": app_data.name,
             "description": app_data.description,
-            "image_url": app_data.image_url,
-            "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else None,
-            "theme": app_data.theme,
-            "reviews": reviews_json,
-            "communities": communities_json,
-            "team_members": team_json
+            "creation_date": app_data.created_at.isoformat() if app_data.created_at else None,
+            "team_members": [
+                {"name": m.name, "role": m.role, "avatar_url": m.avatar_url} 
+                for m in app_data.team_members
+            ],
+            "reviews": [
+                {
+                    "username": r.user.name if r.user else "Anónimo",
+                    "content": r.content,
+                    "rating": r.rating
+                }
+                for r in app_data.reviews
+            ],
+            "communities": [
+                {"id": str(c.id), "name": c.name} 
+                for c in app_data.communities
+            ]
         }
 
         return jsonify({"success": True, "app": app_json})
+
 
 
 
