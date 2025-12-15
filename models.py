@@ -208,6 +208,7 @@ class GroupMessage(db.Model):
     user = db.relationship("User")
     app = db.relationship("App", back_populates="group_messages")
     community = db.relationship("Community", back_populates="messages")
+    
 
 # -------------------------
 # COMUNIDADES
@@ -223,8 +224,9 @@ class Community(db.Model):
 
     # Relaciones
     app = db.relationship("App", back_populates="communities")
-    members = db.relationship("GroupMember", backref="community", cascade="all, delete-orphan")
-    messages = db.relationship("GroupMessage", backref="community", cascade="all, delete-orphan")
+    members = db.relationship("GroupMember", back_populates="community", cascade="all, delete-orphan")
+    messages = db.relationship("GroupMessage", back_populates="community", cascade="all, delete-orphan")
+
 
 # -------------------------
 # MODELOS EXISTENTES (MANTENIDOS)
