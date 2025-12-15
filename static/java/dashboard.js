@@ -135,16 +135,26 @@ async function openAppDetail(appId) {
         });
     }
 
-    const reviewsBox = document.getElementById('reviews');
-    reviewsBox.innerHTML = '';
-    if (app.reviews.length === 0) reviewsBox.innerHTML = '<p>Sin reseñas</p>';
-    else {
-        app.reviews.forEach(r => {
-            const div = document.createElement('div');
-            div.innerHTML = `<strong>${r.username}</strong>: ${r.content} ⭐${r.rating}`;
-            reviewsBox.appendChild(div);
-        });
-    }
+const reviewsList = document.getElementById('reviews-list');
+reviewsList.innerHTML = ''; // Solo borramos las reseñas anteriores
+
+if (app.reviews.length === 0) {
+    reviewsList.innerHTML = '<p>Sin reseñas</p>';
+} else {
+    app.reviews.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `
+            <strong>${r.username}</strong> ⭐${r.rating}
+            <p>${r.content}</p>
+        `;
+        reviewsList.appendChild(div);
+    });
+}
+
+// Actualizar contador de reseñas
+const reviewsCount = document.querySelector('.reviews-count');
+reviewsCount.textContent = `(${app.reviews.length})`;
 
     const communitiesBox = document.getElementById('communities');
     communitiesBox.innerHTML = '';
