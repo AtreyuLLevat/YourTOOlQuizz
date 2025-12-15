@@ -121,58 +121,43 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Error cargando app');
         return;
       }
+document.querySelector('.app-name').textContent = app.name;
+document.querySelector('.app-description').textContent = app.description || '';
+document.querySelector('.app-date').textContent = `Fecha: ${app.creation_date || '---'}`;
+document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
+document.querySelector('.app-logo img').src = app.image_url || '/static/images/app-placeholder.png';
 
-      const app = data.app;
+// Team members
+const teamBox = document.getElementById('team-members-container');
+teamBox.innerHTML = '';
+app.team_members.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'team-member-horizontal';
+    div.innerHTML = `
+        <img src="${m.avatar_url || 'https://picsum.photos/60'}">
+        <div><strong>${m.name}</strong><p>${m.role || ''}</p></div>
+    `;
+    teamBox.appendChild(div);
+});
 
-      // === Datos básicos ===
-      document.querySelector('.app-name').textContent = app.name;
-      document.querySelector('.app-description').textContent = app.short_description || '';
-      document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
-      document.querySelector('.app-date').textContent =
-        `Fecha: ${app.creation_date || 'Desconocida'}`;
+// Reviews
+const reviewsBox = document.getElementById('reviews-list');
+reviewsBox.innerHTML = '';
+app.reviews.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `<strong>${r.username}</strong> <span>⭐ ${r.rating}</span> <p>${r.content}</p>`;
+    reviewsBox.appendChild(div);
+});
 
-      const img = document.querySelector('.app-logo img');
-      img.src = app.image_url || '/static/images/app-placeholder.png';
-
-      // === TEAM MEMBERS ===
-      const teamBox = document.getElementById('team-members-container');
-      teamBox.innerHTML = '';
-
-      if (app.team_members.length === 0) {
-        teamBox.innerHTML = '<p>Sin miembros</p>';
-      } else {
-        app.team_members.forEach(m => {
-          const div = document.createElement('div');
-          div.className = 'team-member-horizontal';
-          div.innerHTML = `
-            <img src="${m.avatar_url || 'https://picsum.photos/60'}">
-            <div>
-              <strong>${m.name}</strong>
-              <p>${m.role || ''}</p>
-            </div>
-          `;
-          teamBox.appendChild(div);
-        });
-      }
-
-      // === REVIEWS ===
-      const reviewsBox = document.getElementById('reviews');
-      reviewsBox.innerHTML = '';
-
-      if (app.reviews.length === 0) {
-        reviewsBox.innerHTML = '<p>Sin reseñas</p>';
-      } else {
-        app.reviews.forEach(r => {
-          const div = document.createElement('div');
-          div.className = 'review-item';
-          div.innerHTML = `
-            <strong>${r.username}</strong>
-            <span>⭐ ${r.rating}</span>
-            <p>${r.content}</p>
-          `;
-          reviewsBox.appendChild(div);
-        });
-      }
+// Comunidades
+const communityList = document.querySelector('.community-list');
+communityList.innerHTML = '';
+app.communities.forEach(c => {
+    const li = document.createElement('li');
+    li.textContent = c.name;
+    communityList.appendChild(li);
+});
 
       appDetailModal.classList.remove('hidden');
 

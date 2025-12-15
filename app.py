@@ -401,64 +401,50 @@ def create_app():
 
 
     @app.route("/account/get_app/<string:id>")
+    @login_required
     def get_app(id):
-        # Validar UUID
         try:
+            # Validar que sea UUID
             uuid_obj = UUID(id, version=4)
         except ValueError:
             return jsonify({"success": False, "error": "ID inválido"}), 400
 
-        try:
-            # Obtener app
-            app_data = App.query.filter_by(id=uuid_obj).first()
-            if not app_data:
-                return jsonify({"success": False, "error": "App no encontrada"}), 404
+        # Obtener la app
+        app_data = App.query.filter_by(id=uuid_obj).first()
+        if not app_data:
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-            # Reviews
-            reviews = Review.query.filter_by(app_id=app_data.id) \
-                                .order_by(Review.created_at.desc()).all()
+        # Traer reviews relacionadas
+        reviews = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+        reviews_json = [
+            {"username": r.user.name if r.user else "Anónimo",
+            "content": r.content,
+            "rating": r.rating}
+            for r in reviews
+        ]
 
-            # Tags
-            tags = [t.name for t in app_data.tags]
+        # Traer comunidades relacionadas
+        communities = Community.query.filter_by(app_id=app_data.id).all()
+        communities_json = [{"id": str(c.id), "name": c.name} for c in communities]
 
-            # Team Members
-            team = TeamMember.query.filter_by(app_id=app_data.id).all()
-            team_json = [
-                {
-                    "name": m.name,
-                    "role": m.role,
-                    "username": m.username if hasattr(m, "username") else None,
-                    "avatar_url": m.avatar_url,
-                }
-                for m in team
-            ]
+        # Traer team members
+        team_members = TeamMember.query.filter_by(app_id=app_data.id).all()
+        team_json = [{"name": t.name, "role": t.role, "avatar_url": t.avatar_url} for t in team_members]
 
-            # JSON final
-            return jsonify({
-                "success": True,
-                "app": {
-                    "id": str(app_data.id),
-                    "name": app_data.name,
-                    "image_url": app_data.image_url,
-                    "short_description": app_data.description,
-                    "long_description": getattr(app_data, "long_description", app_data.description),
-                    "tags": tags,
-                    "team_members": team_json,
-                    "reviews": [
-                        {
-                            "username": r.user.name if r.user else "Anónimo",
-                            "content": r.content,
-                            "rating": r.rating
-                        }
-                        for r in reviews
-                    ]
-                }
-            })
+        # Construir JSON final
+        app_json = {
+            "id": str(app_data.id),
+            "name": app_data.name,
+            "description": app_data.description,
+            "image_url": app_data.image_url,
+            "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else None,
+            "theme": app_data.theme,
+            "reviews": reviews_json,
+            "communities": communities_json,
+            "team_members": team_json
+        }
 
-        except Exception:
-            import traceback
-            print(traceback.format_exc())
-            return jsonify({"success": False, "error": "Error interno del servidor"}), 500
+        return jsonify({"success": True, "app": app_json})
 
 
 
