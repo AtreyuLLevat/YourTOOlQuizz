@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 from models import (
     User, Quiz, Question, Blog, Page, Plan, UserPlan, 
     App, GroupMember, GroupMessage, SecurityLog, Result, 
-    Review, TeamMember, Tag
+    Review, TeamMember, Tag, Community
 )
 from forms import RegisterForm, LoginForm, ContactForm
 from flask_migrate import Migrate
