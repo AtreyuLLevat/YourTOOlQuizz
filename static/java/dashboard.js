@@ -112,60 +112,53 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      ABRIR MODAL CON DATOS REALES
   ====================================================== */
-  async function openAppDetail(appId) {
-    try {
-      const res = await fetch(`/account/get_app/${appId}`);
-      const data = await res.json();
+async function openAppDetail(appId) {
+    const res = await fetch(`/account/get_app/${appId}`);
+    const data = await res.json();
+    if (!data.success) { alert("Error cargando app"); return; }
 
-      if (!data.success) {
-        alert('Error cargando app');
-        return;
-      }
-document.querySelector('.app-name').textContent = app.name;
-document.querySelector('.app-description').textContent = app.description || '';
-document.querySelector('.app-date').textContent = `Fecha: ${app.creation_date || '---'}`;
-document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
-document.querySelector('.app-logo img').src = app.image_url || '/static/images/app-placeholder.png';
+    const app = data.app;
 
-// Team members
-const teamBox = document.getElementById('team-members-container');
-teamBox.innerHTML = '';
-app.team_members.forEach(m => {
-    const div = document.createElement('div');
-    div.className = 'team-member-horizontal';
-    div.innerHTML = `
-        <img src="${m.avatar_url || 'https://picsum.photos/60'}">
-        <div><strong>${m.name}</strong><p>${m.role || ''}</p></div>
-    `;
-    teamBox.appendChild(div);
-});
+    document.querySelector('.app-name').textContent = app.name;
+    document.querySelector('.app-description').textContent = app.description || '';
+    document.querySelector('.app-date').textContent = app.creation_date || '---';
+    document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
 
-// Reviews
-const reviewsBox = document.getElementById('reviews-list');
-reviewsBox.innerHTML = '';
-app.reviews.forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'review-item';
-    div.innerHTML = `<strong>${r.username}</strong> <span>⭐ ${r.rating}</span> <p>${r.content}</p>`;
-    reviewsBox.appendChild(div);
-});
-
-// Comunidades
-const communityList = document.querySelector('.community-list');
-communityList.innerHTML = '';
-app.communities.forEach(c => {
-    const li = document.createElement('li');
-    li.textContent = c.name;
-    communityList.appendChild(li);
-});
-
-      appDetailModal.classList.remove('hidden');
-
-    } catch (err) {
-      console.error(err);
-      alert('Error cargando datos');
+    const teamBox = document.getElementById('team-members-container');
+    teamBox.innerHTML = '';
+    if (app.team_members.length === 0) teamBox.innerHTML = '<p>Sin miembros</p>';
+    else {
+        app.team_members.forEach(m => {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${m.name}</strong> - ${m.role || ''}`;
+            teamBox.appendChild(div);
+        });
     }
-  }
+
+    const reviewsBox = document.getElementById('reviews');
+    reviewsBox.innerHTML = '';
+    if (app.reviews.length === 0) reviewsBox.innerHTML = '<p>Sin reseñas</p>';
+    else {
+        app.reviews.forEach(r => {
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${r.username}</strong>: ${r.content} ⭐${r.rating}`;
+            reviewsBox.appendChild(div);
+        });
+    }
+
+    const communitiesBox = document.getElementById('communities');
+    communitiesBox.innerHTML = '';
+    if (app.communities.length === 0) communitiesBox.innerHTML = '<p>Sin comunidades</p>';
+    else {
+        app.communities.forEach(c => {
+            const div = document.createElement('div');
+            div.textContent = c.name;
+            communitiesBox.appendChild(div);
+        });
+    }
+
+    document.getElementById('appDetailModal').classList.remove('hidden');
+}
 
   /* ======================================================
      CERRAR MODAL DETALLE
