@@ -112,6 +112,7 @@ class App(db.Model):
     group_members = db.relationship("GroupMember", back_populates="app")
     group_messages = db.relationship("GroupMessage", back_populates="app", cascade="all, delete-orphan")
     communities = db.relationship("Community", back_populates="app", cascade="all, delete-orphan")
+    reviews = db.relationship("Review", back_populates="app", cascade="all, delete-orphan")
 
     # Relación muchos a muchos con tags
     tags = db.relationship("Tag", secondary="app_tags", back_populates="apps")
@@ -152,6 +153,7 @@ class TeamMember(db.Model):
 
     app = db.relationship("App", back_populates="team_members")
     
+    
 class Review(db.Model):
     __tablename__ = "reviews"
     
@@ -164,6 +166,8 @@ class Review(db.Model):
 
     # Relación opcional para acceder al usuario desde la review
     user = db.relationship("User", backref="reviews")
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    app = db.relationship("App", back_populates="reviews")
 
 
 class GroupMember(db.Model):
