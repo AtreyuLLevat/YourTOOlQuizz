@@ -692,50 +692,45 @@ input[type="checkbox"] {
 <div id="appDetailModal" class="modal-backdrop hidden">
   <div class="modal-content large">
     <button id="closeAppDetail" class="close-btn">&times;</button>
-    <!-- Aquí irán los contenidos del modal que se rellenan desde JS -->
-  </div>
-</div>
 
-
-    <!-- Sección básica -->
     <div class="app-basic">
       <div class="app-logo">
-        <img src="{{ app.image_url or '/static/images/app-placeholder.png' }}" alt="Logo App">
+        <img src="/static/images/app-placeholder.png" alt="Logo App">
         <button class="edit-btn" title="Editar imagen">🖼️</button>
       </div>
       <div class="app-info">
         <h2>
-          <span class="app-name">{{ app.name }}</span>
+          <span class="app-name"></span>
           <button class="edit-btn" title="Editar nombre">✏️</button>
         </h2>
         <p>
-          <span class="app-description">{{ app.description }}</span>
+          <span class="app-description"></span>
           <button class="edit-btn" title="Editar descripción">✏️</button>
         </p>
         <p>
-          <span class="app-date">Fecha: {{ app.creation_date.strftime('%d/%m/%Y') if app.creation_date else '---' }}</span>
+          <span class="app-date"></span>
           <button class="edit-btn" title="Editar fecha">✏️</button>
         </p>
         <p>
-          <span class="app-theme">Tema: {{ app.theme or 'General' }}</span>
+          <span class="app-theme"></span>
           <button class="edit-btn" title="Editar tema">✏️</button>
         </p>
       </div>
     </div>
 
-    <!-- Pestañas reseñas / comunidades -->
+    <!-- Pestañas -->
     <div class="app-tabs">
       <button class="tab-btn active" data-tab="reviews">Reseñas</button>
       <button class="tab-btn" data-tab="communities">Comunidades</button>
     </div>
 
-    <!-- Cajones -->
     <div class="tab-content" id="reviews">
       <div class="reviews-summary">
-        <div class="stars">⭐⭐⭐⭐☆</div>
-        <div class="reviews-count">({{ app.reviews|length }})</div>
+        <div class="stars"></div>
+        <div class="reviews-count"></div>
         <button class="view-all-btn">Ver todas las reseñas</button>
       </div>
+      <div id="reviews-list"></div>
     </div>
 
     <div class="tab-content hidden" id="communities">
@@ -743,15 +738,8 @@ input[type="checkbox"] {
         <h3>Comunidades</h3>
         <button class="create-community-btn">Crear nueva comunidad</button>
       </div>
-      <ul class="community-list">
-        {% for community in app.communities %}
-          <li>{{ community.name }}</li>
-        {% else %}
-          <li>No hay comunidades creadas.</li>
-        {% endfor %}
-      </ul>
+      <ul class="community-list"></ul>
     </div>
-
   </div>
 </div>
 
