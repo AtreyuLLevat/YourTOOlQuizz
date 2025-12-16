@@ -118,146 +118,115 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      ABRIR MODAL APP
   ====================================================== */
-  async function openAppDetail(appId) {
-    try {
-      currentApp = await fetchAppData(appId);
-    } catch {
-      return alert('Error cargando app');
-    }
+async function openAppDetail(appId) {
+  try {
+    currentApp = await fetchAppData(appId);
+  } catch {
+    return alert('Error cargando app');
+  }
 
-    const modalContent = document.querySelector('#appDetailModal .modal-content');
-    if (modalContent) modalContent.dataset.appId = appId;
+  const appDetailModal = document.getElementById('appDetailModal');
+  const modalContent = appDetailModal?.querySelector('.modal-content');
+  if (!modalContent) return;
 
-    document.querySelector('#appDetailModal .app-name').textContent = currentApp.name;
-    document.querySelector('#appDetailModal .app-description').textContent =
-      currentApp.description || '';
-    document.querySelector('#appDetailModal .app-date').textContent =
-      currentApp.creation_date || '---';
-    document.querySelector('#appDetailModal .app-theme').textContent =
-      `Tema: ${currentApp.theme || 'General'}`;
+  modalContent.dataset.appId = appId;
 
-    // TEAM
-    teamContainer.innerHTML = '';
-    if (!currentApp.team_members.length) {
-      teamContainer.innerHTML = '<p>Sin miembros</p>';
+  // Elementos del modal
+  const appNameEl = modalContent.querySelector('.app-name');
+  const appDescEl = modalContent.querySelector('.app-description');
+  const appDateEl = modalContent.querySelector('.app-date');
+  const appThemeEl = modalContent.querySelector('.app-theme');
+  const teamContainerEl = modalContent.querySelector('#team-members-container');
+
+  if (appNameEl) appNameEl.textContent = currentApp.name || '---';
+  if (appDescEl) appDescEl.textContent = currentApp.description || '---';
+  if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
+  if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
+
+  // TEAM MEMBERS
+  if (teamContainerEl) {
+    teamContainerEl.innerHTML = '';
+    if (!currentApp.team_members || !currentApp.team_members.length) {
+      teamContainerEl.innerHTML = '<p>Sin miembros</p>';
     } else {
       currentApp.team_members.forEach(m => {
         const div = document.createElement('div');
-        div.innerHTML = `<strong>${m.name}</strong> - ${m.role || ''}`;
-        teamContainer.appendChild(div);
+        div.textContent = `${m.name} - ${m.role || ''}`;
+        teamContainerEl.appendChild(div);
       });
     }
-
-    renderReviewsAdmin();
-    renderCommunities();
-
-    appDetailModal.classList.remove('hidden');
   }
 
-  /* ======================================================
-     REVIEWS ADMIN
-  ====================================================== */
-  function renderReviewsAdmin() {
-    const reviewsList = document.getElementById('reviews-list');
-    const reviewsCount = document.querySelector('.reviews-count');
-    reviewsList.innerHTML = '';
+  renderReviewsAdmin();
+  renderCommunities();
 
-    if (!currentApp.reviews.length) {
-      reviewsList.innerHTML = '<p>Sin reseñas</p>';
-      reviewsCount.textContent = '(0)';
-      return;
-    }
+  appDetailModal.classList.remove('hidden');
+}
 
-    currentApp.reviews.forEach(r => {
+/* ======================================================
+   REVIEWS ADMIN
+====================================================== */
+function renderReviewsAdmin() {
+  const reviewsList = document.getElementById('reviews-list');
+  const reviewsCount = document.querySelector('.reviews-count');
+
+  if (!reviewsList || !reviewsCount) return;
+
+  reviewsList.innerHTML = '';
+
+  if (!currentApp.reviews || !currentApp.reviews.length) {
+    reviewsList.innerHTML = '<p>Sin reseñas</p>';
+    reviewsCount.textContent = '(0)';
+    return;
+  }
+
+  currentApp.reviews.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.dataset.reviewId = r.id;
+    div.innerHTML = `
+      <div style="display:flex; justify-content:space-between;">
+        <strong>@${r.username || 'Usuario'}</strong>
+        <span>⭐ ${r.rating}</span>
+      </div>
+      <textarea class="review-content">${r.content || ''}</textarea>
+      <div style="margin-top:6px; display:flex; gap:8px;">
+        <button class="save-review-btn">Guardar</button>
+        <button class="delete-review-btn">Eliminar</button>
+      </div>
+    `;
+    reviewsList.appendChild(div);
+  });
+
+  reviewsCount.textContent = `(${currentApp.reviews.length})`;
+}
+
+/* ======================================================
+   COMMUNITIES
+====================================================== */
+function renderCommunities() {
+  const communitiesEl = document.getElementById('communities');
+  if (!communitiesEl) return;
+
+  communitiesEl.innerHTML = '';
+  if (!currentApp.communities || !currentApp.communities.length) {
+    communitiesEl.innerHTML = '<p>Sin comunidades</p>';
+  } else {
+    currentApp.communities.forEach(c => {
       const div = document.createElement('div');
-      div.className = 'review-item';
-      div.dataset.reviewId = r.id;
-      div.innerHTML = `
-        <div style="display:flex; justify-content:space-between;">
-          <strong>@${r.username || 'Usuario'}</strong>
-          <span>⭐ ${r.rating}</span>
-        </div>
-        <textarea class="review-content">${r.content}</textarea>
-        <div style="margin-top:6px; display:flex; gap:8px;">
-          <button class="save-review-btn">Guardar</button>
-          <button class="delete-review-btn">Eliminar</button>
-        </div>
-      `;
-      reviewsList.appendChild(div);
+      div.textContent = c.name;
+      communitiesEl.appendChild(div);
     });
-
-    reviewsCount.textContent = `(${currentApp.reviews.length})`;
   }
+}
 
-  document.addEventListener('click', async (e) => {
-
-    // GUARDAR RESEÑA
-    if (e.target.classList.contains('save-review-btn')) {
-      const item = e.target.closest('.review-item');
-      const id = item.dataset.reviewId;
-      const content = item.querySelector('.review-content').value.trim();
-      if (!content) return alert('Vacío');
-
-      try {
-        const res = await fetch(`/reviews/${id}/edit`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error();
-
-        const r = currentApp.reviews.find(r => r.id === id);
-        if (r) r.content = content;
-
-        alert('Reseña actualizada ✅');
-      } catch {
-        alert('Error al guardar');
-      }
-    }
-
-    // ELIMINAR RESEÑA
-    if (e.target.classList.contains('delete-review-btn')) {
-      const item = e.target.closest('.review-item');
-      const id = item.dataset.reviewId;
-      if (!confirm('¿Eliminar esta reseña?')) return;
-
-      try {
-        const res = await fetch(`/reviews/${id}/delete`, { method: 'DELETE' });
-        const data = await res.json();
-        if (!data.success) throw new Error();
-
-        currentApp.reviews = currentApp.reviews.filter(r => r.id !== id);
-        item.remove();
-      } catch {
-        alert('Error al eliminar');
-      }
-    }
-  });
-
-  /* ======================================================
-     COMMUNITIES
-  ====================================================== */
-  function renderCommunities() {
-    const box = document.getElementById('communities');
-    box.innerHTML = '';
-    if (!currentApp.communities.length) {
-      box.innerHTML = '<p>Sin comunidades</p>';
-    } else {
-      currentApp.communities.forEach(c => {
-        const div = document.createElement('div');
-        div.textContent = c.name;
-        box.appendChild(div);
-      });
-    }
-  }
-
-  /* ======================================================
-     CERRAR MODAL
-  ====================================================== */
-  closeAppDetail?.addEventListener('click', () => {
-    appDetailModal.classList.add('hidden');
-    currentApp = null;
-  });
-
+/* ======================================================
+   CERRAR MODAL
+====================================================== */
+closeAppDetail?.addEventListener('click', () => {
+  const appDetailModal = document.getElementById('appDetailModal');
+  if (appDetailModal) appDetailModal.classList.add('hidden');
+  currentApp = null;
 });
+
+})
