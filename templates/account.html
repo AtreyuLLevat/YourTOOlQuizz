@@ -688,68 +688,38 @@ input[type="checkbox"] {
             <p>No tienes aplicaciones creadas.</p>
           {% endif %}
         </div>
-<!-- Modal de Detalle de App -->
-<div id="appDetailModal" class="modal-backdrop hidden">
-  <div class="modal-content large">
-    <button id="closeAppDetail" class="close-btn">&times;</button>
+        <!-- Modal Detalle App -->
+        <div id="appDetailModal" class="modal-backdrop hidden">
+          <div class="modal-content large">
+            <button id="closeAppDetail" class="close-btn">&times;</button>
 
-    <div class="app-basic">
-      <div class="app-logo">
-        <img src="/static/images/app-placeholder.png" alt="Logo App">
-        <button class="edit-btn" title="Editar imagen">🖼️</button>
-      </div>
-      <div class="app-info">
-        <h2>
-          <span class="app-name"></span>
-          <button class="edit-btn" title="Editar nombre">✏️</button>
-        </h2>
-        <p>
-          <span class="app-description"></span>
-          <button class="edit-btn" title="Editar descripción">✏️</button>
-        </p>
-        <p>
-          <span class="app-date"></span>
-          <button class="edit-btn" title="Editar fecha">✏️</button>
-        </p>
-        <p>
-          <span class="app-theme"></span>
-          <button class="edit-btn" title="Editar tema">✏️</button>
-        </p>
-      </div>
-    </div>
+            <div class="app-basic">
+              <div class="app-logo">
+                <img src="/static/images/app-placeholder.png" alt="Logo App">
+              </div>
+              <div class="app-info">
+                <h2><span class="app-name"></span></h2>
+                <p><span class="app-description"></span></p>
+                <p><span class="app-date"></span></p>
+                <p><span class="app-theme"></span></p>
+              </div>
+            </div>
 
-    <!-- Pestañas -->
-    <div class="app-tabs">
-      <button class="tab-btn active" data-tab="reviews">Reseñas</button>
-      <button class="tab-btn" data-tab="communities">Comunidades</button>
-    </div>
+            <!-- Pestañas -->
+            <div class="app-tabs">
+              <button class="tab-btn active" data-tab="reviews">Reseñas</button>
+              <button class="tab-btn" data-tab="communities">Comunidades</button>
+            </div>
 
-  <div class="tab-content" id="reviews">
-    <div class="reviews-summary">
-      <div class="stars"></div>
-      <div class="reviews-count"></div>
-      <button class="view-all-btn">Ver todas las reseñas</button>
-    </div>
+            <div class="tab-content" id="reviews">
+              <h3 style="margin-bottom:10px;">Gestión de reseñas</h3>
+              <p class="reviews-count"></p>
+              <div id="reviews-list" class="reviews-list"></div>
+            </div>
 
-    <!-- ⬇️ AQUÍ VA ESTO ⬇️ -->
-
-    <div id="reviews-list" class="reviews-list"></div>
-
-  </div>
-
-
-    <div class="tab-content hidden" id="communities">
-      <div class="community-header">
-        <h3>Comunidades</h3>
-        <button class="create-community-btn">Crear nueva comunidad</button>
-      </div>
-      <ul class="community-list"></ul>
-    </div>
-  </div>
-</div>
-
-
-      </div>
+            <div class="tab-content hidden" id="communities"></div>
+          </div>
+        </div>
 
 
 
@@ -812,7 +782,16 @@ input[type="checkbox"] {
 
     </div>
   </div>
-
+<div id="unsavedModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <h3>⚠️ Cambios sin guardar</h3>
+    <p>¿Deseas guardar tus cambios antes de salir?</p>
+    <div class="modal-buttons">
+      <button id="modalSave" class="modal-btn primary">Guardar</button>
+      <button id="modalDiscard" class="modal-btn secondary">Descartar</button>
+    </div>
+  </div>
+</div>
 
 
     </div>
