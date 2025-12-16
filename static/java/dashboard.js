@@ -1,6 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ======================================================
+     ESTADO GLOBAL
+  ====================================================== */
+  let currentApp = null;
+
+  /* ======================================================
      VARIABLES
   ====================================================== */
   const createAppForm = document.getElementById('createAppForm');
@@ -33,39 +38,39 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ======================================================
-     AÑADIR TEAM MEMBERS (FORM)
+     AÑADIR TEAM MEMBERS
   ====================================================== */
   addMemberBtn?.addEventListener('click', () => {
-    const memberDiv = document.createElement('div');
-    memberDiv.className = 'team-member-entry';
-    memberDiv.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'team-member-entry';
+    div.innerHTML = `
       <input type="text" placeholder="Nombre" required>
       <input type="text" placeholder="Rol">
       <input type="url" placeholder="URL Avatar">
       <button type="button" class="remove-member-btn">Eliminar</button>
     `;
-    teamContainer.appendChild(memberDiv);
-
-    memberDiv.querySelector('.remove-member-btn')
-      .addEventListener('click', () => memberDiv.remove());
+    teamContainer.appendChild(div);
+    div.querySelector('.remove-member-btn').onclick = () => div.remove();
   });
 
   /* ======================================================
-     CREAR APP (AJAX + TEAM MEMBERS)
+     CREAR APP
   ====================================================== */
   createAppForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const formData = new FormData(createAppForm);
-
-    // TEAM MEMBERS → JSON
     const members = [];
+
     document.querySelectorAll('.team-member-entry').forEach(div => {
       const inputs = div.querySelectorAll('input');
-      const name = inputs[0].value.trim();
-      const role = inputs[1].value.trim();
-      const avatar_url = inputs[2].value.trim();
-      if (name) members.push({ name, role, avatar_url });
+      if (inputs[0].value.trim()) {
+        members.push({
+          name: inputs[0].value.trim(),
+          role: inputs[1].value.trim(),
+          avatar_url: inputs[2].value.trim()
+        });
+      }
     });
 
     formData.append('members_json', JSON.stringify(members));
@@ -77,136 +82,182 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
+      if (!data.success) return alert(data.message || 'Error');
 
-      if (!data.success) {
-        alert(data.message || 'Error creando app');
-        return;
-      }
-
-      // Añadir app a la lista
-      const appBtn = document.createElement('button');
-      appBtn.className = 'app-item';
-      appBtn.dataset.appId = data.app.id;
-      appBtn.innerHTML = `
+      const btn = document.createElement('button');
+      btn.className = 'app-item';
+      btn.dataset.appId = data.app.id;
+      btn.innerHTML = `
         <img src="${data.app.image_url}" class="app-img">
         <span class="app-name">${data.app.name}</span>
       `;
+      btn.onclick = () => openAppDetail(data.app.id);
 
-      appBtn.addEventListener('click', () => {
-        openAppDetail(data.app.id);
-      });
+      appsList.prepend(btn);
 
-      appsList.prepend(appBtn);
-
-      // Reset
       createAppForm.reset();
       teamContainer.innerHTML = '';
       createAppModal.classList.add('hidden');
 
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert('Error de red');
     }
   });
 
   /* ======================================================
-     ABRIR MODAL CON DATOS REALES
+     FETCH APP
   ====================================================== */
-async function openAppDetail(appId) {
+  async function fetchAppData(appId) {
     const res = await fetch(`/account/get_app/${appId}`);
     const data = await res.json();
-    if (!data.success) { alert("Error cargando app"); return; }
-
-    const app = data.app;
-
-    document.querySelector('.app-name').textContent = app.name;
-    document.querySelector('.app-description').textContent = app.description || '';
-    document.querySelector('.app-date').textContent = app.creation_date || '---';
-    document.querySelector('.app-theme').textContent = `Tema: ${app.theme || 'General'}`;
-
-    const teamBox = document.getElementById('team-members-container');
-    teamBox.innerHTML = '';
-    if (app.team_members.length === 0) teamBox.innerHTML = '<p>Sin miembros</p>';
-    else {
-        app.team_members.forEach(m => {
-            const div = document.createElement('div');
-            div.innerHTML = `<strong>${m.name}</strong> - ${m.role || ''}`;
-            teamBox.appendChild(div);
-        });
-    }
-
-const reviewsList = document.getElementById('reviews-list');
-reviewsList.innerHTML = ''; // Solo borramos las reseñas anteriores
-
-if (app.reviews.length === 0) {
-    reviewsList.innerHTML = '<p>Sin reseñas</p>';
-} else {
-    app.reviews.forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'review-item';
-        div.innerHTML = `
-            <strong>${r.username}</strong> ⭐${r.rating}
-            <p>${r.content}</p>
-        `;
-        reviewsList.appendChild(div);
-    });
-}
-
-// Actualizar contador de reseñas
-const reviewsCount = document.querySelector('.reviews-count');
-reviewsCount.textContent = `(${app.reviews.length})`;
-
-    const communitiesBox = document.getElementById('communities');
-    communitiesBox.innerHTML = '';
-    if (app.communities.length === 0) communitiesBox.innerHTML = '<p>Sin comunidades</p>';
-    else {
-        app.communities.forEach(c => {
-            const div = document.createElement('div');
-            div.textContent = c.name;
-            communitiesBox.appendChild(div);
-        });
-    }
-
-    document.getElementById('appDetailModal').classList.remove('hidden');
-}
+    if (!data.success) throw new Error();
+    data.app.reviews ||= [];
+    return data.app;
+  }
 
   /* ======================================================
-     CERRAR MODAL DETALLE
+     ABRIR MODAL APP
+  ====================================================== */
+  async function openAppDetail(appId) {
+    try {
+      currentApp = await fetchAppData(appId);
+    } catch {
+      return alert('Error cargando app');
+    }
+
+    const modalContent = document.querySelector('#appDetailModal .modal-content');
+    if (modalContent) modalContent.dataset.appId = appId;
+
+    document.querySelector('#appDetailModal .app-name').textContent = currentApp.name;
+    document.querySelector('#appDetailModal .app-description').textContent =
+      currentApp.description || '';
+    document.querySelector('#appDetailModal .app-date').textContent =
+      currentApp.creation_date || '---';
+    document.querySelector('#appDetailModal .app-theme').textContent =
+      `Tema: ${currentApp.theme || 'General'}`;
+
+    // TEAM
+    teamContainer.innerHTML = '';
+    if (!currentApp.team_members.length) {
+      teamContainer.innerHTML = '<p>Sin miembros</p>';
+    } else {
+      currentApp.team_members.forEach(m => {
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${m.name}</strong> - ${m.role || ''}`;
+        teamContainer.appendChild(div);
+      });
+    }
+
+    renderReviewsAdmin();
+    renderCommunities();
+
+    appDetailModal.classList.remove('hidden');
+  }
+
+  /* ======================================================
+     REVIEWS ADMIN
+  ====================================================== */
+  function renderReviewsAdmin() {
+    const reviewsList = document.getElementById('reviews-list');
+    const reviewsCount = document.querySelector('.reviews-count');
+    reviewsList.innerHTML = '';
+
+    if (!currentApp.reviews.length) {
+      reviewsList.innerHTML = '<p>Sin reseñas</p>';
+      reviewsCount.textContent = '(0)';
+      return;
+    }
+
+    currentApp.reviews.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      div.dataset.reviewId = r.id;
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between;">
+          <strong>@${r.username || 'Usuario'}</strong>
+          <span>⭐ ${r.rating}</span>
+        </div>
+        <textarea class="review-content">${r.content}</textarea>
+        <div style="margin-top:6px; display:flex; gap:8px;">
+          <button class="save-review-btn">Guardar</button>
+          <button class="delete-review-btn">Eliminar</button>
+        </div>
+      `;
+      reviewsList.appendChild(div);
+    });
+
+    reviewsCount.textContent = `(${currentApp.reviews.length})`;
+  }
+
+  document.addEventListener('click', async (e) => {
+
+    // GUARDAR RESEÑA
+    if (e.target.classList.contains('save-review-btn')) {
+      const item = e.target.closest('.review-item');
+      const id = item.dataset.reviewId;
+      const content = item.querySelector('.review-content').value.trim();
+      if (!content) return alert('Vacío');
+
+      try {
+        const res = await fetch(`/reviews/${id}/edit`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error();
+
+        const r = currentApp.reviews.find(r => r.id === id);
+        if (r) r.content = content;
+
+        alert('Reseña actualizada ✅');
+      } catch {
+        alert('Error al guardar');
+      }
+    }
+
+    // ELIMINAR RESEÑA
+    if (e.target.classList.contains('delete-review-btn')) {
+      const item = e.target.closest('.review-item');
+      const id = item.dataset.reviewId;
+      if (!confirm('¿Eliminar esta reseña?')) return;
+
+      try {
+        const res = await fetch(`/reviews/${id}/delete`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.success) throw new Error();
+
+        currentApp.reviews = currentApp.reviews.filter(r => r.id !== id);
+        item.remove();
+      } catch {
+        alert('Error al eliminar');
+      }
+    }
+  });
+
+  /* ======================================================
+     COMMUNITIES
+  ====================================================== */
+  function renderCommunities() {
+    const box = document.getElementById('communities');
+    box.innerHTML = '';
+    if (!currentApp.communities.length) {
+      box.innerHTML = '<p>Sin comunidades</p>';
+    } else {
+      currentApp.communities.forEach(c => {
+        const div = document.createElement('div');
+        div.textContent = c.name;
+        box.appendChild(div);
+      });
+    }
+  }
+
+  /* ======================================================
+     CERRAR MODAL
   ====================================================== */
   closeAppDetail?.addEventListener('click', () => {
     appDetailModal.classList.add('hidden');
-  });
-
-  const createCommunityBtns = document.querySelectorAll('.create-community-btn');
-  createCommunityBtns.forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const communityName = prompt('Nombre de la nueva comunidad:');
-      if (!communityName) return;
-
-      const appId = btn.closest('.modal-content').dataset.appId; // asegúrate de tener data-app-id
-      try {
-        const res = await fetch(`/apps/${appId}/create_community`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ name: communityName })
-        });
-        const data = await res.json();
-        if (data.success) {
-          const communityList = btn.closest('.tab-content').querySelector('.community-list');
-          const li = document.createElement('li');
-          li.textContent = data.community.name;
-          communityList.appendChild(li);
-          alert('Comunidad creada correctamente ✅');
-        } else {
-          alert('Error: ' + data.error);
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error al crear la comunidad.');
-      }
-    });
+    currentApp = null;
   });
 
 });
