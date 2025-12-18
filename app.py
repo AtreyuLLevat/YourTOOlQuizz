@@ -407,12 +407,10 @@ def create_app():
     @app.route("/account/apps")
     @login_required
     def account_apps():
-        user_apps = (
-            App.query
-            .filter_by(owner_id=current_user.id)
-            .order_by(App.created_at.desc())
-            .all()
-        )
+        print("🔥 ENTRANDO EN /account/apps")
+
+        user_apps = App.query.all()
+        print("APPS EN DB:", len(user_apps))
 
         return render_template(
             "account1.html",
