@@ -407,15 +407,19 @@ def create_app():
     @app.route("/account/apps")
     @login_required
     def account_apps():
-        print("🔥 ENTRANDO EN /account/apps")
+        apps = [
+            {
+                "id": "test-1",
+                "name": "APP DE PRUEBA 1"
+            },
+            {
+                "id": "test-2",
+                "name": "APP DE PRUEBA 2"
+            }
+        ]
 
-        user_apps = App.query.all()
-        print("APPS EN DB:", len(user_apps))
+        return render_template("account1.html", apps=apps)
 
-        return render_template(
-            "account1.html",
-            apps=user_apps
-        )
 
 
     @app.route("/api/apps/<uuid:app_id>/edit", methods=["GET"])
