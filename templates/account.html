@@ -724,12 +724,25 @@ input[type="checkbox"] {
 
 
             <div class="tab-content hidden" id="communities">
-  <div class="community-header">
-    <h3>Comunidades</h3>
-  </div>
+          <div class="community-header">
+            <h3>Comunidades</h3>
+            <button id="addCommunityBtn" class="btn btn-small">+ Añadir</button>
+          </div>
 
-  <ul class="community-list"></ul>
-</div>
+          <div id="addCommunityForm" class="hidden" style="margin-top:10px;">
+            <input
+              type="text"
+              id="communityNameInput"
+              placeholder="Nombre de la comunidad"
+              style="width:100%; margin-bottom:8px;"
+            >
+            <button id="saveCommunityBtn" class="btn btn-small primary">
+              Crear comunidad
+            </button>
+          </div>
+
+          <ul class="community-list"></ul>
+
 
           </div>
         </div>

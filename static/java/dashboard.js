@@ -205,20 +205,64 @@ function renderReviewsAdmin() {
    COMMUNITIES
 ====================================================== */
 function renderCommunities() {
-  const communitiesEl = document.getElementById('communities');
-  if (!communitiesEl) return;
+  const list = document.querySelector('.community-list');
+  if (!list) return;
 
-  communitiesEl.innerHTML = '';
+  list.innerHTML = '';
+
   if (!currentApp.communities || !currentApp.communities.length) {
-    communitiesEl.innerHTML = '<p>Sin comunidades</p>';
-  } else {
-    currentApp.communities.forEach(c => {
-      const div = document.createElement('div');
-      div.textContent = c.name;
-      communitiesEl.appendChild(div);
-    });
+    list.innerHTML = '<li>Sin comunidades</li>';
+    return;
   }
+
+  currentApp.communities.forEach(c => {
+    const li = document.createElement('li');
+    li.textContent = c.name;
+    list.appendChild(li);
+  });
 }
+
+const addCommunityBtn = document.getElementById('addCommunityBtn');
+const addCommunityForm = document.getElementById('addCommunityForm');
+const saveCommunityBtn = document.getElementById('saveCommunityBtn');
+const communityNameInput = document.getElementById('communityNameInput');
+
+addCommunityBtn?.addEventListener('click', () => {
+  addCommunityForm.classList.toggle('hidden');
+});
+
+saveCommunityBtn?.addEventListener('click', async () => {
+  const name = communityNameInput.value.trim();
+  if (!name) return alert('Nombre obligatorio');
+
+  const appId = document
+    .querySelector('#appDetailModal .modal-content')
+    ?.dataset.appId;
+
+  if (!appId) return alert('App no válida');
+
+  try {
+    const res = await fetch(`/apps/${appId}/create_community`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name })
+    });
+
+    const data = await res.json();
+    if (!data.success) return alert(data.error);
+
+    // Añadir sin recargar
+    currentApp.communities.push(data.community);
+    renderCommunities();
+
+    communityNameInput.value = '';
+    addCommunityForm.classList.add('hidden');
+
+  } catch {
+    alert('Error de red');
+  }
+});
+
 
 /* ======================================================
    CERRAR MODAL

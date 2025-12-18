@@ -567,32 +567,40 @@ def create_app():
         })
         
 
-
-    @app.route('/apps/<int:app_id>/create_community', methods=['POST'])
+    @app.route('/apps/<string:app_id>/create_community', methods=['POST'])
     @login_required
     def create_community(app_id):
-        app_obj = App.query.get_or_404(app_id)
+        try:
+            uuid_obj = UUID(app_id, version=4)
+        except ValueError:
+            return jsonify({"success": False, "error": "ID inválido"}), 400
+
+        app_obj = App.query.filter_by(id=uuid_obj).first()
+        if not app_obj:
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
+
         data = request.json
-        community_name = data.get('name')
+        name = data.get('name', '').strip()
 
-        if not community_name or community_name.strip() == '':
-            return jsonify({"success": False, "error": "El nombre de la comunidad es obligatorio"}), 400
+        if not name:
+            return jsonify({"success": False, "error": "Nombre obligatorio"}), 400
 
-        new_community = Community(
-            name=community_name,
-            app=app_obj
+        community = Community(
+            name=name,
+            app_id=app_obj.id
         )
-        db.session.add(new_community)
+
+        db.session.add(community)
         db.session.commit()
 
         return jsonify({
             "success": True,
             "community": {
-                "id": new_community.id,
-                "name": new_community.name,
-                "created_at": new_community.created_at.isoformat()
+                "id": str(community.id),
+                "name": community.name
             }
         })
+
     
     @app.route('/listadodecosas')
     def explorador():
