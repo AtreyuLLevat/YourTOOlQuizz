@@ -235,9 +235,9 @@ saveCommunityBtn?.addEventListener('click', async () => {
   const name = communityNameInput.value.trim();
   if (!name) return alert('Nombre obligatorio');
 
-  const appId = document
-    .querySelector('#appDetailModal .modal-content')
-    ?.dataset.appId;
+const appId = document
+  .getElementById('appDetailModal')
+  ?.dataset.appId;
 
   if (!appId) return alert('App no válida');
 
