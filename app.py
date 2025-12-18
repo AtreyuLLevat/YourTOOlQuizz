@@ -404,23 +404,7 @@ def create_app():
     def account1():
         return render_template('account1.html')
     
-    @app.route("/account/apps")
-    @login_required
-    def account_apps():
-        apps = [
-            {
-                "id": "test-1",
-                "name": "APP DE PRUEBA 1"
-            },
-            {
-                "id": "test-2",
-                "name": "APP DE PRUEBA 2"
-            }
-        ]
-
-        return render_template("account1.html", apps=apps)
-
-
+    
 
     @app.route("/api/apps/<uuid:app_id>/edit", methods=["GET"])
     @login_required
@@ -455,7 +439,7 @@ def create_app():
 
 
 
-    @app.route("/account/get_app/<string:id>")
+    @app.route("/account1/get_app/<string:id>")
     def get_app(id):
         try:
             uuid_obj = UUID(id, version=4)
@@ -500,7 +484,7 @@ def create_app():
 
 
 
-    @app.route("/account/get_all_apps")
+    @app.route("/account1/get_all_apps")
     def get_all_apps():
         apps = App.query.all()
         apps_list = []
