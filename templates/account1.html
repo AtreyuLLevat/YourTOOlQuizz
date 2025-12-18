@@ -44,23 +44,28 @@
 }
 .btn-primary { background:#2563eb; color:white; }
 .btn-secondary { background:#e5e7eb; }
+.app-card {
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 
-<h1>Mis aplicaciones</h1>
+<h1>ACCOUNT1</h1>
 
-<div id="apps-list">
-  {% for app in apps %}
-    <div class="app-card">
-      <strong>{{ app.name }}</strong>
-      <button class="btn btn-secondary edit-app-btn" data-id="{{ app.id }}">
-        Editar
-      </button>
-    </div>
-  {% endfor %}
-</div>
+{% for app in apps %}
+  <div>
+    {{ app.name }} — {{ app.id }}
+  </div>
+{% endfor %}
+
 
 <!-- MODAL -->
 <div class="modal-overlay" id="editModal">
