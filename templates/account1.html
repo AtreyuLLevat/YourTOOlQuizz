@@ -1,0 +1,95 @@
+<!-- account1.html -->
+{% extends "base.html" %}
+{% block title %}Mis Apps | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal {
+  background: #fff;
+  width: 520px;
+  max-width: 95%;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.15);
+}
+.modal h2 { margin-bottom: 16px; }
+.modal label { font-weight: 600; display:block; margin-top:12px; }
+.modal input, .modal textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+.modal-actions {
+  display:flex;
+  justify-content: flex-end;
+  gap:10px;
+  margin-top:20px;
+}
+.btn {
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  border:none;
+}
+.btn-primary { background:#2563eb; color:white; }
+.btn-secondary { background:#e5e7eb; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<h1>Mis aplicaciones</h1>
+
+<div id="apps-list">
+  {% for app in apps %}
+    <div class="app-card">
+      <strong>{{ app.name }}</strong>
+      <button class="btn btn-secondary edit-app-btn" data-id="{{ app.id }}">
+        Editar
+      </button>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>Editar aplicación</h2>
+
+    <input type="hidden" id="edit-app-id">
+
+    <label>Nombre</label>
+    <input id="edit-name">
+
+    <label>Descripción</label>
+    <textarea id="edit-description"></textarea>
+
+    <label>Tema</label>
+    <input id="edit-theme">
+
+    <label>Estado</label>
+    <input id="edit-status">
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="closeModal">Cancelar</button>
+      <button class="btn btn-primary" id="saveChanges">Guardar</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='java/app_edit_modal.js') }}" defer></script>
+{% endblock %}

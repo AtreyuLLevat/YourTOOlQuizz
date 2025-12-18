@@ -399,6 +399,44 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
 
+
+    @app.route('/account1')
+    def account1():
+        return render_template('account1.html')
+
+    @app.route("/api/apps/<uuid:app_id>/edit", methods=["GET"])
+    @login_required
+    def get_app_for_edit(app_id):
+        app_data = App.query.filter_by(id=app_id, owner_id=current_user.id).first_or_404()
+
+        return jsonify({
+            "success": True,
+            "app": {
+                "id": str(app_data.id),
+                "name": app_data.name,
+                "description": app_data.description,
+                "theme": app_data.theme,
+                "status": app_data.status
+            }
+        })
+
+    @app.route("/api/apps/<uuid:app_id>/edit", methods=["POST"])
+    @login_required
+    def save_app_edit(app_id):
+        app_data = App.query.filter_by(id=app_id, owner_id=current_user.id).first_or_404()
+        data = request.json
+
+        app_data.name = data.get("name", app_data.name)
+        app_data.description = data.get("description", app_data.description)
+        app_data.theme = data.get("theme", app_data.theme)
+        app_data.status = data.get("status", app_data.status)
+
+        db.session.commit()
+
+        return jsonify({"success": True})
+
+
+
     @app.route("/account/get_app/<string:id>")
     def get_app(id):
         try:
