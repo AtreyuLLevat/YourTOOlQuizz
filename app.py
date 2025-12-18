@@ -403,6 +403,22 @@ def create_app():
     @app.route('/account1')
     def account1():
         return render_template('account1.html')
+    
+    @app.route("/account/apps")
+    @login_required
+    def account_apps():
+        user_apps = (
+            App.query
+            .filter_by(owner_id=current_user.id)
+            .order_by(App.created_at.desc())
+            .all()
+        )
+
+        return render_template(
+            "account1.html",
+            apps=user_apps
+        )
+
 
     @app.route("/api/apps/<uuid:app_id>/edit", methods=["GET"])
     @login_required
