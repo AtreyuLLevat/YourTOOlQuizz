@@ -108,7 +108,11 @@ class App(db.Model):
     # Relaciones
     owner = db.relationship("User", foreign_keys=[owner_id])
     team_members = db.relationship("TeamMember", back_populates="app", cascade="all, delete-orphan")
-    reviews = db.relationship("Review", backref="app", cascade="all, delete-orphan")
+    reviews = db.relationship(
+        "Review",
+        back_populates="app",
+        cascade="all, delete-orphan"
+    )
     group_members = db.relationship("GroupMember", back_populates="app")
     group_messages = db.relationship("GroupMessage", back_populates="app", cascade="all, delete-orphan")
     communities = db.relationship("Community", back_populates="app", cascade="all, delete-orphan")
@@ -157,16 +161,27 @@ class Review(db.Model):
     __tablename__ = "reviews"
     
     id = db.Column(db.Integer, primary_key=True)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"))
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)  # nuevo campo
+
+    app_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("apps.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
+        nullable=False
+    )
+
     content = db.Column(db.Text)
     rating = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relación opcional para acceder al usuario desde la review
+    # Relaciones
     user = db.relationship("User", backref="reviews")
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
     app = db.relationship("App", back_populates="reviews")
+
 
 
 class GroupMember(db.Model):
