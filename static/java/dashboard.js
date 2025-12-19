@@ -172,25 +172,46 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      COMMUNITIES (Optimizada y SPA-ready)
   ====================================================== */
-  function renderCommunities() {
-    if(!communityListContainer) return;
-    communityListContainer.innerHTML = '';
+function renderCommunities() {
+  const list = document.querySelector('.community-list');
+  if (!list) return;
 
-    if(!currentApp.communities.length) {
-      communityListContainer.innerHTML = '<li>Sin comunidades</li>';
-      return;
-    }
+  list.innerHTML = '';
 
-    currentApp.communities.forEach(c => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `/community/${c.id}`;
-      a.textContent = c.name;
-      a.className = 'community-link';
-      li.appendChild(a);
-      communityListContainer.appendChild(li);
-    });
+  if (!currentApp.communities.length) {
+    list.innerHTML = '<li>Sin comunidades</li>';
+    return;
   }
+
+  currentApp.communities.forEach(c => {
+    const li = document.createElement('li');
+
+    // Crear enlace normal
+    const a = document.createElement('a');
+    a.href = `/community/${c.id}`;
+    a.textContent = c.name;
+    a.className = 'community-link';
+    a.style.cursor = 'pointer';
+
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+
+  // Delegación de eventos solo si quieres SPA
+  list.addEventListener('click', e => {
+    const a = e.target.closest('a.community-link');
+    if (!a) return;
+
+    // Solo prevenir si SPA está disponible
+    if (typeof openCommunityModal === 'function') {
+      e.preventDefault();
+      const communityId = a.getAttribute('href').split('/').pop();
+      openCommunityModal(communityId);
+    }
+    // Si no, deja que el enlace navegue normalmente
+  });
+}
+
 
   // Delegación de eventos para communities
   communityListContainer?.addEventListener('click', e => {
