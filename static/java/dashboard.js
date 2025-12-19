@@ -142,6 +142,35 @@ if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}
     renderReviewsAdmin();
     renderCommunities();
 
+    // Tab switching logic
+    const tabBtns = appDetailModal.querySelectorAll('.tab-btn');
+    const tabContents = appDetailModal.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active from all buttons
+        tabBtns.forEach(b => b.classList.remove('active'));
+        // Add active to clicked button
+        btn.classList.add('active');
+
+        // Hide all tab contents
+        tabContents.forEach(c => c.classList.add('hidden'));
+
+        // Show the target tab
+        const targetTab = appDetailModal.querySelector(`#${btn.dataset.tab}`);
+        if (targetTab) {
+          targetTab.classList.remove('hidden');
+        }
+      });
+    });
+
+    // Close modal on backdrop click
+    appDetailModal.addEventListener('click', e => {
+      if (e.target === appDetailModal) {
+        appDetailModal.classList.add('hidden');
+      }
+    });
+
     appDetailModal.classList.remove('hidden');
   }
 
