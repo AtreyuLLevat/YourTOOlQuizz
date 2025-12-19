@@ -244,6 +244,8 @@ class GroupMessage(db.Model):
         index=True
     )
 
+    
+
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     content = db.Column(db.Text, nullable=False)
@@ -251,7 +253,10 @@ class GroupMessage(db.Model):
 
     community = db.relationship("Community", back_populates="messages")
     user = db.relationship("User")
-
+    app = db.relationship(
+        "App",
+        back_populates="group_messages"
+    )
     
 
 # -------------------------
