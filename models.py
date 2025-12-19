@@ -113,7 +113,11 @@ class App(db.Model):
         back_populates="app",
         cascade="all, delete-orphan"
     )
-    group_members = db.relationship("GroupMember", back_populates="app")
+    group_members = db.relationship(
+        "GroupMember",
+        back_populates="app",
+        cascade="all, delete-orphan"
+    )
     group_messages = db.relationship(
         "GroupMessage",
         back_populates="app",
@@ -218,7 +222,7 @@ class GroupMember(db.Model):
     community = db.relationship("Community", back_populates="members")
     app = db.relationship(
         "App",
-        back_populates="group_messages"
+        back_populates="group_members"  # ✅ CORRECTO
     )
     user = db.relationship("User")
 
