@@ -685,10 +685,10 @@ def create_app():
     def preview():
         return render_template('Preview.html')
 
-    @app.route('/chat')
+    @app.route('/community')
     @login_required
-    def chat():
-        return render_template('chat.html')
+    def community():
+        return render_template('community.html')
 
 
     @app.route('/quizzproductividad', methods=['GET', 'POST'])
