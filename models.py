@@ -112,7 +112,6 @@ class App(db.Model):
     group_members = db.relationship("GroupMember", back_populates="app")
     group_messages = db.relationship("GroupMessage", back_populates="app", cascade="all, delete-orphan")
     communities = db.relationship("Community", back_populates="app", cascade="all, delete-orphan")
-    reviews = db.relationship("Review", back_populates="app", cascade="all, delete-orphan")
 
     # Relación muchos a muchos con tags
     tags = db.relationship("Tag", secondary="app_tags", back_populates="apps")
@@ -174,44 +173,60 @@ class GroupMember(db.Model):
     __tablename__ = "group_members"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
-    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)  # <-- esto
+
+    community_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("communities.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    app_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("apps.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    is_verified = db.Column(db.Boolean, default=False)
-    verification_method = db.Column(db.String(50))
-    account_username = db.Column(db.String(150))
-    usage_count = db.Column(db.Integer, default=0)
-    last_used_at = db.Column(db.DateTime)
-    interests_data = db.Column(JSON)
+
     is_active = db.Column(db.Boolean, default=True)
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relaciones
-    app = db.relationship("App", back_populates="group_members")
+    community = db.relationship("Community", back_populates="members")
+    app = db.relationship("App")
     user = db.relationship("User")
-    community = db.relationship("Community", back_populates="members")  
+
 # -------------------------
 # MENSAJES GRUPALES
 # -------------------------
 class GroupMessage(db.Model):
     __tablename__ = "group_messages"
-    
-    id = db.Column(UUID(as_uuid=True), primary_key=True)
-    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
-    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    message_type = db.Column(db.String(20), default='user')  # admin / user / poll
-    poll_question = db.Column(db.String(500))
-    poll_options = db.Column(JSON)
-    is_pinned = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-    # Relaciones
-    user = db.relationship("User")
-    app = db.relationship("App", back_populates="group_messages")
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
+    community_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("communities.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    app_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("apps.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     community = db.relationship("Community", back_populates="messages")
+    user = db.relationship("User")
+
     
 
 # -------------------------
