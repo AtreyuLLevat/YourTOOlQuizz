@@ -601,22 +601,29 @@ def create_app():
             }
         })
 
-
     @app.route("/community/<uuid:community_id>")
     @login_required
     def community_view(community_id):
         community = Community.query.get_or_404(community_id)
 
-        # comprobar que el usuario pertenece (opcional ahora)
+        # Comprobar si el usuario ya es miembro activo
         member = GroupMember.query.filter_by(
             community_id=community.id,
-            user_id=current_user.id,
-            is_active=True
+            user_id=current_user.id
         ).first()
 
+        # Si no existe, añadirlo automáticamente como miembro activo
         if not member:
-            abort(403)
+            member = GroupMember(
+                community_id=community.id,
+                user_id=current_user.id,
+                app_id=community.app_id,
+                is_active=True
+            )
+            db.session.add(member)
+            db.session.commit()
 
+        # Cargar los últimos mensajes de la comunidad
         messages = (
             GroupMessage.query
             .filter_by(community_id=community.id)
@@ -630,12 +637,13 @@ def create_app():
             community=community,
             messages=messages
         )
+
     
     @socketio.on("join_community")
     def join_community(data):
         room = f"community_{data['community_id']}"
         join_room(room)
-        
+
     @socketio.on("send_message")
     @login_required
     def send_message(data):
