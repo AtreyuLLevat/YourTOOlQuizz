@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
-  const communityListContainer = document.querySelector('.community-list');
 
   /* ======================================================
      MODAL CREAR APP
@@ -172,11 +171,28 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      COMMUNITIES (SPA-ready)
   ====================================================== */
+const communityListContainer = document.querySelector('.community-list');
+if (communityListContainer) {
+  communityListContainer.addEventListener('click', e => {
+    const a = e.target.closest('a.community-link');
+    if (!a) return;
+
+    e.preventDefault();
+    const communityId = a.getAttribute('href').split('/').pop();
+
+    if (typeof openCommunityModal === 'function') {
+      openCommunityModal(communityId);
+    } else {
+      window.location.href = `/community/${communityId}`;
+    }
+  });
+}
+
+// Renderizado de enlaces
 function renderCommunities() {
   const list = document.querySelector('.community-list');
   if (!list) return;
 
-  // Limpiar lista
   list.innerHTML = '';
 
   if (!currentApp.communities.length) {
@@ -184,10 +200,8 @@ function renderCommunities() {
     return;
   }
 
-  // Crear los elementos li + a
   currentApp.communities.forEach(c => {
     const li = document.createElement('li');
-
     const a = document.createElement('a');
     a.href = `/community/${c.id}`;
     a.textContent = c.name;
@@ -197,25 +211,6 @@ function renderCommunities() {
     li.appendChild(a);
     list.appendChild(li);
   });
-
-  // Delegación de eventos: funciona para enlaces existentes y futuros
-  if (!list.dataset.listenerAttached) {
-    list.addEventListener('click', e => {
-      const a = e.target.closest('a.community-link');
-      if (!a) return;
-
-      e.preventDefault();
-      const communityId = a.getAttribute('href').split('/').pop();
-
-      if (typeof openCommunityModal === 'function') {
-        openCommunityModal(communityId);
-      } else {
-        window.location.href = `/community/${communityId}`;
-      }
-    });
-
-    list.dataset.listenerAttached = 'true'; // Evita múltiples listeners
-  }
 }
 
 
