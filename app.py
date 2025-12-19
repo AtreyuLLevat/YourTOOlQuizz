@@ -601,7 +601,69 @@ def create_app():
             }
         })
 
+
+    @app.route("/community/<uuid:community_id>")
+    @login_required
+    def community_view(community_id):
+        community = Community.query.get_or_404(community_id)
+
+        # comprobar que el usuario pertenece (opcional ahora)
+        member = GroupMember.query.filter_by(
+            community_id=community.id,
+            user_id=current_user.id,
+            is_active=True
+        ).first()
+
+        if not member:
+            abort(403)
+
+        messages = (
+            GroupMessage.query
+            .filter_by(community_id=community.id)
+            .order_by(GroupMessage.created_at.asc())
+            .limit(100)
+            .all()
+        )
+
+        return render_template(
+            "community.html",
+            community=community,
+            messages=messages
+        )
     
+    @socketio.on("join_community")
+    def join_community(data):
+        room = f"community_{data['community_id']}"
+        join_room(room)
+        
+    @socketio.on("send_message")
+    @login_required
+    def send_message(data):
+        community_id = data["community_id"]
+        content = data["content"]
+
+        msg = GroupMessage(
+            id=uuid.uuid4(),
+            community_id=community_id,
+            app_id=current_user.id,  # O saca la app desde la comunidad
+            user_id=current_user.id,
+            content=content,
+            message_type="user"
+        )
+
+        db.session.add(msg)
+        db.session.commit()
+
+        emit(
+            "new_message",
+            {
+                "user": current_user.name,
+                "content": content
+            },
+            room=f"community_{community_id}"
+        )
+
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')

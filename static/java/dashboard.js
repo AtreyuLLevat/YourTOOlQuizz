@@ -214,11 +214,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    currentApp.communities.forEach(c => {
-      const li = document.createElement('li');
-      li.textContent = c.name;
-      list.appendChild(li);
-    });
+currentApp.communities.forEach(c => {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    <a href="/community/${c.id}">
+      ${c.name}
+    </a>
+  `;
+  list.appendChild(li);
+});
   }
 
   addCommunityBtn?.addEventListener('click', () => {

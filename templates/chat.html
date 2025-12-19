@@ -355,93 +355,185 @@
 </head>
 <body>
     <!-- Sidebar de Información del Grupo -->
-    <div class="group-sidebar">
-        <div class="group-header">
-            <div class="group-logo"></div>
-            <div class="group-name">{{ app_name }}</div>
-            <div class="group-members">{{ member_count }} miembros</div>
+ <div class="group-sidebar">
+    <div class="group-header">
+        <div class="group-logo"></div>
+        <div class="group-name">{{ community.name }}</div>
+        <div class="group-members">{{ member_count }} miembros</div>
+    </div>
+
+    <div class="group-info">
+        <div class="info-section">
+            <div class="section-title">Información del Grupo</div>
+            <div class="info-item">
+                <span>Administrador</span>
+                <span>{{ admin_name }}</span>
+            </div>
+            <div class="info-item">
+                <span>Usuarios activos</span>
+                <span>{{ active_users }}</span>
+            </div>
         </div>
 
-        <div class="group-info">
-            <div class="info-section">
-                <div class="section-title">Información del Grupo</div>
-                <div class="info-item">
-                    <span>Administrador</span>
-                    <span>{{ admin_name }}</span>
+        {% if current_user.is_admin %}
+        <div class="info-section">
+            <div class="section-title">Acciones de Administrador</div>
+            <div class="admin-actions">
+                <div class="admin-btn" id="create-poll-btn">
+                    <i>📊</i> Crear Encuesta
                 </div>
-                <div class="info-item">
-                    <span>Usuarios activos</span>
-                    <span>{{ active_users }}</span>
+                <div class="admin-btn" id="announcement-btn">
+                    <i>📢</i> Hacer Anuncio
                 </div>
-                <div class="info-item">
-                    <span>Valoración</span>
-                    <div class="rating-stars">
-                        <span class="star" data-rating="1">★</span>
-                        <span class="star" data-rating="2">★</span>
-                        <span class="star" data-rating="3">★</span>
-                        <span class="star" data-rating="4">★</span>
-                        <span class="star" data-rating="5">★</span>
-                    </div>
+                <div class="admin-btn" id="stats-btn">
+                    <i>📈</i> Ver Estadísticas
                 </div>
             </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
-            {% if current_user.is_admin %}
-            <div class="info-section">
-                <div class="section-title">Acciones de Administrador</div>
-                <div class="admin-actions">
-                    <div class="admin-btn" id="create-poll-btn">
-                        <i>📊</i> Crear Encuesta
-                    </div>
-                    <div class="admin-btn" id="announcement-btn">
-                        <i>📢</i> Hacer Anuncio
-                    </div>
-                    <div class="admin-btn" id="stats-btn">
-                        <i>📈</i> Ver Estadísticas
-                    </div>
+<!-- Área Principal del Chat -->
+<div class="chat-area">
+    <div class="chat-header">
+        <div class="chat-title">Chat de la Comunidad {{ community.name }}</div>
+        <div class="user-status">
+            <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.is_admin else "Usuario" }}
+        </div>
+    </div>
+
+    <div class="chat-messages" id="messages">
+        {% for msg in messages %}
+            {% if msg.message_type == 'admin' %}
+            <div class="admin-message">
+                <div class="admin-header">
+                    <span class="admin-badge">ADMIN</span>
+                    <span class="admin-name">{{ msg.user.name }}</span>
                 </div>
+                <div class="message-content">{{ msg.content }}</div>
+            </div>
+            {% elif msg.message_type == 'poll' %}
+            <div class="poll-message">
+                <div class="poll-question">{{ msg.content }}</div>
+                <div class="poll-options">
+                    {% for option in msg.poll_options %}
+                    <div class="poll-option" data-poll-id="{{ msg.id }}" data-option-id="{{ loop.index0 }}">{{ option }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="user-message">
+                <div class="user-name">{{ msg.user.name }}</div>
+                <div class="message-content">{{ msg.content }}</div>
             </div>
             {% endif %}
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- Área Principal del Chat -->
-    <div class="chat-area">
-        <div class="chat-header">
-            <div class="chat-title">Chat de la Comunidad {{ app_name }}</div>
-            <div class="user-status">
-                <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.is_admin else "Usuario" }}
-            </div>
+    <div class="chat-input">
+        <div class="user-input">
+            <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+            <button id="send-btn">Enviar</button>
         </div>
 
-        <div class="chat-messages" id="messages">
-            <!-- Los mensajes se cargan aquí -->
+        {% if current_user.is_admin %}
+        <div class="admin-input" id="admin-input">
+            <button id="send-poll">Enviar como Encuesta</button>
+            <button id="send-announcement">Enviar como Anuncio</button>
+            <button id="cancel-admin">Cancelar</button>
         </div>
-
-        <div class="chat-input">
-            <div class="user-input">
-                <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
-                <button id="send-btn">Enviar</button>
-            </div>
-            
-            {% if current_user.is_admin %}
-            <div class="admin-input" id="admin-input">
-                <button id="send-poll">Enviar como Encuesta</button>
-                <button id="send-announcement">Enviar como Anuncio</button>
-                <button id="cancel-admin">Cancelar</button>
-            </div>
-            {% endif %}
-        </div>
+        {% endif %}
     </div>
+</div>
 
-    <!-- Datos de la aplicación -->
-    <div id="app-data" 
-         data-app-id="{{ app_id }}"
-         data-user-id="{{ current_user.id }}"
-         data-user-name="{{ current_user.name }}"
-         data-is-admin="{{ 'true' if current_user.is_admin else 'false' }}">
-    </div>
+<!-- Datos de la Comunidad -->
+<div id="community-data"
+     data-community-id="{{ community.id }}"
+     data-user-id="{{ current_user.id }}"
+     data-user-name="{{ current_user.name }}"
+     data-is-admin="{{ 'true' if current_user.is_admin else 'false' }}">
+</div>
 
-    <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='java/group_chat.js') }}"></script>
+<script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
+<script>
+const socket = io();
+const communityData = document.getElementById('community-data');
+const communityId = communityData.dataset.communityId;
+const userId = communityData.dataset.userId;
+const userName = communityData.dataset.userName;
+const isAdmin = communityData.dataset.isAdmin === 'true';
+
+socket.emit("join_community", { community_id: communityId });
+
+// Enviar mensaje normal
+document.getElementById("send-btn").onclick = () => {
+    const input = document.getElementById("message-input");
+    if (!input.value.trim()) return;
+
+    socket.emit("send_message", {
+        community_id: communityId,
+        content: input.value,
+        message_type: 'user'
+    });
+
+    input.value = "";
+};
+
+// Recibir mensajes
+socket.on("new_message", data => {
+    const div = document.createElement("div");
+    if(data.message_type === 'admin'){
+        div.className = 'admin-message';
+        div.innerHTML = `<div class="admin-header"><span class="admin-badge">ADMIN</span><span class="admin-name">${data.user}</span></div>
+                         <div class="message-content">${data.content}</div>`;
+    } else if(data.message_type === 'poll'){
+        div.className = 'poll-message';
+        let optionsHtml = '';
+        data.options.forEach((opt, idx) => {
+            optionsHtml += `<div class="poll-option" data-poll-id="${data.id}" data-option-id="${idx}">${opt}</div>`;
+        });
+        div.innerHTML = `<div class="poll-question">${data.content}</div>
+                         <div class="poll-options">${optionsHtml}</div>`;
+    } else {
+        div.className = 'user-message';
+        div.innerHTML = `<div class="user-name">${data.user}</div><div class="message-content">${data.content}</div>`;
+    }
+
+    document.getElementById("messages").appendChild(div);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+});
+
+// Opciones de admin
+if(isAdmin){
+    document.getElementById("create-poll-btn").onclick = () => document.getElementById("admin-input").classList.add('show');
+    document.getElementById("cancel-admin").onclick = () => document.getElementById("admin-input").classList.remove('show');
+
+    document.getElementById("send-poll").onclick = () => {
+        const input = document.getElementById("message-input");
+        if(!input.value.trim()) return;
+        socket.emit("send_message", {
+            community_id: communityId,
+            content: input.value,
+            message_type: 'poll',
+            options: ['Opción 1', 'Opción 2'] // puedes generar dinámicamente
+        });
+        input.value = "";
+        document.getElementById("admin-input").classList.remove('show');
+    };
+
+    document.getElementById("send-announcement").onclick = () => {
+        const input = document.getElementById("message-input");
+        if(!input.value.trim()) return;
+        socket.emit("send_message", {
+            community_id: communityId,
+            content: input.value,
+            message_type: 'admin'
+        });
+        input.value = "";
+        document.getElementById("admin-input").classList.remove('show');
+    };
+}
+</script>
 </body>
 </html>
