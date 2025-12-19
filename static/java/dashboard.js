@@ -126,10 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!appDetailModal) return;
     appDetailModal.dataset.appId = appId;
 
-    appDetailModal.querySelector('.app-name')?.textContent = currentApp.name || '---';
-    appDetailModal.querySelector('.app-description')?.textContent = currentApp.description || '---';
-    appDetailModal.querySelector('.app-date')?.textContent = currentApp.creation_date || '---';
-    appDetailModal.querySelector('.app-theme')?.textContent = `Tema: ${currentApp.theme || 'General'}`;
+const appNameEl = appDetailModal.querySelector('.app-name');
+if (appNameEl) appNameEl.textContent = currentApp.name || '---';
+
+const appDescEl = appDetailModal.querySelector('.app-description');
+if (appDescEl) appDescEl.textContent = currentApp.description || '---';
+
+const appDateEl = appDetailModal.querySelector('.app-date');
+if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
+
+const appThemeEl = appDetailModal.querySelector('.app-theme');
+if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
+
 
     renderReviewsAdmin();
     renderCommunities();
