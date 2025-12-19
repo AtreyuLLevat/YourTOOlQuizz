@@ -176,32 +176,48 @@ function renderCommunities() {
   const list = document.querySelector('.community-list');
   if (!list) return;
 
+  // Limpiar lista
   list.innerHTML = '';
+
   if (!currentApp.communities.length) {
     list.innerHTML = '<li>Sin comunidades</li>';
     return;
   }
 
+  // Crear los elementos li + a
   currentApp.communities.forEach(c => {
     const li = document.createElement('li');
+
     const a = document.createElement('a');
     a.href = `/community/${c.id}`;
     a.textContent = c.name;
     a.className = 'community-link';
+    a.style.cursor = 'pointer';
+
     li.appendChild(a);
     list.appendChild(li);
   });
+
+  // Delegación de eventos: funciona para enlaces existentes y futuros
+  if (!list.dataset.listenerAttached) {
+    list.addEventListener('click', e => {
+      const a = e.target.closest('a.community-link');
+      if (!a) return;
+
+      e.preventDefault();
+      const communityId = a.getAttribute('href').split('/').pop();
+
+      if (typeof openCommunityModal === 'function') {
+        openCommunityModal(communityId);
+      } else {
+        window.location.href = `/community/${communityId}`;
+      }
+    });
+
+    list.dataset.listenerAttached = 'true'; // Evita múltiples listeners
+  }
 }
 
-// Delegación de eventos (fuera de render)
-document.querySelector('.community-list')?.addEventListener('click', e => {
-  const a = e.target.closest('a.community-link');
-  if (!a) return;
-  e.preventDefault();
-  const communityId = a.getAttribute('href').split('/').pop();
-  if (typeof openCommunityModal === 'function') openCommunityModal(communityId);
-  else window.location.href = `/community/${communityId}`;
-});
 
 
   /* ======================================================
