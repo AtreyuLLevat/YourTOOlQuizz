@@ -25,13 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
+  const communityListContainer = document.querySelector('.community-list');
 
   /* ======================================================
      MODAL CREAR APP
   ====================================================== */
   newAppBtn?.addEventListener('click', () => createAppModal.classList.remove('hidden'));
   cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
-  createAppModal?.addEventListener('click', e => { if(e.target === createAppModal) createAppModal.classList.add('hidden'); });
+  createAppModal?.addEventListener('click', e => { 
+    if(e.target === createAppModal) createAppModal.classList.add('hidden'); 
+  });
 
   /* ======================================================
      AÑADIR TEAM MEMBERS
@@ -150,7 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!reviewsList || !reviewsCount) return;
 
     reviewsList.innerHTML = '';
-    if(!currentApp.reviews.length) { reviewsList.innerHTML = '<p>Sin reseñas</p>'; reviewsCount.textContent = '(0)'; return; }
+    if(!currentApp.reviews.length) { 
+      reviewsList.innerHTML = '<p>Sin reseñas</p>'; 
+      reviewsCount.textContent = '(0)'; 
+      return; 
+    }
 
     currentApp.reviews.forEach(r => {
       const div = document.createElement('div');
@@ -171,49 +178,46 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      COMMUNITIES (SPA-ready)
   ====================================================== */
-const communityListContainer = document.querySelector('.community-list');
-if (communityListContainer) {
-  communityListContainer.addEventListener('click', e => {
-    const a = e.target.closest('a.community-link');
-    if (!a) return;
+  function renderCommunities() {
+    const list = document.querySelector('.community-list');
+    if (!list) return;
 
-    e.preventDefault();
-    const communityId = a.getAttribute('href').split('/').pop();
+    list.innerHTML = '';
 
-    if (typeof openCommunityModal === 'function') {
-      openCommunityModal(communityId);
-    } else {
-      window.location.href = `/community/${communityId}`;
+    if (!currentApp.communities.length) {
+      list.innerHTML = '<li>Sin comunidades</li>';
+      return;
     }
-  });
-}
 
-// Renderizado de enlaces
-function renderCommunities() {
-  const list = document.querySelector('.community-list');
-  if (!list) return;
+    currentApp.communities.forEach(c => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `/community/${c.id}`;
+      a.textContent = c.name;
+      a.className = 'community-link';
+      a.style.cursor = 'pointer';
 
-  list.innerHTML = '';
-
-  if (!currentApp.communities.length) {
-    list.innerHTML = '<li>Sin comunidades</li>';
-    return;
+      li.appendChild(a);
+      list.appendChild(li);
+    });
   }
 
-  currentApp.communities.forEach(c => {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.href = `/community/${c.id}`;
-    a.textContent = c.name;
-    a.className = 'community-link';
-    a.style.cursor = 'pointer';
+  // Delegación global para enlaces de comunidad
+  if (communityListContainer) {
+    communityListContainer.addEventListener('click', e => {
+      const a = e.target.closest('a.community-link');
+      if (!a) return;
 
-    li.appendChild(a);
-    list.appendChild(li);
-  });
-}
+      e.preventDefault();
+      const communityId = a.getAttribute('href').split('/').pop();
 
-
+      if (typeof openCommunityModal === 'function') {
+        openCommunityModal(communityId);
+      } else {
+        window.location.href = `/community/${communityId}`;
+      }
+    });
+  }
 
   /* ======================================================
      AÑADIR COMUNIDAD
