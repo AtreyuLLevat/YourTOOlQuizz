@@ -172,35 +172,37 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      COMMUNITIES (SPA-ready)
   ====================================================== */
-  function renderCommunities() {
-    if(!communityListContainer) return;
+function renderCommunities() {
+  const list = document.querySelector('.community-list');
+  if (!list) return;
 
-    communityListContainer.innerHTML = '';
-    if(!currentApp.communities.length) { 
-      communityListContainer.innerHTML = '<li>Sin comunidades</li>'; 
-      return; 
-    }
-
-    currentApp.communities.forEach(c => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `/community/${c.id}`;
-      a.textContent = c.name;
-      a.className = 'community-link';
-      li.appendChild(a);
-      communityListContainer.appendChild(li);
-    });
+  list.innerHTML = '';
+  if (!currentApp.communities.length) {
+    list.innerHTML = '<li>Sin comunidades</li>';
+    return;
   }
 
-  // Delegación global para communities
-  communityListContainer?.addEventListener('click', e => {
-    const a = e.target.closest('a.community-link');
-    if(!a) return;
-    e.preventDefault();
-    const communityId = a.getAttribute('href').split('/').pop();
-    if(typeof openCommunityModal === 'function') openCommunityModal(communityId);
-    else window.location.href = `/community/${communityId}`;
+  currentApp.communities.forEach(c => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = `/community/${c.id}`;
+    a.textContent = c.name;
+    a.className = 'community-link';
+    li.appendChild(a);
+    list.appendChild(li);
   });
+}
+
+// Delegación de eventos (fuera de render)
+document.querySelector('.community-list')?.addEventListener('click', e => {
+  const a = e.target.closest('a.community-link');
+  if (!a) return;
+  e.preventDefault();
+  const communityId = a.getAttribute('href').split('/').pop();
+  if (typeof openCommunityModal === 'function') openCommunityModal(communityId);
+  else window.location.href = `/community/${communityId}`;
+});
+
 
   /* ======================================================
      AÑADIR COMUNIDAD
