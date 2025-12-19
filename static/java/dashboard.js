@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
      ESTADO GLOBAL
   ====================================================== */
   let currentApp = null;
+  window.currentApp = currentApp; // para depuración
 
   /* ======================================================
      VARIABLES
@@ -74,17 +75,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       if(!data.success) return alert(data.message || 'Error');
 
+      // Crear botón dinámico con delegación
       const btn = document.createElement('button');
       btn.className = 'app-item';
       btn.dataset.appId = data.app.id;
       btn.innerHTML = `<img src="${data.app.image_url}" class="app-img"><span class="app-name">${data.app.name}</span>`;
-      btn.onclick = () => openAppDetail(data.app.id);
-
       appsList.prepend(btn);
+
       createAppForm.reset();
       teamContainer.innerHTML = '';
       createAppModal.classList.add('hidden');
-
     } catch {
       alert('Error de red');
     }
@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!data.success) throw new Error();
     data.app.reviews ||= [];
     data.app.communities ||= [];
+    data.app.team_members ||= [];
     return data.app;
   }
 
@@ -106,8 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
      ABRIR MODAL APP
   ====================================================== */
   async function openAppDetail(appId) {
-    try { currentApp = await fetchAppData(appId); } 
-    catch { return alert('Error cargando app'); }
+    try { 
+      currentApp = await fetchAppData(appId); 
+      window.currentApp = currentApp; // actualizar referencia global
+    } catch { return alert('Error cargando app'); }
 
     if(!appDetailModal) return;
     appDetailModal.dataset.appId = appId;
@@ -123,10 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if(appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
     if(appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
 
-    // TEAM MEMBERS
     if(teamContainerEl) {
       teamContainerEl.innerHTML = '';
-      if(!currentApp.team_members?.length) teamContainerEl.innerHTML = '<p>Sin miembros</p>';
+      if(!currentApp.team_members.length) teamContainerEl.innerHTML = '<p>Sin miembros</p>';
       else currentApp.team_members.forEach(m => {
         const div = document.createElement('div');
         div.textContent = `${m.name} - ${m.role || ''}`;
@@ -149,7 +151,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!reviewsList || !reviewsCount) return;
 
     reviewsList.innerHTML = '';
-    if(!currentApp.reviews.length) { reviewsList.innerHTML = '<p>Sin reseñas</p>'; reviewsCount.textContent = '(0)'; return; }
+    if(!currentApp.reviews.length) { 
+      reviewsList.innerHTML = '<p>Sin reseñas</p>'; 
+      reviewsCount.textContent = '(0)'; 
+      return; 
+    }
 
     currentApp.reviews.forEach(r => {
       const div = document.createElement('div');
@@ -168,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES (SPA-ready con delegación global)
+     COMMUNITIES
   ====================================================== */
   function renderCommunities() {
     const list = document.querySelector('.community-list');
@@ -191,31 +197,21 @@ document.addEventListener('DOMContentLoaded', () => {
       li.appendChild(a);
       list.appendChild(li);
     });
-
-    // Delegación: un solo listener para todos los enlaces
-    attachCommunityListener();
   }
 
-  function attachCommunityListener() {
-    const list = document.querySelector('.community-list');
-    if (!list || list.dataset.listenerAttached) return;
+  // Delegación global para comunidades
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a.community-link');
+    if(!a) return;
 
-    list.addEventListener('click', e => {
-      const a = e.target.closest('a.community-link');
-      if (!a) return;
-
-      e.preventDefault();
-      const communityId = a.getAttribute('href').split('/').pop();
-
-      if (typeof openCommunityModal === 'function') {
-        openCommunityModal(communityId);
-      } else {
-        window.location.href = `/community/${communityId}`;
-      }
-    });
-
-    list.dataset.listenerAttached = 'true';
-  }
+    e.preventDefault();
+    const communityId = a.href.split('/').pop();
+    if(typeof openCommunityModal === 'function') {
+      openCommunityModal(communityId);
+    } else {
+      window.location.href = `/community/${communityId}`;
+    }
+  });
 
   /* ======================================================
      AÑADIR COMUNIDAD
@@ -253,19 +249,17 @@ document.addEventListener('DOMContentLoaded', () => {
   closeAppDetail?.addEventListener('click', () => { 
     appDetailModal.classList.add('hidden'); 
     currentApp = null; 
+    window.currentApp = null;
   });
 
   /* ======================================================
-     LISTENERS PARA APPS
+     LISTENER DINÁMICO PARA APPS
   ====================================================== */
-  document.querySelectorAll('.app-item').forEach(btn => {
-    btn.addEventListener('click', () => { 
-      const appId = btn.dataset.appId; 
-      if(appId) openAppDetail(appId);
-    });
+  appsList?.addEventListener('click', e => {
+    const btn = e.target.closest('.app-item');
+    if(!btn) return;
+    const appId = btn.dataset.appId;
+    if(appId) openAppDetail(appId);
   });
-
-  // Inicializamos delegación aunque no haya comunidades todavía
-  attachCommunityListener();
 
 });
