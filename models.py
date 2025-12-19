@@ -114,7 +114,11 @@ class App(db.Model):
         cascade="all, delete-orphan"
     )
     group_members = db.relationship("GroupMember", back_populates="app")
-    group_messages = db.relationship("GroupMessage", back_populates="app", cascade="all, delete-orphan")
+    group_messages = db.relationship(
+        "GroupMessage",
+        back_populates="app",
+        cascade="all, delete-orphan"
+    )
     communities = db.relationship("Community", back_populates="app", cascade="all, delete-orphan")
 
     # Relación muchos a muchos con tags
@@ -180,7 +184,10 @@ class Review(db.Model):
 
     # Relaciones
     user = db.relationship("User", backref="reviews")
-    app = db.relationship("App", back_populates="reviews")
+    app = db.relationship(
+        "App",
+        back_populates="reviews"
+    )
 
 
 
@@ -209,7 +216,10 @@ class GroupMember(db.Model):
     joined_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     community = db.relationship("Community", back_populates="members")
-    app = db.relationship("App")
+    app = db.relationship(
+        "App",
+        back_populates="group_messages"
+    )
     user = db.relationship("User")
 
 # -------------------------
