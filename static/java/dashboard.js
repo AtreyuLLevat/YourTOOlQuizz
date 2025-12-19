@@ -25,22 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
+  const communityListContainer = document.querySelector('.community-list');
+
   /* ======================================================
      MODAL CREAR APP
   ====================================================== */
-  newAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.remove('hidden');
-  });
-
-  cancelAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.add('hidden');
-  });
-
-  createAppModal?.addEventListener('click', (e) => {
-    if (e.target === createAppModal) {
-      createAppModal.classList.add('hidden');
-    }
-  });
+  newAppBtn?.addEventListener('click', () => createAppModal.classList.remove('hidden'));
+  cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
+  createAppModal?.addEventListener('click', e => { if(e.target === createAppModal) createAppModal.classList.add('hidden'); });
 
   /* ======================================================
      AÑADIR TEAM MEMBERS
@@ -61,15 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      CREAR APP
   ====================================================== */
-  createAppForm?.addEventListener('submit', async (e) => {
+  createAppForm?.addEventListener('submit', async e => {
     e.preventDefault();
-
     const formData = new FormData(createAppForm);
     const members = [];
 
     document.querySelectorAll('.team-member-entry').forEach(div => {
       const inputs = div.querySelectorAll('input');
-      if (inputs[0].value.trim()) {
+      if(inputs[0].value.trim()) {
         members.push({
           name: inputs[0].value.trim(),
           role: inputs[1].value.trim(),
@@ -81,25 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append('members_json', JSON.stringify(members));
 
     try {
-      const res = await fetch('/account/create_app', {
-        method: 'POST',
-        body: formData
-      });
-
+      const res = await fetch('/account/create_app', { method: 'POST', body: formData });
       const data = await res.json();
-      if (!data.success) return alert(data.message || 'Error');
+      if(!data.success) return alert(data.message || 'Error');
 
       const btn = document.createElement('button');
       btn.className = 'app-item';
       btn.dataset.appId = data.app.id;
-      btn.innerHTML = `
-        <img src="${data.app.image_url}" class="app-img">
-        <span class="app-name">${data.app.name}</span>
-      `;
+      btn.innerHTML = `<img src="${data.app.image_url}" class="app-img"><span class="app-name">${data.app.name}</span>`;
       btn.onclick = () => openAppDetail(data.app.id);
 
       appsList.prepend(btn);
-
       createAppForm.reset();
       teamContainer.innerHTML = '';
       createAppModal.classList.add('hidden');
@@ -115,25 +98,20 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchAppData(appId) {
     const res = await fetch(`/account/get_app/${appId}`);
     const data = await res.json();
-    if (!data.success) throw new Error();
+    if(!data.success) throw new Error();
     data.app.reviews ||= [];
     data.app.communities ||= [];
     return data.app;
   }
 
   /* ======================================================
-     ABRIR MODAL APP (CORREGIDO)
+     ABRIR MODAL APP
   ====================================================== */
   async function openAppDetail(appId) {
-    try {
-      currentApp = await fetchAppData(appId);
-    } catch {
-      return alert('Error cargando app');
-    }
+    try { currentApp = await fetchAppData(appId); } 
+    catch { return alert('Error cargando app'); }
 
-    if (!appDetailModal) return;
-
-    // Guardar appId de forma robusta
+    if(!appDetailModal) return;
     appDetailModal.dataset.appId = appId;
 
     const appNameEl = appDetailModal.querySelector('.app-name');
@@ -142,23 +120,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const appThemeEl = appDetailModal.querySelector('.app-theme');
     const teamContainerEl = appDetailModal.querySelector('#team-members-container');
 
-    if (appNameEl) appNameEl.textContent = currentApp.name || '---';
-    if (appDescEl) appDescEl.textContent = currentApp.description || '---';
-    if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
-    if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
+    if(appNameEl) appNameEl.textContent = currentApp.name || '---';
+    if(appDescEl) appDescEl.textContent = currentApp.description || '---';
+    if(appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
+    if(appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
 
     // TEAM MEMBERS
-    if (teamContainerEl) {
+    if(teamContainerEl) {
       teamContainerEl.innerHTML = '';
-      if (!currentApp.team_members || !currentApp.team_members.length) {
-        teamContainerEl.innerHTML = '<p>Sin miembros</p>';
-      } else {
-        currentApp.team_members.forEach(m => {
-          const div = document.createElement('div');
-          div.textContent = `${m.name} - ${m.role || ''}`;
-          teamContainerEl.appendChild(div);
-        });
-      }
+      if(!currentApp.team_members?.length) teamContainerEl.innerHTML = '<p>Sin miembros</p>';
+      else currentApp.team_members.forEach(m => {
+        const div = document.createElement('div');
+        div.textContent = `${m.name} - ${m.role || ''}`;
+        teamContainerEl.appendChild(div);
+      });
     }
 
     renderReviewsAdmin();
@@ -173,16 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderReviewsAdmin() {
     const reviewsList = document.getElementById('reviews-list');
     const reviewsCount = document.querySelector('.reviews-count');
-
-    if (!reviewsList || !reviewsCount) return;
+    if(!reviewsList || !reviewsCount) return;
 
     reviewsList.innerHTML = '';
-
-    if (!currentApp.reviews.length) {
-      reviewsList.innerHTML = '<p>Sin reseñas</p>';
-      reviewsCount.textContent = '(0)';
-      return;
-    }
+    if(!currentApp.reviews.length) { reviewsList.innerHTML = '<p>Sin reseñas</p>'; reviewsCount.textContent = '(0)'; return; }
 
     currentApp.reviews.forEach(r => {
       const div = document.createElement('div');
@@ -201,56 +170,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES
+     COMMUNITIES (Optimizada y SPA-ready)
   ====================================================== */
   function renderCommunities() {
-    const list = document.querySelector('.community-list');
-    if (!list) return;
+    if(!communityListContainer) return;
+    communityListContainer.innerHTML = '';
 
-    list.innerHTML = ''; // limpiar lista
-
-    if (!currentApp.communities.length) {
-      list.innerHTML = '<li>Sin comunidades</li>';
+    if(!currentApp.communities.length) {
+      communityListContainer.innerHTML = '<li>Sin comunidades</li>';
       return;
     }
 
     currentApp.communities.forEach(c => {
       const li = document.createElement('li');
-
-      // Crear el enlace real
       const a = document.createElement('a');
       a.href = `/community/${c.id}`;
       a.textContent = c.name;
       a.className = 'community-link';
-      a.style.cursor = 'pointer'; // opcional: para que parezca clicable
-
-      // SPA: abrir modal o ir a página sin recargar
-      a.addEventListener('click', (e) => {
-        e.preventDefault(); // evita recarga de página
-        // Aquí decides si quieres SPA o navegación directa
-        if (typeof openCommunityModal === 'function') {
-          openCommunityModal(c.id); // tu función para abrir la comunidad en modal
-        } else {
-          window.location.href = `/community/${c.id}`; // fallback: navegar a página real
-        }
-      });
-
       li.appendChild(a);
-      list.appendChild(li);
+      communityListContainer.appendChild(li);
     });
   }
 
-
-  addCommunityBtn?.addEventListener('click', () => {
-    addCommunityForm.classList.toggle('hidden');
+  // Delegación de eventos para communities
+  communityListContainer?.addEventListener('click', e => {
+    const a = e.target.closest('a.community-link');
+    if(!a) return;
+    e.preventDefault();
+    const communityId = a.getAttribute('href').split('/').pop();
+    if(typeof openCommunityModal === 'function') openCommunityModal(communityId);
+    else window.location.href = `/community/${communityId}`;
   });
+
+  /* ======================================================
+     AÑADIR COMUNIDAD
+  ====================================================== */
+  addCommunityBtn?.addEventListener('click', () => addCommunityForm.classList.toggle('hidden'));
 
   saveCommunityBtn?.addEventListener('click', async () => {
     const name = communityNameInput.value.trim();
-    if (!name) return alert('Nombre obligatorio');
-
+    if(!name) return alert('Nombre obligatorio');
     const appId = appDetailModal?.dataset.appId;
-    if (!appId) return alert('App no válida');
+    if(!appId) return alert('App no válida');
 
     try {
       const res = await fetch(`/apps/${appId}/create_community`, {
@@ -258,16 +219,14 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
       });
-
       const data = await res.json();
-      if (!data.success) return alert(data.error);
+      if(!data.success) return alert(data.error);
 
       currentApp.communities.push(data.community);
       renderCommunities();
 
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
-
     } catch {
       alert('Error de red');
     }
@@ -276,18 +235,16 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      CERRAR MODAL
   ====================================================== */
-  closeAppDetail?.addEventListener('click', () => {
-    appDetailModal.classList.add('hidden');
-    currentApp = null;
+  closeAppDetail?.addEventListener('click', () => { appDetailModal.classList.add('hidden'); currentApp = null; });
+
+  /* ======================================================
+     LISTENERS PARA APPS
+  ====================================================== */
+  document.querySelectorAll('.app-item').forEach(btn => {
+    btn.addEventListener('click', () => { 
+      const appId = btn.dataset.appId; 
+      if(appId) openAppDetail(appId);
+    });
   });
 
-
-document.querySelectorAll('.app-item').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const appId = btn.dataset.appId;
-    if (appId) {
-      openAppDetail(appId);
-    }
-  });
 });
-})
