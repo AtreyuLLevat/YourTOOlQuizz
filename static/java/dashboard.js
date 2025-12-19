@@ -25,16 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
-  const communityListContainer = document.querySelector('.community-list');
-
   /* ======================================================
      MODAL CREAR APP
   ====================================================== */
   newAppBtn?.addEventListener('click', () => createAppModal.classList.remove('hidden'));
   cancelAppBtn?.addEventListener('click', () => createAppModal.classList.add('hidden'));
-  createAppModal?.addEventListener('click', e => { 
-    if(e.target === createAppModal) createAppModal.classList.add('hidden'); 
-  });
+  createAppModal?.addEventListener('click', e => { if(e.target === createAppModal) createAppModal.classList.add('hidden'); });
 
   /* ======================================================
      AÑADIR TEAM MEMBERS
@@ -153,11 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!reviewsList || !reviewsCount) return;
 
     reviewsList.innerHTML = '';
-    if(!currentApp.reviews.length) { 
-      reviewsList.innerHTML = '<p>Sin reseñas</p>'; 
-      reviewsCount.textContent = '(0)'; 
-      return; 
-    }
+    if(!currentApp.reviews.length) { reviewsList.innerHTML = '<p>Sin reseñas</p>'; reviewsCount.textContent = '(0)'; return; }
 
     currentApp.reviews.forEach(r => {
       const div = document.createElement('div');
@@ -176,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES (SPA-ready)
+     COMMUNITIES (SPA-ready con delegación global)
   ====================================================== */
   function renderCommunities() {
     const list = document.querySelector('.community-list');
@@ -196,15 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
       a.textContent = c.name;
       a.className = 'community-link';
       a.style.cursor = 'pointer';
-
       li.appendChild(a);
       list.appendChild(li);
     });
+
+    // Delegación: un solo listener para todos los enlaces
+    attachCommunityListener();
   }
 
-  // Delegación global para enlaces de comunidad
-  if (communityListContainer) {
-    communityListContainer.addEventListener('click', e => {
+  function attachCommunityListener() {
+    const list = document.querySelector('.community-list');
+    if (!list || list.dataset.listenerAttached) return;
+
+    list.addEventListener('click', e => {
       const a = e.target.closest('a.community-link');
       if (!a) return;
 
@@ -217,6 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = `/community/${communityId}`;
       }
     });
+
+    list.dataset.listenerAttached = 'true';
   }
 
   /* ======================================================
@@ -266,5 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if(appId) openAppDetail(appId);
     });
   });
+
+  // Inicializamos delegación aunque no haya comunidades todavía
+  attachCommunityListener();
 
 });
