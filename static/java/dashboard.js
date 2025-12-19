@@ -207,23 +207,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const list = document.querySelector('.community-list');
     if (!list) return;
 
-    list.innerHTML = '';
+    list.innerHTML = ''; // limpiar lista
 
     if (!currentApp.communities.length) {
       list.innerHTML = '<li>Sin comunidades</li>';
       return;
     }
 
-currentApp.communities.forEach(c => {
-  const li = document.createElement('li');
-  li.innerHTML = `
-    <a href="/community/${c.id}">
-      ${c.name}
-    </a>
-  `;
-  list.appendChild(li);
-});
+    currentApp.communities.forEach(c => {
+      const li = document.createElement('li');
+
+      // Crear el enlace real
+      const a = document.createElement('a');
+      a.href = `/community/${c.id}`;
+      a.textContent = c.name;
+      a.className = 'community-link';
+      a.style.cursor = 'pointer'; // opcional: para que parezca clicable
+
+      // SPA: abrir modal o ir a página sin recargar
+      a.addEventListener('click', (e) => {
+        e.preventDefault(); // evita recarga de página
+        // Aquí decides si quieres SPA o navegación directa
+        if (typeof openCommunityModal === 'function') {
+          openCommunityModal(c.id); // tu función para abrir la comunidad en modal
+        } else {
+          window.location.href = `/community/${c.id}`; // fallback: navegar a página real
+        }
+      });
+
+      li.appendChild(a);
+      list.appendChild(li);
+    });
   }
+
 
   addCommunityBtn?.addEventListener('click', () => {
     addCommunityForm.classList.toggle('hidden');
