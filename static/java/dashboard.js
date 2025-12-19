@@ -261,4 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
     currentApp = null;
   });
 
+
+document.querySelectorAll('.app-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const appId = btn.dataset.appId;
+    if (appId) {
+      openAppDetail(appId);
+    }
+  });
 });
+})
