@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - YourToolQuizz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background: #fafafa;
+        }
+
+        /* Sidebar de Información del Grupo */
+        .group-sidebar {
+            width: 320px;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .group-header {
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .group-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: white;
+            margin: 0 auto 15px;
+            border: 4px solid white;
+        }
+
+        .group-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .group-members {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .group-info {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .star {
+            font-size: 18px;
+            color: #d1d5db;
+            transition: all 0.2s;
+        }
+
+        .star.active {
+            color: #fbbf24;
+        }
+
+        .star:hover {
+            transform: scale(1.2);
+        }
+
+        .admin-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .admin-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .admin-btn:hover {
+            background: #e2e8f0;
+            transform: translateX(2px);
+        }
+
+        .admin-btn i {
+            color: #3b82f6;
+        }
+
+        /* Área Principal del Chat */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f7f7f7;
+        }
+
+        .chat-header {
+            padding: 20px 25px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .user-status {
+            font-size: 14px;
+            color: #10b981;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Mensajes de Administradores */
+        .admin-message {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px solid #3b82f6;
+            max-width: 80%;
+            align-self: flex-start;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .admin-badge {
+            background: #3b82f6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .message-content {
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .action-btn:hover {
+            color: #374151;
+        }
+
+        /* Mensajes de Usuarios */
+        .user-message {
+            background: #3b82f6;
+            color: white;
+            border-radius: 16px;
+            padding: 12px 16px;
+            max-width: 70%;
+            align-self: flex-end;
+        }
+
+        .user-name {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        /* Encuestas */
+        .poll-message {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px solid #10b981;
+            max-width: 80%;
+            align-self: flex-start;
+        }
+
+        .poll-question {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .poll-option {
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .poll-option:hover {
+            background: #f3f4f6;
+        }
+
+        .poll-option.selected {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        /* Input Area */
+        .chat-input {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .user-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .user-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .user-input input:focus {
+            border-color: #3b82f6;
+        }
+
+        .user-input button {
+            padding: 12px 24px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .user-input button:hover {
+            background: #2563eb;
+        }
+
+        /* Solo para admins */
+        .admin-input {
+            display: none;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .admin-input.show {
+            display: flex;
+        }
+
+        .admin-input button {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .admin-input button:hover {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar de Información del Grupo -->
+ <div class="group-sidebar">
+    <div class="group-header">
+        <div class="group-logo"></div>
+        <div class="group-name">{{ community.name }}</div>
+        <div class="group-members">{{ member_count }} miembros</div>
+    </div>
+
+    <div class="group-info">
+        <div class="info-section">
+            <div class="section-title">Información del Grupo</div>
+            <div class="info-item">
+                <span>Administrador</span>
+                <span>{{ admin_name }}</span>
+            </div>
+            <div class="info-item">
+                <span>Usuarios activos</span>
+                <span>{{ active_users }}</span>
+            </div>
+        </div>
+
+        {% if current_user.is_admin %}
+        <div class="info-section">
+            <div class="section-title">Acciones de Administrador</div>
+            <div class="admin-actions">
+                <div class="admin-btn" id="create-poll-btn">
+                    <i>📊</i> Crear Encuesta
+                </div>
+                <div class="admin-btn" id="announcement-btn">
+                    <i>📢</i> Hacer Anuncio
+                </div>
+                <div class="admin-btn" id="stats-btn">
+                    <i>📈</i> Ver Estadísticas
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Área Principal del Chat -->
+<div class="chat-area">
+    <div class="chat-header">
+        <div class="chat-title">Chat de la Comunidad {{ community.name }}</div>
+        <div class="user-status">
+            <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.is_admin else "Usuario" }}
+        </div>
+    </div>
+
+    <div class="chat-messages" id="messages">
+        {% for msg in messages %}
+            {% if msg.message_type == 'admin' %}
+            <div class="admin-message">
+                <div class="admin-header">
+                    <span class="admin-badge">ADMIN</span>
+                    <span class="admin-name">{{ msg.user.name }}</span>
+                </div>
+                <div class="message-content">{{ msg.content }}</div>
+            </div>
+            {% elif msg.message_type == 'poll' %}
+            <div class="poll-message">
+                <div class="poll-question">{{ msg.content }}</div>
+                <div class="poll-options">
+                    {% for option in msg.poll_options %}
+                    <div class="poll-option" data-poll-id="{{ msg.id }}" data-option-id="{{ loop.index0 }}">{{ option }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="user-message">
+                <div class="user-name">{{ msg.user.name }}</div>
+                <div class="message-content">{{ msg.content }}</div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="chat-input">
+        <div class="user-input">
+            <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+            <button id="send-btn">Enviar</button>
+        </div>
+
+        {% if current_user.is_admin %}
+        <div class="admin-input" id="admin-input">
+            <button id="send-poll">Enviar como Encuesta</button>
+            <button id="send-announcement">Enviar como Anuncio</button>
+            <button id="cancel-admin">Cancelar</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Datos de la Comunidad -->
+<div id="community-data"
+     data-community-id="{{ community.id }}"
+     data-user-id="{{ current_user.id }}"
+     data-user-name="{{ current_user.name }}"
+     data-is-admin="{{ 'true' if current_user.is_admin else 'false' }}">
+</div>
+
+<script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
+<script>
+const socket = io();
+const communityData = document.getElementById('community-data');
+const communityId = communityData.dataset.communityId;
+const userId = communityData.dataset.userId;
+const userName = communityData.dataset.userName;
+const isAdmin = communityData.dataset.isAdmin === 'true';
+
+socket.emit("join_community", { community_id: communityId });
+
+// Enviar mensaje normal
+document.getElementById("send-btn").onclick = () => {
+    const input = document.getElementById("message-input");
+    if (!input.value.trim()) return;
+
+    socket.emit("send_message", {
+        community_id: communityId,
+        content: input.value,
+        message_type: 'user'
+    });
+
+    input.value = "";
+};
+
+// Recibir mensajes
+socket.on("new_message", data => {
+    const div = document.createElement("div");
+    if(data.message_type === 'admin'){
+        div.className = 'admin-message';
+        div.innerHTML = `<div class="admin-header"><span class="admin-badge">ADMIN</span><span class="admin-name">${data.user}</span></div>
+                         <div class="message-content">${data.content}</div>`;
+    } else if(data.message_type === 'poll'){
+        div.className = 'poll-message';
+        let optionsHtml = '';
+        data.options.forEach((opt, idx) => {
+            optionsHtml += `<div class="poll-option" data-poll-id="${data.id}" data-option-id="${idx}">${opt}</div>`;
+        });
+        div.innerHTML = `<div class="poll-question">${data.content}</div>
+                         <div class="poll-options">${optionsHtml}</div>`;
+    } else {
+        div.className = 'user-message';
+        div.innerHTML = `<div class="user-name">${data.user}</div><div class="message-content">${data.content}</div>`;
+    }
+
+    document.getElementById("messages").appendChild(div);
+    document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+});
+
+// Opciones de admin
+if(isAdmin){
+    document.getElementById("create-poll-btn").onclick = () => document.getElementById("admin-input").classList.add('show');
+    document.getElementById("cancel-admin").onclick = () => document.getElementById("admin-input").classList.remove('show');
+
+    document.getElementById("send-poll").onclick = () => {
+        const input = document.getElementById("message-input");
+        if(!input.value.trim()) return;
+        socket.emit("send_message", {
+            community_id: communityId,
+            content: input.value,
+            message_type: 'poll',
+            options: ['Opción 1', 'Opción 2'] // puedes generar dinámicamente
+        });
+        input.value = "";
+        document.getElementById("admin-input").classList.remove('show');
+    };
+
+    document.getElementById("send-announcement").onclick = () => {
+        const input = document.getElementById("message-input");
+        if(!input.value.trim()) return;
+        socket.emit("send_message", {
+            community_id: communityId,
+            content: input.value,
+            message_type: 'admin'
+        });
+        input.value = "";
+        document.getElementById("admin-input").classList.remove('show');
+    };
+}
+</script>
+</body>
+</html>
