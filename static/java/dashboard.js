@@ -104,9 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await res.json();
     if (!data.success) throw new Error();
 
-    data.app.reviews ||= [];
-    data.app.communities ||= [];
-    data.app.team_members ||= [];
+  data.app.reviews = data.app.reviews || [];
+  data.app.communities = data.app.communities || [];
+  data.app.team_members = data.app.team_members || [];
+
 
     return data.app;
   }
