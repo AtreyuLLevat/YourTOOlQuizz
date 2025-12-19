@@ -176,28 +176,34 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      COMMUNITIES
   ====================================================== */
-  function renderCommunities() {
-    const list = document.querySelector('.community-list');
-    if (!list) return;
+function renderCommunities() {
+  console.log('community-list:', document.querySelector('.community-list'));
 
-    list.innerHTML = '';
+  if (!appDetailModal) return;
 
-    if (!currentApp.communities.length) {
-      list.innerHTML = '<li>Sin comunidades</li>';
-      return;
-    }
+  const list = appDetailModal.querySelector('.community-list');
+  if (!list) return;
 
-    currentApp.communities.forEach(c => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `/community/${c.id}`;
-      a.textContent = c.name;
-      a.className = 'community-link';
-      a.style.cursor = 'pointer';
-      li.appendChild(a);
-      list.appendChild(li);
-    });
+  list.innerHTML = '';
+
+  if (!currentApp.communities.length) {
+    list.innerHTML = '<li>Sin comunidades</li>';
+    return;
   }
+
+  currentApp.communities.forEach(c => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+
+    a.href = `/community/${c.id}`;
+    a.textContent = c.name;
+    a.className = 'community-link';
+
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+}
+
 
   // Delegación global para comunidades
   document.addEventListener('click', e => {
