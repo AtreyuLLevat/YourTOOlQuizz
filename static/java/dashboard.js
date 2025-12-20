@@ -97,23 +97,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ======================================================
-     FETCH APP
+     FETCH APP - CORREGIDO
   ====================================================== */
   async function fetchAppData(appId) {
     const res = await fetch(`/account/get_app/${appId}`);
     const data = await res.json();
     if (!data.success) throw new Error();
 
-  data.app.reviews = data.app.reviews || [];
-  data.app.communities = data.app.communities || [];
-  data.app.team_members = data.app.team_members || [];
-
+    // SOLUCIÓN: Solo establecer arrays vacíos si no existen los campos
+    // No sobrescribir datos ya existentes
+    if (!data.app.reviews) data.app.reviews = [];
+    if (!data.app.communities) data.app.communities = [];
+    if (!data.app.team_members) data.app.team_members = [];
 
     return data.app;
   }
 
   /* ======================================================
-     ABRIR MODAL APP
+     ABRIR MODAL APP - CORREGIDO
   ====================================================== */
   async function openAppDetail(appId) {
     try {
@@ -126,19 +127,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!appDetailModal) return;
     appDetailModal.dataset.appId = appId;
 
-const appNameEl = appDetailModal.querySelector('.app-name');
-if (appNameEl) appNameEl.textContent = currentApp.name || '---';
+    const appNameEl = appDetailModal.querySelector('.app-name');
+    if (appNameEl) appNameEl.textContent = currentApp.name || '---';
 
-const appDescEl = appDetailModal.querySelector('.app-description');
-if (appDescEl) appDescEl.textContent = currentApp.description || '---';
+    const appDescEl = appDetailModal.querySelector('.app-description');
+    if (appDescEl) appDescEl.textContent = currentApp.description || '---';
 
-const appDateEl = appDetailModal.querySelector('.app-date');
-if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
+    const appDateEl = appDetailModal.querySelector('.app-date');
+    if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
 
-const appThemeEl = appDetailModal.querySelector('.app-theme');
-if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
+    const appThemeEl = appDetailModal.querySelector('.app-theme');
+    if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
 
-
+    // SOLUCIÓN: Asegurarse de que currentApp.communities existe antes de renderizar
+    if (!currentApp.communities) {
+      currentApp.communities = [];
+    }
+    
+    // Asegurar que renderCommunities tiene los datos correctos
     renderReviewsAdmin();
     renderCommunities();
 
@@ -178,7 +184,7 @@ if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}
   }
 
   /* ======================================================
-     COMMUNITIES (CLAVE)
+     COMMUNITIES - COMPLETAMENTE CORREGIDO
   ====================================================== */
   function renderCommunities() {
     if (!appDetailModal) return;
@@ -188,26 +194,58 @@ if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}
 
     list.innerHTML = '';
 
-    if (!currentApp.communities.length) {
+    // SOLUCIÓN: Verificar que currentApp y currentApp.communities existan
+    if (!currentApp || !currentApp.communities || !currentApp.communities.length) {
       list.innerHTML = '<li>Sin comunidades</li>';
       return;
     }
 
     currentApp.communities.forEach(c => {
+      // SOLUCIÓN: Verificar que cada comunidad tenga un ID válido
+      if (!c || !c.id) return;
+      
       const li = document.createElement('li');
-
+      
       const a = document.createElement('a');
       a.href = `/community/${c.id}`;
       a.className = 'community-link';
-      a.textContent = c.name;
-
+      a.textContent = c.name || 'Comunidad sin nombre';
+      a.target = '_blank'; // Para abrir en nueva pestaña (opcional)
+      
+      // Asegurar que el enlace funcione inmediatamente
+      a.addEventListener('click', function(e) {
+        if (!this.href || this.href === '#') {
+          e.preventDefault();
+          alert('Enlace no disponible temporalmente');
+          return;
+        }
+        window.location.href = this.href;
+      });
+      
       li.appendChild(a);
       list.appendChild(li);
     });
+    
+    // SOLUCIÓN: Forzar actualización del DOM para asegurar que los enlaces se renderizan
+    setTimeout(() => {
+      const links = document.querySelectorAll('.community-link');
+      links.forEach(link => {
+        if (!link.onclick) {
+          link.addEventListener('click', function(e) {
+            if (!this.href || this.href === '#') {
+              e.preventDefault();
+              alert('Enlace no disponible temporalmente');
+              return;
+            }
+            window.location.href = this.href;
+          });
+        }
+      });
+    }, 50);
   }
 
   /* ======================================================
-     AÑADIR COMUNIDAD
+     AÑADIR COMUNIDAD - CORREGIDO
   ====================================================== */
   addCommunityBtn?.addEventListener('click', () => {
     addCommunityForm.classList.toggle('hidden');
@@ -230,11 +268,33 @@ if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}
       const data = await res.json();
       if (!data.success) return alert(data.error);
 
+      // SOLUCIÓN: Asegurar que currentApp.communities existe antes de push
+      if (!currentApp.communities) {
+        currentApp.communities = [];
+      }
+      
       currentApp.communities.push(data.community);
       renderCommunities();
 
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
+
+      // SOLUCIÓN: Forzar actualización del DOM para asegurar que los enlaces se renderizan
+      setTimeout(() => {
+        const links = document.querySelectorAll('.community-link');
+        links.forEach(link => {
+          if (!link.onclick) {
+            link.addEventListener('click', function(e) {
+              if (!this.href || this.href === '#') {
+                e.preventDefault();
+                alert('Enlace no disponible temporalmente');
+                return;
+              }
+              window.location.href = this.href;
+            });
+          }
+        });
+      }, 100);
 
     } catch {
       alert('Error de red');
@@ -251,14 +311,26 @@ if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}
   });
 
   /* ======================================================
-     LISTENER APPS
+     LISTENER APPS - CORREGIDO
   ====================================================== */
-  appsList?.addEventListener('click', e => {
+  appsList?.addEventListener('click', async e => {
     const btn = e.target.closest('.app-item');
     if (!btn) return;
 
     const appId = btn.dataset.appId;
-    if (appId) openAppDetail(appId);
+    if (appId) {
+      // SOLUCIÓN: Resetear currentApp antes de abrir
+      currentApp = null;
+      window.currentApp = null;
+      
+      // Asegurar que el modal está limpio
+      const communityList = appDetailModal.querySelector('.community-list');
+      if (communityList) {
+        communityList.innerHTML = '<li>Cargando comunidades...</li>';
+      }
+      
+      await openAppDetail(appId);
+    }
   });
 
   // Tab switching logic (bound once on load)
