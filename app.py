@@ -586,19 +586,18 @@ def create_app():
             }
         })
 
-    @app.route("/account/review/<uuid:review_id>", methods=["DELETE"])
+    @app.route("/account/review/<int:review_id>", methods=["DELETE"])
     @login_required
     def delete_review(review_id):
         review = Review.query.get_or_404(review_id)
 
-        # Opcional: solo el creador o admin puede borrar
         if review.user_id != current_user.id:
             return jsonify({"success": False, "error": "No tienes permisos para eliminar esta reseña"}), 403
 
         db.session.delete(review)
         db.session.commit()
-
         return jsonify({"success": True})
+
 
 
     @app.route('/apps/<string:app_id>/create_community', methods=['POST'])
