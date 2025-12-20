@@ -335,20 +335,25 @@ document.addEventListener('DOMContentLoaded', () => {
   // Tab switching logic
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
+  
+tabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    tabContents.forEach(c => c.classList.add('hidden'));
 
-      tabContents.forEach(c => c.classList.add('hidden'));
+    const targetTab = document.querySelector(`#${btn.dataset.tab}`);
+    if (targetTab) {
+      targetTab.classList.remove('hidden');
+    }
 
-      const targetTab = document.querySelector(`#${btn.dataset.tab}`);
-      if (targetTab) {
-        targetTab.classList.remove('hidden');
-      }
-    });
+    // 🔥 CLAVE
+    if (btn.dataset.tab === 'communities') {
+      renderCommunities();
+    }
   });
+});
 
   // Close modal on backdrop click
   appDetailModal?.addEventListener('click', e => {
