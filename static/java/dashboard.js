@@ -116,42 +116,38 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      ABRIR MODAL APP - VERSIÓN SIMPLIFICADA
   ====================================================== */
-  async function openAppDetail(appId) {
-    console.log(`🚀 Abriendo detalle de app: ${appId}`);
-    
-    try {
-      currentApp = await fetchAppData(appId);
-      window.currentApp = currentApp;
-    } catch {
-      return alert('Error cargando app');
-    }
+async function openAppDetail(appId) {
+  if (!appId) return;
 
-    if (!appDetailModal) return;
-    appDetailModal.dataset.appId = appId;
+  try {
+    currentApp = await fetchAppData(appId);
+    window.currentApp = currentApp;
 
-    const appNameEl = appDetailModal.querySelector('.app-name');
-    if (appNameEl) appNameEl.textContent = currentApp.name || '---';
+    // Asegurar arrays vacíos
+    if (!currentApp.reviews) currentApp.reviews = [];
+    if (!currentApp.communities) currentApp.communities = [];
+    if (!currentApp.team_members) currentApp.team_members = [];
 
-    const appDescEl = appDetailModal.querySelector('.app-description');
-    if (appDescEl) appDescEl.textContent = currentApp.description || '---';
-
-    const appDateEl = appDetailModal.querySelector('.app-date');
-    if (appDateEl) appDateEl.textContent = currentApp.creation_date || '---';
-
-    const appThemeEl = appDetailModal.querySelector('.app-theme');
-    if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
-
-    // Asegurar que currentApp.communities existe
-    if (!currentApp.communities) {
-      currentApp.communities = [];
-    }
-
-    renderReviewsAdmin();
-    renderCommunities();
-
-    appDetailModal.classList.remove('hidden');
-    console.log('✅ Modal abierto exitosamente');
+  } catch (err) {
+    return alert('Error cargando app');
   }
+
+  if (!appDetailModal) return;
+  appDetailModal.dataset.appId = appId;
+
+  // Actualizar datos básicos
+  appDetailModal.querySelector('.app-name')?.textContent = currentApp.name || '---';
+  appDetailModal.querySelector('.app-description')?.textContent = currentApp.description || '---';
+  appDetailModal.querySelector('.app-date')?.textContent = currentApp.creation_date || '---';
+  appDetailModal.querySelector('.app-theme')?.textContent = `Tema: ${currentApp.theme || 'General'}`;
+
+  // Renderizar reviews y comunidades **después de asegurarse de que hay datos**
+  renderReviewsAdmin();
+  renderCommunities();
+
+  appDetailModal.classList.remove('hidden');
+  console.log('✅ Modal abierto correctamente con reviews y estrellas sincronizadas');
+}
 
   /* ======================================================
      REVIEWS
@@ -159,11 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderReviewsAdmin() {
   const reviewsList = document.getElementById('reviews-list');
   const reviewsCount = document.querySelector('.reviews-count');
+  const starsElement = document.querySelector('.stars');
   if (!reviewsList || !reviewsCount) return;
 
   reviewsList.innerHTML = '';
 
-  if (!currentApp.reviews || !currentApp.reviews.length) {
+  if (!currentApp.reviews || currentApp.reviews.length === 0) {
     reviewsList.innerHTML = `
       <div class="no-reviews-message">
         <div class="icon">💬</div>
@@ -172,35 +169,29 @@ function renderReviewsAdmin() {
       </div>
     `;
     reviewsCount.textContent = '(0)';
+    if (starsElement) starsElement.innerHTML = '★☆☆☆☆ (0.0)';
     return;
   }
 
+  // Crear cards de reseña
   currentApp.reviews.forEach((r, index) => {
     const card = document.createElement('div');
     card.className = 'review-card';
-    card.dataset.reviewId = r.id;  // 🔥 imprescindible
+    card.dataset.reviewId = r.id;
 
-    // Determinar estado basado en rating
     let statusClass = 'neutral';
     let statusText = 'Neutral';
-    if (r.rating >= 4) {
+    if (Number(r.rating) >= 4) {
       statusClass = 'positive';
       statusText = 'Positivo';
-    } else if (r.rating <= 2) {
+    } else if (Number(r.rating) <= 2) {
       statusClass = 'negative';
       statusText = 'Negativo';
     }
 
-    // Crear estrellas visuales
-    const stars = '⭐'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-
-    // Iniciales de usuario
+    const stars = '⭐'.repeat(Number(r.rating)) + '☆'.repeat(5 - Number(r.rating));
     const initials = r.username ? r.username.charAt(0).toUpperCase() : 'U';
-
-    // Formatear fecha
-    const reviewDate = r.created_at ? new Date(r.created_at).toLocaleDateString('es-ES', {
-      day: 'numeric', month: 'short', year: 'numeric'
-    }) : 'Fecha no disponible';
+    const reviewDate = r.created_at ? new Date(r.created_at).toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' }) : 'Fecha no disponible';
 
     card.innerHTML = `
       <div class="review-status ${statusClass}">${statusText}</div>
@@ -219,28 +210,20 @@ function renderReviewsAdmin() {
       </div>
       <div class="review-content">${r.content || 'Sin comentario'}</div>
     `;
-
-    // 🔥 Evento click para abrir menú de acciones
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openReviewActionsMenu(e, r.id);
-    });
-
-    // Animación escalonada
-    card.style.animationDelay = `${index * 0.05}s`;
-
     reviewsList.appendChild(card);
   });
 
+  // Actualizar contador y promedio
   reviewsCount.textContent = `(${currentApp.reviews.length})`;
-
-  // Resumen de estrellas en el header
-  const starsElement = document.querySelector('.stars');
-  if (starsElement && currentApp.reviews.length > 0) {
-    const avgRating = (currentApp.reviews.reduce((sum, r) => sum + r.rating, 0) / currentApp.reviews.length).toFixed(1);
+  if (starsElement) {
+    const avgRating = (
+      currentApp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) / currentApp.reviews.length
+    ).toFixed(1);
     starsElement.innerHTML = `
       <span style="display:flex;align-items:center;gap:4px;">
-        <span style="color:#f59e0b;font-size:18px;">${'★'.repeat(Math.floor(avgRating))}${'☆'.repeat(5 - Math.floor(avgRating))}</span>
+        <span style="color:#f59e0b;font-size:18px;">
+          ${'★'.repeat(Math.floor(avgRating))}${'☆'.repeat(5 - Math.floor(avgRating))}
+        </span>
         <span style="font-weight:600;color:#1e293b;">${avgRating}</span>
         <span style="color:#64748b;font-size:14px;">(${currentApp.reviews.length} ${currentApp.reviews.length === 1 ? 'reseña' : 'reseñas'})</span>
       </span>
