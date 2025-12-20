@@ -136,10 +136,32 @@ main { max-width: 960px; margin: 3rem auto; background: var(--surface); border-r
 
       <div class="actions">
         <a href="{{ app.website_url or '#' }}" class="btn btn-primary">Probar app</a>
-        <a href="#" class="btn btn-outline">Entrar en comunidad</a>
-      </div>
-    </div>
-  </section>
+  <!-- Dropdown de comunidades -->
+  <div class="community-dropdown-wrapper" style="position: relative;">
+    <button id="openCommunityDropdown" class="btn btn-outline" type="button">
+      Entrar en comunidad ▼
+    </button>
+    <ul id="communityDropdown" style="
+      display: none;
+      position: absolute;
+      top: 42px;
+      left: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      list-style: none;
+      padding: 0.5rem 0;
+      min-width: 220px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: all 0.25s ease;
+    ">
+      <!-- JS añadirá aquí las comunidades -->
+    </ul>
+  </div>
+</div>
 
   <!-- PESTAÑAS -->
   <div class="tabs">
