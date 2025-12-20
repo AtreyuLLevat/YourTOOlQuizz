@@ -259,7 +259,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const li = document.createElement('li');
-      li.style.marginBottom = '8px';
+      li.style.cssText = `
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
+      `;
       
       const a = document.createElement('a');
       const communityUrl = `/community/${c.id}`;
@@ -270,16 +276,18 @@ document.addEventListener('DOMContentLoaded', () => {
       a.style.cssText = `
         color: #2563eb;
         text-decoration: none;
-        padding: 6px 12px;
-        border: 1px solid #2563eb;
-        border-radius: 6px;
-        display: inline-block;
-        transition: all 0.2s;
+        font-weight: 500;
+        display: block;
+        padding: 6px 10px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        cursor: pointer;
       `;
       
+      // Efecto hover
       a.addEventListener('mouseenter', () => {
-        a.style.backgroundColor = '#2563eb';
-        a.style.color = 'white';
+        a.style.backgroundColor = '#eff6ff';
+        a.style.color = '#1d4ed8';
       });
       
       a.addEventListener('mouseleave', () => {
@@ -287,15 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
         a.style.color = '#2563eb';
       });
       
-      // Evento de clic robusto
+      // Asegurar que el enlace funcione
       a.addEventListener('click', (e) => {
-        e.preventDefault();
         console.log(`🔗 Navegando a comunidad: ${communityUrl}`);
-        if (communityUrl && communityUrl !== '#') {
-          window.open(communityUrl, '_blank');
-        } else {
-          alert('Enlace no disponible');
-        }
+        // Permitir que el navegador maneje el enlace normalmente
+        // No usar e.preventDefault() aquí
       });
       
       li.appendChild(a);
