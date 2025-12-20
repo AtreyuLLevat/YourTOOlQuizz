@@ -416,11 +416,13 @@ def create_app():
         for r in reviews_data:
             username = r.user.name if r.user else "Anónimo"
             reviews.append({
+                "id": str(r.id),  # 🔥 Añadido
                 "username": username, 
                 "content": r.content, 
                 "rating": r.rating,
                 "created_at": r.created_at.isoformat() if r.created_at else None
             })
+
 
         # Asegurar que los team members se cargan
         team_members_data = TeamMember.query.filter_by(app_id=app_data.id).all()
