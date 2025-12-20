@@ -671,6 +671,24 @@ def create_app():
             messages=messages
         )
 
+    @app.route("/account/community/<uuid:community_id>", methods=["DELETE"])
+    @login_required
+    def delete_community(community_id):
+        community = Community.query.get_or_404(community_id)
+
+        # Opcional: solo el creador o admin puede borrar
+        # Aquí puedes definir: community.creator_id o solo admins
+        # if community.creator_id != current_user.id:
+        #     return jsonify({"success": False, "error": "No tienes permisos para eliminar esta comunidad"}), 403
+
+        # Eliminar los miembros y mensajes asociados si quieres limpieza completa
+        GroupMember.query.filter_by(community_id=community.id).delete()
+        GroupMessage.query.filter_by(community_id=community.id).delete()
+
+        db.session.delete(community)
+        db.session.commit()
+        return jsonify({"success": True})
+
     
     @socketio.on("join_community")
     def join_community(data):
