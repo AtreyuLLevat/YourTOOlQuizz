@@ -156,35 +156,93 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      REVIEWS
   ====================================================== */
-  function renderReviewsAdmin() {
-    const reviewsList = document.getElementById('reviews-list');
-    const reviewsCount = document.querySelector('.reviews-count');
-    if (!reviewsList || !reviewsCount) return;
+function renderReviewsAdmin() {
+  const reviewsList = document.getElementById('reviews-list');
+  const reviewsCount = document.querySelector('.reviews-count');
+  if (!reviewsList || !reviewsCount) return;
 
-    reviewsList.innerHTML = '';
+  reviewsList.innerHTML = '';
 
-    if (!currentApp.reviews.length) {
-      reviewsList.innerHTML = '<p>Sin reseñas</p>';
-      reviewsCount.textContent = '(0)';
-      return;
-    }
-
-    currentApp.reviews.forEach(r => {
-      const div = document.createElement('div');
-      div.className = 'review-item';
-      div.innerHTML = `
-        <div style="display:flex; justify-content:space-between;">
-          <strong>@${r.username || 'Usuario'}</strong>
-          <span>⭐ ${r.rating}</span>
-        </div>
-        <textarea class="review-content">${r.content || ''}</textarea>
-      `;
-      reviewsList.appendChild(div);
-    });
-
-    reviewsCount.textContent = `(${currentApp.reviews.length})`;
+  if (!currentApp.reviews || !currentApp.reviews.length) {
+    reviewsList.innerHTML = `
+      <div class="no-reviews-message">
+        <div class="icon">💬</div>
+        <h3>Sin reseñas aún</h3>
+        <p>Esta app no tiene reseñas. Los usuarios podrán añadirlas cuando prueben tu aplicación.</p>
+      </div>
+    `;
+    reviewsCount.textContent = '(0)';
+    return;
   }
 
+  currentApp.reviews.forEach((r, index) => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.dataset.rating = r.rating;
+    
+    // Determinar estado basado en rating
+    let statusClass = 'neutral';
+    let statusText = 'Neutral';
+    if (r.rating >= 4) {
+      statusClass = 'positive';
+      statusText = 'Positivo';
+    } else if (r.rating <= 2) {
+      statusClass = 'negative';
+      statusText = 'Negativo';
+    }
+
+    // Crear estrellas visuales
+    const stars = '⭐'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    
+    // Obtener iniciales del usuario para el avatar
+    const initials = r.username ? r.username.charAt(0).toUpperCase() : 'U';
+    
+    // Formatear fecha si existe
+    const reviewDate = r.date ? new Date(r.date).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }) : 'Fecha no disponible';
+
+    card.innerHTML = `
+      <div class="review-status ${statusClass}">${statusText}</div>
+      <div class="review-header">
+        <div class="review-user-info">
+          <div class="review-avatar">${initials}</div>
+          <div class="review-user-details">
+            <div class="review-username">@${r.username || 'Usuario'}</div>
+            <div class="review-date">${reviewDate}</div>
+          </div>
+        </div>
+        <div class="review-rating">
+          <span class="star-icon">${stars}</span>
+          <span class="rating-value">${r.rating}/5</span>
+        </div>
+      </div>
+      <div class="review-content">${r.content || 'Sin comentario'}</div>
+    `;
+
+    // Añadir animación escalonada
+    card.style.animationDelay = `${index * 0.05}s`;
+    
+    reviewsList.appendChild(card);
+  });
+
+  reviewsCount.textContent = `(${currentApp.reviews.length})`;
+  
+  // Actualizar resumen de estrellas en el header
+  const starsElement = document.querySelector('.stars');
+  if (starsElement && currentApp.reviews.length > 0) {
+    const avgRating = (currentApp.reviews.reduce((sum, r) => sum + r.rating, 0) / currentApp.reviews.length).toFixed(1);
+    starsElement.innerHTML = `
+      <span style="display:flex;align-items:center;gap:4px;">
+        <span style="color:#f59e0b;font-size:18px;">${'★'.repeat(Math.floor(avgRating))}${'☆'.repeat(5 - Math.floor(avgRating))}</span>
+        <span style="font-weight:600;color:#1e293b;">${avgRating}</span>
+        <span style="color:#64748b;font-size:14px;">(${currentApp.reviews.length} ${currentApp.reviews.length === 1 ? 'reseña' : 'reseñas'})</span>
+      </span>
+    `;
+  }
+}
   /* ======================================================
      COMMUNITIES - ESTILO MINIMALISTA MODERNO
   ====================================================== */
