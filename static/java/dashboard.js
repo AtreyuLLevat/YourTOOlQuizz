@@ -1,3 +1,6 @@
+// static/java/dashboard.js (versión simplificada)
+import { communitiesManager } from './communities.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ======================================================
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ======================================================
-     FETCH APP - CON DEPURACIÓN
+     FETCH APP
   ====================================================== */
   async function fetchAppData(appId) {
     console.log(`🔍 Fetching app data for ID: ${appId}`);
@@ -109,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
       throw new Error(data.error || 'Error cargando app');
     }
 
-    // DEPURACIÓN: Ver qué nos devuelve el backend
     console.log('📦 Datos recibidos del backend:', {
       appId: data.app.id,
       name: data.app.name,
@@ -129,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     ABRIR MODAL APP - CON DEPURACIÓN
+     ABRIR MODAL APP
   ====================================================== */
   async function openAppDetail(appId) {
     console.log(`🚀 Abriendo detalle de app: ${appId}`);
@@ -174,8 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
       currentApp.communities = [];
     }
 
+    // Usar el CommunitiesManager
+    communitiesManager.init(currentApp, appDetailModal);
+    communitiesManager.renderCommunities();
+
     renderReviewsAdmin();
-    renderCommunities();
 
     appDetailModal.classList.remove('hidden');
     console.log('✅ Modal abierto exitosamente');
@@ -214,103 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES - SOLUCIÓN DEFINITIVA
-  ====================================================== */
-  function renderCommunities() {
-    if (!appDetailModal) {
-      console.error('❌ appDetailModal no encontrado');
-      return;
-    }
-
-    const list = appDetailModal.querySelector('.community-list');
-    if (!list) {
-      console.error('❌ No se encontró .community-list en el modal');
-      return;
-    }
-
-    list.innerHTML = '';
-
-    // Validación exhaustiva
-    if (!currentApp) {
-      console.error('❌ currentApp es null/undefined');
-      list.innerHTML = '<li>Error: App no cargada</li>';
-      return;
-    }
-
-    if (!currentApp.communities) {
-      console.warn('⚠️ currentApp.communities es undefined');
-      currentApp.communities = [];
-    }
-
-    if (!currentApp.communities.length) {
-      console.log('ℹ️ No hay comunidades para mostrar');
-      list.innerHTML = '<li>Sin comunidades</li>';
-      return;
-    }
-
-    console.log(`🎯 Renderizando ${currentApp.communities.length} comunidades:`);
-    
-    currentApp.communities.forEach((c, index) => {
-      console.log(`  ${index + 1}. ID: ${c?.id}, Nombre: ${c?.name}`);
-      
-      if (!c || !c.id) {
-        console.warn(`⚠️ Comunidad ${index} sin ID válido:`, c);
-        return;
-      }
-      
-      const li = document.createElement('li');
-      li.style.cssText = `
-        margin-bottom: 10px;
-        padding: 8px;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        background: #f8fafc;
-      `;
-      
-      const a = document.createElement('a');
-      const communityUrl = `/community/${c.id}`;
-      a.href = communityUrl;
-      a.className = 'community-link';
-      a.textContent = c.name || 'Comunidad sin nombre';
-      a.target = '_blank';
-      a.style.cssText = `
-        color: #2563eb;
-        text-decoration: none;
-        font-weight: 500;
-        display: block;
-        padding: 6px 10px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-        cursor: pointer;
-      `;
-      
-      // Efecto hover
-      a.addEventListener('mouseenter', () => {
-        a.style.backgroundColor = '#eff6ff';
-        a.style.color = '#1d4ed8';
-      });
-      
-      a.addEventListener('mouseleave', () => {
-        a.style.backgroundColor = 'transparent';
-        a.style.color = '#2563eb';
-      });
-      
-      // Asegurar que el enlace funcione
-      a.addEventListener('click', (e) => {
-        console.log(`🔗 Navegando a comunidad: ${communityUrl}`);
-        // Permitir que el navegador maneje el enlace normalmente
-        // No usar e.preventDefault() aquí
-      });
-      
-      li.appendChild(a);
-      list.appendChild(li);
-    });
-
-    console.log('✅ Comunidades renderizadas');
-  }
-
-  /* ======================================================
-     AÑADIR COMUNIDAD
+     AÑADIR COMUNIDAD (usando el manager)
   ====================================================== */
   addCommunityBtn?.addEventListener('click', () => {
     addCommunityForm.classList.toggle('hidden');
@@ -323,38 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const appId = appDetailModal?.dataset.appId;
     if (!appId) return alert('App no válida');
 
-    console.log(`➕ Creando comunidad para app ${appId}: ${name}`);
-
-    try {
-      const res = await fetch(`/apps/${appId}/create_community`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
-
-      const data = await res.json();
-      console.log('📥 Respuesta crear comunidad:', data);
-      
-      if (!data.success) return alert(data.error);
-
-      // Asegurar que currentApp.communities existe
-      if (!currentApp.communities) {
-        currentApp.communities = [];
-      }
-      
-      // Agregar nueva comunidad
-      currentApp.communities.push(data.community);
-      console.log('✅ Comunidad agregada a currentApp:', data.community);
-      
-      // Re-renderizar
-      renderCommunities();
-
+    const community = await communitiesManager.addCommunity(name, appId);
+    
+    if (community) {
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
-
-    } catch (error) {
-      console.error('❌ Error creando comunidad:', error);
-      alert('Error de red');
     }
   });
 
