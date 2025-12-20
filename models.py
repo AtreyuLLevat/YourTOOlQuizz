@@ -248,24 +248,22 @@ class GroupMessage(db.Model):
         index=True
     )
 
-    
-
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # 🔥 CLAVE
     message_type = db.Column(db.String(20), default="user")
 
+    # Para encuestas (JSON simple)
+    extra_data = db.Column(JSON, nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     community = db.relationship("Community", back_populates="messages")
     user = db.relationship("User")
-    app = db.relationship(
-        "App",
-        back_populates="group_messages"
-    )
-    
+    app = db.relationship("App", back_populates="group_messages")
 
-# -------------------------
 # COMUNIDADES
 # -------------------------
 class Community(db.Model):
