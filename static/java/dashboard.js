@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = await res.json();
     if (!data.success) throw new Error();
 
-    // SOLUCIÓN: Solo establecer arrays vacíos si no existen los campos
+    // Solo establecer arrays vacíos si no existen
     if (!data.app.reviews) data.app.reviews = [];
     if (!data.app.communities) data.app.communities = [];
     if (!data.app.team_members) data.app.team_members = [];
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     ABRIR MODAL APP - CORREGIDO
+     ABRIR MODAL APP - VERSIÓN SIMPLIFICADA
   ====================================================== */
   async function openAppDetail(appId) {
     console.log(`🚀 Abriendo detalle de app: ${appId}`);
@@ -144,12 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Asegurar que currentApp.communities existe
     if (!currentApp.communities) {
       currentApp.communities = [];
-    }
-
-    // PRIMERO: Limpiar completamente el contenido
-    const communityList = appDetailModal.querySelector('.community-list');
-    if (communityList) {
-      communityList.innerHTML = '';
     }
 
     renderReviewsAdmin();
@@ -192,10 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES - SOLUCIÓN DEFINITIVA
+     COMMUNITIES - VERSIÓN DEFINITIVA Y FUNCIONAL
   ====================================================== */
   function renderCommunities() {
-    console.log('🎯 INICIANDO renderCommunities()');
+    console.log('🎯 EJECUTANDO renderCommunities()');
     
     if (!appDetailModal) {
       console.error('❌ appDetailModal no encontrado');
@@ -208,22 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // LIMPIAR COMPLETAMENTE
+    // Limpiar completamente
     list.innerHTML = '';
 
-    // Validación exhaustiva
-    if (!currentApp) {
-      console.error('❌ currentApp es null/undefined');
-      list.innerHTML = '<li>Error: App no cargada</li>';
-      return;
-    }
-
-    if (!currentApp.communities) {
-      console.warn('⚠️ currentApp.communities es undefined');
-      currentApp.communities = [];
-    }
-
-    if (!currentApp.communities.length) {
+    if (!currentApp || !currentApp.communities || !currentApp.communities.length) {
       console.log('ℹ️ No hay comunidades para mostrar');
       list.innerHTML = '<li>Sin comunidades</li>';
       return;
@@ -231,55 +213,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
     
-    // USAR INNERHTML PARA ASEGURAR QUE SE RENDERICE CORRECTAMENTE
-    let communitiesHTML = '';
-    
-    currentApp.communities.forEach(c => {
-      if (!c || !c.id) {
-        console.warn('⚠️ Comunidad sin ID válido:', c);
-        return;
-      }
+    // Crear cada elemento MANUALMENTE con createElement
+    currentApp.communities.forEach(community => {
+      if (!community || !community.id) return;
       
-      const communityUrl = `/community/${c.id}`;
-      communitiesHTML += `
-        <li style="margin-bottom: 10px;">
-          <a href="${communityUrl}" 
-             class="community-link" 
-             target="_blank"
-             style="
-               display: block;
-               padding: 10px 15px;
-               background: #2563eb;
-               color: white;
-               text-decoration: none;
-               border-radius: 6px;
-               font-weight: 500;
-               text-align: center;
-               transition: background 0.2s;
-               cursor: pointer;
-             "
-             onmouseover="this.style.background='#1d4ed8'"
-             onmouseout="this.style.background='#2563eb'">
-            ${c.name || 'Comunidad sin nombre'}
-          </a>
-        </li>
+      // 1. Crear el elemento <li>
+      const li = document.createElement('li');
+      li.style.cssText = 'margin-bottom: 10px;';
+      
+      // 2. Crear el elemento <a> - ¡ESTO ES LO CLAVE!
+      const a = document.createElement('a');
+      a.href = `/community/${community.id}`;
+      a.className = 'community-link';
+      a.textContent = community.name || 'Comunidad sin nombre';
+      a.target = '_blank';
+      
+      // Estilos INLINE obligatorios
+      a.style.cssText = `
+        display: block;
+        padding: 12px 16px;
+        background: #2563eb;
+        color: white !important;
+        text-decoration: none !important;
+        border-radius: 8px;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+        border: 2px solid #2563eb;
+        transition: all 0.2s ease;
       `;
+      
+      // Efectos hover
+      a.addEventListener('mouseenter', () => {
+        a.style.background = '#1d4ed8';
+        a.style.borderColor = '#1d4ed8';
+      });
+      
+      a.addEventListener('mouseleave', () => {
+        a.style.background = '#2563eb';
+        a.style.borderColor = '#2563eb';
+      });
+      
+      // Evento de clic
+      a.addEventListener('click', () => {
+        console.log(`🔗 Navegando a comunidad: ${community.name}`);
+      });
+      
+      // 3. Añadir el enlace al <li>
+      li.appendChild(a);
+      
+      // 4. Añadir el <li> a la lista
+      list.appendChild(li);
     });
     
-    list.innerHTML = communitiesHTML;
-    
-    // AGREGAR EVENT LISTENERS DESPUÉS DE RENDERIZAR
-    setTimeout(() => {
-      const links = list.querySelectorAll('.community-link');
-      links.forEach(link => {
-        link.addEventListener('click', function(e) {
-          console.log(`🔗 Navegando a: ${this.href}`);
-          // Permitir que el navegador maneje el enlace
-        });
-      });
-    }, 100);
-    
-    console.log('✅ Comunidades renderizadas exitosamente');
+    console.log(`✅ Se crearon ${list.children.length} enlaces de comunidad`);
   }
 
   /* ======================================================
@@ -314,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Agregar nueva comunidad
       currentApp.communities.push(data.community);
       
-      // RE-RENDERIZAR comunidades
+      // Re-renderizar
       renderCommunities();
 
       communityNameInput.value = '';
@@ -370,20 +357,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Función de test actualizada
+  window.testCommunities = function() {
+    console.log('=== TEST COMUNIDADES ===');
+    console.log('1. currentApp:', currentApp);
+    console.log('2. currentApp.communities:', currentApp?.communities);
+    
+    const list = appDetailModal?.querySelector('.community-list');
+    console.log('3. Lista HTML:', list?.innerHTML);
+    
+    const links = list?.querySelectorAll('a') || [];
+    console.log('4. Enlaces encontrados:', links.length);
+    
+    console.log('5. Ejecutando renderCommunities()...');
+    renderCommunities(); // Esta función DEBE estar definida
+    
+    console.log('=== FIN TEST ===');
+  };
+
   console.log('✅ dashboard.js cargado completamente');
 });
-// TEST FUNCIONAL
-window.testCommunities = function() {
-  console.log('=== TEST COMUNIDADES ===');
-  console.log('1. currentApp:', currentApp);
-  console.log('2. currentApp.communities:', currentApp?.communities);
-  console.log('3. Lista HTML:', document.querySelector('.community-list')?.innerHTML);
-  console.log('4. Enlaces encontrados:', document.querySelectorAll('.community-link').length);
-  
-  // Forzar renderizado
-  if (currentApp) {
-    console.log('🔄 Forzando renderCommunities()');
-    renderCommunities();
-  }
-  console.log('=== FIN TEST ===');
-};
