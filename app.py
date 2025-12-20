@@ -698,16 +698,22 @@ def create_app():
     @socketio.on("send_message")
     @login_required
     def send_message(data):
-        community_id = data["community_id"]
-        content = data["content"]
+        community_id = data.get("community_id")
+        content = data.get("content", "").strip()
+
+        if not content:
+            return
+
+        community = Community.query.get(community_id)
+        if not community:
+            return
 
         msg = GroupMessage(
             id=uuid.uuid4(),
-            community_id=community_id,
-            app_id=current_user.id,  # O saca la app desde la comunidad
+            community_id=community.id,
+            app_id=community.app_id,   # 🔥 AQUÍ ESTABA EL BUG
             user_id=current_user.id,
-            content=content,
-            message_type="user"
+            content=content
         )
 
         db.session.add(msg)
@@ -717,10 +723,13 @@ def create_app():
             "new_message",
             {
                 "user": current_user.name,
-                "content": content
+                "content": content,
+                "user_id": current_user.id,
+                "created_at": msg.created_at.isoformat()
             },
             room=f"community_{community_id}"
         )
+
 
 
     @app.route('/listadodecosas')
