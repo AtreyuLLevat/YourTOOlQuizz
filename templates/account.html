@@ -566,6 +566,46 @@ input[type="checkbox"] {
   justify-content: space-between;
   align-items: center;
 }
+/* Estilos específicos para comunidades */
+.community-item {
+  margin-bottom: 10px;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.community-item:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.community-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  display: block;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.community-link:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.community-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.community-list li {
+  margin-bottom: 8px;
+}
 
 </style>
 {% endblock %}
@@ -844,6 +884,7 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/modal.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/communities.js') }}" defer></script>
 <!-- Scripts normales que no usan módulos -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
