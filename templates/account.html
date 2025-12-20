@@ -723,30 +723,32 @@ input[type="checkbox"] {
         </div>
 
 
-            <div class="tab-content hidden" id="communities">
-          <div class="community-header">
-            <h3>Comunidades</h3>
-            <button id="addCommunityBtn" class="btn btn-small">+ Añadir</button>
-          </div>
+<!-- En la sección de comunidades del modal -->
+<div class="tab-content hidden" id="communities">
+  <div class="community-header">
+    <h3>Comunidades</h3>
+    <button id="addCommunityBtn" class="btn btn-small">+ Añadir</button>
+  </div>
 
-          <div id="addCommunityForm" class="hidden" style="margin-top:10px;">
-            <input
-              type="text"
-              id="communityNameInput"
-              placeholder="Nombre de la comunidad"
-              style="width:100%; margin-bottom:8px;"
-            >
-            <button id="saveCommunityBtn" class="btn btn-small primary">
-              Crear comunidad
-            </button>
-          </div>
+  <div id="addCommunityForm" class="hidden" style="margin-top:10px;">
+    <input
+      type="text"
+      id="communityNameInput"
+      placeholder="Nombre de la comunidad"
+      style="width:100%; margin-bottom:8px;"
+    >
+    <button id="saveCommunityBtn" class="btn btn-small primary">
+      Crear comunidad
+    </button>
+  </div>
 
-          <ul class="community-list"></ul>
-
-
-          </div>
-        </div>
-        
+  <!-- SOLUCIÓN: Añadir un contenedor con ID específico para debug -->
+  <div id="communities-debug" style="display:none;"></div>
+  
+  <ul class="community-list">
+    <!-- Las comunidades se cargarán aquí -->
+  </ul>
+</div>
 
 
 
@@ -809,16 +811,7 @@ input[type="checkbox"] {
 
     </div>
   </div>
-<div id="unsavedModal" class="modal-backdrop hidden">
-  <div class="modal-content">
-    <h3>⚠️ Cambios sin guardar</h3>
-    <p>¿Deseas guardar tus cambios antes de salir?</p>
-    <div class="modal-buttons">
-      <button id="modalSave" class="modal-btn primary">Guardar</button>
-      <button id="modalDiscard" class="modal-btn secondary">Descartar</button>
-    </div>
-  </div>
-</div>
+
 
 
     </div>
