@@ -1,6 +1,3 @@
-// static/java/dashboard.js (versión simplificada)
-import { communitiesManager } from './communities.js';
-
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ======================================================
@@ -106,32 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(`🔍 Fetching app data for ID: ${appId}`);
     const res = await fetch(`/account/get_app/${appId}`);
     const data = await res.json();
-    
-    if (!data.success) {
-      console.error('❌ Error en fetchAppData:', data.error);
-      throw new Error(data.error || 'Error cargando app');
-    }
+    if (!data.success) throw new Error();
 
-    console.log('📦 Datos recibidos del backend:', {
-      appId: data.app.id,
-      name: data.app.name,
-      communitiesCount: data.app.communities?.length || 0,
-      communities: data.app.communities
-    });
-
-    // Solo inicializar si no existen
+    // SOLUCIÓN: Solo establecer arrays vacíos si no existen los campos
     if (!data.app.reviews) data.app.reviews = [];
-    if (!data.app.communities) {
-      console.warn('⚠️ No hay comunidades en la respuesta del backend');
-      data.app.communities = [];
-    }
+    if (!data.app.communities) data.app.communities = [];
     if (!data.app.team_members) data.app.team_members = [];
 
     return data.app;
   }
 
   /* ======================================================
-     ABRIR MODAL APP
+     ABRIR MODAL APP - CORREGIDO
   ====================================================== */
   async function openAppDetail(appId) {
     console.log(`🚀 Abriendo detalle de app: ${appId}`);
@@ -139,16 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       currentApp = await fetchAppData(appId);
       window.currentApp = currentApp;
-    } catch (error) {
-      console.error('❌ Error en openAppDetail:', error);
-      return alert(`Error cargando app: ${error.message}`);
+    } catch {
+      return alert('Error cargando app');
     }
 
-    if (!appDetailModal) {
-      console.error('❌ No se encontró el modal appDetailModal');
-      return;
-    }
-    
+    if (!appDetailModal) return;
     appDetailModal.dataset.appId = appId;
 
     const appNameEl = appDetailModal.querySelector('.app-name');
@@ -163,24 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const appThemeEl = appDetailModal.querySelector('.app-theme');
     if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
 
-    // DEPURACIÓN: Verificar comunidades antes de renderizar
-    console.log('📊 Comunidades para renderizar:', {
-      hasCurrentApp: !!currentApp,
-      hasCommunities: !!currentApp.communities,
-      communitiesCount: currentApp.communities?.length || 0,
-      communities: currentApp.communities
-    });
-
+    // Asegurar que currentApp.communities existe
     if (!currentApp.communities) {
-      console.warn('⚠️ currentApp.communities es undefined, inicializando array vacío');
       currentApp.communities = [];
     }
 
-    // Usar el CommunitiesManager
-    communitiesManager.init(currentApp, appDetailModal);
-    communitiesManager.renderCommunities();
+    // PRIMERO: Limpiar completamente el contenido
+    const communityList = appDetailModal.querySelector('.community-list');
+    if (communityList) {
+      communityList.innerHTML = '';
+    }
 
     renderReviewsAdmin();
+    renderCommunities();
 
     appDetailModal.classList.remove('hidden');
     console.log('✅ Modal abierto exitosamente');
@@ -219,7 +192,98 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     AÑADIR COMUNIDAD (usando el manager)
+     COMMUNITIES - SOLUCIÓN DEFINITIVA
+  ====================================================== */
+  function renderCommunities() {
+    console.log('🎯 INICIANDO renderCommunities()');
+    
+    if (!appDetailModal) {
+      console.error('❌ appDetailModal no encontrado');
+      return;
+    }
+
+    const list = appDetailModal.querySelector('.community-list');
+    if (!list) {
+      console.error('❌ No se encontró .community-list en el modal');
+      return;
+    }
+
+    // LIMPIAR COMPLETAMENTE
+    list.innerHTML = '';
+
+    // Validación exhaustiva
+    if (!currentApp) {
+      console.error('❌ currentApp es null/undefined');
+      list.innerHTML = '<li>Error: App no cargada</li>';
+      return;
+    }
+
+    if (!currentApp.communities) {
+      console.warn('⚠️ currentApp.communities es undefined');
+      currentApp.communities = [];
+    }
+
+    if (!currentApp.communities.length) {
+      console.log('ℹ️ No hay comunidades para mostrar');
+      list.innerHTML = '<li>Sin comunidades</li>';
+      return;
+    }
+
+    console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
+    
+    // USAR INNERHTML PARA ASEGURAR QUE SE RENDERICE CORRECTAMENTE
+    let communitiesHTML = '';
+    
+    currentApp.communities.forEach(c => {
+      if (!c || !c.id) {
+        console.warn('⚠️ Comunidad sin ID válido:', c);
+        return;
+      }
+      
+      const communityUrl = `/community/${c.id}`;
+      communitiesHTML += `
+        <li style="margin-bottom: 10px;">
+          <a href="${communityUrl}" 
+             class="community-link" 
+             target="_blank"
+             style="
+               display: block;
+               padding: 10px 15px;
+               background: #2563eb;
+               color: white;
+               text-decoration: none;
+               border-radius: 6px;
+               font-weight: 500;
+               text-align: center;
+               transition: background 0.2s;
+               cursor: pointer;
+             "
+             onmouseover="this.style.background='#1d4ed8'"
+             onmouseout="this.style.background='#2563eb'">
+            ${c.name || 'Comunidad sin nombre'}
+          </a>
+        </li>
+      `;
+    });
+    
+    list.innerHTML = communitiesHTML;
+    
+    // AGREGAR EVENT LISTENERS DESPUÉS DE RENDERIZAR
+    setTimeout(() => {
+      const links = list.querySelectorAll('.community-link');
+      links.forEach(link => {
+        link.addEventListener('click', function(e) {
+          console.log(`🔗 Navegando a: ${this.href}`);
+          // Permitir que el navegador maneje el enlace
+        });
+      });
+    }, 100);
+    
+    console.log('✅ Comunidades renderizadas exitosamente');
+  }
+
+  /* ======================================================
+     AÑADIR COMUNIDAD
   ====================================================== */
   addCommunityBtn?.addEventListener('click', () => {
     addCommunityForm.classList.toggle('hidden');
@@ -232,11 +296,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const appId = appDetailModal?.dataset.appId;
     if (!appId) return alert('App no válida');
 
-    const community = await communitiesManager.addCommunity(name, appId);
-    
-    if (community) {
+    try {
+      const res = await fetch(`/apps/${appId}/create_community`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name })
+      });
+
+      const data = await res.json();
+      if (!data.success) return alert(data.error);
+
+      // Asegurar que currentApp.communities existe
+      if (!currentApp.communities) {
+        currentApp.communities = [];
+      }
+      
+      // Agregar nueva comunidad
+      currentApp.communities.push(data.community);
+      
+      // RE-RENDERIZAR comunidades
+      renderCommunities();
+
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
+
+    } catch {
+      alert('Error de red');
     }
   });
 
@@ -247,7 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
     appDetailModal.classList.add('hidden');
     currentApp = null;
     window.currentApp = null;
-    console.log('🔒 Modal cerrado');
   });
 
   /* ======================================================
@@ -258,10 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!btn) return;
 
     const appId = btn.dataset.appId;
-    if (appId) {
-      console.log('🖱️ Click en app:', appId);
-      openAppDetail(appId);
-    }
+    if (appId) openAppDetail(appId);
   });
 
   // Tab switching logic
@@ -289,6 +370,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // DEBUG: Verificar que todo esté cargado
   console.log('✅ dashboard.js cargado completamente');
 });
+// TEST FUNCIONAL
+window.testCommunities = function() {
+  console.log('=== TEST COMUNIDADES ===');
+  console.log('1. currentApp:', currentApp);
+  console.log('2. currentApp.communities:', currentApp?.communities);
+  console.log('3. Lista HTML:', document.querySelector('.community-list')?.innerHTML);
+  console.log('4. Enlaces encontrados:', document.querySelectorAll('.community-link').length);
+  
+  // Forzar renderizado
+  if (currentApp) {
+    console.log('🔄 Forzando renderCommunities()');
+    renderCommunities();
+  }
+  console.log('=== FIN TEST ===');
+};
