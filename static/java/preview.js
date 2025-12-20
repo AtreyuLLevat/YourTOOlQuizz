@@ -229,4 +229,51 @@ if (teamContainer) {
   } catch (error) {
     console.error("Error fetching app data:", error);
   }
+
+
+  // --- Dropdown de comunidades ---
+const openCommunityBtn = document.getElementById("openCommunityDropdown");
+const communityDropdown = document.getElementById("communityDropdown");
+
+if (openCommunityBtn && communityDropdown) {
+  // Llenar el dropdown con comunidades de la app
+  communityDropdown.innerHTML = "";
+  const communities = app.communities || [];
+  
+  if (communities.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No hay comunidades disponibles.";
+    li.style.padding = "0.5rem 1rem";
+    li.style.color = "#666";
+    communityDropdown.appendChild(li);
+  } else {
+    communities.forEach(c => {
+      const li = document.createElement("li");
+      li.textContent = c.name;
+      li.style.padding = "0.5rem 1rem";
+      li.style.cursor = "pointer";
+      li.style.transition = "background 0.2s";
+      li.addEventListener("mouseover", () => li.style.background = "#f0f4ff");
+      li.addEventListener("mouseout", () => li.style.background = "transparent");
+      li.addEventListener("click", () => {
+        // Redirigir al enlace de la comunidad
+        window.location.href = c.link || "#";
+      });
+      communityDropdown.appendChild(li);
+    });
+  }
+
+  // Toggle dropdown al hacer click
+  openCommunityBtn.addEventListener("click", () => {
+    communityDropdown.style.display = communityDropdown.style.display === "none" ? "block" : "none";
+  });
+
+  // Cerrar dropdown al hacer click fuera
+  document.addEventListener("click", (e) => {
+    if (!openCommunityBtn.contains(e.target) && !communityDropdown.contains(e.target)) {
+      communityDropdown.style.display = "none";
+    }
+  });
+}
+
 });
