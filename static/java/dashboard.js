@@ -178,8 +178,8 @@ function renderReviewsAdmin() {
   currentApp.reviews.forEach((r, index) => {
     const card = document.createElement('div');
     card.className = 'review-card';
-    card.dataset.rating = r.rating;
-    
+    card.dataset.reviewId = r.id;  // 🔥 imprescindible
+
     // Determinar estado basado en rating
     let statusClass = 'neutral';
     let statusText = 'Neutral';
@@ -193,15 +193,13 @@ function renderReviewsAdmin() {
 
     // Crear estrellas visuales
     const stars = '⭐'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-    
-    // Obtener iniciales del usuario para el avatar
+
+    // Iniciales de usuario
     const initials = r.username ? r.username.charAt(0).toUpperCase() : 'U';
-    
-    // Formatear fecha si existe
-    const reviewDate = r.date ? new Date(r.date).toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
+
+    // Formatear fecha
+    const reviewDate = r.created_at ? new Date(r.created_at).toLocaleDateString('es-ES', {
+      day: 'numeric', month: 'short', year: 'numeric'
     }) : 'Fecha no disponible';
 
     card.innerHTML = `
@@ -222,15 +220,21 @@ function renderReviewsAdmin() {
       <div class="review-content">${r.content || 'Sin comentario'}</div>
     `;
 
-    // Añadir animación escalonada
+    // 🔥 Evento click para abrir menú de acciones
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openReviewActionsMenu(e, r.id);
+    });
+
+    // Animación escalonada
     card.style.animationDelay = `${index * 0.05}s`;
-    
+
     reviewsList.appendChild(card);
   });
 
   reviewsCount.textContent = `(${currentApp.reviews.length})`;
-  
-  // Actualizar resumen de estrellas en el header
+
+  // Resumen de estrellas en el header
   const starsElement = document.querySelector('.stars');
   if (starsElement && currentApp.reviews.length > 0) {
     const avgRating = (currentApp.reviews.reduce((sum, r) => sum + r.rating, 0) / currentApp.reviews.length).toFixed(1);
@@ -243,6 +247,67 @@ function renderReviewsAdmin() {
     `;
   }
 }
+
+// ---------------------------
+// Menú flotante y eliminación
+// ---------------------------
+function closeReviewActionsMenu() {
+  document.getElementById('review-actions-menu')?.remove();
+}
+
+document.addEventListener('click', closeReviewActionsMenu);
+
+function openReviewActionsMenu(event, reviewId) {
+  closeReviewActionsMenu();
+
+  const menu = document.createElement('div');
+  menu.id = 'review-actions-menu';
+  menu.innerHTML = `<button class="danger">🗑 Eliminar reseña</button>`;
+
+  menu.style.cssText = `
+    position: fixed;
+    top: ${event.clientY}px;
+    left: ${event.clientX}px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    z-index: 9999;
+    padding: 6px;
+  `;
+
+  menu.querySelector('button').onclick = () => {
+    deleteReview(reviewId);
+    closeReviewActionsMenu();
+  };
+
+  document.body.appendChild(menu);
+}
+
+async function deleteReview(reviewId) {
+  if (!confirm('¿Eliminar esta reseña definitivamente?')) return;
+
+  const appId = appDetailModal.dataset.appId;
+
+  try {
+    const res = await fetch(`/account/review/${reviewId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await res.json();
+    if (!data.success) return alert(data.error);
+
+    // Eliminar del estado local
+    currentApp.reviews = currentApp.reviews.filter(r => r.id !== reviewId);
+
+    renderReviewsAdmin();
+  } catch {
+    alert('Error eliminando reseña');
+  }
+}
+
+
   /* ======================================================
      COMMUNITIES - ESTILO MINIMALISTA MODERNO
   ====================================================== */
