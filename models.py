@@ -254,6 +254,8 @@ class GroupMessage(db.Model):
 
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    message_type = db.Column(db.String(20), default="user")
+
 
     community = db.relationship("Community", back_populates="messages")
     user = db.relationship("User")
