@@ -136,13 +136,25 @@ async function openAppDetail(appId) {
   appDetailModal.dataset.appId = appId;
 
   // Actualizar datos básicos
-  appDetailModal.querySelector('.app-name')?.textContent = currentApp.name || '---';
-  appDetailModal.querySelector('.app-description')?.textContent = currentApp.description || '---';
-  appDetailModal.querySelector('.app-date')?.textContent = currentApp.creation_date || '---';
-  appDetailModal.querySelector('.app-theme')?.textContent = `Tema: ${currentApp.theme || 'General'}`;
+// Actualizar datos básicos del modal
+if (appDetailModal) {
+  const appNameEl = appDetailModal.querySelector('.app-name');
+  if (appNameEl) appNameEl.textContent = currentApp.name ? currentApp.name : '---';
 
-  // Renderizar reviews y comunidades **después de asegurarse de que hay datos**
-  renderReviewsAdmin();
+  const appDescEl = appDetailModal.querySelector('.app-description');
+  if (appDescEl) appDescEl.textContent = currentApp.description ? currentApp.description : '---';
+
+  const appDateEl = appDetailModal.querySelector('.app-date');
+  if (appDateEl) appDateEl.textContent = currentApp.creation_date ? currentApp.creation_date : '---';
+
+  const appThemeEl = appDetailModal.querySelector('.app-theme');
+  if (appThemeEl) appThemeEl.textContent = "Tema: " + (currentApp.theme ? currentApp.theme : "General");
+}
+
+// ⚠️ NO tocar aquí las estrellas ni el contador de reseñas
+// Ellos se actualizan dentro de renderReviewsAdmin() y no deben resetearse
+renderReviewsAdmin(); 
+
   renderCommunities();
 
   appDetailModal.classList.remove('hidden');
