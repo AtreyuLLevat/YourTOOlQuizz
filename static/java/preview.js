@@ -235,9 +235,10 @@ if (openCommunityBtn && communityDropdown) {
       li.addEventListener("mouseleave", () => li.style.background = "transparent");
 
       // Redirigir al chat de la comunidad
-      li.addEventListener("click", () => {
-        window.location.href = `/community/${c.id}/chat`;
-      });
+li.addEventListener("click", () => {
+  window.location.href = `/community/${c.id}`;
+});
+
 
       communityDropdown.appendChild(li);
     });
