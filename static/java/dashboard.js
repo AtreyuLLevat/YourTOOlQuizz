@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES - VERSIÓN DEFINITIVA Y FUNCIONAL
+     COMMUNITIES - ESTILO MINIMALISTA MODERNO
   ====================================================== */
   function renderCommunities() {
     console.log('🎯 EJECUTANDO renderCommunities()');
@@ -207,66 +207,127 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!currentApp || !currentApp.communities || !currentApp.communities.length) {
       console.log('ℹ️ No hay comunidades para mostrar');
-      list.innerHTML = '<li>Sin comunidades</li>';
+      list.innerHTML = '<li class="no-communities">Sin comunidades creadas</li>';
       return;
     }
 
     console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
     
-    // Crear cada elemento MANUALMENTE con createElement
+    // Crear tarjetas minimalistas modernas
     currentApp.communities.forEach(community => {
       if (!community || !community.id) return;
       
-      // 1. Crear el elemento <li>
+      // Crear contenedor de tarjeta
       const li = document.createElement('li');
-      li.style.cssText = 'margin-bottom: 10px;';
+      li.className = 'community-card-container';
+      li.style.cssText = 'margin-bottom: 16px; list-style: none;';
       
-      // 2. Crear el elemento <a> - ¡ESTO ES LO CLAVE!
+      // Crear el enlace como tarjeta
       const a = document.createElement('a');
       a.href = `/community/${community.id}`;
-      a.className = 'community-link';
-      a.textContent = community.name || 'Comunidad sin nombre';
+      a.className = 'community-card';
       a.target = '_blank';
       
-      // Estilos INLINE obligatorios
-      a.style.cssText = `
-        display: block;
-        padding: 12px 16px;
-        background: #2563eb;
-        color: white !important;
-        text-decoration: none !important;
-        border-radius: 8px;
-        font-weight: 600;
-        text-align: center;
-        cursor: pointer;
-        border: 2px solid #2563eb;
-        transition: all 0.2s ease;
+      // Contenido de la tarjeta
+      a.innerHTML = `
+        <div class="community-card-content">
+          <div class="community-card-name">${community.name || 'Comunidad sin nombre'}</div>
+          <div class="community-card-meta">${community.members_count || 0} miembros</div>
+        </div>
+        <div class="community-card-arrow">→</div>
       `;
       
-      // Efectos hover
+      // Estilos minimalistas modernos
+      a.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        background: #ffffff;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      `;
+      
+      // Estilos hover elegante
       a.addEventListener('mouseenter', () => {
-        a.style.background = '#1d4ed8';
-        a.style.borderColor = '#1d4ed8';
+        a.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)';
+        a.style.transform = 'translateY(-2px)';
+        a.style.borderColor = '#d1d5db';
       });
       
       a.addEventListener('mouseleave', () => {
-        a.style.background = '#2563eb';
-        a.style.borderColor = '#2563eb';
+        a.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)';
+        a.style.transform = 'translateY(0)';
+        a.style.borderColor = '#e5e7eb';
       });
+      
+      // Estilos para el contenido interno
+      const cardContent = a.querySelector('.community-card-content');
+      if (cardContent) {
+        cardContent.style.cssText = `
+          flex: 1;
+          min-width: 0;
+        `;
+      }
+      
+      const cardName = a.querySelector('.community-card-name');
+      if (cardName) {
+        cardName.style.cssText = `
+          font-size: 16px;
+          font-weight: 600;
+          color: #111827;
+          margin-bottom: 4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        `;
+      }
+      
+      const cardMeta = a.querySelector('.community-card-meta');
+      if (cardMeta) {
+        cardMeta.style.cssText = `
+          font-size: 14px;
+          color: #6b7280;
+          font-weight: 400;
+        `;
+      }
+      
+      const cardArrow = a.querySelector('.community-card-arrow');
+      if (cardArrow) {
+        cardArrow.style.cssText = `
+          font-size: 20px;
+          color: #374151;
+          font-weight: 300;
+          margin-left: 16px;
+          transition: transform 0.2s ease;
+        `;
+        
+        // Animación de la flecha en hover
+        a.addEventListener('mouseenter', () => {
+          cardArrow.style.transform = 'translateX(4px)';
+        });
+        
+        a.addEventListener('mouseleave', () => {
+          cardArrow.style.transform = 'translateX(0)';
+        });
+      }
       
       // Evento de clic
-      a.addEventListener('click', () => {
-        console.log(`🔗 Navegando a comunidad: ${community.name}`);
+      a.addEventListener('click', (e) => {
+        console.log(`🔗 Navegando a comunidad: ${community.name} (ID: ${community.id})`);
       });
       
-      // 3. Añadir el enlace al <li>
       li.appendChild(a);
-      
-      // 4. Añadir el <li> a la lista
       list.appendChild(li);
     });
     
-    console.log(`✅ Se crearon ${list.children.length} enlaces de comunidad`);
+    console.log(`✅ Se crearon ${list.children.length} tarjetas de comunidad`);
   }
 
   /* ======================================================
@@ -336,24 +397,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
   
-tabBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    tabBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-    tabContents.forEach(c => c.classList.add('hidden'));
+      tabContents.forEach(c => c.classList.add('hidden'));
 
-    const targetTab = document.querySelector(`#${btn.dataset.tab}`);
-    if (targetTab) {
-      targetTab.classList.remove('hidden');
-    }
+      const targetTab = document.querySelector(`#${btn.dataset.tab}`);
+      if (targetTab) {
+        targetTab.classList.remove('hidden');
+      }
 
-    // 🔥 CLAVE
-    if (btn.dataset.tab === 'communities') {
-      renderCommunities();
-    }
+      // 🔥 CLAVE: Re-renderizar comunidades al cambiar a esa pestaña
+      if (btn.dataset.tab === 'communities') {
+        renderCommunities();
+      }
+    });
   });
-});
 
   // Close modal on backdrop click
   appDetailModal?.addEventListener('click', e => {
@@ -375,7 +436,7 @@ tabBtns.forEach(btn => {
     console.log('4. Enlaces encontrados:', links.length);
     
     console.log('5. Ejecutando renderCommunities()...');
-    renderCommunities(); // Esta función DEBE estar definida
+    renderCommunities();
     
     console.log('=== FIN TEST ===');
   };
