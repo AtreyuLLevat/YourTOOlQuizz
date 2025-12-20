@@ -205,44 +205,58 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // --- Renderizar comunidades ---
-    const openCommunityBtn = document.getElementById("openCommunityDropdown");
-    const communityDropdown = document.getElementById("communityDropdown");
+// --- Dropdown de comunidades ---
+const openCommunityBtn = document.getElementById("openCommunityDropdown");
+const communityDropdown = document.getElementById("communityDropdown");
 
-    if (openCommunityBtn && communityDropdown) {
-      communityDropdown.innerHTML = "";
+if (openCommunityBtn && communityDropdown) {
+  // Limpiar contenido previo
+  communityDropdown.innerHTML = "";
 
-      if (app.communities.length === 0) {
-        const li = document.createElement("li");
-        li.textContent = "No hay comunidades disponibles.";
-        li.style.padding = "0.5rem 1rem";
-        li.style.color = "#666";
-        communityDropdown.appendChild(li);
-      } else {
-        app.communities.forEach(c => {
-          const li = document.createElement("li");
-          li.textContent = c.name;
-          li.style.padding = "0.5rem 1rem";
-          li.style.cursor = "pointer";
-          li.style.transition = "background 0.2s";
-          li.addEventListener("mouseover", () => li.style.background = "#f0f4ff");
-          li.addEventListener("mouseout", () => li.style.background = "transparent");
-          li.addEventListener("click", () => window.location.href = c.link || "#");
-          communityDropdown.appendChild(li);
-        });
-      }
+  // Obtener comunidades de la app
+  const communities = app.communities || [];
 
-      openCommunityBtn.addEventListener("click", () => {
-        communityDropdown.style.display = communityDropdown.style.display === "none" ? "block" : "none";
+  if (communities.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No hay comunidades disponibles.";
+    li.style.padding = "0.5rem 1rem";
+    li.style.color = "#666";
+    communityDropdown.appendChild(li);
+  } else {
+    communities.forEach(c => {
+      const li = document.createElement("li");
+      li.textContent = c.name;
+      li.style.padding = "0.5rem 1rem";
+      li.style.cursor = "pointer";
+      li.style.transition = "background 0.2s";
+
+      // Efectos hover
+      li.addEventListener("mouseenter", () => li.style.background = "#f0f4ff");
+      li.addEventListener("mouseleave", () => li.style.background = "transparent");
+
+      // Redirigir al chat de la comunidad
+      li.addEventListener("click", () => {
+        window.location.href = `/community/${c.id}/chat`;
       });
 
-      document.addEventListener("click", (e) => {
-        if (!openCommunityBtn.contains(e.target) && !communityDropdown.contains(e.target)) {
-          communityDropdown.style.display = "none";
-        }
-      });
+      communityDropdown.appendChild(li);
+    });
+  }
+
+  // Toggle dropdown al hacer click en el botón
+  openCommunityBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // evitar que se cierre inmediatamente
+    communityDropdown.style.display = communityDropdown.style.display === "block" ? "none" : "block";
+  });
+
+  // Cerrar dropdown al hacer click fuera
+  document.addEventListener("click", (e) => {
+    if (!openCommunityBtn.contains(e.target) && !communityDropdown.contains(e.target)) {
+      communityDropdown.style.display = "none";
     }
-
+  });
+}
   } catch (error) {
-    console.error("Error fetching app data:", error);
+    console.error("Error al cargar la app:", error);
   }
 });
