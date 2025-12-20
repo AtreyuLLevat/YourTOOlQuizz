@@ -756,15 +756,16 @@ input[type="checkbox"] {
   <div id="createAppModal" class="modal-backdrop hidden">
     <div class="modal-content">
       <h3>Crear Nueva App</h3>
+<!-- En el formulario de crear app, dentro del modal -->
 <form id="createAppForm" method="POST" enctype="multipart/form-data">
   <div class="field">
     <label for="appName">Nombre</label>
-    <input id="appName" name="appName" type="text" required>
+    <input id="appName" name="appName" type="text" required autocomplete="off">
   </div>
 
   <div class="field">
     <label for="appDescription">Descripción</label>
-    <textarea id="appDescription" name="appDescription" rows="3" required></textarea>
+    <textarea id="appDescription" name="appDescription" rows="3" required autocomplete="off"></textarea>
   </div>
 
   <div class="field">
@@ -775,19 +776,19 @@ input[type="checkbox"] {
   <div class="field">
     <label>Equipo / Miembros</label>
     <div id="team-members-container">
-      <!-- Aquí se agregan miembros dinámicamente -->
+      <!-- Los miembros dinámicos también necesitan name/id -->
     </div>
     <button type="button" id="addMemberBtn">Añadir miembro</button>
   </div>
 
   <div class="field">
     <label for="appTheme">Tema</label>
-    <input id="appTheme" name="appTheme" type="text">
+    <input id="appTheme" name="appTheme" type="text" autocomplete="off">
   </div>
 
   <div class="field">
     <label for="appCreationDate">Fecha de creación</label>
-    <input id="appCreationDate" name="appCreationDate" type="date">
+    <input id="appCreationDate" name="appCreationDate" type="date" autocomplete="off">
   </div>
 
   <div class="field">
@@ -800,7 +801,7 @@ input[type="checkbox"] {
 
   <div class="field">
     <label for="appOfficialId">Identificación / Propiedad</label>
-    <input id="appOfficialId" name="appOfficialId" type="text">
+    <input id="appOfficialId" name="appOfficialId" type="text" autocomplete="off">
   </div>
 
   <div class="modal-buttons">

@@ -410,20 +410,38 @@ def create_app():
         if not app_data:
             return jsonify({"success": False, "error": "App no encontrada"}), 404
 
-        reviews = [
-            {"username": r.user.name if r.user else "Anónimo", "content": r.content, "rating": r.rating}
-            for r in Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
-        ]
+        # Asegurar que las reviews se cargan
+        reviews_data = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
+        reviews = []
+        for r in reviews_data:
+            username = r.user.name if r.user else "Anónimo"
+            reviews.append({
+                "username": username, 
+                "content": r.content, 
+                "rating": r.rating,
+                "created_at": r.created_at.isoformat() if r.created_at else None
+            })
 
-        team_members = [
-            {"name": t.name, "role": t.role, "avatar_url": t.avatar_url}
-            for t in TeamMember.query.filter_by(app_id=app_data.id).all()
-        ]
+        # Asegurar que los team members se cargan
+        team_members_data = TeamMember.query.filter_by(app_id=app_data.id).all()
+        team_members = []
+        for t in team_members_data:
+            team_members.append({
+                "name": t.name, 
+                "role": t.role, 
+                "avatar_url": t.avatar_url
+            })
 
-        communities = [
-            {"name": c.name, "id": str(c.id)}
-            for c in Community.query.filter_by(app_id=app_data.id).all()
-        ]
+        # 🔥 CORRECCIÓN CLAVE: Asegurar que las comunidades se cargan correctamente
+        communities_data = Community.query.filter_by(app_id=app_data.id).all()
+        communities = []
+        for c in communities_data:
+            communities.append({
+                "id": str(c.id),  # 🔥 Asegurar que es string
+                "name": c.name,
+                "description": c.description,
+                "created_at": c.created_at.isoformat() if c.created_at else None
+            })
 
         return jsonify({
             "success": True,
@@ -436,7 +454,7 @@ def create_app():
                 "image_url": app_data.image_url,
                 "reviews": reviews,
                 "team_members": team_members,
-                "communities": communities
+                "communities": communities  # 🔥 Ahora siempre tendrá datos
             }
         })
 

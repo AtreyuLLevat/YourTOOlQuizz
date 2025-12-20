@@ -97,34 +97,56 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ======================================================
-     FETCH APP - CORREGIDO
+     FETCH APP - CON DEPURACIÓN
   ====================================================== */
   async function fetchAppData(appId) {
+    console.log(`🔍 Fetching app data for ID: ${appId}`);
     const res = await fetch(`/account/get_app/${appId}`);
     const data = await res.json();
-    if (!data.success) throw new Error();
+    
+    if (!data.success) {
+      console.error('❌ Error en fetchAppData:', data.error);
+      throw new Error(data.error || 'Error cargando app');
+    }
 
-    // SOLUCIÓN: Solo establecer arrays vacíos si no existen los campos
-    // No sobrescribir datos ya existentes
+    // DEPURACIÓN: Ver qué nos devuelve el backend
+    console.log('📦 Datos recibidos del backend:', {
+      appId: data.app.id,
+      name: data.app.name,
+      communitiesCount: data.app.communities?.length || 0,
+      communities: data.app.communities
+    });
+
+    // Solo inicializar si no existen
     if (!data.app.reviews) data.app.reviews = [];
-    if (!data.app.communities) data.app.communities = [];
+    if (!data.app.communities) {
+      console.warn('⚠️ No hay comunidades en la respuesta del backend');
+      data.app.communities = [];
+    }
     if (!data.app.team_members) data.app.team_members = [];
 
     return data.app;
   }
 
   /* ======================================================
-     ABRIR MODAL APP - CORREGIDO
+     ABRIR MODAL APP - CON DEPURACIÓN
   ====================================================== */
   async function openAppDetail(appId) {
+    console.log(`🚀 Abriendo detalle de app: ${appId}`);
+    
     try {
       currentApp = await fetchAppData(appId);
       window.currentApp = currentApp;
-    } catch {
-      return alert('Error cargando app');
+    } catch (error) {
+      console.error('❌ Error en openAppDetail:', error);
+      return alert(`Error cargando app: ${error.message}`);
     }
 
-    if (!appDetailModal) return;
+    if (!appDetailModal) {
+      console.error('❌ No se encontró el modal appDetailModal');
+      return;
+    }
+    
     appDetailModal.dataset.appId = appId;
 
     const appNameEl = appDetailModal.querySelector('.app-name');
@@ -139,16 +161,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const appThemeEl = appDetailModal.querySelector('.app-theme');
     if (appThemeEl) appThemeEl.textContent = `Tema: ${currentApp.theme || 'General'}`;
 
-    // SOLUCIÓN: Asegurarse de que currentApp.communities existe antes de renderizar
+    // DEPURACIÓN: Verificar comunidades antes de renderizar
+    console.log('📊 Comunidades para renderizar:', {
+      hasCurrentApp: !!currentApp,
+      hasCommunities: !!currentApp.communities,
+      communitiesCount: currentApp.communities?.length || 0,
+      communities: currentApp.communities
+    });
+
     if (!currentApp.communities) {
+      console.warn('⚠️ currentApp.communities es undefined, inicializando array vacío');
       currentApp.communities = [];
     }
-    
-    // Asegurar que renderCommunities tiene los datos correctos
+
     renderReviewsAdmin();
     renderCommunities();
 
     appDetailModal.classList.remove('hidden');
+    console.log('✅ Modal abierto exitosamente');
   }
 
   /* ======================================================
@@ -184,68 +214,99 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES - COMPLETAMENTE CORREGIDO
+     COMMUNITIES - SOLUCIÓN DEFINITIVA
   ====================================================== */
   function renderCommunities() {
-    if (!appDetailModal) return;
+    if (!appDetailModal) {
+      console.error('❌ appDetailModal no encontrado');
+      return;
+    }
 
     const list = appDetailModal.querySelector('.community-list');
-    if (!list) return;
+    if (!list) {
+      console.error('❌ No se encontró .community-list en el modal');
+      return;
+    }
 
     list.innerHTML = '';
 
-    // SOLUCIÓN: Verificar que currentApp y currentApp.communities existan
-    if (!currentApp || !currentApp.communities || !currentApp.communities.length) {
+    // Validación exhaustiva
+    if (!currentApp) {
+      console.error('❌ currentApp es null/undefined');
+      list.innerHTML = '<li>Error: App no cargada</li>';
+      return;
+    }
+
+    if (!currentApp.communities) {
+      console.warn('⚠️ currentApp.communities es undefined');
+      currentApp.communities = [];
+    }
+
+    if (!currentApp.communities.length) {
+      console.log('ℹ️ No hay comunidades para mostrar');
       list.innerHTML = '<li>Sin comunidades</li>';
       return;
     }
 
-    currentApp.communities.forEach(c => {
-      // SOLUCIÓN: Verificar que cada comunidad tenga un ID válido
-      if (!c || !c.id) return;
+    console.log(`🎯 Renderizando ${currentApp.communities.length} comunidades:`);
+    
+    currentApp.communities.forEach((c, index) => {
+      console.log(`  ${index + 1}. ID: ${c?.id}, Nombre: ${c?.name}`);
+      
+      if (!c || !c.id) {
+        console.warn(`⚠️ Comunidad ${index} sin ID válido:`, c);
+        return;
+      }
       
       const li = document.createElement('li');
+      li.style.marginBottom = '8px';
       
       const a = document.createElement('a');
-      a.href = `/community/${c.id}`;
+      const communityUrl = `/community/${c.id}`;
+      a.href = communityUrl;
       a.className = 'community-link';
       a.textContent = c.name || 'Comunidad sin nombre';
-      a.target = '_blank'; // Para abrir en nueva pestaña (opcional)
+      a.target = '_blank';
+      a.style.cssText = `
+        color: #2563eb;
+        text-decoration: none;
+        padding: 6px 12px;
+        border: 1px solid #2563eb;
+        border-radius: 6px;
+        display: inline-block;
+        transition: all 0.2s;
+      `;
       
-      // Asegurar que el enlace funcione inmediatamente
-      a.addEventListener('click', function(e) {
-        if (!this.href || this.href === '#') {
-          e.preventDefault();
-          alert('Enlace no disponible temporalmente');
-          return;
+      a.addEventListener('mouseenter', () => {
+        a.style.backgroundColor = '#2563eb';
+        a.style.color = 'white';
+      });
+      
+      a.addEventListener('mouseleave', () => {
+        a.style.backgroundColor = 'transparent';
+        a.style.color = '#2563eb';
+      });
+      
+      // Evento de clic robusto
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log(`🔗 Navegando a comunidad: ${communityUrl}`);
+        if (communityUrl && communityUrl !== '#') {
+          window.open(communityUrl, '_blank');
+        } else {
+          alert('Enlace no disponible');
         }
-        window.location.href = this.href;
       });
       
       li.appendChild(a);
       list.appendChild(li);
     });
-    
-    // SOLUCIÓN: Forzar actualización del DOM para asegurar que los enlaces se renderizan
-    setTimeout(() => {
-      const links = document.querySelectorAll('.community-link');
-      links.forEach(link => {
-        if (!link.onclick) {
-          link.addEventListener('click', function(e) {
-            if (!this.href || this.href === '#') {
-              e.preventDefault();
-              alert('Enlace no disponible temporalmente');
-              return;
-            }
-            window.location.href = this.href;
-          });
-        }
-      });
-    }, 50);
+
+    console.log('✅ Comunidades renderizadas');
   }
 
   /* ======================================================
-     AÑADIR COMUNIDAD - CORREGIDO
+     AÑADIR COMUNIDAD
   ====================================================== */
   addCommunityBtn?.addEventListener('click', () => {
     addCommunityForm.classList.toggle('hidden');
@@ -258,6 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const appId = appDetailModal?.dataset.appId;
     if (!appId) return alert('App no válida');
 
+    console.log(`➕ Creando comunidad para app ${appId}: ${name}`);
+
     try {
       const res = await fetch(`/apps/${appId}/create_community`, {
         method: 'POST',
@@ -266,37 +329,27 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const data = await res.json();
+      console.log('📥 Respuesta crear comunidad:', data);
+      
       if (!data.success) return alert(data.error);
 
-      // SOLUCIÓN: Asegurar que currentApp.communities existe antes de push
+      // Asegurar que currentApp.communities existe
       if (!currentApp.communities) {
         currentApp.communities = [];
       }
       
+      // Agregar nueva comunidad
       currentApp.communities.push(data.community);
+      console.log('✅ Comunidad agregada a currentApp:', data.community);
+      
+      // Re-renderizar
       renderCommunities();
 
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
 
-      // SOLUCIÓN: Forzar actualización del DOM para asegurar que los enlaces se renderizan
-      setTimeout(() => {
-        const links = document.querySelectorAll('.community-link');
-        links.forEach(link => {
-          if (!link.onclick) {
-            link.addEventListener('click', function(e) {
-              if (!this.href || this.href === '#') {
-                e.preventDefault();
-                alert('Enlace no disponible temporalmente');
-                return;
-              }
-              window.location.href = this.href;
-            });
-          }
-        });
-      }, 100);
-
-    } catch {
+    } catch (error) {
+      console.error('❌ Error creando comunidad:', error);
       alert('Error de red');
     }
   });
@@ -308,46 +361,34 @@ document.addEventListener('DOMContentLoaded', () => {
     appDetailModal.classList.add('hidden');
     currentApp = null;
     window.currentApp = null;
+    console.log('🔒 Modal cerrado');
   });
 
   /* ======================================================
-     LISTENER APPS - CORREGIDO
+     LISTENER APPS
   ====================================================== */
-  appsList?.addEventListener('click', async e => {
+  appsList?.addEventListener('click', e => {
     const btn = e.target.closest('.app-item');
     if (!btn) return;
 
     const appId = btn.dataset.appId;
     if (appId) {
-      // SOLUCIÓN: Resetear currentApp antes de abrir
-      currentApp = null;
-      window.currentApp = null;
-      
-      // Asegurar que el modal está limpio
-      const communityList = appDetailModal.querySelector('.community-list');
-      if (communityList) {
-        communityList.innerHTML = '<li>Cargando comunidades...</li>';
-      }
-      
-      await openAppDetail(appId);
+      console.log('🖱️ Click en app:', appId);
+      openAppDetail(appId);
     }
   });
 
-  // Tab switching logic (bound once on load)
+  // Tab switching logic
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Remove active from all buttons
       tabBtns.forEach(b => b.classList.remove('active'));
-      // Add active to clicked button
       btn.classList.add('active');
 
-      // Hide all tab contents
       tabContents.forEach(c => c.classList.add('hidden'));
 
-      // Show the target tab
       const targetTab = document.querySelector(`#${btn.dataset.tab}`);
       if (targetTab) {
         targetTab.classList.remove('hidden');
@@ -355,11 +396,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Close modal on backdrop click (bound once)
+  // Close modal on backdrop click
   appDetailModal?.addEventListener('click', e => {
     if (e.target === appDetailModal) {
       appDetailModal.classList.add('hidden');
     }
   });
 
+  // DEBUG: Verificar que todo esté cargado
+  console.log('✅ dashboard.js cargado completamente');
 });
