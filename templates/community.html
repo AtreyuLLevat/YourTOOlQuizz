@@ -372,7 +372,36 @@
     </div>
   </div>
 
-  <div class="chat-messages" id="messages"></div>
+<div class="chat-messages" id="messages">
+  {% for msg in messages %}
+    {% if msg.message_type == 'admin' %}
+      <div class="admin-message">
+        <div class="admin-header">
+          <span class="admin-badge">ADMIN</span>
+          <span class="admin-name">{{ msg.user.name }}</span>
+        </div>
+        <div class="message-content">{{ msg.content }}</div>
+      </div>
+
+    {% elif msg.message_type == 'poll' %}
+      <div class="poll-message">
+        <div class="poll-question">{{ msg.content }}</div>
+        <div class="poll-options">
+          {% for opt in msg.extra_data.options %}
+            <div class="poll-option">{{ opt }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+    {% else %}
+      <div class="user-message">
+        <div class="user-name">{{ msg.user.name }}</div>
+        <div class="message-content">{{ msg.content }}</div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
 
   <div class="chat-input">
     <input type="text" id="message-input" placeholder="Escribe tu mensaje...">

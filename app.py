@@ -48,7 +48,7 @@ from flask_socketio import join_room, leave_room, emit
 from slugify import slugify
 from models import unique_slug
 from uuid import UUID
-
+from sqlalchemy.orm import joinedload
 
 
 
@@ -659,11 +659,13 @@ def create_app():
         # Cargar los últimos mensajes de la comunidad
         messages = (
             GroupMessage.query
+            .options(joinedload(GroupMessage.user))  # 🔴 CLAVE
             .filter_by(community_id=community.id)
             .order_by(GroupMessage.created_at.asc())
             .limit(100)
             .all()
         )
+        
 
         return render_template(
             "community.html",
@@ -698,22 +700,19 @@ def create_app():
     @socketio.on("send_message")
     @login_required
     def send_message(data):
-        community_id = data.get("community_id")
-        content = data.get("content", "").strip()
-
-        if not content:
-            return
-
-        community = Community.query.get(community_id)
-        if not community:
-            return
+        community_id = data["community_id"]
+        content = data["content"]
+        message_type = data.get("message_type", "user")
+        extra_data = data.get("extra_data")
 
         msg = GroupMessage(
             id=uuid.uuid4(),
-            community_id=community.id,
-            app_id=community.app_id,   # 🔥 AQUÍ ESTABA EL BUG
+            community_id=community_id,
+            app_id=Community.query.get(community_id).app_id,
             user_id=current_user.id,
-            content=content
+            content=content,
+            message_type=message_type,
+            extra_data=extra_data
         )
 
         db.session.add(msg)
@@ -722,14 +721,15 @@ def create_app():
         emit(
             "new_message",
             {
+                "id": str(msg.id),
                 "user": current_user.name,
-                "content": content,
-                "user_id": current_user.id,
+                "content": msg.content,
+                "message_type": msg.message_type,
+                "extra_data": msg.extra_data,
                 "created_at": msg.created_at.isoformat()
             },
             room=f"community_{community_id}"
         )
-
 
 
     @app.route('/listadodecosas')
