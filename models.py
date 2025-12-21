@@ -289,6 +289,11 @@ class Community(db.Model):
     members = db.relationship("GroupMember", back_populates="community", cascade="all, delete-orphan")
     messages = db.relationship("GroupMessage", back_populates="community", cascade="all, delete-orphan")
 
+    @property
+    def owner_id(self):
+        """Devuelve el id del owner de la comunidad (heredado del owner de la app)"""
+        return self.app.owner_id
+
 
 # -------------------------
 # MODELOS EXISTENTES (MANTENIDOS)
