@@ -2,21 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatContainer = document.getElementById('chat-container');
     if (!chatContainer) return console.error("No se encontró el contenedor de chat");
 
-    const communityId = chatContainer.dataset.communityId;
-    const userId = chatContainer.dataset.userId;
-    const userName = chatContainer.dataset.userName;
-    const isAdmin = chatContainer.dataset.isAdmin === 'true';
-    const isOwner = chatContainer.dataset.isOwner === 'true';
+
 
     if (!communityId) return console.error("No se encontró el ID de la comunidad");
 
-    const socket = io();
-    const messagesContainer = document.getElementById("messages");
-    const inputField = document.getElementById("message-input");
-    const sendBtn = document.getElementById("send-btn");
+const socket = io();
 
-    // Unirse a la comunidad
-    socket.emit("join_community", { community_id: communityId });
+const communityData = document.getElementById('chat-container');
+
+const communityId = communityData.dataset.communityId;
+const userId = communityData.dataset.userId;
+const userName = communityData.dataset.userName;
+const isAdmin = communityData.dataset.isAdmin === 'true';
+const isOwner = communityData.dataset.isOwner === 'true';
+
+socket.emit("join_community", { community_id: communityId });
+
 
     // Función para renderizar un mensaje
     const renderMessage = (data) => {
