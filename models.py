@@ -135,6 +135,7 @@ class App(db.Model):
 
     # Relación muchos a muchos con tags
     tags = db.relationship("Tag", secondary="app_tags", back_populates="apps")
+    
 
     def __repr__(self):
         return f"<App {self.name}>"
@@ -153,11 +154,12 @@ class Tag(db.Model):
 class AppTag(db.Model):
     __tablename__ = "app_tags"
 
+
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), primary_key=True)
     tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), primary_key=True)
 
-    app = db.relationship("App", backref=db.backref("app_tags_assoc"))
-    tag = db.relationship("Tag", backref=db.backref("app_tags_assoc"))
+    app = db.relationship("App", overlaps="tags,apps")
+    tag = db.relationship("Tag", overlaps="apps,tags")
 
 
 class TeamMember(db.Model):
