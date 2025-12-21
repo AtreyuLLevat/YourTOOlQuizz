@@ -662,23 +662,29 @@ def create_app():
             .order_by(GroupMessage.created_at.asc())
             .all()
         )
-        historical_messages = [
-            {
+
+        # ✅ Convertir los mensajes a dict para JSON
+        historical_messages = []
+        for msg in messages:
+            historical_messages.append({
                 "id": str(msg.id),
+                "community_id": str(msg.community_id),
                 "content": msg.content,
-                "user": {"name": msg.user.name},
-                "role": msg.role,                    # 🔹 rol real guardado
-                "message_type": msg.message_type,    # user/admin/poll/etc.
+                "user": {
+                    "id": str(msg.user.id),
+                    "name": msg.user.name,
+                    "is_owner": msg.user.is_owner,
+                    "is_admin": msg.user.is_admin
+                },
+                "role": "owner" if msg.user.is_owner else "admin" if msg.user.is_admin else "user",
+                "message_type": msg.message_type,
                 "extra_data": msg.extra_data or {},
                 "created_at": msg.created_at.isoformat()
-            }
-            for msg in messages
-        ]       
+            })
 
         return render_template(
             "community.html",
             community=community,
-            messages=messages,
             historical_messages=historical_messages
         )
 
