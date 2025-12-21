@@ -91,35 +91,12 @@ body { display: flex; height: 100vh; background: #fafafa; }
   <div class="chat-header">
     <div class="chat-title">Chat de {{ community.name }}</div>
     <div class="user-status">
-      <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.is_admin else "Usuario" }}
+      <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.role == 'admin' else "Usuario" }}
     </div>
   </div>
 
   <div class="chat-messages" id="messages">
-    {% for msg in messages %}
-      {% set role = "owner" if msg.user.is_owner else "admin" if msg.user.is_admin else "user" %}
-      {% if msg.message_type == 'poll' %}
-        <div class="poll-message">
-          <div class="poll-question">{{ msg.content }}</div>
-          <div class="poll-options">
-            {% for opt in msg.extra_data.options %}
-              <div class="poll-option">{{ opt }}</div>
-            {% endfor %}
-          </div>
-        </div>
-      {% elif role in ['owner','admin'] %}
-        <div class="role-message">
-          <div class="role-badge">{{ role.upper() }}</div>
-          <div class="admin-name">{{ msg.user.name }}</div>
-          <div class="message-content">{{ msg.content }}</div>
-        </div>
-      {% else %}
-        <div class="user-message">
-          <div class="user-name">{{ msg.user.name }}</div>
-          <div class="message-content">{{ msg.content }}</div>
-        </div>
-      {% endif %}
-    {% endfor %}
+    <!-- Mensajes serán renderizados vía JS desde historical_messages -->
   </div>
 
   <div class="chat-input">
@@ -128,7 +105,6 @@ body { display: flex; height: 100vh; background: #fafafa; }
   </div>
 </div>
 
-<!-- Datos JS -->
 <!-- Datos JS -->
 <div id="chat-container" 
      data-community-id="{{ community.id }}" 
@@ -140,8 +116,9 @@ body { display: flex; height: 100vh; background: #fafafa; }
 
 <!-- Mensajes históricos ocultos para JS -->
 <div id="historical-messages" style="display:none;">
-    {{ historical_messages | tojson }}
+    {{ messages | tojson }}
 </div>
+
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/community-chat.js') }}"></script>
