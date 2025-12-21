@@ -251,7 +251,7 @@ class GroupMessage(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     content = db.Column(db.Text, nullable=False)
-
+    role = db.Column(db.String(20)) 
     # 🔥 CLAVE
     message_type = db.Column(db.String(20), default="user")
 
