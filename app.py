@@ -700,15 +700,23 @@ def create_app():
     @socketio.on("send_message")
     @login_required
     def send_message(data):
-        community_id = data["community_id"]
-        content = data["content"]
+        community_id = data.get("community_id")
+        content = data.get("content", "").strip()
         message_type = data.get("message_type", "user")
         extra_data = data.get("extra_data")
 
+        if not content or not community_id:
+            return
+
+        # Obtener comunidad
+        community = Community.query.get(community_id)
+        if not community:
+            return
+
+        # Guardar mensaje en DB
         msg = GroupMessage(
-            id=uuid.uuid4(),
-            community_id=community_id,
-            app_id=Community.query.get(community_id).app_id,
+            community_id=community.id,
+            app_id=community.app_id,
             user_id=current_user.id,
             content=content,
             message_type=message_type,
@@ -718,19 +726,20 @@ def create_app():
         db.session.add(msg)
         db.session.commit()
 
-        emit(
+        # 🔥 EMITIR MENSAJE AL CHAT
+        socketio.emit(
             "new_message",
             {
-                "id": str(msg.id),
-                "user": current_user.name,
+                "community_id": str(community.id),
                 "content": msg.content,
-                "message_type": msg.message_type,
-                "extra_data": msg.extra_data,
-                "created_at": msg.created_at.isoformat()
+                "user": current_user.name,
+                "message_type": message_type,
+                "role": current_user.role,
+                "extra_data": extra_data,
+                "id": str(msg.id)
             },
-            room=f"community_{community_id}"
+            room=f"community_{community.id}"
         )
-
 
     @app.route('/listadodecosas')
     def explorador():

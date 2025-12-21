@@ -17,47 +17,47 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ============================
        RECIBIR MENSAJES
     ============================ */
-    socket.on("new_message", data => {
-        if (data.community_id !== communityId) return;
+socket.on("new_message", data => {
+    if (data.community_id !== communityId) return;
 
-        const div = document.createElement("div");
+    const div = document.createElement("div");
 
-        if (data.message_type === "admin") {
-            div.className = "admin-message";
-            div.innerHTML = `
-                <div class="admin-header">
-                    <span class="admin-badge">ADMIN</span>
-                    <span class="admin-name">${data.user}</span>
-                </div>
-                <div class="message-content">${data.content}</div>
-            `;
-        }
+    const isHighRole = ["owner", "admin", "moderator"].includes(data.role);
 
-        else if (data.message_type === "poll") {
-            div.className = "poll-message";
+    if (data.message_type === "poll") {
+        div.className = "poll-message";
+        let optionsHtml = "";
+        (data.extra_data?.options || []).forEach(opt => {
+            optionsHtml += `<div class="poll-option">${opt}</div>`;
+        });
 
-            let optionsHtml = "";
-            (data.extra_data?.options || []).forEach((opt, idx) => {
-                optionsHtml += `<div class="poll-option" data-option-id="${idx}">${opt}</div>`;
-            });
+        div.innerHTML = `
+            <div class="poll-question">${data.content}</div>
+            <div class="poll-options">${optionsHtml}</div>
+        `;
+    }
 
-            div.innerHTML = `
-                <div class="poll-question">${data.content}</div>
-                <div class="poll-options">${optionsHtml}</div>
-            `;
-        }
+    else if (isHighRole) {
+        div.className = "admin-message role-message";
+        div.innerHTML = `
+            <div class="role-badge">${data.role}</div>
+            <div class="admin-name">${data.user}</div>
+            <div class="message-content">${data.content}</div>
+        `;
+    }
 
-        else {
-            div.className = "user-message";
-            div.innerHTML = `
-                <div class="user-name">${data.user}</div>
-                <div class="message-content">${data.content}</div>
-            `;
-        }
+    else {
+        div.className = "user-message";
+        div.innerHTML = `
+            <div class="user-name">${data.user}</div>
+            <div class="message-content">${data.content}</div>
+        `;
+    }
 
-        messagesContainer.appendChild(div);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    });
+    messagesContainer.appendChild(div);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+});
+
 
     /* ============================
        ENVIAR MENSAJES
