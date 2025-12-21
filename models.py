@@ -233,36 +233,18 @@ class GroupMessage(db.Model):
     __tablename__ = "group_messages"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-
-    community_id = db.Column(
-        UUID(as_uuid=True),
-        db.ForeignKey("communities.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
-
-    app_id = db.Column(
-        UUID(as_uuid=True),
-        db.ForeignKey("apps.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True
-    )
-
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"))
+    app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
 
     content = db.Column(db.Text, nullable=False)
 
-    # 🔥 CLAVE
     message_type = db.Column(db.String(20), default="user")
 
-    # Para encuestas (JSON simple)
+    role = db.Column(db.String(20), default="member")  # 🔥 CLAVE
+
     extra_data = db.Column(JSON, nullable=True)
-
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    community = db.relationship("Community", back_populates="messages")
-    user = db.relationship("User")
-    app = db.relationship("App", back_populates="group_messages")
 
 # COMUNIDADES
 # -------------------------

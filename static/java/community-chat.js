@@ -54,14 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         /* ---------- ROLES ALTOS ---------- */
-        else if (isHighRole) {
-            div.className = "role-message role-${data.role}";
-
+        else if (data.role === "owner" || data.role === "admin") {
+            // renderizar mensaje con estilo admin/owner
+            div.className = "admin-message role-message";
             div.innerHTML = `
-                <div class="role-header">
-                    <span class="role-badge">${data.role.toUpperCase()}</span>
-                    <span class="role-user">${data.user}</span>
-                </div>
+                <div class="role-badge">${data.role}</div>
+                <div class="admin-name">${data.user}</div>
                 <div class="message-content">${data.content}</div>
             `;
         }
