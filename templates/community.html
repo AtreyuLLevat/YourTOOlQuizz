@@ -428,19 +428,21 @@
 </div>
 
 
-  <div class="chat-input">
-    <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
-    <button id="send-btn">Enviar</button>
-  </div>
-</div>
 
 <!-- Datos para JS -->
-<div id="community-data"
+<div id="chat-container"
      data-community-id="{{ community.id }}"
      data-user-id="{{ current_user.id }}"
      data-user-name="{{ current_user.name }}"
      data-is-admin="{{ 'true' if current_user.is_admin else 'false' }}">
 </div>
+
+<div id="messages"></div>
+<input id="message-input" type="text" placeholder="Escribe un mensaje">
+<button id="send-btn">Enviar</button>
+
+<script src="{{ url_for('static', filename='js/community-chat.js') }}"></script>
+
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/community-chat.js') }}"></script>
