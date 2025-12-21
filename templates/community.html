@@ -97,13 +97,14 @@ body { display: flex; height: 100vh; background: #fafafa; }
 </div>
 
 <!-- Datos JS -->
-<div id="chat-container"
-     data-community-id="{{ community.id }}"
-     data-user-id="{{ current_user.id }}"
-     data-user-name="{{ current_user.name }}"
-     data-is-admin="{{ 'true' if current_user.is_admin else 'false' }}"
-     data-is-owner="{{ 'true' if current_user.is_owner else 'false' }}">
+<div id="chat-container" 
+     data-community-id="{{ community.id }}" 
+     data-user-id="{{ current_user.id }}" 
+     data-user-name="{{ current_user.name }}" 
+     data-is-admin="{{ current_user.role == 'admin' }}" 
+     data-is-owner="{{ current_user.is_owner }}">
 </div>
+
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/community-chat.js') }}"></script>

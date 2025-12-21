@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("Elemento chat-container:", document.getElementById("chat-container"));
+
     const communityData = document.getElementById('community-data');
     const communityId = communityData.dataset.communityId;
     const userId = communityData.dataset.userId;
