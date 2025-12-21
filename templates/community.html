@@ -41,6 +41,38 @@ body { display: flex; height: 100vh; background: #fafafa; }
 .chat-input input:focus { border-color: #3b82f6; }
 .chat-input button { padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 600; }
 .chat-input button:hover { background: #2563eb; }
+/* Mensajes de owner */
+.owner-message {
+    background-color: #e0f7fa;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 6px;
+}
+
+/* Mensajes de admin */
+.admin-message {
+    background-color: #fff3e0;
+    border-left: 4px solid #ff9800;
+    padding: 8px;
+    margin-bottom: 6px;
+}
+
+/* Mensajes de usuario normal */
+.user-message {
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    padding: 6px;
+    margin-bottom: 6px;
+}
+
+/* Mensajes de encuesta/poll */
+.poll-message {
+    background-color: #f0f4c3;
+    border-radius: 6px;
+    padding: 6px;
+    margin-bottom: 6px;
+}
+
 </style>
 </head>
 <body>
