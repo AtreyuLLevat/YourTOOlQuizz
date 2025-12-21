@@ -29,24 +29,36 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Evento new_message recibido:", data);
         if (String(data.community_id) !== String(communityId)) return;
 
+    const div = document.createElement("div");
+    // 🔹 Log para depuración
+console.log("Renderizando mensaje:", {
+    user: data.user,
+    role: data.role,
+    message_type: data.message_type
+});
 
-        const div = document.createElement("div");
-        if(data.message_type === 'admin'){
-            div.className = 'admin-message';
-            div.innerHTML = `<div class="admin-header"><span class="admin-badge">ADMIN</span><span class="admin-name">${data.user}</span></div>
-                             <div class="message-content">${data.content}</div>`;
-        } else if(data.message_type === 'poll'){
-            div.className = 'poll-message';
-            let optionsHtml = '';
-            data.options?.forEach((opt, idx) => {
-                optionsHtml += `<div class="poll-option" data-poll-id="${data.id}" data-option-id="${idx}">${opt}</div>`;
-            });
-            div.innerHTML = `<div class="poll-question">${data.content}</div>
-                             <div class="poll-options">${optionsHtml}</div>`;
-        } else {
-            div.className = 'user-message';
-            div.innerHTML = `<div class="user-name">${data.user}</div><div class="message-content">${data.content}</div>`;
-        }
+
+    if (data.message_type === "admin") {
+        div.className = 'admin-message';
+        div.innerHTML = `<div class="admin-header"><span class="admin-badge">ADMIN</span><span class="admin-name">${data.user}</span></div>
+                        <div class="message-content">${data.content}</div>`;
+    } else if (data.role === "owner") {  // 🔹 Agregado
+        div.className = 'owner-message';
+        div.innerHTML = `<div class="owner-name">${data.user}</div>
+                        <div class="message-content">${data.content}</div>`;
+    } else if (data.message_type === "poll") {
+        div.className = 'poll-message';
+        let optionsHtml = '';
+        data.extra_data?.options?.forEach((opt, idx) => {
+            optionsHtml += `<div class="poll-option" data-poll-id="${data.id}" data-option-id="${idx}">${opt}</div>`;
+        });
+        div.innerHTML = `<div class="poll-question">${data.content}</div>
+                        <div class="poll-options">${optionsHtml}</div>`;
+    } else {
+        div.className = 'user-message';
+        div.innerHTML = `<div class="user-name">${data.user}</div><div class="message-content">${data.content}</div>`;
+}
+
 
         messagesContainer.appendChild(div);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
