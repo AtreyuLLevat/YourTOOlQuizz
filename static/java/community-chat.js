@@ -1,22 +1,25 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return console.error("No se encontró el contenedor de chat");
+
+    const communityData = document.getElementById("chat-container");
+    if (!communityData) {
+        console.error("chat-container no existe");
+        return;
+    }
+
+    const communityId = communityData.dataset.communityId;
+    const userId = communityData.dataset.userId;
+    const userName = communityData.dataset.userName;
+    const isAdmin = communityData.dataset.isAdmin === "true";
+
+    const socket = io();
+
+    socket.emit("join_community", {
+        community_id: communityId
+    });
 
 
 
-    if (!communityId) return console.error("No se encontró el ID de la comunidad");
 
-const socket = io();
-
-const communityData = document.getElementById('chat-container');
-
-const communityId = communityData.dataset.communityId;
-const userId = communityData.dataset.userId;
-const userName = communityData.dataset.userName;
-const isAdmin = communityData.dataset.isAdmin === 'true';
-const isOwner = communityData.dataset.isOwner === 'true';
-
-socket.emit("join_community", { community_id: communityId });
 
 
     // Función para renderizar un mensaje
@@ -119,3 +122,5 @@ socket.emit("join_community", { community_id: communityId });
         });
     };
 });
+
+
