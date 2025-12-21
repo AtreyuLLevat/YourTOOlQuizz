@@ -689,10 +689,14 @@ def create_app():
         return jsonify({"success": True})
 
     
+
+
     @socketio.on("join_community")
-    def join_community(data):
-        room = f"community_{data['community_id']}"
-        join_room(room)
+    def handle_join_community(data):
+        community_id = data.get("community_id")
+        if community_id:
+            join_room(str(community_id))
+            print(f"👤 Usuario {current_user.name} se unió a la sala {community_id}")
 
 
     @socketio.on("send_message")
@@ -700,12 +704,16 @@ def create_app():
         community_id = data.get("community_id")
         content = data.get("content")
 
+        print(f"🔹 Evento send_message recibido: community_id={community_id}, content={content}")
+
         if not community_id or not content:
+            print("❌ Faltan datos")
             return
 
         # 1️⃣ Cargar comunidad
         community = Community.query.get(community_id)
         if not community:
+            print("❌ Comunidad no encontrada")
             return
 
         # 2️⃣ Asociar comunidad al usuario (para is_owner)
@@ -719,19 +727,20 @@ def create_app():
             if current_user.role == "admin"
             else "user"
         )
+        print(f"🔹 Rol del usuario: {role}")
 
         # 4️⃣ Crear mensaje (🔥 app_id OBLIGATORIO)
         msg = GroupMessage(
             community_id=community.id,
-            app_id=community.app_id,  # ✅ AQUÍ ESTABA EL FALLO
+            app_id=community.app_id,  
             user_id=current_user.id,
             content=content,
             role=role,
             message_type="user"
         )
-
         db.session.add(msg)
         db.session.commit()
+        print(f"🔹 Mensaje creado: id={msg.id}, contenido={msg.content}")
 
         # 5️⃣ Emitir a la sala
         socketio.emit(
@@ -742,12 +751,13 @@ def create_app():
                 "content": msg.content,
                 "user": current_user.name,
                 "role": msg.role,
-                "message_type": msg.message_type,   # 🔥 agregar
-                "extra_data": msg.extra_data or {}, # 🔥 agregar
+                "message_type": msg.message_type,
+                "extra_data": msg.extra_data or {},
                 "created_at": msg.created_at.isoformat()
             },
             room=str(community.id)
         )
+        print(f"🔹 Mensaje emitido a la sala {community.id}")
 
 
 

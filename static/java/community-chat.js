@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Recibir mensajes
     socket.on("new_message", data => {
-        if (data.community_id !== communityId) return;
+            console.log("Evento new_message recibido:", data);
+        if (String(data.community_id) !== String(communityId)) return;
+
 
         const div = document.createElement("div");
         if(data.message_type === 'admin'){
@@ -44,6 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
     sendBtn.onclick = () => {
         const text = inputField.value.trim();
         if (!text) return;
+
+console.log("Socket conectado?", socket.connected);
+
+socket.on("connect", () => {
+    console.log("✅ Conectado a Socket.IO con id:", socket.id);
+});
+
+socket.on("disconnect", () => {
+    console.log("⚠ Desconectado de Socket.IO");
+});
+
 
         socket.emit("send_message", {
             community_id: communityId,
