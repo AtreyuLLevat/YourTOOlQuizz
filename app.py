@@ -654,7 +654,7 @@ def create_app():
             db.session.add(member)
             db.session.commit()
 
-        # Cargar mensajes
+        # Cargar mensajes con usuarios
         messages = (
             GroupMessage.query
             .options(joinedload(GroupMessage.user))
@@ -663,7 +663,7 @@ def create_app():
             .all()
         )
 
-        # ✅ Convertir los mensajes a dict para JSON
+        # Construir mensajes históricos serializables
         historical_messages = []
         for msg in messages:
             historical_messages.append({
@@ -674,9 +674,9 @@ def create_app():
                     "id": str(msg.user.id),
                     "name": msg.user.name,
                     "is_owner": msg.user.is_owner,
-                    "is_admin": msg.user.is_admin
+                    "role": msg.user.role  # <- aquí usamos role en vez de is_admin
                 },
-                "role": "owner" if msg.user.is_owner else "admin" if msg.user.is_admin else "user",
+                "role": "owner" if msg.user.is_owner else "admin" if msg.user.role == "admin" else "user",
                 "message_type": msg.message_type,
                 "extra_data": msg.extra_data or {},
                 "created_at": msg.created_at.isoformat()
@@ -685,9 +685,9 @@ def create_app():
         return render_template(
             "community.html",
             community=community,
-            historical_messages=historical_messages
+            messages=messages,  # para render inicial en el HTML
+            historical_messages=historical_messages  # para el JS
         )
-
 
 
     @app.route("/account/community/<uuid:community_id>", methods=["DELETE"])
