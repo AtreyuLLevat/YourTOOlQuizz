@@ -742,10 +742,13 @@ def create_app():
                 "content": msg.content,
                 "user": current_user.name,
                 "role": msg.role,
+                "message_type": msg.message_type,   # 🔥 agregar
+                "extra_data": msg.extra_data or {}, # 🔥 agregar
                 "created_at": msg.created_at.isoformat()
             },
             room=str(community.id)
         )
+
 
 
     @app.route('/listadodecosas')
