@@ -80,6 +80,30 @@ document.addEventListener("DOMContentLoaded", () => {
     // =========================
     // Recibir mensajes
     // =========================
+    // =========================
+// Mensajes históricos
+// =========================
+const historicalMessagesElem = document.getElementById("historical-messages");
+if (historicalMessagesElem) {
+    try {
+        const historicalMessages = JSON.parse(historicalMessagesElem.textContent);
+
+        historicalMessages.forEach(msg => {
+            renderMessage({
+                community_id: communityId,
+                content: msg.content,
+                user: msg.user.name,
+                role: msg.role,                   // 🔹 Usar directamente el role del mensaje
+                message_type: msg.message_type || "user",
+                extra_data: msg.extra_data || {},
+                id: msg.id
+            });
+        });
+    } catch (err) {
+        console.error("Error al cargar mensajes históricos:", err);
+    }
+}
+
     socket.on("new_message", renderMessage);
 
     // =========================
