@@ -1,11 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("Elemento chat-container:", document.getElementById("chat-container"));
+    const communityData = document.getElementById("chat-container");
+    if (!communityData) {
+        console.error("❌ chat-container no existe");
+        return;
+    }
 
-    const communityData = document.getElementById('community-data');
-    const communityId = communityData.dataset.communityId;
-    const userId = communityData.dataset.userId;
-    const userName = communityData.dataset.userName;
-    const isAdmin = communityData.dataset.isAdmin === 'true';
+    // Acceder a dataset de forma segura
+    const { communityId, userId, userName, isAdmin, isOwner } = communityData.dataset;
+
+    if (!communityId || !userId || !userName) {
+        console.error("❌ Faltan atributos data en chat-container");
+        return;
+    }
+
+    console.log({ communityId, userId, userName, isAdmin, isOwner });
 
     const socket = io();
 
