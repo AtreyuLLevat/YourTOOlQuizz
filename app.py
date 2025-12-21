@@ -662,12 +662,26 @@ def create_app():
             .order_by(GroupMessage.created_at.asc())
             .all()
         )
+        historical_messages = [
+            {
+                "id": str(msg.id),
+                "content": msg.content,
+                "user": {"name": msg.user.name},
+                "role": msg.role,                    # 🔹 rol real guardado
+                "message_type": msg.message_type,    # user/admin/poll/etc.
+                "extra_data": msg.extra_data or {},
+                "created_at": msg.created_at.isoformat()
+            }
+            for msg in messages
+        ]       
 
         return render_template(
             "community.html",
             community=community,
-            messages=messages
+            messages=messages,
+            historical_messages=historical_messages
         )
+
 
 
     @app.route("/account/community/<uuid:community_id>", methods=["DELETE"])

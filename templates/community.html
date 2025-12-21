@@ -97,6 +97,7 @@ body { display: flex; height: 100vh; background: #fafafa; }
 </div>
 
 <!-- Datos JS -->
+<!-- Datos JS -->
 <div id="chat-container" 
      data-community-id="{{ community.id }}" 
      data-user-id="{{ current_user.id }}" 
@@ -105,6 +106,10 @@ body { display: flex; height: 100vh; background: #fafafa; }
      data-is-owner="{{ current_user.is_owner }}">
 </div>
 
+<!-- Mensajes históricos ocultos para JS -->
+<div id="historical-messages" style="display:none;">
+    {{ historical_messages | tojson }}
+</div>
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/community-chat.js') }}"></script>
