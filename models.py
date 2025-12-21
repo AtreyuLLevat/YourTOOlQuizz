@@ -84,6 +84,14 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f"<User {self.name} ({self.email})>"
 
+    @property
+    def is_owner(self):
+        """
+        Devuelve True si el usuario es el owner de la comunidad asignada a current_community.
+        """
+        return hasattr(self, 'current_community') and self.id == self.current_community.owner_id
+
+
 # -------------------------
 # MODELO DE APLICACIONES
 class App(db.Model):
