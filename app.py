@@ -699,35 +699,40 @@ def create_app():
     @socketio.on("send_message")
     def send_message(data):
         community_id = data.get("community_id")
-        content = data.get("content", "").strip()
+        content = data.get("content")
+        message_type = data.get("message_type", "user")
 
-        if not content or not community_id:
+        # Obtener la comunidad
+        community = Community.query.get(community_id)
+        if not community:
             return
 
-        # Determinar rol del usuario
+        # Asignar la comunidad al usuario temporalmente
+        current_user.current_community = community
+
+        # Calcular rol
         role = "owner" if current_user.is_owner else "admin" if current_user.is_admin else "user"
 
-        # Guardar en DB
+        # Crear mensaje
         msg = GroupMessage(
             community_id=community_id,
             user_id=current_user.id,
-            content=content
+            content=content,
+            role=role,
+            message_type=message_type
         )
         db.session.add(msg)
         db.session.commit()
 
-        # Emitir a todos en la comunidad
-        socketio.emit(
-            "receive_message",
-            {
-                "id": str(msg.id),
-                "username": current_user.name,
-                "role": role,
-                "content": msg.content,
-                "created_at": msg.created_at.isoformat()
-            },
-            room=f"community_{community_id}"
-        )
+        # Emitir mensaje al resto de la comunidad
+        socketio.emit("new_message", {
+            "community_id": community_id,
+            "user": current_user.name,
+            "content": content,
+            "role": role,
+            "message_type": message_type
+        }, room=f"community_{community_id}")
+
 
 
     @app.route('/listadodecosas')
