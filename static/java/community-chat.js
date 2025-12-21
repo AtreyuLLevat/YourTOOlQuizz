@@ -97,10 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
             user: userName
         };
 
-        // Renderizar local para feedback instantáneo
-        renderMessage(msgData);
-
-        // Emitir al servidor
+        // 🔹 Opción A: No renderizamos localmente
         socket.emit("send_message", msgData);
 
         inputField.value = "";
