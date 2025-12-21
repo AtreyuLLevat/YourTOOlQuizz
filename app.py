@@ -637,16 +637,13 @@ def create_app():
     @app.route("/community/<uuid:community_id>")
     @login_required
     def community_view(community_id):
-        # Obtener la comunidad
         community = Community.query.get_or_404(community_id)
 
-        # Comprobar si el usuario ya es miembro activo
+        # Asegurar que el usuario es miembro
         member = GroupMember.query.filter_by(
             community_id=community.id,
             user_id=current_user.id
         ).first()
-
-        # Si no existe, añadirlo automáticamente como miembro activo
         if not member:
             member = GroupMember(
                 community_id=community.id,
@@ -657,45 +654,21 @@ def create_app():
             db.session.add(member)
             db.session.commit()
 
-        # Obtener todos los miembros activos y sus roles
-        members = GroupMember.query.options(joinedload(GroupMember.user)).filter_by(
-            community_id=community.id,
-            is_active=True
-        ).all()
-
-        # Construir un diccionario de user_id → role para usar en los mensajes
-        user_roles = {m.user.id: m.user.role for m in members}
-
-        # Cargar los últimos 100 mensajes con el usuario
+        # Cargar mensajes
         messages = (
             GroupMessage.query
-            .options(joinedload(GroupMessage.user))  # 🔑 Traer info del usuario
+            .options(joinedload(GroupMessage.user))
             .filter_by(community_id=community.id)
             .order_by(GroupMessage.created_at.asc())
-            .limit(100)
             .all()
         )
-
-        # Transformar mensajes a dicts para pasar al template o al frontend
-        messages_data = []
-        for msg in messages:
-            messages_data.append({
-                "id": str(msg.id),
-                "user": msg.user.name if msg.user else "Anónimo",
-                "user_id": msg.user.id if msg.user else None,
-                "role": msg.user.role if msg.user else "member",
-                "content": msg.content,
-                "message_type": msg.message_type,
-                "extra_data": msg.extra_data,
-                "created_at": msg.created_at.isoformat() if msg.created_at else None
-            })
 
         return render_template(
             "community.html",
             community=community,
-            messages=messages_data,
-            current_user_id=current_user.id
+            messages=messages
         )
+
 
     @app.route("/account/community/<uuid:community_id>", methods=["DELETE"])
     @login_required
@@ -724,41 +697,34 @@ def create_app():
 
 
     @socketio.on("send_message")
-    @login_required
     def send_message(data):
-        community_id = data["community_id"]
-        content = data["content"]
-        message_type = data.get("message_type", "user")
+        community_id = data.get("community_id")
+        content = data.get("content", "").strip()
 
-        member = GroupMember.query.filter_by(
-            community_id=community_id,
-            user_id=current_user.id
-        ).first()
+        if not content or not community_id:
+            return
 
-        role = "member"
-        if member:
-            role = getattr(member, "role", "member")
+        # Determinar rol del usuario
+        role = "owner" if current_user.is_owner else "admin" if current_user.is_admin else "user"
 
+        # Guardar en DB
         msg = GroupMessage(
             community_id=community_id,
-            app_id=member.app_id,
             user_id=current_user.id,
-            content=content,
-            message_type=message_type,
-            role=role
+            content=content
         )
-
         db.session.add(msg)
         db.session.commit()
 
-        emit(
-            "new_message",
+        # Emitir a todos en la comunidad
+        socketio.emit(
+            "receive_message",
             {
-                "community_id": str(community_id),
+                "id": str(msg.id),
+                "username": current_user.name,
+                "role": role,
                 "content": msg.content,
-                "user": current_user.name,
-                "message_type": msg.message_type,
-                "role": msg.role
+                "created_at": msg.created_at.isoformat()
             },
             room=f"community_{community_id}"
         )
