@@ -1,18 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Obtener datos de la comunidad y usuario desde el HTML
-    const communityData = document.getElementById('chat-container'); // div contenedor con data attributes
-    if (!communityData) return console.error("No se encontró el contenedor de chat");
+    const chatContainer = document.getElementById('chat-container');
+    if (!chatContainer) return console.error("No se encontró el contenedor de chat");
 
-    const communityId = communityData.dataset.communityId;
-    const userId = communityData.dataset.userId;
-    const userName = communityData.dataset.userName;
-    const isAdmin = communityData.dataset.isAdmin === 'true';
+    const communityId = chatContainer.dataset.communityId;
+    const userId = chatContainer.dataset.userId;
+    const userName = chatContainer.dataset.userName;
+    const isAdmin = chatContainer.dataset.isAdmin === 'true';
+    const isOwner = chatContainer.dataset.isOwner === 'true';
 
     if (!communityId) return console.error("No se encontró el ID de la comunidad");
 
-    // Conexión socket.io
     const socket = io();
-
     const messagesContainer = document.getElementById("messages");
     const inputField = document.getElementById("message-input");
     const sendBtn = document.getElementById("send-btn");
@@ -20,34 +18,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // Unirse a la comunidad
     socket.emit("join_community", { community_id: communityId });
 
-    /* ============================
-       RECIBIR MENSAJES
-    ============================ */
-    socket.on("new_message", data => {
-        if (data.community_id !== communityId) return;
+    // Función para renderizar un mensaje
+    const renderMessage = (data) => {
+        if (!data || data.community_id !== communityId) return;
 
         const div = document.createElement("div");
-        const isHighRole = ["owner", "admin"].includes(data.role);
+        const role = data.role || "user";
+        const isHighRole = ["owner", "admin"].includes(role);
 
+        // Mensajes tipo encuesta
         if (data.message_type === "poll") {
             div.className = "poll-message";
             let optionsHtml = "";
             (data.extra_data?.options || []).forEach(opt => {
                 optionsHtml += `<div class="poll-option">${opt}</div>`;
             });
-
             div.innerHTML = `
                 <div class="poll-question">${data.content}</div>
                 <div class="poll-options">${optionsHtml}</div>
             `;
-        } else if (isHighRole) {
+        }
+        // Mensajes de admin/owner
+        else if (isHighRole) {
             div.className = "admin-message role-message";
             div.innerHTML = `
-                <div class="role-badge">${data.role}</div>
+                <div class="role-badge">${role}</div>
                 <div class="admin-name">${data.user}</div>
                 <div class="message-content">${data.content}</div>
             `;
-        } else {
+        }
+        // Mensajes de usuario normal
+        else {
             div.className = "user-message";
             div.innerHTML = `
                 <div class="user-name">${data.user}</div>
@@ -57,11 +58,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
         messagesContainer.appendChild(div);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    });
+    };
 
-    /* ============================
-       ENVIAR MENSAJES
-    ============================ */
+    // Recibir mensaje nuevo
+    socket.on("new_message", renderMessage);
+
+    // Renderizar mensajes históricos (si existen)
+    const historicalMessagesElem = document.getElementById("historical-messages");
+    if (historicalMessagesElem) {
+        try {
+            const historicalMessages = JSON.parse(historicalMessagesElem.textContent);
+            historicalMessages.forEach(msg => {
+                renderMessage({
+                    community_id: communityId,
+                    content: msg.content,
+                    role: msg.user.is_owner ? "owner" : msg.user.is_admin ? "admin" : "user",
+                    user: msg.user.name,
+                    message_type: msg.message_type || "text",
+                    extra_data: msg.extra_data || {}
+                });
+            });
+        } catch (err) {
+            console.error("Error al cargar mensajes históricos:", err);
+        }
+    }
+
+    // Enviar mensaje
     const sendMessage = () => {
         const text = inputField.value.trim();
         if (!text) return;
@@ -69,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.emit("send_message", {
             community_id: communityId,
             content: text,
-            message_type: isAdmin ? "admin" : "user",
-            role: isAdmin ? "admin" : "user",
+            message_type: isAdmin || isOwner ? "admin" : "user",
+            role: isAdmin ? "admin" : isOwner ? "owner" : "user",
             user: userName
         });
 
@@ -82,18 +104,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.key === "Enter") sendMessage();
     });
 
-    /* ============================
-       ENVIAR ENCUESTA (ADMIN)
-    ============================ */
+    // Enviar encuesta (solo admin/owner)
     window.sendPoll = (question = "¿Te gusta la app?", options = ["Sí", "No"]) => {
-        if (!isAdmin) return;
+        if (!(isAdmin || isOwner)) return;
 
         socket.emit("send_message", {
             community_id: communityId,
             content: question,
             message_type: "poll",
             extra_data: { options },
-            role: "admin",
+            role: isAdmin ? "admin" : "owner",
             user: userName
         });
     };
