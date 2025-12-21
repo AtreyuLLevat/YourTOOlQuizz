@@ -694,52 +694,45 @@ def create_app():
     
     @socketio.on("join_community")
     def join_community(data):
-        room = f"community_{data['community_id']}"
-        join_room(room)
+        join_room(str(data["community_id"]))
+
 
     @socketio.on("send_message")
-    @login_required
-    def send_message(data):
-        community_id = data.get("community_id")
-        content = data.get("content", "").strip()
-        message_type = data.get("message_type", "user")
-        extra_data = data.get("extra_data")
+    def handle_send_message(data):
+        user = current_user
+        community_id = data["community_id"]
+        content = data["content"]
 
-        if not content or not community_id:
-            return
-
-        # Obtener comunidad
         community = Community.query.get(community_id)
-        if not community:
-            return
+        app = community.app
 
-        # Guardar mensaje en DB
         msg = GroupMessage(
             community_id=community.id,
-            app_id=community.app_id,
-            user_id=current_user.id,
+            app_id=app.id,
+            user_id=user.id,
             content=content,
-            message_type=message_type,
-            extra_data=extra_data
+            message_type="user"
         )
 
         db.session.add(msg)
         db.session.commit()
 
-        # 🔥 EMITIR MENSAJE AL CHAT
-        socketio.emit(
-            "new_message",
-            {
-                "community_id": str(community.id),
-                "content": msg.content,
-                "user": current_user.name,
-                "message_type": message_type,
-                "role": current_user.role,
-                "extra_data": extra_data,
-                "id": str(msg.id)
-            },
-            room=f"community_{community.id}"
-        )
+        # 🔥 ROL CORRECTO
+        role = "owner" if user.id == app.owner_id else member_role
+
+        message_type = "admin" if role in ["owner", "admin"] else "user"
+
+
+        socketio.emit("new_message", {
+            "community_id": str(community.id),
+            "content": msg.content,
+            "user": user.name,
+            "role": role,
+            "message_type": message_type,
+            "extra_data": msg.extra_data
+        }, room=str(community.id))
+
+
 
     @app.route('/listadodecosas')
     def explorador():

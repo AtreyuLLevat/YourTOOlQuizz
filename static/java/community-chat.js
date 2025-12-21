@@ -1,88 +1,107 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const communityData = document.getElementById('community-data');
+
+    /* ============================
+       DATOS INYECTADOS DESDE HTML
+    ============================ */
+    const communityData = document.getElementById("community-data");
+    if (!communityData) return;
+
     const communityId = communityData.dataset.communityId;
     const userId = communityData.dataset.userId;
     const userName = communityData.dataset.userName;
-    const isAdmin = communityData.dataset.isAdmin === 'true';
+    const isAdmin = communityData.dataset.isAdmin === "true"; // SOLO UI
 
+    /* ============================
+       SOCKET
+    ============================ */
     const socket = io();
 
+    socket.emit("join_community", {
+        community_id: currentCommunityId
+    });
+
+    /* ============================
+       ELEMENTOS DOM
+    ============================ */
     const messagesContainer = document.getElementById("messages");
     const inputField = document.getElementById("message-input");
     const sendBtn = document.getElementById("send-btn");
 
-    // Unirse a la comunidad
-    socket.emit("join_community", { community_id: communityId });
-
     /* ============================
        RECIBIR MENSAJES
+       (ÚNICO PUNTO DE RENDER)
     ============================ */
-socket.on("new_message", data => {
-    if (data.community_id !== communityId) return;
+    socket.on("new_message", data => {
+        if (data.community_id !== communityId) return;
 
-    const div = document.createElement("div");
+        const div = document.createElement("div");
 
-    const isHighRole = ["owner", "admin", "moderator"].includes(data.role);
+        const isHighRole = ["owner", "admin", "moderator"].includes(data.role);
 
-    if (data.message_type === "poll") {
-        div.className = "poll-message";
-        let optionsHtml = "";
-        (data.extra_data?.options || []).forEach(opt => {
-            optionsHtml += `<div class="poll-option">${opt}</div>`;
-        });
+        /* ---------- ENCUESTA ---------- */
+        if (data.message_type === "poll") {
+            div.className = "poll-message";
 
-        div.innerHTML = `
-            <div class="poll-question">${data.content}</div>
-            <div class="poll-options">${optionsHtml}</div>
-        `;
-    }
+            let optionsHtml = "";
+            (data.extra_data?.options || []).forEach(opt => {
+                optionsHtml += `<div class="poll-option">${opt}</div>`;
+            });
 
-    else if (isHighRole) {
-        div.className = "admin-message role-message";
-        div.innerHTML = `
-            <div class="role-badge">${data.role}</div>
-            <div class="admin-name">${data.user}</div>
-            <div class="message-content">${data.content}</div>
-        `;
-    }
+            div.innerHTML = `
+                <div class="poll-question">${data.content}</div>
+                <div class="poll-options">${optionsHtml}</div>
+            `;
+        }
 
-    else {
-        div.className = "user-message";
-        div.innerHTML = `
-            <div class="user-name">${data.user}</div>
-            <div class="message-content">${data.content}</div>
-        `;
-    }
+        /* ---------- ROLES ALTOS ---------- */
+        else if (isHighRole) {
+            div.className = "role-message role-${data.role}";
 
-    messagesContainer.appendChild(div);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-});
+            div.innerHTML = `
+                <div class="role-header">
+                    <span class="role-badge">${data.role.toUpperCase()}</span>
+                    <span class="role-user">${data.user}</span>
+                </div>
+                <div class="message-content">${data.content}</div>
+            `;
+        }
 
+        /* ---------- USUARIO NORMAL ---------- */
+        else {
+            div.className = "user-message";
+
+            div.innerHTML = `
+                <div class="user-name">${data.user}</div>
+                <div class="message-content">${data.content}</div>
+            `;
+        }
+
+        messagesContainer.appendChild(div);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
 
     /* ============================
-       ENVIAR MENSAJES
+       ENVIAR MENSAJE
+       (EL FRONT NO DECIDE ROL)
     ============================ */
-    sendBtn.onclick = () => {
+    sendBtn.addEventListener("click", () => {
         const text = inputField.value.trim();
         if (!text) return;
 
-        // Usuario normal
         socket.emit("send_message", {
             community_id: communityId,
-            content: text,
-            message_type: isAdmin ? "admin" : "user"
+            content: text
         });
 
         inputField.value = "";
-    };
+    });
 
     inputField.addEventListener("keypress", e => {
         if (e.key === "Enter") sendBtn.click();
     });
 
     /* ============================
-       ENVIAR ENCUESTA (ADMIN)
-       (ejemplo, puedes llamarlo desde un botón)
+       ENVIAR ENCUESTA (SOLO UI)
     ============================ */
     window.sendPoll = () => {
         if (!isAdmin) return;
@@ -96,4 +115,5 @@ socket.on("new_message", data => {
             }
         });
     };
+
 });
