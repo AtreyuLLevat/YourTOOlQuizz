@@ -83,7 +83,25 @@ def iniciar_tareas(app):
     scheduler.add_job(lambda: enviar_newsletters(app), trigger_newsletter)
 
     print("🕒 Tareas configuradas: recordatorios diarios y newsletter semanal")
+# Añade estas funciones después de las importaciones, antes de create_app()
 
+def get_default_avatar_url():
+    """Devuelve la URL del avatar por defecto"""
+    return url_for('static', filename='Imagenes/logo.png', _external=True)
+
+def get_app_placeholder_url():
+    """Devuelve la URL del placeholder para apps"""
+    return url_for('static', filename='Imagenes/logo.png', _external=True)
+
+def get_user_avatar_url(user):
+    """Devuelve la URL del avatar del usuario o la por defecto"""
+    if user and user.avatar_url:
+        # Si avatar_url es una ruta relativa (ej: /static/uploads/avatars/...)
+        if user.avatar_url.startswith('/'):
+            return user.avatar_url
+        # Si ya es una URL completa
+        return user.avatar_url
+    return get_default_avatar_url()
 # -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
@@ -458,10 +476,10 @@ def create_app():
                 "description": app_data.description,
                 "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else None,
                 "theme": app_data.theme,
-                "image_url": app_data.image_url,
+                "image_url": app_data.image_url or get_app_placeholder_url(),  # CORRECCIÓN
                 "reviews": reviews,
                 "team_members": team_members,
-                "communities": communities  # 🔥 Ahora siempre tendrá datos
+                "communities": communities
             }
         })
 
@@ -474,10 +492,13 @@ def create_app():
         apps = App.query.all()
         apps_list = []
         for app_data in apps:
+            # CORRECCIÓN: Usar placeholder si no hay imagen
+            image_url = app_data.image_url or get_app_placeholder_url()
+            
             apps_list.append({
                 "id": str(app_data.id),
                 "name": app_data.name,
-                "image_url": app_data.image_url,
+                "image_url": image_url,  # Usa el helper
                 "description": app_data.description,
                 "theme": app_data.theme or "General",
                 "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else "Desconocida"
@@ -825,15 +846,33 @@ def create_app():
         
         return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
 
+    @app.route('/static/images/<filename>')
+    def serve_placeholder_images(filename):
+        """Sirve imágenes placeholder o redirige a placeholders online"""
+        allowed_files = {
+            'app-placeholder.png': 'static/Imagenes/logo.png',
+            'default-avatar.png': 'static/Imagenes/logo.png'
+        }
+        
+        if filename in allowed_files:
+            placeholder_path = allowed_files[filename]
+            # Verifica si el archivo existe localmente
+            full_path = os.path.join(app.root_path, placeholder_path)
+            if os.path.exists(full_path):
+                return send_from_directory('static/Imagenes', 'logo.png')
+        
+        # Si no existe, devuelve 404 o redirige a un placeholder online
+        abort(404)
+
     @app.route('/account/remove_avatar', methods=['POST'])
     @login_required
     def remove_avatar():
-        # ¡CORRECCIÓN AQUÍ TAMBIÉN!
-        default_avatar = url_for('static', filename='images/default-avatar.png')
+        # CORRECCIÓN: Usar logo.png que sí existe en lugar de default-avatar.png
+        default_avatar = url_for('static', filename='Imagenes/logo.png')  # Cambiado
         current_user.avatar_url = default_avatar
         db.session.commit()
         return jsonify({'success': True, 'avatar_url': default_avatar})
-        
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
@@ -1498,9 +1537,9 @@ def create_app():
             return {
                 "success": True,
                 "app": {
-                    "id": str(new_app.id),  # ¡IMPORTANTE!
+                    "id": str(new_app.id),
                     "name": new_app.name,
-                    "image_url": new_app.image_url or url_for("static", filename="images/app-placeholder.png", _external=True)
+                    "image_url": new_app.image_url or url_for("static", filename="Imagenes/logo.png")  # Cambiado
                 }
             }
         except Exception as e:
