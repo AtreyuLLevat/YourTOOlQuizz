@@ -822,14 +822,18 @@ def create_app():
             return jsonify({'success': True, 'avatar_url': avatar_url})
         
         return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
-
     @app.route('/account/remove_avatar', methods=['POST'])
     @login_required
     def remove_avatar():
-        # Establecer avatar por defecto
-        default_avatar = url_for('static', filename='images/default-avatar.png')
-        current_user.avatar_url = default_avatar
-        db.session.commit()
+        try:
+            # Establecer avatar por defecto
+            default_avatar = url_for('static', filename='images/default-avatar.png', _external=True)
+            current_user.avatar_url = default_avatar
+            db.session.commit()
+            
+            return jsonify({'success': True, 'avatar_url': default_avatar, 'message': 'Foto eliminada correctamente'})
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
     
     return jsonify({'success': True, 'avatar_url': default_avatar})
     @app.route('/listadodecosas')
