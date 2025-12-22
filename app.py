@@ -633,7 +633,7 @@ def create_app():
                 "name": community.name
             }
         })
-        
+
     @app.route("/community/<uuid:community_id>")
     @login_required
     def community_view(community_id):
@@ -761,7 +761,31 @@ def create_app():
         )
         print(f"🔹 Mensaje emitido a la sala {community.id}")
 
+    @app.route("/search_users")
+    @login_required
+    def search_users():
+        query = request.args.get("q", "").strip()
+        if not query or len(query) < 2:
+            return jsonify([])
 
+        # Buscar usuarios por nombre o email
+        users = User.query.filter(
+            or_(
+                User.name.ilike(f"%{query}%"),
+                User.email.ilike(f"%{query}%")
+            )
+        ).limit(10).all()
+
+        results = []
+        for user in users:
+            results.append({
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "avatar_url": user.avatar_url
+            })
+
+        return jsonify(results)
 
     @app.route('/listadodecosas')
     def explorador():
