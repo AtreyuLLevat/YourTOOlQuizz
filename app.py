@@ -49,6 +49,7 @@ from slugify import slugify
 from models import unique_slug
 from uuid import UUID
 from sqlalchemy.orm import joinedload
+from werkzeug.utils import secure_filename
 
 
 
@@ -112,6 +113,8 @@ def create_app():
     CANCEL_URL = os.getenv("STRIPE_CANCEL_URLpost")
     STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
     endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+    AVATAR_UPLOAD_FOLDER = 'static/uploads/avatars'
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     
 
 
@@ -389,6 +392,8 @@ def create_app():
         send_email(email, subject, body)
 
 
+    def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # -----------------------------
@@ -787,6 +792,46 @@ def create_app():
 
         return jsonify(results)
 
+
+    @app.route('/account/upload_avatar', methods=['POST'])
+    @login_required
+    def upload_avatar():
+        if 'avatar' not in request.files:
+            return jsonify({'success': False, 'message': 'No se seleccionó ningún archivo'}), 400
+        
+        file = request.files['avatar']
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'No se seleccionó ningún archivo'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Crear directorio si no existe
+            os.makedirs(AVATAR_UPLOAD_FOLDER, exist_ok=True)
+            
+            # Generar nombre único para el archivo
+            filename = secure_filename(f"{current_user.id}_{datetime.utcnow().timestamp()}.{file.filename.rsplit('.', 1)[1].lower()}")
+            filepath = os.path.join(AVATAR_UPLOAD_FOLDER, filename)
+            
+            # Guardar archivo
+            file.save(filepath)
+            
+            # Actualizar usuario
+            avatar_url = f'/{filepath}'
+            current_user.avatar_url = avatar_url
+            db.session.commit()
+            
+            return jsonify({'success': True, 'avatar_url': avatar_url})
+        
+        return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
+
+    @app.route('/account/remove_avatar', methods=['POST'])
+    @login_required
+    def remove_avatar():
+        # Establecer avatar por defecto
+        default_avatar = url_for('static', filename='images/default-avatar.png')
+        current_user.avatar_url = default_avatar
+        db.session.commit()
+    
+    return jsonify({'success': True, 'avatar_url': default_avatar})
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
