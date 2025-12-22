@@ -633,7 +633,7 @@ def create_app():
                 "name": community.name
             }
         })
-
+        
     @app.route("/community/<uuid:community_id>")
     @login_required
     def community_view(community_id):
@@ -644,6 +644,7 @@ def create_app():
             community_id=community.id,
             user_id=current_user.id
         ).first()
+
         if not member:
             member = GroupMember(
                 community_id=community.id,
@@ -654,7 +655,7 @@ def create_app():
             db.session.add(member)
             db.session.commit()
 
-        # Cargar mensajes con usuarios
+        # 🔹 Cargar mensajes (solo para HTML)
         messages = (
             GroupMessage.query
             .options(joinedload(GroupMessage.user))
@@ -663,30 +664,11 @@ def create_app():
             .all()
         )
 
-        # Construir mensajes históricos serializables
-        historical_messages = []
-        for msg in messages:
-            historical_messages.append({
-                "id": str(msg.id),
-                "community_id": str(msg.community_id),
-                "content": msg.content,
-                "user": {
-                    "id": str(msg.user.id),
-                    "name": msg.user.name,
-                    "is_owner": msg.user.is_owner,
-                    "role": msg.user.role  # <- aquí usamos role en vez de is_admin
-                },
-                "role": "owner" if msg.user.is_owner else "admin" if msg.user.role == "admin" else "user",
-                "message_type": msg.message_type,
-                "extra_data": msg.extra_data or {},
-                "created_at": msg.created_at.isoformat()
-            })
-
         return render_template(
             "community.html",
             community=community,
-            messages=messages,  # para render inicial en el HTML
-            historical_messages=historical_messages  # para el JS
+            messages=messages
+            # ❌ NADA de historical_messages
         )
 
 

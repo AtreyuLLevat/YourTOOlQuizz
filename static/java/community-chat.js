@@ -3,40 +3,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // Obtener datos del contenedor
     // =========================
     const communityData = document.getElementById("chat-container");
-    if (!communityData) return console.error("❌ chat-container no existe");
+    if (!communityData) {
+        console.error("❌ chat-container no existe");
+        return;
+    }
 
     const { communityId, userId, userName, isAdmin, isOwner } = communityData.dataset;
-    if (!communityId || !userId || !userName) return console.error("❌ Faltan atributos data en chat-container");
 
-    console.log("Datos del usuario y comunidad:", { communityId, userId, userName, isAdmin, isOwner });
+    if (!communityId || !userId || !userName) {
+        console.error("❌ Faltan atributos data en chat-container");
+        return;
+    }
+
+    console.log("Datos del usuario y comunidad:", {
+        communityId,
+        userId,
+        userName,
+        isAdmin,
+        isOwner
+    });
 
     const messagesContainer = document.getElementById("messages");
     const inputField = document.getElementById("message-input");
     const sendBtn = document.getElementById("send-btn");
-    if (!messagesContainer || !inputField || !sendBtn) return console.error("❌ Elementos del chat no encontrados");
+
+    if (!messagesContainer || !inputField || !sendBtn) {
+        console.error("❌ Elementos del chat no encontrados");
+        return;
+    }
 
     // =========================
     // Conexión Socket.IO
     // =========================
     const socket = io();
-    socket.on("connect", () => console.log("✅ Conectado a Socket.IO con id:", socket.id));
-    socket.on("disconnect", () => console.log("⚠ Desconectado de Socket.IO"));
 
-    // Unir a la comunidad
-    socket.emit("join_community", { community_id: communityId });
-    console.log(`👤 Usuario ${userName} se unió a la comunidad ${communityId}`);
+    socket.on("connect", () => {
+        console.log("✅ Conectado a Socket.IO:", socket.id);
+        socket.emit("join_community", { community_id: communityId });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("⚠ Desconectado de Socket.IO");
+    });
 
     // =========================
-    // Función para renderizar mensajes
+    // Renderizar mensajes (SOLO TIEMPO REAL)
     // =========================
     const renderMessage = (data) => {
         if (!data || String(data.community_id) !== String(communityId)) return;
 
         const div = document.createElement("div");
 
-        // Roles especiales
-        if (data.message_type === "admin") {
-            div.className = 'admin-message';
+        // ADMIN
+        if (data.message_type === "admin" || data.role === "admin") {
+            div.className = "admin-message";
             div.innerHTML = `
                 <div class="admin-header">
                     <span class="admin-badge">ADMIN</span>
@@ -44,24 +64,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <div class="message-content">${data.content}</div>
             `;
-        } else if (data.role === "owner") {
-            div.className = 'owner-message';
+        }
+        // OWNER
+        else if (data.role === "owner") {
+            div.className = "owner-message";
             div.innerHTML = `
                 <div class="owner-name">${data.user}</div>
                 <div class="message-content">${data.content}</div>
             `;
-        } else if (data.message_type === "poll") {
-            div.className = 'poll-message';
-            let optionsHtml = '';
+        }
+        // POLL
+        else if (data.message_type === "poll") {
+            div.className = "poll-message";
+            let optionsHtml = "";
+
             data.extra_data?.options?.forEach((opt, idx) => {
-                optionsHtml += `<div class="poll-option" data-poll-id="${data.id}" data-option-id="${idx}">${opt}</div>`;
+                optionsHtml += `
+                    <div class="poll-option"
+                         data-poll-id="${data.id}"
+                         data-option-id="${idx}">
+                        ${opt}
+                    </div>
+                `;
             });
+
             div.innerHTML = `
                 <div class="poll-question">${data.content}</div>
                 <div class="poll-options">${optionsHtml}</div>
             `;
-        } else {
-            div.className = 'user-message';
+        }
+        // USER NORMAL
+        else {
+            div.className = "user-message";
             div.innerHTML = `
                 <div class="user-name">${data.user}</div>
                 <div class="message-content">${data.content}</div>
@@ -73,28 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     // =========================
-    // Renderizar mensajes históricos
-    // =========================
-    const historicalMessagesElem = document.getElementById("historical-messages");
-    if (historicalMessagesElem) {
-        try {
-            const historicalMessages = JSON.parse(historicalMessagesElem.textContent);
-            historicalMessages.forEach(msg => renderMessage({
-                community_id: communityId,
-                content: msg.content,
-                user: msg.user.name,
-                role: msg.role,
-                message_type: msg.message_type || "user",
-                extra_data: msg.extra_data || {},
-                id: msg.id
-            }));
-        } catch (err) {
-            console.error("Error al cargar mensajes históricos:", err);
-        }
-    }
-
-    // =========================
-    // Recibir mensajes en tiempo real
+    // Mensajes en tiempo real
     // =========================
     socket.on("new_message", renderMessage);
 
@@ -108,18 +121,23 @@ document.addEventListener("DOMContentLoaded", () => {
         const msgData = {
             community_id: communityId,
             content: text,
-            message_type: isAdmin === "true" || isOwner === "true" ? "admin" : "user",
-            role: isAdmin === "true" ? "admin" : isOwner === "true" ? "owner" : "user",
-            user: userName
+            user: userName,
+            role: isOwner === "true"
+                ? "owner"
+                : isAdmin === "true"
+                ? "admin"
+                : "user",
+            message_type: isAdmin === "true" || isOwner === "true"
+                ? "admin"
+                : "user"
         };
 
-        // Emitir mensaje al servidor
         socket.emit("send_message", msgData);
-
-        // Limpiar input
         inputField.value = "";
     };
 
     sendBtn.addEventListener("click", sendMessage);
-    inputField.addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    inputField.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
 });

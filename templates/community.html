@@ -42,27 +42,25 @@ body { display: flex; height: 100vh; background: #fafafa; }
 .chat-input button { padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 600; }
 .chat-input button:hover { background: #2563eb; }
 /* Mensajes de owner */
-.owner-message {
-    background-color: #e0f7fa;
-    border-radius: 8px;
-    padding: 8px;
-    margin-bottom: 6px;
+.message {
+  max-width: 70%;
+  margin-bottom: 12px;
 }
 
-/* Mensajes de admin */
-.admin-message {
-    background-color: #fff3e0;
-    border-left: 4px solid #ff9800;
-    padding: 8px;
-    margin-bottom: 6px;
+.message.user {
+  margin-left: auto;
+  background: #e5e7eb;
 }
 
-/* Mensajes de usuario normal */
-.user-message {
-    background-color: #f1f1f1;
-    border-radius: 4px;
-    padding: 6px;
-    margin-bottom: 6px;
+.message.admin {
+  margin-right: auto;
+  background: #dbeafe;
+}
+
+.message.owner {
+  margin-right: auto;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
 }
 
 /* Mensajes de encuesta/poll */
@@ -95,28 +93,29 @@ body { display: flex; height: 100vh; background: #fafafa; }
     </div>
   </div>
 
-  <div class="chat-messages" id="messages">
-    <!-- Mensajes serán renderizados vía JS desde historical_messages -->
-  </div>
+<div class="chat-messages" id="messages">
+  {% for msg in messages %}
+    {% set role =
+        "owner" if msg.user.id == community.owner_id
+        else msg.user.role
+    %}
 
-  <div class="chat-input">
-    <input id="message-input" type="text" placeholder="Escribe un mensaje">
-    <button id="send-btn">Enviar</button>
-  </div>
-</div>
+    <div class="message {{ role }}">
+      <div class="message-header">
+        <span class="username">{{ msg.user.name }}</span>
 
-<!-- Datos JS -->
-<div id="chat-container" 
-     data-community-id="{{ community.id }}" 
-     data-user-id="{{ current_user.id }}" 
-     data-user-name="{{ current_user.name }}" 
-     data-is-admin="{{ current_user.role == 'admin' }}" 
-     data-is-owner="{{ current_user.is_owner }}">
-</div>
+        {% if role == "owner" %}
+          <span class="badge owner">Owner</span>
+        {% elif role == "admin" %}
+          <span class="badge admin">Admin</span>
+        {% endif %}
+      </div>
 
-<!-- Mensajes históricos ocultos para JS -->
-<div id="historical-messages" style="display:none;">
-    {{ messages | tojson }}
+      <div class="message-content">
+        {{ msg.content }}
+      </div>
+    </div>
+  {% endfor %}
 </div>
 
 
