@@ -76,6 +76,10 @@ body { display: flex; height: 100vh; background: #fafafa; }
 <body>
 
 <!-- Sidebar -->
+</head>
+<body>
+
+<!-- Sidebar -->
 <div class="group-sidebar">
   <div class="group-header">
     <div class="group-logo"></div>
@@ -89,39 +93,53 @@ body { display: flex; height: 100vh; background: #fafafa; }
   <div class="chat-header">
     <div class="chat-title">Chat de {{ community.name }}</div>
     <div class="user-status">
-      <span>●</span> {{ current_user.name }} - {{ "Administrador" if current_user.role == 'admin' else "Usuario" }}
+      <span>●</span>
+      {{ current_user.name }} -
+      {{ "Administrador" if current_user.role == 'admin' else "Usuario" }}
     </div>
   </div>
 
-<div class="chat-messages" id="messages">
-  {% for msg in messages %}
-    {% set role =
-        "owner" if msg.user.id == community.owner_id
-        else msg.user.role
-    %}
+  <!-- MENSAJES -->
+  <div class="chat-messages" id="messages">
+    {% for msg in messages %}
+      {% set role = "owner" if msg.user.id == community.owner_id else msg.user.role %}
+      <div class="message {{ role }}">
+        <div class="message-header">
+          <span class="username">{{ msg.user.name }}</span>
 
-    <div class="message {{ role }}">
-      <div class="message-header">
-        <span class="username">{{ msg.user.name }}</span>
+          {% if role == "owner" %}
+            <span class="badge owner">Owner</span>
+          {% elif role == "admin" %}
+            <span class="badge admin">Admin</span>
+          {% endif %}
+        </div>
 
-        {% if role == "owner" %}
-          <span class="badge owner">Owner</span>
-        {% elif role == "admin" %}
-          <span class="badge admin">Admin</span>
-        {% endif %}
+        <div class="message-content">{{ msg.content }}</div>
       </div>
+    {% endfor %}
+  </div>
 
-      <div class="message-content">
-        {{ msg.content }}
-      </div>
-    </div>
-  {% endfor %}
+  <!-- INPUT (ESTO FALTABA) -->
+  <div class="chat-input">
+    <input id="message-input" type="text" placeholder="Escribe un mensaje">
+    <button id="send-btn">Enviar</button>
+  </div>
 </div>
 
+<!-- DATA PARA JS -->
+<div id="chat-container"
+     data-community-id="{{ community.id }}"
+     data-user-id="{{ current_user.id }}"
+     data-user-name="{{ current_user.name }}"
+     data-is-admin="{{ current_user.role == 'admin' }}"
+     data-is-owner="{{ current_user.id == community.owner_id }}">
+</div>
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>
 <script src="{{ url_for('static', filename='java/community-chat.js') }}"></script>
 
+</body>
+</html>
 
 </body>
 </html>
