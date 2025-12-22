@@ -47,60 +47,48 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // =========================
-    // Renderizar mensajes (SOLO TIEMPO REAL)
+    // Renderizar mensajes (SOLO TIEMPO REAL) - NUEVA VERSIÓN
     // =========================
     const renderMessage = (data) => {
         if (!data || String(data.community_id) !== String(communityId)) return;
 
         const div = document.createElement("div");
+        
+        // Determinar el rol (ajustar según lo que envía tu backend)
+        let roleClass = "user";
+        let role = data.role || "user";
+        
+        // Si el backend no envía role, usar el mismo cálculo que usas en el envío
+        if (!data.role) {
+            role = data.message_type === "admin" ? "admin" : 
+                   data.role === "owner" ? "owner" : "user";
+        }
+        
+        // Establecer clase CSS según el rol
+        if (role === "owner") {
+            roleClass = "owner";
+        } else if (role === "admin") {
+            roleClass = "admin";
+        } else {
+            roleClass = "user";
+        }
 
-        // ADMIN
-        if (data.message_type === "admin" || data.role === "admin") {
-            div.className = "admin-message";
-            div.innerHTML = `
-                <div class="admin-header">
-                    <span class="admin-badge">ADMIN</span>
-                    <span class="admin-name">${data.user}</span>
-                </div>
-                <div class="message-content">${data.content}</div>
-            `;
+        // Crear HTML con la misma estructura que los mensajes históricos
+        let badgeHtml = "";
+        if (role === "owner") {
+            badgeHtml = '<span class="badge owner">Owner</span>';
+        } else if (role === "admin") {
+            badgeHtml = '<span class="badge admin">Admin</span>';
         }
-        // OWNER
-        else if (data.role === "owner") {
-            div.className = "owner-message";
-            div.innerHTML = `
-                <div class="owner-name">${data.user}</div>
-                <div class="message-content">${data.content}</div>
-            `;
-        }
-        // POLL
-        else if (data.message_type === "poll") {
-            div.className = "poll-message";
-            let optionsHtml = "";
 
-            data.extra_data?.options?.forEach((opt, idx) => {
-                optionsHtml += `
-                    <div class="poll-option"
-                         data-poll-id="${data.id}"
-                         data-option-id="${idx}">
-                        ${opt}
-                    </div>
-                `;
-            });
-
-            div.innerHTML = `
-                <div class="poll-question">${data.content}</div>
-                <div class="poll-options">${optionsHtml}</div>
-            `;
-        }
-        // USER NORMAL
-        else {
-            div.className = "user-message";
-            div.innerHTML = `
-                <div class="user-name">${data.user}</div>
-                <div class="message-content">${data.content}</div>
-            `;
-        }
+        div.className = `message ${roleClass}`;
+        div.innerHTML = `
+            <div class="message-header">
+                <span class="username">${data.user || userName}</span>
+                ${badgeHtml}
+            </div>
+            <div class="message-content">${data.content}</div>
+        `;
 
         messagesContainer.appendChild(div);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -118,18 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const text = inputField.value.trim();
         if (!text) return;
 
+        // Nota: El rol se determina en el backend, no es necesario enviarlo desde aquí
         const msgData = {
             community_id: communityId,
-            content: text,
-            user: userName,
-            role: isOwner === "true"
-                ? "owner"
-                : isAdmin === "true"
-                ? "admin"
-                : "user",
-            message_type: isAdmin === "true" || isOwner === "true"
-                ? "admin"
-                : "user"
+            content: text
         };
 
         socket.emit("send_message", msgData);
