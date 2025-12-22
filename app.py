@@ -807,35 +807,33 @@ def create_app():
             # Crear directorio si no existe
             os.makedirs(AVATAR_UPLOAD_FOLDER, exist_ok=True)
             
-            # Generar nombre único para el archivo
-            filename = secure_filename(f"{current_user.id}_{datetime.utcnow().timestamp()}.{file.filename.rsplit('.', 1)[1].lower()}")
+            # Generar nombre único
+            timestamp = int(datetime.utcnow().timestamp())
+            extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
+            filename = f"avatar_{current_user.id}_{timestamp}.{extension}"
             filepath = os.path.join(AVATAR_UPLOAD_FOLDER, filename)
             
             # Guardar archivo
             file.save(filepath)
             
-            # Actualizar usuario
-            avatar_url = f'/{filepath}'
+            # ¡CORRECCIÓN AQUÍ! - Usar url_for
+            avatar_url = url_for('static', filename=f'uploads/avatars/{filename}')
             current_user.avatar_url = avatar_url
             db.session.commit()
             
             return jsonify({'success': True, 'avatar_url': avatar_url})
         
         return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
+
     @app.route('/account/remove_avatar', methods=['POST'])
     @login_required
     def remove_avatar():
-        try:
-            # Establecer avatar por defecto
-            default_avatar = url_for('static', filename='images/default-avatar.png', _external=True)
-            current_user.avatar_url = default_avatar
-            db.session.commit()
-            
-            return jsonify({'success': True, 'avatar_url': default_avatar, 'message': 'Foto eliminada correctamente'})
-        except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
-    
+        # ¡CORRECCIÓN AQUÍ TAMBIÉN!
+        default_avatar = url_for('static', filename='images/default-avatar.png')
+        current_user.avatar_url = default_avatar
+        db.session.commit()
         return jsonify({'success': True, 'avatar_url': default_avatar})
+        
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
@@ -1500,12 +1498,11 @@ def create_app():
             return {
                 "success": True,
                 "app": {
+                    "id": str(new_app.id),  # ¡IMPORTANTE!
                     "name": new_app.name,
-                    "image_url": new_app.image_url
-                        or url_for("static", filename="images/app-placeholder.png")
+                    "image_url": new_app.image_url or url_for("static", filename="images/app-placeholder.png", _external=True)
                 }
             }
-
         except Exception as e:
             db.session.rollback()
             print("ERROR:", e)
