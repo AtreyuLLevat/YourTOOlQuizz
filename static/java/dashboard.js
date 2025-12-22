@@ -31,13 +31,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
+  // Verificación inicial
+  console.log('✅ dashboard.js iniciado');
+  console.log('Elementos encontrados:', {
+    appsList: !!appsList,
+    createAppForm: !!createAppForm,
+    appDetailModal: !!appDetailModal
+  });
+
+  /* ======================================================
+     FUNCIONES AUXILIARES
+  ====================================================== */
+  function showError(message) {
+    console.error('❌ Error:', message);
+    alert(message);
+  }
+
+  function showSuccess(message) {
+    console.log('✅ Éxito:', message);
+    alert(message);
+  }
+
   /* ======================================================
      BÚSQUEDA DE USUARIOS PARA EQUIPO
   ====================================================== */
   let searchTimeout;
   let currentSearchResults = [];
 
-  // Búsqueda en tiempo real de usuarios
   userSearchInput?.addEventListener('input', async (e) => {
     const query = e.target.value.trim();
     
@@ -46,15 +66,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Debounce para no hacer demasiadas peticiones
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(async () => {
       try {
         const res = await fetch(`/search_users?q=${encodeURIComponent(query)}`);
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
         const users = await res.json();
         currentSearchResults = users;
 
-        if (users.length === 0) {
+        if (!users || users.length === 0) {
           userSearchResults.style.display = 'none';
           return;
         }
@@ -63,12 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
         users.forEach(user => {
           const div = document.createElement('div');
           div.className = 'user-search-result';
+          div.style.cssText = 'padding: 8px; cursor: pointer; border-bottom: 1px solid #e2e8f0;';
+          
           div.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px; padding: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
               ${user.avatar_url ? `<img src="${user.avatar_url}" style="width:32px;height:32px;border-radius:50%;">` : ''}
               <div>
-                <strong>${user.name}</strong>
-                <div style="font-size: 0.85rem; color: #64748b;">${user.email}</div>
+                <strong>${user.name || 'Sin nombre'}</strong>
+                <div style="font-size: 0.85rem; color: #64748b;">${user.email || 'Sin email'}</div>
               </div>
             </div>
           `;
@@ -89,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   });
 
-  // Agregar miembro al equipo
   function addTeamMember(user) {
     const role = userRoleSelect.value;
     const memberId = `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -97,42 +119,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const memberDiv = document.createElement('div');
     memberDiv.className = 'team-member-entry';
     memberDiv.dataset.memberId = memberId;
-    memberDiv.dataset.userId = user.id;
+    memberDiv.dataset.userId = user.id || '';
     
     memberDiv.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           ${user.avatar_url ? `<img src="${user.avatar_url}" style="width:36px;height:36px;border-radius:50%;">` : ''}
           <div>
-            <div style="font-weight: 500;">${user.name}</div>
-            <div style="font-size: 0.85rem; color: #64748b;">${user.email} • ${role}</div>
+            <div style="font-weight: 500;">${user.name || 'Miembro sin nombre'}</div>
+            <div style="font-size: 0.85rem; color: #64748b;">${user.email || ''} • ${role}</div>
           </div>
         </div>
         <button type="button" class="remove-member-btn" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
           Eliminar
         </button>
       </div>
-      <input type="hidden" name="team_members[${memberId}][name]" value="${user.name}">
+      <input type="hidden" name="team_members[${memberId}][name]" value="${user.name || ''}">
       <input type="hidden" name="team_members[${memberId}][role]" value="${role}">
       <input type="hidden" name="team_members[${memberId}][avatar_url]" value="${user.avatar_url || ''}">
-      <input type="hidden" name="team_members[${memberId}][user_id]" value="${user.id}">
+      <input type="hidden" name="team_members[${memberId}][user_id]" value="${user.id || ''}">
     `;
     
     memberDiv.querySelector('.remove-member-btn').onclick = () => memberDiv.remove();
     teamContainer.appendChild(memberDiv);
   }
 
-  // Botón para agregar usuario manualmente si no se encuentra en búsqueda
   addUserBtn?.addEventListener('click', () => {
     const query = userSearchInput.value.trim();
     
     if (query && currentSearchResults.length > 0) {
-      // Agregar el primer resultado de búsqueda
       addTeamMember(currentSearchResults[0]);
       userSearchInput.value = '';
       userSearchResults.style.display = 'none';
     } else if (query) {
-      // Si no hay resultados pero hay texto, agregar como miembro manual
       const user = {
         id: null,
         name: query,
@@ -144,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Ocultar resultados al hacer clic fuera
   document.addEventListener('click', (e) => {
     if (!userSearchResults.contains(e.target) && e.target !== userSearchInput) {
       userSearchResults.style.display = 'none';
@@ -156,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
   ====================================================== */
   newAppBtn?.addEventListener('click', () => {
     createAppModal.classList.remove('hidden');
-    // Limpiar campos al abrir
     userSearchInput.value = '';
     userSearchResults.style.display = 'none';
     teamContainer.innerHTML = '';
@@ -173,109 +190,187 @@ document.addEventListener('DOMContentLoaded', () => {
   createAppForm?.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const formData = new FormData(createAppForm);
-    const members = [];
+    try {
+      const formData = new FormData(createAppForm);
+      const members = [];
 
-    // Recolectar miembros del equipo
-    document.querySelectorAll('.team-member-entry').forEach(div => {
-      const inputs = div.querySelectorAll('input[type="hidden"]');
-      const memberData = {};
-      inputs.forEach(input => {
-        const name = input.name.match(/\[([^\]]+)\]/g);
-        if (name && name.length >= 2) {
-          const key = name[1].replace(/[\[\]]/g, '');
-          memberData[key] = input.value;
+      // Recolectar miembros del equipo
+      document.querySelectorAll('.team-member-entry').forEach(div => {
+        const inputs = div.querySelectorAll('input[type="hidden"]');
+        const memberData = {};
+        inputs.forEach(input => {
+          const name = input.name.match(/\[([^\]]+)\]/g);
+          if (name && name.length >= 2) {
+            const key = name[1].replace(/[\[\]]/g, '');
+            memberData[key] = input.value;
+          }
+        });
+        if (memberData.name) {
+          members.push(memberData);
         }
       });
-      if (memberData.name) {
-        members.push(memberData);
+
+      formData.append('members_json', JSON.stringify(members));
+
+      const res = await fetch('/account/create_app', { 
+        method: 'POST', 
+        body: formData 
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
       }
-    });
-
-    formData.append('members_json', JSON.stringify(members));
-
-    try {
-      const res = await fetch('/account/create_app', { method: 'POST', body: formData });
+      
       const data = await res.json();
-      if (!data.success) return alert(data.message || 'Error');
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Error al crear la app');
+      }
 
+      // Verificar que la app tiene ID
+      if (!data.app || !data.app.id) {
+        throw new Error('La app fue creada pero no se recibió un ID válido');
+      }
+
+      console.log('✅ App creada con ID:', data.app.id);
+
+      // Crear botón para la nueva app
       const btn = document.createElement('button');
       btn.className = 'app-item';
-      btn.dataset.appId = data.app.id;
+      btn.dataset.appId = data.app.id.toString(); // Asegurar que es string
+      
+      const imageUrl = data.app.image_url || '/static/images/app-placeholder.png';
+      
       btn.innerHTML = `
-        <img src="${data.app.image_url}" class="app-img">
+        <img src="${imageUrl}" class="app-img" alt="${data.app.name}">
         <span class="app-name">${data.app.name}</span>
       `;
-      appsList.prepend(btn);
-
+      
+      // Agregar listener al nuevo botón
+      btn.addEventListener('click', function() {
+        const id = this.dataset.appId;
+        if (id) {
+          openAppDetail(id);
+        } else {
+          console.error('Botón sin data-app-id:', this);
+          showError('Esta aplicación no tiene un ID válido');
+        }
+      });
+      
+      // Agregar al principio de la lista
+      if (appsList) {
+        if (appsList.firstChild) {
+          appsList.insertBefore(btn, appsList.firstChild);
+        } else {
+          appsList.appendChild(btn);
+        }
+      }
+      
+      // Limpiar y cerrar modal
       createAppForm.reset();
       teamContainer.innerHTML = '';
       createAppModal.classList.add('hidden');
-
-    } catch {
-      alert('Error de red');
+      
+      showSuccess('¡App creada exitosamente!');
+      
+    } catch (err) {
+      console.error('Error al crear app:', err);
+      showError(err.message || 'Error de red al crear la app');
     }
   });
 
   /* ======================================================
-     FETCH APP
+     FETCH APP - MEJORADO CON MANEJO DE ERRORES
   ====================================================== */
   async function fetchAppData(appId) {
-    console.log(`🔍 Fetching app data for ID: ${appId}`);
-    const res = await fetch(`/account/get_app/${appId}`);
-    const data = await res.json();
-    if (!data.success) throw new Error();
-
-    // Solo establecer arrays vacíos si no existen
-    if (!data.app.reviews) data.app.reviews = [];
-    if (!data.app.communities) data.app.communities = [];
-    if (!data.app.team_members) data.app.team_members = [];
-
-    return data.app;
+    console.log(`🔍 Solicitando datos para app ID: ${appId}`);
+    
+    if (!appId || appId === 'undefined' || appId === 'null') {
+      throw new Error('ID de aplicación no válido');
+    }
+    
+    try {
+      const response = await fetch(`/account/get_app/${appId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Error al obtener datos de la app');
+      }
+      
+      // Asegurar arrays
+      data.app.reviews = data.app.reviews || [];
+      data.app.communities = data.app.communities || [];
+      data.app.team_members = data.app.team_members || [];
+      
+      console.log('✅ Datos de app obtenidos:', data.app.name);
+      return data.app;
+      
+    } catch (error) {
+      console.error('❌ Error en fetchAppData:', error);
+      throw error;
+    }
   }
 
   /* ======================================================
-     ABRIR MODAL APP - VERSIÓN SIMPLIFICADA
+     ABRIR MODAL APP - VERSIÓN MEJORADA
   ====================================================== */
   async function openAppDetail(appId) {
-    if (!appId) return;
-
+    console.log(`📱 Abriendo app con ID: ${appId}`);
+    
+    // Validación básica
+    if (!appId || appId === 'undefined' || appId === 'null') {
+      showError('ID de aplicación no válido');
+      return;
+    }
+    
     try {
       currentApp = await fetchAppData(appId);
       window.currentApp = currentApp;
-
-      // Asegurar arrays vacíos
-      if (!currentApp.reviews) currentApp.reviews = [];
-      if (!currentApp.communities) currentApp.communities = [];
-      if (!currentApp.team_members) currentApp.team_members = [];
-
-    } catch (err) {
-      return alert('Error cargando app');
+      
+      if (!appDetailModal) {
+        showError('No se puede mostrar la app - modal no encontrado');
+        return;
+      }
+      
+      // Guardar el ID en el modal
+      appDetailModal.dataset.appId = appId;
+      
+      // Actualizar información básica
+      updateAppBasicInfo();
+      
+      // Renderizar contenido
+      renderReviewsAdmin(); 
+      renderCommunities();
+      
+      // Mostrar modal
+      appDetailModal.classList.remove('hidden');
+      console.log('✅ Modal abierto correctamente');
+      
+    } catch (error) {
+      console.error('❌ Error al abrir app:', error);
+      showError('No se pudo cargar la aplicación: ' + error.message);
     }
-
-    if (!appDetailModal) return;
-    appDetailModal.dataset.appId = appId;
-
-    // Actualizar datos básicos
-    if (appDetailModal) {
-      const appNameEl = appDetailModal.querySelector('.app-name');
-      if (appNameEl) appNameEl.textContent = currentApp.name ? currentApp.name : '---';
-
-      const appDescEl = appDetailModal.querySelector('.app-description');
-      if (appDescEl) appDescEl.textContent = currentApp.description ? currentApp.description : '---';
-
-      const appDateEl = appDetailModal.querySelector('.app-date');
-      if (appDateEl) appDateEl.textContent = currentApp.creation_date ? currentApp.creation_date : '---';
-
-      const appThemeEl = appDetailModal.querySelector('.app-theme');
-      if (appThemeEl) appThemeEl.textContent = "Tema: " + (currentApp.theme ? currentApp.theme : "General");
-    }
-
-    renderReviewsAdmin(); 
-    renderCommunities();
-
-    appDetailModal.classList.remove('hidden');
-    console.log('✅ Modal abierto correctamente con reviews y estrellas sincronizadas');
+  }
+  
+  function updateAppBasicInfo() {
+    if (!appDetailModal || !currentApp) return;
+    
+    const elements = {
+      name: appDetailModal.querySelector('.app-name'),
+      description: appDetailModal.querySelector('.app-description'),
+      date: appDetailModal.querySelector('.app-date'),
+      theme: appDetailModal.querySelector('.app-theme')
+    };
+    
+    if (elements.name) elements.name.textContent = currentApp.name || '---';
+    if (elements.description) elements.description.textContent = currentApp.description || '---';
+    if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
+    if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
   }
 
   /* ======================================================
@@ -285,10 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewsList = document.getElementById('reviews-list');
     const reviewsCount = document.querySelector('.reviews-count');
     const starsElement = document.querySelector('.stars');
+    
     if (!reviewsList || !reviewsCount) return;
-
+    
     reviewsList.innerHTML = '';
-
+    
     if (!currentApp.reviews || currentApp.reviews.length === 0) {
       reviewsList.innerHTML = `
         <div class="no-reviews-message">
@@ -301,81 +397,93 @@ document.addEventListener('DOMContentLoaded', () => {
       if (starsElement) starsElement.innerHTML = '★☆☆☆☆ (0.0)';
       return;
     }
-
-    // Crear cards de reseña
-    currentApp.reviews.forEach((r, index) => {
+    
+    // Calcular promedio
+    const totalReviews = currentApp.reviews.length;
+    const averageRating = currentApp.reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviews;
+    const roundedAverage = averageRating.toFixed(1);
+    
+    // Actualizar contador y estrellas
+    reviewsCount.textContent = `(${totalReviews})`;
+    if (starsElement) {
+      starsElement.innerHTML = `
+        <span style="display:flex;align-items:center;gap:4px;">
+          <span style="color:#f59e0b;font-size:18px;">
+            ${'★'.repeat(Math.floor(averageRating))}${'☆'.repeat(5 - Math.floor(averageRating))}
+          </span>
+          <span style="font-weight:600;color:#1e293b;">${roundedAverage}</span>
+          <span style="color:#64748b;font-size:14px;">(${totalReviews} ${totalReviews === 1 ? 'reseña' : 'reseñas'})</span>
+        </span>
+      `;
+    }
+    
+    // Crear tarjetas de reseñas
+    currentApp.reviews.forEach((review, index) => {
       const card = document.createElement('div');
       card.className = 'review-card';
-      card.dataset.reviewId = r.id;
-
+      card.dataset.reviewId = review.id || index;
+      card.dataset.rating = review.rating || 0;
+      
+      const rating = Number(review.rating) || 0;
       let statusClass = 'neutral';
       let statusText = 'Neutral';
-      if (Number(r.rating) >= 4) {
+      
+      if (rating >= 4) {
         statusClass = 'positive';
         statusText = 'Positivo';
-      } else if (Number(r.rating) <= 2) {
+      } else if (rating <= 2) {
         statusClass = 'negative';
         statusText = 'Negativo';
       }
-
-      const stars = '⭐'.repeat(Number(r.rating)) + '☆'.repeat(5 - Number(r.rating));
-      const initials = r.username ? r.username.charAt(0).toUpperCase() : 'U';
-      const reviewDate = r.created_at ? new Date(r.created_at).toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' }) : 'Fecha no disponible';
-
+      
+      const stars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+      const initials = (review.username || 'U').charAt(0).toUpperCase();
+      const reviewDate = review.created_at ? 
+        new Date(review.created_at).toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short', 
+          year: 'numeric' 
+        }) : 'Fecha no disponible';
+      
       card.innerHTML = `
         <div class="review-status ${statusClass}">${statusText}</div>
         <div class="review-header">
           <div class="review-user-info">
             <div class="review-avatar">${initials}</div>
             <div class="review-user-details">
-              <div class="review-username">@${r.username || 'Usuario'}</div>
+              <div class="review-username">@${review.username || 'Usuario'}</div>
               <div class="review-date">${reviewDate}</div>
             </div>
           </div>
           <div class="review-rating">
             <span class="star-icon">${stars}</span>
-            <span class="rating-value">${r.rating}/5</span>
+            <span class="rating-value">${rating}/5</span>
           </div>
         </div>
-        <div class="review-content">${r.content || 'Sin comentario'}</div>
+        <div class="review-content">${review.content || 'Sin comentario'}</div>
       `;
+      
+      // Agregar menú contextual
+      card.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        openReviewActionsMenu(e, review.id || index);
+      });
+      
       reviewsList.appendChild(card);
     });
-
-    // Actualizar contador y promedio
-    reviewsCount.textContent = `(${currentApp.reviews.length})`;
-    if (starsElement) {
-      const avgRating = (
-        currentApp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) / currentApp.reviews.length
-      ).toFixed(1);
-      starsElement.innerHTML = `
-        <span style="display:flex;align-items:center;gap:4px;">
-          <span style="color:#f59e0b;font-size:18px;">
-            ${'★'.repeat(Math.floor(avgRating))}${'☆'.repeat(5 - Math.floor(avgRating))}
-          </span>
-          <span style="font-weight:600;color:#1e293b;">${avgRating}</span>
-          <span style="color:#64748b;font-size:14px;">(${currentApp.reviews.length} ${currentApp.reviews.length === 1 ? 'reseña' : 'reseñas'})</span>
-        </span>
-      `;
-    }
   }
-
-  // ---------------------------
-  // Menú flotante y eliminación
-  // ---------------------------
+  
   function closeReviewActionsMenu() {
-    document.getElementById('review-actions-menu')?.remove();
+    const menu = document.getElementById('review-actions-menu');
+    if (menu) menu.remove();
   }
-
-  document.addEventListener('click', closeReviewActionsMenu);
-
+  
   function openReviewActionsMenu(event, reviewId) {
     closeReviewActionsMenu();
-
+    
     const menu = document.createElement('div');
     menu.id = 'review-actions-menu';
     menu.innerHTML = `<button class="danger">🗑 Eliminar reseña</button>`;
-
     menu.style.cssText = `
       position: fixed;
       top: ${event.clientY}px;
@@ -387,77 +495,88 @@ document.addEventListener('DOMContentLoaded', () => {
       z-index: 9999;
       padding: 6px;
     `;
-
+    
     menu.querySelector('button').onclick = () => {
       deleteReview(reviewId);
       closeReviewActionsMenu();
     };
-
+    
     document.body.appendChild(menu);
   }
-
+  
+  document.addEventListener('click', closeReviewActionsMenu);
+  
   async function deleteReview(reviewId) {
     if (!confirm('¿Eliminar esta reseña definitivamente?')) return;
-
-    const appId = appDetailModal.dataset.appId;
-
+    
+    const appId = appDetailModal?.dataset.appId;
+    if (!appId) {
+      showError('No se pudo identificar la app');
+      return;
+    }
+    
     try {
       const res = await fetch(`/account/review/${reviewId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
       });
-
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
       const data = await res.json();
-      if (!data.success) return alert(data.error);
-
-      // Eliminar del estado local
+      if (!data.success) throw new Error(data.error || 'Error al eliminar');
+      
+      // Actualizar lista localmente
       currentApp.reviews = currentApp.reviews.filter(r => r.id !== reviewId);
-
       renderReviewsAdmin();
-    } catch {
-      alert('Error eliminando reseña');
+      
+      showSuccess('Reseña eliminada correctamente');
+      
+    } catch (error) {
+      console.error('Error eliminando reseña:', error);
+      showError('No se pudo eliminar la reseña: ' + error.message);
     }
   }
 
   /* ======================================================
-     COMMUNITIES - ESTILO MINIMALISTA MODERNO
+     COMMUNITIES
   ====================================================== */
   function renderCommunities() {
-    console.log('🎯 EJECUTANDO renderCommunities()');
-
+    console.log('🎯 Renderizando comunidades...');
+    
     if (!appDetailModal) {
       console.error('❌ appDetailModal no encontrado');
       return;
     }
-
+    
     const list = appDetailModal.querySelector('.community-list');
     if (!list) {
       console.error('❌ No se encontró .community-list en el modal');
       return;
     }
-
+    
     list.innerHTML = '';
-
-    if (!currentApp || !currentApp.communities || !currentApp.communities.length) {
+    
+    if (!currentApp || !currentApp.communities || currentApp.communities.length === 0) {
       console.log('ℹ️ No hay comunidades para mostrar');
       list.innerHTML = '<li class="no-communities">Sin comunidades creadas</li>';
       return;
     }
-
+    
     console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
-
-    currentApp.communities.forEach(community => {
+    
+    currentApp.communities.forEach((community, index) => {
       if (!community || !community.id) return;
-
+      
       const li = document.createElement('li');
       li.className = 'community-card-container';
       li.style.cssText = 'margin-bottom: 16px; list-style: none;';
-
+      
       const a = document.createElement('a');
       a.href = `/community/${community.id}`;
       a.className = 'community-card';
       a.target = '_blank';
-
+      
       a.innerHTML = `
         <div class="community-card-content">
           <div class="community-card-name">${community.name || 'Comunidad sin nombre'}</div>
@@ -465,8 +584,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <div class="community-card-arrow">→</div>
       `;
-
-      // Estilos minimalistas modernos
+      
+      // Estilos inline para consistencia
       a.style.cssText = `
         display: flex;
         justify-content: space-between;
@@ -482,67 +601,37 @@ document.addEventListener('DOMContentLoaded', () => {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       `;
-
-      // Hover elegante
+      
+      // Hover effects
       a.addEventListener('mouseenter', () => {
         a.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)';
         a.style.transform = 'translateY(-2px)';
         a.style.borderColor = '#d1d5db';
       });
+      
       a.addEventListener('mouseleave', () => {
         a.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)';
         a.style.transform = 'translateY(0)';
         a.style.borderColor = '#e5e7eb';
       });
-
-      const cardContent = a.querySelector('.community-card-content');
-      if (cardContent) cardContent.style.cssText = 'flex: 1; min-width: 0;';
-
-      const cardName = a.querySelector('.community-card-name');
-      if (cardName) cardName.style.cssText = `
-        font-size: 16px;
-        font-weight: 600;
-        color: #111827;
-        margin-bottom: 4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      `;
-
-      const cardMeta = a.querySelector('.community-card-meta');
-      if (cardMeta) cardMeta.style.cssText = 'font-size: 14px; color: #6b7280; font-weight: 400;';
-
-      const cardArrow = a.querySelector('.community-card-arrow');
-      if (cardArrow) {
-        cardArrow.style.cssText = `
-          font-size: 20px;
-          color: #374151;
-          font-weight: 300;
-          margin-left: 16px;
-          transition: transform 0.2s ease;
-        `;
-        a.addEventListener('mouseenter', () => cardArrow.style.transform = 'translateX(4px)');
-        a.addEventListener('mouseleave', () => cardArrow.style.transform = 'translateX(0)');
-      }
-
-      // Menú de acciones para eliminar
-      a.addEventListener('click', (e) => {
+      
+      // Menú contextual para eliminar
+      a.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         e.stopPropagation();
         openCommunityActionsMenu(e, community.id);
       });
-
+      
       li.appendChild(a);
       list.appendChild(li);
     });
-
+    
     console.log(`✅ Se crearon ${list.children.length} tarjetas de comunidad`);
   }
-
-  // Menu contextual para eliminar comunidad
+  
   function openCommunityActionsMenu(event, communityId) {
     closeCommunityActionsMenu();
-
+    
     const menu = document.createElement('div');
     menu.id = 'community-actions-menu';
     menu.innerHTML = `<button class="danger">🗑 Eliminar comunidad</button>`;
@@ -557,37 +646,45 @@ document.addEventListener('DOMContentLoaded', () => {
       z-index: 9999;
       padding: 6px;
     `;
-
+    
     menu.querySelector('button').onclick = () => {
       deleteCommunity(communityId);
       closeCommunityActionsMenu();
     };
-
+    
     document.body.appendChild(menu);
   }
-
+  
   function closeCommunityActionsMenu() {
-    document.getElementById('community-actions-menu')?.remove();
+    const menu = document.getElementById('community-actions-menu');
+    if (menu) menu.remove();
   }
-
+  
   document.addEventListener('click', closeCommunityActionsMenu);
-
+  
   async function deleteCommunity(communityId) {
     if (!confirm('¿Eliminar esta comunidad definitivamente?')) return;
-
+    
     try {
       const res = await fetch(`/account/community/${communityId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
       });
-
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
       const data = await res.json();
-      if (!data.success) return alert(data.error);
-
+      if (!data.success) throw new Error(data.error || 'Error al eliminar');
+      
+      // Actualizar lista local
       currentApp.communities = currentApp.communities.filter(c => c.id !== communityId);
       renderCommunities();
-    } catch {
-      alert('Error eliminando comunidad');
+      
+      showSuccess('Comunidad eliminada correctamente');
+      
+    } catch (error) {
+      console.error('Error eliminando comunidad:', error);
+      showError('No se pudo eliminar la comunidad: ' + error.message);
     }
   }
 
@@ -600,10 +697,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   saveCommunityBtn?.addEventListener('click', async () => {
     const name = communityNameInput.value.trim();
-    if (!name) return alert('Nombre obligatorio');
+    if (!name) {
+      showError('El nombre de la comunidad es obligatorio');
+      return;
+    }
 
     const appId = appDetailModal?.dataset.appId;
-    if (!appId) return alert('App no válida');
+    if (!appId) {
+      showError('No se pudo identificar la aplicación');
+      return;
+    }
 
     try {
       const res = await fetch(`/apps/${appId}/create_community`, {
@@ -611,11 +714,13 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name })
       });
-
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
       const data = await res.json();
-      if (!data.success) return alert(data.error);
+      if (!data.success) throw new Error(data.error || 'Error al crear comunidad');
 
-      // Asegurar que currentApp.communities existe
+      // Asegurar que existe el array de comunidades
       if (!currentApp.communities) {
         currentApp.communities = [];
       }
@@ -626,11 +731,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // Re-renderizar
       renderCommunities();
 
+      // Limpiar y cerrar formulario
       communityNameInput.value = '';
       addCommunityForm.classList.add('hidden');
-
-    } catch {
-      alert('Error de red');
+      
+      showSuccess('¡Comunidad creada exitosamente!');
+      
+    } catch (error) {
+      console.error('Error al crear comunidad:', error);
+      showError('No se pudo crear la comunidad: ' + error.message);
     }
   });
 
@@ -641,48 +750,106 @@ document.addEventListener('DOMContentLoaded', () => {
     appDetailModal.classList.add('hidden');
     currentApp = null;
     window.currentApp = null;
+    console.log('🗑 Modal cerrado y estado limpiado');
   });
 
   /* ======================================================
-     LISTENER APPS
+     LISTENER PARA APPS EXISTENTES Y NUEVAS
   ====================================================== */
-  appsList?.addEventListener('click', e => {
-    const btn = e.target.closest('.app-item');
-    if (!btn) return;
-
-    const appId = btn.dataset.appId;
-    if (appId) openAppDetail(appId);
+  function setupAppClickListeners() {
+    const appButtons = document.querySelectorAll('.app-item');
+    
+    appButtons.forEach(button => {
+      // Evitar agregar múltiples listeners
+      button.removeEventListener('click', handleAppClick);
+      button.addEventListener('click', handleAppClick);
+    });
+  }
+  
+  function handleAppClick() {
+    const appId = this.dataset.appId;
+    console.log('🖱️ Botón de app clickeado, ID:', appId);
+    
+    if (!appId) {
+      console.error('Botón sin data-app-id:', this);
+      showError('Esta aplicación no tiene un ID válido');
+      return;
+    }
+    
+    openAppDetail(appId);
+  }
+  
+  // Configurar listeners iniciales
+  setupAppClickListeners();
+  
+  // También configurar para botones que se agreguen dinámicamente
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList') {
+        setupAppClickListeners();
+      }
+    });
   });
+  
+  if (appsList) {
+    observer.observe(appsList, { childList: true });
+  }
 
-  // Tab switching logic
+  /* ======================================================
+     TABS DEL MODAL
+  ====================================================== */
   const tabBtns = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
   
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
+      // Actualizar botones activos
       tabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
+      
+      // Ocultar todos los contenidos
       tabContents.forEach(c => c.classList.add('hidden'));
-
-      const targetTab = document.querySelector(`#${btn.dataset.tab}`);
+      
+      // Mostrar contenido correspondiente
+      const targetTab = document.getElementById(btn.dataset.tab);
       if (targetTab) {
         targetTab.classList.remove('hidden');
       }
-
-      // 🔥 CLAVE: Re-renderizar comunidades al cambiar a esa pestaña
+      
+      // Re-renderizar si es necesario
       if (btn.dataset.tab === 'communities') {
         renderCommunities();
       }
     });
   });
 
-  // Close modal on backdrop click
+  // Cerrar modal al hacer clic fuera
   appDetailModal?.addEventListener('click', e => {
     if (e.target === appDetailModal) {
       appDetailModal.classList.add('hidden');
+      currentApp = null;
+      window.currentApp = null;
     }
   });
 
-  console.log('✅ dashboard.js cargado completamente con sistema de búsqueda de usuarios');
+  /* ======================================================
+     DEBUGGING INICIAL
+  ====================================================== */
+  setTimeout(() => {
+    console.log('🔍 Verificando botones de apps...');
+    const appButtons = document.querySelectorAll('.app-item');
+    console.log(`✅ Encontrados ${appButtons.length} botones de apps`);
+    
+    appButtons.forEach((btn, index) => {
+      const appId = btn.dataset.appId;
+      const isValid = appId && appId !== 'undefined' && appId !== 'null';
+      console.log(`App ${index + 1}:`, {
+        id: appId,
+        isValid: isValid,
+        text: btn.querySelector('.app-name')?.textContent || 'Sin nombre'
+      });
+    });
+  }, 500);
+
+  console.log('✅ dashboard.js completamente cargado y listo');
 });
