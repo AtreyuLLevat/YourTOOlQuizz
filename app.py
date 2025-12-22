@@ -835,7 +835,7 @@ def create_app():
         except Exception as e:
             return jsonify({'success': False, 'error': str(e)}), 500
     
-    return jsonify({'success': True, 'avatar_url': default_avatar})
+        return jsonify({'success': True, 'avatar_url': default_avatar})
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
