@@ -920,6 +920,20 @@ input[type="checkbox"] {
   border-bottom: none;
   margin-bottom: 12px;
 }
+
+/* Estilos para resultados de búsqueda */
+.user-search-result:hover {
+  background: #f1f5f9;
+}
+
+.user-search-result {
+  transition: background 0.2s ease;
+}
+
+/* Ocultar resultados cuando no sea necesario */
+#userSearchResults:empty {
+  display: none !important;
+}
 </style>
 {% endblock %}
 
@@ -1135,17 +1149,50 @@ input[type="checkbox"] {
         <input id="appImage" name="appImage" type="file" accept="image/*">
       </div>
 
-      <div class="field">
-        <label>Equipo / Miembros</label>
-        <div id="team-members-container">
-          <!-- Los miembros dinámicos se añadirán aquí -->
-        </div>
-        <button type="button" id="addMemberBtn" style="margin-top: 10px;">Añadir miembro</button>
-      </div>
+<div class="field">
+  <label>Equipo / Miembros</label>
+  <div class="team-search-container">
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input 
+        type="text" 
+        id="userSearch" 
+        placeholder="Buscar usuario por nombre o email" 
+        style="flex: 1;"
+      >
+      <select id="userRole">
+        <option value="Desarrollador">Desarrollador</option>
+        <option value="Diseñador">Diseñador</option>
+        <option value="Manager">Manager</option>
+        <option value="Tester">Tester</option>
+        <option value="Soporte">Soporte</option>
+        <option value="Otro">Otro</option>
+      </select>
+      <button type="button" id="addUserBtn">Agregar</button>
+    </div>
+    <div id="userSearchResults" style="border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none;"></div>
+  </div>
+
+  <div id="team-members-container">
+    <!-- Aquí se agregarán los miembros seleccionados -->
+  </div>
+</div>
 
       <div class="field">
         <label for="appTheme">Tema</label>
-        <input id="appTheme" name="appTheme" type="text" autocomplete="off">
+        <select id="appTheme" name="appTheme" required>
+          <option value="">Selecciona un tema</option>
+          <option value="General">General</option>
+          <option value="Productividad">Productividad</option>
+          <option value="Desarrollo">Desarrollo</option>
+          <option value="Diseño">Diseño</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Redes Sociales">Redes Sociales</option>
+          <option value="Educación">Educación</option>
+          <option value="Entretenimiento">Entretenimiento</option>
+          <option value="Salud">Salud</option>
+          <option value="Finanzas">Finanzas</option>
+          <option value="Otros">Otros</option>
+        </select>
       </div>
 
       <div class="field">
