@@ -357,21 +357,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
-  function updateAppBasicInfo() {
-    if (!appDetailModal || !currentApp) return;
-    
-    const elements = {
-      name: appDetailModal.querySelector('.app-name'),
-      description: appDetailModal.querySelector('.app-description'),
-      date: appDetailModal.querySelector('.app-date'),
-      theme: appDetailModal.querySelector('.app-theme')
-    };
-    
-    if (elements.name) elements.name.textContent = currentApp.name || '---';
-    if (elements.description) elements.description.textContent = currentApp.description || '---';
-    if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
-    if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
+function updateAppBasicInfo() {
+  if (!appDetailModal || !currentApp) return;
+  
+  const elements = {
+    name: appDetailModal.querySelector('.app-name'),
+    description: appDetailModal.querySelector('.app-description'),
+    date: appDetailModal.querySelector('.app-date'),
+    theme: appDetailModal.querySelector('.app-theme')
+  };
+  
+  if (elements.name) elements.name.textContent = currentApp.name || '---';
+  if (elements.description) elements.description.textContent = currentApp.description || '---';
+  if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
+  if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
+
+  // 🔥 LOGO DE LA APP
+  const logoImg = document.getElementById("app-logo");
+  if (logoImg) {
+    logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
   }
+}
+
 
   /* ======================================================
      REVIEWS
