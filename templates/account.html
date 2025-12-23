@@ -1001,7 +1001,7 @@ input[type="checkbox"] {
           <div class="field" style="display: flex; align-items: center; gap: 20px;">
             <div style="text-align: center;">
               <img id="avatarPreview" 
-                   src="{{ usuario.avatar_url or url_for('static', filename='images/default-avatar.png') }}" 
+                   src="{{ usuario.avatar_url }}"
                    style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0;"
                    alt="Foto de perfil">
             </div>
@@ -1092,16 +1092,17 @@ input[type="checkbox"] {
         <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
 
         <div id="appsList" class="apps-list">
-          {% if apps %}
-            {% for app in apps %}
-              <button class="app-item" data-app-id="{{ app.id }}">
-                <img src="{{ app.image_url or url_for('static', filename='images/app-placeholder.png') }}" class="app-img">
-                <span class="app-name">{{ app.name }}</span>
-              </button>
-            {% endfor %}
-          {% else %}
-            <p>No tienes aplicaciones creadas.</p>
-          {% endif %}
+{% if apps %}
+  {% for app in apps %}
+    <!-- Convierte app.id a string -->
+    <button class="app-item" data-app-id="{{ app.id|string }}">
+      <img src="{{ app.image_url }}" class="app-img">
+      <span class="app-name">{{ app.name }}</span>
+    </button>
+  {% endfor %}
+{% else %}
+  <p>No tienes aplicaciones creadas.</p>
+{% endif %}
         </div>
       </div>
     </div>
@@ -1115,7 +1116,7 @@ input[type="checkbox"] {
 
     <div class="app-basic">
       <div class="app-logo">
-        <img src="/static/images/app-placeholder.png" alt="Logo App">
+        <img src="{{ app.image_url }}" alt="Logo App">
       </div>
       <div class="app-info">
         <h2><span class="app-name"></span></h2>
@@ -1294,7 +1295,8 @@ input[type="checkbox"] {
     
     <div style="text-align: center; margin: 25px 0;">
       <img id="avatarModalPreview" 
-           src="{{ url_for('static', filename='images/default-avatar.png') }}" 
+          src="{{ usuario.avatar_url }}"
+
            style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #2563eb; margin-bottom: 15px;">
       
       <div style="margin-top: 15px;">

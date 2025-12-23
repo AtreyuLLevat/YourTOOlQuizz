@@ -848,8 +848,7 @@ def create_app():
     def remove_avatar():
         # CORRECCIÓN: Usar logo.png que sí existe en lugar de default-avatar.png
         default_avatar = (
-            "https://ouoodvqsezartigpzwke.supabase.co"
-            "/storage/v1/object/public/images/avatars/default.png"
+            "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png"
         )
 
         current_user.avatar_url = default_avatar
