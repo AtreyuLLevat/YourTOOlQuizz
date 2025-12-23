@@ -50,7 +50,7 @@ from models import unique_slug
 from uuid import UUID
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
-
+from uuid import uuid4
 
 
 
@@ -85,24 +85,7 @@ def iniciar_tareas(app):
     print("🕒 Tareas configuradas: recordatorios diarios y newsletter semanal")
 # Añade estas funciones después de las importaciones, antes de create_app()
 
-def get_default_avatar_url():
-    """Devuelve la URL del avatar por defecto"""
-    return url_for('static', filename='Imagenes/logo.png', _external=True)
 
-def get_app_placeholder_url():
-    """Devuelve la URL del placeholder para apps"""
-    return url_for('static', filename='Imagenes/logo.png', _external=True)
-
-def get_user_avatar_url(user):
-    """Devuelve la URL del avatar del usuario o la por defecto"""
-    if user and user.avatar_url:
-        # Si avatar_url es una ruta relativa (ej: /static/uploads/avatars/...)
-        if user.avatar_url.startswith('/'):
-            return user.avatar_url
-        # Si ya es una URL completa
-        return user.avatar_url
-    return get_default_avatar_url()
-# -----------------------------
 # FACTORY DE LA APP
 # -----------------------------
 def create_app():
@@ -147,11 +130,20 @@ def create_app():
  # Solo una vez, no redefinir socketio
 
 
-    @app.route('/static/java/<path:filename>')
-    def serve_js_modules(filename):
-        response = send_from_directory('static/java', filename)
-        response.headers['Content-Type'] = 'application/javascript'
-        return response
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -826,19 +818,22 @@ def create_app():
         
         if file and allowed_file(file.filename):
             # Crear directorio si no existe
-            os.makedirs(AVATAR_UPLOAD_FOLDER, exist_ok=True)
-            
-            # Generar nombre único
-            timestamp = int(datetime.utcnow().timestamp())
-            extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
-            filename = f"avatar_{current_user.id}_{timestamp}.{extension}"
-            filepath = os.path.join(AVATAR_UPLOAD_FOLDER, filename)
-            
-            # Guardar archivo
-            file.save(filepath)
-            
-            # ¡CORRECCIÓN AQUÍ! - Usar url_for
-            avatar_url = url_for('static', filename=f'uploads/avatars/{filename}')
+            ext = file.filename.rsplit(".", 1)[1].lower()
+            filename = f"avatars/{current_user.id}/{uuid4().hex}.{ext}"
+
+            supabase.storage.from_("images").upload(
+                filename,
+                file.read(),
+                {"content-type": file.mimetype}
+            )
+
+            avatar_url = (
+                supabase.storage
+                .from_("images")
+                .get_public_url(filename)
+                .public_url
+            )
+
             current_user.avatar_url = avatar_url
             db.session.commit()
             
@@ -846,29 +841,17 @@ def create_app():
         
         return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
 
-    @app.route('/static/images/<filename>')
-    def serve_placeholder_images(filename):
-        """Sirve imágenes placeholder o redirige a placeholders online"""
-        allowed_files = {
-            'app-placeholder.png': 'static/Imagenes/logo.png',
-            'default-avatar.png': 'static/Imagenes/logo.png'
-        }
-        
-        if filename in allowed_files:
-            placeholder_path = allowed_files[filename]
-            # Verifica si el archivo existe localmente
-            full_path = os.path.join(app.root_path, placeholder_path)
-            if os.path.exists(full_path):
-                return send_from_directory('static/Imagenes', 'logo.png')
-        
-        # Si no existe, devuelve 404 o redirige a un placeholder online
-        abort(404)
+
 
     @app.route('/account/remove_avatar', methods=['POST'])
     @login_required
     def remove_avatar():
         # CORRECCIÓN: Usar logo.png que sí existe en lugar de default-avatar.png
-        default_avatar = url_for('static', filename='Imagenes/logo.png')  # Cambiado
+        default_avatar = (
+            "https://ouoodvqsezartigpzwke.supabase.co"
+            "/storage/v1/object/public/images/avatars/default.png"
+        )
+
         current_user.avatar_url = default_avatar
         db.session.commit()
         return jsonify({'success': True, 'avatar_url': default_avatar})
@@ -1491,10 +1474,21 @@ def create_app():
 
         image_url = None
         if image_file and image_file.filename:
-            upload_path = os.path.join("static", "uploads", image_file.filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = f"/{upload_path}"
+            ext = image_file.filename.rsplit(".", 1)[1].lower()
+            filename = f"apps/{uuid4().hex}.{ext}"
+
+            supabase.storage.from_("images").upload(
+                filename,
+                image_file.read(),
+                {"content-type": image_file.mimetype}
+            )
+
+            image_url = (
+                supabase.storage
+                .from_("images")
+                .get_public_url(filename)
+                .public_url
+            )
 
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
