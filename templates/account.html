@@ -954,6 +954,56 @@ input[type="checkbox"] {
   justify-content: center;
   margin-top: 30px;
 }
+/* En el bloque extra_css de account.html, añade estos estilos: */
+
+/* Estilos para enlaces de redes sociales en inputs */
+#socials input[type="url"] {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+#socials input[type="url"]:focus {
+  background: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Badges para redes sociales en tarjetas de equipo */
+.social-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.social-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.social-badge.twitter {
+  background: rgba(29, 161, 242, 0.1);
+  color: #1da1f2;
+  border: 1px solid rgba(29, 161, 242, 0.3);
+}
+
+.social-badge.linkedin {
+  background: rgba(0, 119, 181, 0.1);
+  color: #0077b5;
+  border: 1px solid rgba(0, 119, 181, 0.3);
+}
+
+.social-badge.github {
+  background: rgba(51, 51, 51, 0.1);
+  color: #333;
+  border: 1px solid rgba(51, 51, 51, 0.3);
+}
 </style>
 {% endblock %}
 
@@ -1022,6 +1072,57 @@ input[type="checkbox"] {
           
           <div id="avatarFeedback" style="margin-top: 10px; display: none;"></div>
         </section>
+
+        <!-- En account.html, después de la sección "Foto de perfil" y antes de "Seguridad" -->
+
+<!-- Redes Sociales -->
+<section class="section" id="socials">
+  <h2>Redes Sociales</h2>
+  <p>Conecta tus perfiles sociales para enriquecer tu perfil y facilitar la colaboración.</p>
+  
+  <div class="field">
+    <label for="twitter">Twitter / X</label>
+    <input id="twitter" type="url" 
+           placeholder="https://twitter.com/tu_usuario"
+           value="{{ usuario.socials.twitter if usuario.socials and usuario.socials.twitter else '' }}">
+    <small style="color: var(--muted); font-size: 0.85rem;">
+      Ejemplo: https://twitter.com/tu_usuario o @tu_usuario
+    </small>
+  </div>
+  
+  <div class="field">
+    <label for="linkedin">LinkedIn</label>
+    <input id="linkedin" type="url" 
+           placeholder="https://linkedin.com/in/tu_usuario"
+           value="{{ usuario.socials.linkedin if usuario.socials and usuario.socials.linkedin else '' }}">
+    <small style="color: var(--muted); font-size: 0.85rem;">
+      Ejemplo: https://linkedin.com/in/tu_usuario
+    </small>
+  </div>
+  
+  <div class="field">
+    <label for="github">GitHub</label>
+    <input id="github" type="url" 
+           placeholder="https://github.com/tu_usuario"
+           value="{{ usuario.socials.github if usuario.socials and usuario.socials.github else '' }}">
+    <small style="color: var(--muted); font-size: 0.85rem;">
+      Ejemplo: https://github.com/tu_usuario
+    </small>
+  </div>
+  
+  <div class="field">
+    <label for="website">Sitio Web Personal</label>
+    <input id="website" type="url" 
+           placeholder="https://tusitio.com"
+           value="{{ usuario.socials.website if usuario.socials and usuario.socials.website else '' }}">
+  </div>
+  
+  <div class="actions">
+    <button class="btn primary hidden" id="saveSocials">Guardar Redes Sociales</button>
+  </div>
+  
+  <div id="socialsFeedback" style="margin-top: 10px; display: none;"></div>
+</section>
 
         <!-- Seguridad -->
         <section class="section">
@@ -1331,6 +1432,8 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/modal.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
+<!-- En la sección extra_js de account.html, añade: -->
+<script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
 
 <!-- Scripts normales que no usan módulos -->
 <script>

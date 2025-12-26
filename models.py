@@ -80,7 +80,7 @@ class User(UserMixin, db.Model):
         "community_activity": False,
         "marketing": False
     })
-
+    socials = db.Column(JSON, default=dict)
     def __repr__(self):
         return f"<User {self.name} ({self.email})>"
 
@@ -171,7 +171,7 @@ class TeamMember(db.Model):
     role = db.Column(db.String(100))
     avatar_url = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
+    user = db.relationship("User")
     app = db.relationship("App", back_populates="team_members")
     
     

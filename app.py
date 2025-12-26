@@ -817,7 +817,8 @@ def create_app():
                 "id": user.id,
                 "name": user.name,
                 "email": user.email,
-                "avatar_url": user.avatar_url
+                "avatar_url": user.avatar_url,
+                "socials": user.socials or {}  # Añadir redes sociales
             })
 
         return jsonify(results)
@@ -866,6 +867,80 @@ def create_app():
         current_user.avatar_url = default_avatar
         db.session.commit()
         return jsonify({'success': True, 'avatar_url': default_avatar})
+
+    @app.route("/apps/<uuid:app_id>/team")
+    def get_team(app_id):
+        members = TeamMember.query.filter_by(app_id=app_id).all()
+
+        data = []
+        for m in members:
+            user = m.user
+
+            data.append({
+                "name": user.name if user else m.name,
+                "role": m.role,
+                "avatar": user.avatar_url if user else m.avatar_url,
+                "socials": user.socials if user else {}
+            })
+
+        return jsonify(data)
+
+# En app.py, después de la ruta /account/change_password, añade:
+
+    @app.route("/account/update_socials", methods=["POST"])
+    @login_required
+    def update_socials():
+        """Actualiza las redes sociales del usuario."""
+        try:
+            data = request.get_json()
+            socials_data = data.get("socials", {})
+            
+            # Validar y limpiar URLs
+            cleaned_socials = {}
+            for platform, url in socials_data.items():
+                if url:
+                    # Añadir https:// si no está presente
+                    if not url.startswith(('http://', 'https://', '@')):
+                        url = f'https://{url}'
+                    cleaned_socials[platform] = url
+            
+            # Actualizar en la base de datos
+            if current_user.socials is None:
+                current_user.socials = {}
+            
+            # Mantener otros campos que ya existan
+            current_socials = current_user.socials.copy() if current_user.socials else {}
+            current_socials.update(cleaned_socials)
+            
+            # Actualizar solo los campos proporcionados
+            current_user.socials = current_socials
+            db.session.commit()
+            
+            return jsonify({
+                "success": True,
+                "message": "Redes sociales actualizadas correctamente",
+                "socials": current_user.socials
+            })
+            
+        except Exception as e:
+            print(f"❌ Error actualizando redes sociales: {e}")
+            db.session.rollback()
+            return jsonify({
+                "success": False,
+                "message": f"Error interno: {str(e)}"
+            }), 500
+
+
+# En app.py, añade esta ruta si quieres obtener las redes sociales vía API
+
+    @app.route("/account/get_socials", methods=["GET"])
+    @login_required
+    def get_socials():
+        """Obtiene las redes sociales del usuario."""
+        return jsonify({
+            "success": True,
+            "socials": current_user.socials or {}
+        })
 
     @app.route('/listadodecosas')
     def explorador():

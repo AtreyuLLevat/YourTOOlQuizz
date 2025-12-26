@@ -112,37 +112,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   });
 
-  function addTeamMember(user) {
-    const role = userRoleSelect.value;
-    const memberId = `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    const memberDiv = document.createElement('div');
-    memberDiv.className = 'team-member-entry';
-    memberDiv.dataset.memberId = memberId;
-    memberDiv.dataset.userId = user.id || '';
-    
-    memberDiv.innerHTML = `
-      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          ${user.avatar_url ? `<img src="${user.avatar_url}" style="width:36px;height:36px;border-radius:50%;">` : ''}
-          <div>
-            <div style="font-weight: 500;">${user.name || 'Miembro sin nombre'}</div>
-            <div style="font-size: 0.85rem; color: #64748b;">${user.email || ''} • ${role}</div>
-          </div>
-        </div>
-        <button type="button" class="remove-member-btn" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-          Eliminar
-        </button>
-      </div>
-      <input type="hidden" name="team_members[${memberId}][name]" value="${user.name || ''}">
-      <input type="hidden" name="team_members[${memberId}][role]" value="${role}">
-      <input type="hidden" name="team_members[${memberId}][avatar_url]" value="${user.avatar_url || ''}">
-      <input type="hidden" name="team_members[${memberId}][user_id]" value="${user.id || ''}">
-    `;
-    
-    memberDiv.querySelector('.remove-member-btn').onclick = () => memberDiv.remove();
-    teamContainer.appendChild(memberDiv);
+// En dashboard.js, en la función addTeamMember, actualiza el HTML para incluir redes sociales:
+
+function addTeamMember(user) {
+  const role = userRoleSelect.value;
+  const memberId = `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Extraer redes sociales del usuario
+  const socials = user.socials || {};
+  const socialLinks = [];
+  
+  if (socials.twitter) {
+    socialLinks.push(`<a href="${socials.twitter}" target="_blank" style="color: #1da1f2;">Twitter</a>`);
   }
+  if (socials.linkedin) {
+    socialLinks.push(`<a href="${socials.linkedin}" target="_blank" style="color: #0077b5;">LinkedIn</a>`);
+  }
+  if (socials.github) {
+    socialLinks.push(`<a href="${socials.github}" target="_blank" style="color: #333;">GitHub</a>`);
+  }
+  
+  const memberDiv = document.createElement('div');
+  memberDiv.className = 'team-member-entry';
+  memberDiv.dataset.memberId = memberId;
+  memberDiv.dataset.userId = user.id || '';
+  
+  memberDiv.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+        ${user.avatar_url ? `<img src="${user.avatar_url}" style="width:36px;height:36px;border-radius:50%;">` : ''}
+        <div style="flex: 1;">
+          <div style="font-weight: 500;">${user.name || 'Miembro sin nombre'}</div>
+          <div style="font-size: 0.85rem; color: #64748b;">${user.email || ''} • ${role}</div>
+          ${socialLinks.length > 0 ? 
+            `<div style="display: flex; gap: 8px; margin-top: 4px; font-size: 0.8rem;">
+              ${socialLinks.join(' • ')}
+            </div>` : ''
+          }
+        </div>
+      </div>
+      <button type="button" class="remove-member-btn" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
+        Eliminar
+      </button>
+    </div>
+    <input type="hidden" name="team_members[${memberId}][name]" value="${user.name || ''}">
+    <input type="hidden" name="team_members[${memberId}][role]" value="${role}">
+    <input type="hidden" name="team_members[${memberId}][avatar_url]" value="${user.avatar_url || ''}">
+    <input type="hidden" name="team_members[${memberId}][user_id]" value="${user.id || ''}">
+    <input type="hidden" name="team_members[${memberId}][socials]" value='${JSON.stringify(socials)}'>
+  `;
+  
+  memberDiv.querySelector('.remove-member-btn').onclick = () => memberDiv.remove();
+  teamContainer.appendChild(memberDiv);
+}
 
   addUserBtn?.addEventListener('click', () => {
     const query = userSearchInput.value.trim();
@@ -749,6 +771,28 @@ function updateAppBasicInfo() {
       showError('No se pudo crear la comunidad: ' + error.message);
     }
   });
+async function loadTeamMembers(appId) {
+  const res = await fetch(`/apps/${appId}/team`);
+  const team = await res.json();
+
+  const container = document.getElementById("team-members-list");
+  container.innerHTML = "";
+
+  team.forEach(m => {
+    const socials = Object.entries(m.socials || {})
+      .map(([k, v]) => `<a href="${v}" target="_blank">@${k}</a>`)
+      .join("");
+
+    container.innerHTML += `
+      <div class="team-card">
+        <img src="${m.avatar || '/static/img/default-avatar.png'}">
+        <div class="team-name">${m.name}</div>
+        <div class="team-role">${m.role || ''}</div>
+        <div class="team-socials">${socials}</div>
+      </div>
+    `;
+  });
+}
 
   /* ======================================================
      CERRAR MODAL

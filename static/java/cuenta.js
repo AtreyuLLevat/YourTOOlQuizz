@@ -116,4 +116,7 @@ document.getElementById('saveModal').addEventListener('click', async () => {
 document.getElementById('logoutBtn').addEventListener('click', async () => {
   await supabase.auth.signOut()
   window.location.href = '/login'
+
+
+  
 })
