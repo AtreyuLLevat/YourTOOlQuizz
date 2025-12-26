@@ -1491,7 +1491,8 @@ def create_app():
         image_url = None
         if image_file and image_file.filename:
             ext = image_file.filename.rsplit(".", 1)[1].lower()
-            filename = f"apps/{uuid4().hex}.{ext}"+
+            filename = f"apps/{uuid4().hex}.{ext}"
+
 
             supabase.storage.from_("images").upload(
                 filename,
