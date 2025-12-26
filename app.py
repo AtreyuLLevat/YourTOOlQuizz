@@ -822,19 +822,17 @@ def create_app():
 
         return jsonify(results)
 
-
     @app.route('/account/upload_avatar', methods=['POST'])
     @login_required
     def upload_avatar():
         if 'avatar' not in request.files:
             return jsonify({'success': False, 'message': 'No se seleccionó ningún archivo'}), 400
-        
+
         file = request.files['avatar']
         if file.filename == '':
             return jsonify({'success': False, 'message': 'No se seleccionó ningún archivo'}), 400
-        
+
         if file and allowed_file(file.filename):
-            # Crear directorio si no existe
             ext = file.filename.rsplit(".", 1)[1].lower()
             filename = f"avatars/{current_user.id}/{uuid4().hex}.{ext}"
 
@@ -844,19 +842,16 @@ def create_app():
                 {"content-type": file.mimetype}
             )
 
-            avatar_url = (
-                supabase.storage
-                .from_("images")
-                .get_public_url(filename)
-                .public_url
-            )
+            # ✅ AQUÍ ESTÁ LA CORRECCIÓN
+            avatar_url = supabase.storage.from_("images").get_public_url(filename)
 
             current_user.avatar_url = avatar_url
             db.session.commit()
-            
+
             return jsonify({'success': True, 'avatar_url': avatar_url})
-        
+
         return jsonify({'success': False, 'message': 'Formato de archivo no permitido'}), 400
+
 
 
 
