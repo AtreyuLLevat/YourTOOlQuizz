@@ -162,18 +162,25 @@ class AppTag(db.Model):
     tag = db.relationship("Tag", overlaps="apps,tags")
 
 
+# En models.py, actualiza la clase TeamMember:
+
 class TeamMember(db.Model):
     __tablename__ = "team_members"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
+    
+    # 🔥 AÑADE ESTA LÍNEA: clave foránea a users.id
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    
     name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(100))
     avatar_url = db.Column(db.String(300))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user = db.relationship("User")
-    app = db.relationship("App", back_populates="team_members")
     
+    # 🔥 ACTUALIZA LA RELACIÓN: especifica la clave foránea
+    user = db.relationship("User", foreign_keys=[user_id])
+    app = db.relationship("App", back_populates="team_members")
     
 class Review(db.Model):
     __tablename__ = "reviews"
