@@ -405,6 +405,23 @@ def create_app():
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+    @app.after_request
+    def add_security_headers(response):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' https://cdn.socket.io https://cdn.jsdelivr.net 'unsafe-inline' 'unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; "
+            "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://use.fontawesome.com; "
+            "font-src 'self' https://fonts.gstatic.com https://use.fontawesome.com; "
+            "img-src 'self' https://images.unsplash.com https://i.pravatar.cc "
+            "https://ouoodvqsezartigpzwke.supabase.co data:; "
+            "connect-src 'self' https://cdn.socket.io "
+            "https://db.ouoodvqsezartigpzwke.supabase.co https://cdn.jsdelivr.net; "
+            "media-src 'self'; "
+            "object-src 'none'; "
+            "frame-src 'self';"
+        )
+        return response
 
 # -----------------------------
 
@@ -1474,7 +1491,7 @@ def create_app():
         image_url = None
         if image_file and image_file.filename:
             ext = image_file.filename.rsplit(".", 1)[1].lower()
-            filename = f"apps/{uuid4().hex}.{ext}"
+            filename = f"apps/{uuid4().hex}.{ext}"+
 
             supabase.storage.from_("images").upload(
                 filename,
