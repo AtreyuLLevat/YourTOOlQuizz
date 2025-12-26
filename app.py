@@ -1482,12 +1482,8 @@ def create_app():
                 {"content-type": image_file.mimetype}
             )
 
-            image_url = (
-                supabase.storage
-                .from_("images")
-                .get_public_url(filename)
-                .public_url
-            )
+            image_url = supabase.storage.from_("images").get_public_url(filename)
+
 
         slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
 
