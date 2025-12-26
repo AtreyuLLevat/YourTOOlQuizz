@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
 
+  // Nuevos elementos para editar la app
+  const saveAppChangesBtn = document.getElementById('save-app-changes');
+  const changeLogoBtn = document.getElementById('change-logo-btn');
+  const appLogoInput = document.getElementById('app-logo-input');
+
   // Verificación inicial
   console.log('✅ dashboard.js iniciado');
   console.log('Elementos encontrados:', {
@@ -362,6 +367,13 @@ function addTeamMember(user) {
       // Guardar el ID en el modal
       appDetailModal.dataset.appId = appId;
       
+      // Llena los inputs editables con los datos actuales
+      document.getElementById('app-name-input').value = currentApp.name || '';
+      document.getElementById('app-description-input').value = currentApp.description || '';
+      document.getElementById('app-date-input').value = currentApp.creation_date ? new Date(currentApp.creation_date).toISOString().split('T')[0] : '';
+      document.getElementById('app-theme-input').value = currentApp.theme || 'General';
+      document.getElementById('app-logo').src = currentApp.image_url || '/static/images/app-placeholder.png';
+      
       // Actualizar información básica
       updateAppBasicInfo();
       
@@ -400,7 +412,6 @@ function updateAppBasicInfo() {
     logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
   }
 }
-
 
   /* ======================================================
      REVIEWS
@@ -771,28 +782,117 @@ function updateAppBasicInfo() {
       showError('No se pudo crear la comunidad: ' + error.message);
     }
   });
-async function loadTeamMembers(appId) {
-  const res = await fetch(`/apps/${appId}/team`);
-  const team = await res.json();
 
-  const container = document.getElementById("team-members-list");
-  container.innerHTML = "";
+  /* ======================================================
+     NUEVA FUNCIÓN: RENDERIZAR MIEMBROS DEL EQUIPO
+  ====================================================== */
+  function renderTeamMembers() {
+    console.log('🎯 Renderizando miembros del equipo...');
+    
+    const list = document.getElementById('team-members-list');
+    if (!list) {
+      console.error('❌ No se encontró #team-members-list');
+      return;
+    }
+    
+    list.innerHTML = '';
+    
+    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
+      console.log('ℹ️ No hay miembros en el equipo');
+      list.innerHTML = '<p>No hay miembros en el equipo.</p>';
+      return;
+    }
+    
+    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
+    
+    currentApp.team_members.forEach(member => {
+      const card = document.createElement('div');
+      card.className = 'team-member-card';
+      
+      let socialHtml = '';
+      if (member.socials) {
+        Object.entries(member.socials).forEach(([network, url]) => {
+          if (url) {
+            socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${network}</a>`;
+          }
+        });
+      }
+      
+      card.innerHTML = `
+        <div class="team-member-info">
+          <img src="${member.avatar_url || '/static/images/default-avatar.png'}" alt="${member.name}" class="team-avatar">
+          <div>
+            <div class="team-name">${member.name || 'Sin nombre'}</div>
+            <div class="team-role">${member.role || 'Sin rol'}</div>
+            <div class="team-socials">${socialHtml}</div>
+          </div>
+        </div>
+      `;
+      
+      list.appendChild(card);
+    });
+  }
 
-  team.forEach(m => {
-    const socials = Object.entries(m.socials || {})
-      .map(([k, v]) => `<a href="${v}" target="_blank">@${k}</a>`)
-      .join("");
-
-    container.innerHTML += `
-      <div class="team-card">
-        <img src="${m.avatar || '/static/img/default-avatar.png'}">
-        <div class="team-name">${m.name}</div>
-        <div class="team-role">${m.role || ''}</div>
-        <div class="team-socials">${socials}</div>
-      </div>
-    `;
+  /* ======================================================
+     LISTENER PARA GUARDAR CAMBIOS EN LA APP
+  ====================================================== */
+  saveAppChangesBtn?.addEventListener('click', async () => {
+    const updatedData = {
+      name: document.getElementById('app-name-input').value,
+      description: document.getElementById('app-description-input').value,
+      creation_date: document.getElementById('app-date-input').value,
+      theme: document.getElementById('app-theme-input').value,
+    };
+    
+    try {
+      const res = await fetch(`/account/update_app/${currentApp.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+      
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      
+      // Actualizar currentApp y re-renderizar
+      currentApp = { ...currentApp, ...updatedData };
+      showSuccess('Cambios guardados correctamente');
+      
+    } catch (err) {
+      showError('Error al guardar cambios: ' + err.message);
+    }
   });
-}
+
+  /* ======================================================
+     LISTENER PARA CAMBIAR LOGO
+  ====================================================== */
+  changeLogoBtn?.addEventListener('click', () => appLogoInput.click());
+  appLogoInput?.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('appImage', file);
+    
+    try {
+      const res = await fetch(`/account/update_app_image/${currentApp.id}`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      
+      document.getElementById('app-logo').src = data.image_url;
+      currentApp.image_url = data.image_url;
+      showSuccess('Logo actualizado');
+      
+    } catch (err) {
+      showError('Error al actualizar logo: ' + err.message);
+    }
+  });
 
   /* ======================================================
      CERRAR MODAL
@@ -870,6 +970,8 @@ async function loadTeamMembers(appId) {
       // Re-renderizar si es necesario
       if (btn.dataset.tab === 'communities') {
         renderCommunities();
+      } else if (btn.dataset.tab === 'team') {
+        renderTeamMembers();
       }
     });
   });

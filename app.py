@@ -885,6 +885,40 @@ def create_app():
 
         return jsonify(data)
 
+    @app.route("/account/update_app/<uuid:app_id>", methods=["POST"])
+    @login_required
+    def update_app(app_id):
+        app = App.query.get_or_404(app_id)
+        if app.owner_id != current_user.id:
+            return jsonify({"success": False, "message": "No autorizado"}), 403
+        
+        data = request.json
+        app.name = data.get("name", app.name)
+        app.description = data.get("description", app.description)
+        app.creation_date = data.get("creation_date", app.creation_date)
+        app.theme = data.get("theme", app.theme)
+        db.session.commit()
+        
+        return jsonify({"success": True})
+
+    @app.route("/account/update_app_image/<uuid:app_id>", methods=["POST"])
+    @login_required
+    def update_app_image(app_id):
+        app = App.query.get_or_404(app_id)
+        if app.owner_id != current_user.id:
+            return jsonify({"success": False, "message": "No autorizado"}), 403
+        
+        image_file = request.files.get("appImage")
+        if image_file:
+            # Lógica para subir a Supabase (similar a create_app)
+            ext = image_file.filename.rsplit(".", 1)[1].lower()
+            filename = f"apps/{uuid4().hex}.{ext}"
+            supabase.storage.from_("images").upload(filename, image_file.read(), {"content-type": image_file.mimetype})
+            app.image_url = supabase.storage.from_("images").get_public_url(filename)
+            db.session.commit()
+            return jsonify({"success": True, "image_url": app.image_url})
+        
+        return jsonify({"success": False, "message": "No se proporcionó imagen"}), 400
 # En app.py, después de la ruta /account/change_password, añade:
 
     @app.route("/account/update_socials", methods=["POST"])

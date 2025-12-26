@@ -1,3 +1,5 @@
+[file name]: account.html
+[file content begin]
 {% extends "base.html" %}
 {% block title %}Centro de Cuenta | YourToolQuizz{% endblock %}
 
@@ -1004,6 +1006,97 @@ input[type="checkbox"] {
   color: #333;
   border: 1px solid rgba(51, 51, 51, 0.3);
 }
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.team-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 4px 20px 4px;
+}
+
+.team-member-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fafcff 100%);
+  border-radius: 14px;
+  border: 1px solid #e5e9f2;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.team-member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.12), 0 3px 10px rgba(37, 99, 235, 0.06);
+  border-color: #c7d2fe;
+}
+
+.team-member-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.team-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.team-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.team-role {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.team-socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.team-socials a {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.team-socials a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para campos editables */
+.editable-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition);
+}
+
+.editable-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
 </style>
 {% endblock %}
 
@@ -1215,15 +1308,42 @@ input[type="checkbox"] {
   <div class="modal-content large">
     <button id="closeAppDetail" class="close-btn">&times;</button>
 
+    <!-- Información básica editable -->
     <div class="app-basic">
       <div class="app-logo">
-      <img id="app-logo" src="" alt="Logo App">
+        <img id="app-logo" src="" alt="Logo App">
+        <input type="file" id="app-logo-input" accept="image/*" style="display: none;">
+        <button id="change-logo-btn" class="btn-small secondary" style="margin-top: 8px;">Cambiar Logo</button>
       </div>
       <div class="app-info">
-        <h2><span class="app-name"></span></h2>
-        <p><span class="app-description"></span></p>
-        <p><span class="app-date"></span></p>
-        <p><span class="app-theme"></span></p>
+        <h2>
+          <input id="app-name-input" class="editable-input" type="text" value="">
+        </h2>
+        <p>
+          <textarea id="app-description-input" class="editable-input" rows="3"></textarea>
+        </p>
+        <p>
+          Fecha: <input id="app-date-input" class="editable-input" type="date" value="">
+        </p>
+        <p>
+          Tema: 
+          <select id="app-theme-input" class="editable-input">
+            <option value="General">General</option>
+            <option value="Productividad">Productividad</option>
+            <option value="Desarrollo">Desarrollo</option>
+            <option value="Diseño">Diseño</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Redes Sociales">Redes Sociales</option>
+            <option value="Educación">Educación</option>
+            <option value="Entretenimiento">Entretenimiento</option>
+            <option value="Salud">Salud</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </p>
+        <div class="actions">
+          <button id="save-app-changes" class="btn primary">Guardar Cambios</button>
+        </div>
       </div>
     </div>
 
@@ -1233,6 +1353,7 @@ input[type="checkbox"] {
       <div class="app-tabs">
         <button class="tab-btn active" data-tab="reviews">Reseñas</button>
         <button class="tab-btn" data-tab="communities">Comunidades</button>
+        <button class="tab-btn" data-tab="team">Equipo</button>  <!-- Nueva pestaña -->
       </div>
 
       <!-- Contenedor del contenido de las pestañas -->
@@ -1275,6 +1396,14 @@ input[type="checkbox"] {
           <ul class="community-list">
             <!-- Las comunidades se cargarán aquí -->
           </ul>
+        </div>
+
+        <!-- Pestaña Team -->
+        <div class="tab-content hidden" id="team">
+          <div class="team-header">
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Miembros del Equipo</h3>
+          </div>
+          <div id="team-members-list" class="team-members-list"></div>  <!-- Lista de miembros -->
         </div>
       </div>
     </div>
@@ -1484,3 +1613,4 @@ createAppModal?.addEventListener('click', (e) => {
 });
 </script>
 {% endblock %}
+[file content end]
