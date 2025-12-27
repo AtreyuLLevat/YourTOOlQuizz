@@ -1,5 +1,3 @@
-[file name]: account.html
-[file content begin]
 {% extends "base.html" %}
 {% block title %}Centro de Cuenta | YourToolQuizz{% endblock %}
 
@@ -164,6 +162,15 @@ input:focus {
   background: var(--primary-hover);
 }
 
+.btn.danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #b91c1c;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -259,6 +266,11 @@ input[type="checkbox"] {
 .modal-btn.secondary {
   background: #f1f5f9;
   color: var(--text);
+}
+
+.modal-btn.danger {
+  background: var(--danger);
+  color: white;
 }
 
 /* === SCROLL === */
@@ -370,15 +382,18 @@ input[type="checkbox"] {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
 }
-
 
 /* Contenedor principal de pestañas */
 .app-tabs-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* Necesario para scroll interno */
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -394,7 +409,6 @@ input[type="checkbox"] {
   background: #ffffff;
   border-bottom: 1px solid #f1f5f9;
 }
-
 
 .tab-btn {
   cursor: pointer;
@@ -415,8 +429,6 @@ input[type="checkbox"] {
   border-bottom: 2px solid #2563eb;
 }
 
-
-
 /* Contenedor del contenido de las pestañas */
 .tab-content-container {
   flex: 1;
@@ -433,9 +445,8 @@ input[type="checkbox"] {
   flex-direction: column;
   min-height: 0;
   overflow-y: auto;
-  padding: 20px;
-  background: transparent;
   padding: 24px 20px;
+  background: transparent;
 }
 
 .tab-content.hidden {
@@ -450,7 +461,6 @@ input[type="checkbox"] {
   padding-bottom: 16px;
   margin-bottom: 8px;
 }
-
 
 .app-logo {
   width: 150px;
@@ -509,7 +519,6 @@ input[type="checkbox"] {
   flex-direction: column;
   gap: 15px;
 }
-
 
 /* Contenedor de reviews actualizado */
 .reviews-list {
@@ -839,6 +848,15 @@ input[type="checkbox"] {
   color: #1e293b;
 }
 
+.btn-small.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-small.danger:hover {
+  background: #b91c1c;
+}
+
 /* Botón añadir comunidad */
 #addCommunityBtn {
   background: #2563eb;
@@ -917,6 +935,7 @@ input[type="checkbox"] {
 .remove-member-btn:hover {
   background: #b91c1c;
 }
+
 .community-header,
 .reviews-summary {
   border-bottom: none;
@@ -936,6 +955,7 @@ input[type="checkbox"] {
 #userSearchResults:empty {
   display: none !important;
 }
+
 /* Estilos para foto de perfil */
 #foto-perfil img {
   transition: all 0.3s ease;
@@ -956,7 +976,6 @@ input[type="checkbox"] {
   justify-content: center;
   margin-top: 30px;
 }
-/* En el bloque extra_css de account.html, añade estos estilos: */
 
 /* Estilos para enlaces de redes sociales en inputs */
 #socials input[type="url"] {
@@ -1006,6 +1025,7 @@ input[type="checkbox"] {
   color: #333;
   border: 1px solid rgba(51, 51, 51, 0.3);
 }
+
 .team-header {
   display: flex;
   justify-content: space-between;
@@ -1027,6 +1047,9 @@ input[type="checkbox"] {
   padding: 20px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .team-member-card:hover {
@@ -1039,6 +1062,7 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 1;
 }
 
 .team-avatar {
@@ -1093,48 +1117,48 @@ input[type="checkbox"] {
   box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
 }
 
-.btn-small {
-  padding: 6px 12px;
-  font-size: 0.9rem;
-}
-/* Añade en el bloque extra_css de account.html */
-
 .team-member-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    justify-content: flex-end;
+  display: flex;
+  gap: 8px;
+  margin-left: 10px;
 }
 
 .btn-small {
-    padding: 4px 8px;
-    font-size: 0.8rem;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.btn-small.danger {
-    background: #dc2626;
-    color: white;
+/* Acciones para eliminar app */
+.app-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
 }
 
-.btn-small.danger:hover {
-    background: #b91c1c;
+.app-danger-zone {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
 }
 
-.btn.danger {
-    background: #dc2626;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
+.app-danger-zone h4 {
+  color: #dc2626;
+  margin-bottom: 10px;
 }
 
-.btn.danger:hover {
-    background: #b91c1c;
+.app-danger-zone p {
+  color: #7f1d1d;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
 }
 </style>
 {% endblock %}
@@ -1205,56 +1229,54 @@ input[type="checkbox"] {
           <div id="avatarFeedback" style="margin-top: 10px; display: none;"></div>
         </section>
 
-        <!-- En account.html, después de la sección "Foto de perfil" y antes de "Seguridad" -->
-
-<!-- Redes Sociales -->
-<section class="section" id="socials">
-  <h2>Redes Sociales</h2>
-  <p>Conecta tus perfiles sociales para enriquecer tu perfil y facilitar la colaboración.</p>
-  
-  <div class="field">
-    <label for="twitter">Twitter / X</label>
-    <input id="twitter" type="url" 
-           placeholder="https://twitter.com/tu_usuario"
-           value="{{ usuario.socials.twitter if usuario.socials and usuario.socials.twitter else '' }}">
-    <small style="color: var(--muted); font-size: 0.85rem;">
-      Ejemplo: https://twitter.com/tu_usuario o @tu_usuario
-    </small>
-  </div>
-  
-  <div class="field">
-    <label for="linkedin">LinkedIn</label>
-    <input id="linkedin" type="url" 
-           placeholder="https://linkedin.com/in/tu_usuario"
-           value="{{ usuario.socials.linkedin if usuario.socials and usuario.socials.linkedin else '' }}">
-    <small style="color: var(--muted); font-size: 0.85rem;">
-      Ejemplo: https://linkedin.com/in/tu_usuario
-    </small>
-  </div>
-  
-  <div class="field">
-    <label for="github">GitHub</label>
-    <input id="github" type="url" 
-           placeholder="https://github.com/tu_usuario"
-           value="{{ usuario.socials.github if usuario.socials and usuario.socials.github else '' }}">
-    <small style="color: var(--muted); font-size: 0.85rem;">
-      Ejemplo: https://github.com/tu_usuario
-    </small>
-  </div>
-  
-  <div class="field">
-    <label for="website">Sitio Web Personal</label>
-    <input id="website" type="url" 
-           placeholder="https://tusitio.com"
-           value="{{ usuario.socials.website if usuario.socials and usuario.socials.website else '' }}">
-  </div>
-  
-  <div class="actions">
-    <button class="btn primary hidden" id="saveSocials">Guardar Redes Sociales</button>
-  </div>
-  
-  <div id="socialsFeedback" style="margin-top: 10px; display: none;"></div>
-</section>
+        <!-- Redes Sociales -->
+        <section class="section" id="socials">
+          <h2>Redes Sociales</h2>
+          <p>Conecta tus perfiles sociales para enriquecer tu perfil y facilitar la colaboración.</p>
+          
+          <div class="field">
+            <label for="twitter">Twitter / X</label>
+            <input id="twitter" type="url" 
+                   placeholder="https://twitter.com/tu_usuario"
+                   value="{{ usuario.socials.twitter if usuario.socials and usuario.socials.twitter else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://twitter.com/tu_usuario o @tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="linkedin">LinkedIn</label>
+            <input id="linkedin" type="url" 
+                   placeholder="https://linkedin.com/in/tu_usuario"
+                   value="{{ usuario.socials.linkedin if usuario.socials and usuario.socials.linkedin else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://linkedin.com/in/tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="github">GitHub</label>
+            <input id="github" type="url" 
+                   placeholder="https://github.com/tu_usuario"
+                   value="{{ usuario.socials.github if usuario.socials and usuario.socials.github else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://github.com/tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="website">Sitio Web Personal</label>
+            <input id="website" type="url" 
+                   placeholder="https://tusitio.com"
+                   value="{{ usuario.socials.website if usuario.socials and usuario.socials.website else '' }}">
+          </div>
+          
+          <div class="actions">
+            <button class="btn primary hidden" id="saveSocials">Guardar Redes Sociales</button>
+          </div>
+          
+          <div id="socialsFeedback" style="margin-top: 10px; display: none;"></div>
+        </section>
 
         <!-- Seguridad -->
         <section class="section">
@@ -1325,17 +1347,17 @@ input[type="checkbox"] {
         <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
 
         <div id="appsList" class="apps-list">
-{% if apps %}
-  {% for app in apps %}
-    <!-- Convierte app.id a string -->
-    <button class="app-item" data-app-id="{{ app.id|string }}">
-      <img src="{{ app.image_url }}" class="app-img">
-      <span class="app-name">{{ app.name }}</span>
-    </button>
-  {% endfor %}
-{% else %}
-  <p>No tienes aplicaciones creadas.</p>
-{% endif %}
+          {% if apps %}
+            {% for app in apps %}
+              <!-- Convierte app.id a string -->
+              <button class="app-item" data-app-id="{{ app.id|string }}">
+                <img src="{{ app.image_url }}" class="app-img">
+                <span class="app-name">{{ app.name }}</span>
+              </button>
+            {% endfor %}
+          {% else %}
+            <p>No tienes aplicaciones creadas.</p>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -1380,10 +1402,10 @@ input[type="checkbox"] {
             <option value="Otros">Otros</option>
           </select>
         </p>
-      <div class="actions">
+        <div class="actions">
           <button id="save-app-changes" class="btn primary">Guardar Cambios</button>
           <div id="delete-app-btn-container" style="margin-left: 10px;"></div>
-      </div>
+        </div>
       </div>
     </div>
 
@@ -1393,7 +1415,7 @@ input[type="checkbox"] {
       <div class="app-tabs">
         <button class="tab-btn active" data-tab="reviews">Reseñas</button>
         <button class="tab-btn" data-tab="communities">Comunidades</button>
-        <button class="tab-btn" data-tab="team">Equipo</button>  <!-- Nueva pestaña -->
+        <button class="tab-btn" data-tab="team">Equipo</button>
       </div>
 
       <!-- Contenedor del contenido de las pestañas -->
@@ -1443,7 +1465,7 @@ input[type="checkbox"] {
           <div class="team-header">
             <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Miembros del Equipo</h3>
           </div>
-          <div id="team-members-list" class="team-members-list"></div>  <!-- Lista de miembros -->
+          <div id="team-members-list" class="team-members-list"></div>
         </div>
       </div>
     </div>
@@ -1470,33 +1492,33 @@ input[type="checkbox"] {
         <input id="appImage" name="appImage" type="file" accept="image/*">
       </div>
 
-<div class="field">
-  <label>Equipo / Miembros</label>
-  <div class="team-search-container">
-    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-      <input 
-        type="text" 
-        id="userSearch" 
-        placeholder="Buscar usuario por nombre o email" 
-        style="flex: 1;"
-      >
-      <select id="userRole">
-        <option value="Desarrollador">Desarrollador</option>
-        <option value="Diseñador">Diseñador</option>
-        <option value="Manager">Manager</option>
-        <option value="Tester">Tester</option>
-        <option value="Soporte">Soporte</option>
-        <option value="Otro">Otro</option>
-      </select>
-      <button type="button" id="addUserBtn">Agregar</button>
-    </div>
-    <div id="userSearchResults" style="border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none;"></div>
-  </div>
+      <div class="field">
+        <label>Equipo / Miembros</label>
+        <div class="team-search-container">
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input 
+              type="text" 
+              id="userSearch" 
+              placeholder="Buscar usuario por nombre o email" 
+              style="flex: 1;"
+            >
+            <select id="userRole">
+              <option value="Desarrollador">Desarrollador</option>
+              <option value="Diseñador">Diseñador</option>
+              <option value="Manager">Manager</option>
+              <option value="Tester">Tester</option>
+              <option value="Soporte">Soporte</option>
+              <option value="Otro">Otro</option>
+            </select>
+            <button type="button" id="addUserBtn">Agregar</button>
+          </div>
+          <div id="userSearchResults" style="border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none;"></div>
+        </div>
 
-  <div id="team-members-container">
-    <!-- Aquí se agregarán los miembros seleccionados -->
-  </div>
-</div>
+        <div id="team-members-container">
+          <!-- Aquí se agregarán los miembros seleccionados -->
+        </div>
+      </div>
 
       <div class="field">
         <label for="appTheme">Tema</label>
@@ -1554,9 +1576,6 @@ input[type="checkbox"] {
   </div>
 </div>
 
-
-
-
 <!-- Modal para foto de perfil (para nuevos usuarios) -->
 <div id="avatarSetupModal" class="modal-backdrop {{ 'hidden' if usuario.avatar_url else '' }}">
   <div class="modal-content">
@@ -1566,7 +1585,6 @@ input[type="checkbox"] {
     <div style="text-align: center; margin: 25px 0;">
       <img id="avatarModalPreview" 
           src="{{ usuario.avatar_url }}"
-
            style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #2563eb; margin-bottom: 15px;">
       
       <div style="margin-top: 15px;">
@@ -1594,17 +1612,30 @@ input[type="checkbox"] {
 {% endblock %}
 
 {% block extra_js %}
-<!-- El resto de tus scripts, todos como módulos -->
+<!-- Pasar usuario actual a JavaScript -->
+<script>
+  window.currentUserData = {{ {
+    "id": current_user.id,
+    "name": current_user.name,
+    "email": current_user.email,
+    "avatar_url": current_user.avatar_url,
+    "role": current_user.role
+  } | tojson }};
+  
+  console.log("👤 Usuario actual cargado:", window.currentUserData);
+</script>
+
+
+<!-- Scripts de funcionalidades -->
 <script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/notifications.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/modal.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
-<!-- En la sección extra_js de account.html, añade: -->
 <script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
 
-<!-- Scripts normales que no usan módulos -->
+<!-- Scripts para navegación y modales -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const menuItems = document.querySelectorAll('.sidebar .menu-item');
@@ -1633,24 +1664,23 @@ document.addEventListener('DOMContentLoaded', function() {
   );
 
   changeSection('configuracion');
-});
 
-// Script para crear app modal
-const newAppBtn = document.getElementById('newAppBtn');
-const createAppModal = document.getElementById('createAppModal');
-const cancelAppBtn = document.getElementById('cancelAppBtn');
+  // Script para crear app modal
+  const newAppBtn = document.getElementById('newAppBtn');
+  const createAppModal = document.getElementById('createAppModal');
+  const cancelAppBtn = document.getElementById('cancelAppBtn');
 
-newAppBtn?.addEventListener('click', () => {
-  createAppModal.classList.remove('hidden');
-});
+  newAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.remove('hidden');
+  });
 
-cancelAppBtn?.addEventListener('click', () => {
-  createAppModal.classList.add('hidden');
-});
+  cancelAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.add('hidden');
+  });
 
-createAppModal?.addEventListener('click', (e) => {
-  if (e.target === createAppModal) createAppModal.classList.add('hidden');
+  createAppModal?.addEventListener('click', (e) => {
+    if (e.target === createAppModal) createAppModal.classList.add('hidden');
+  });
 });
 </script>
 {% endblock %}
-[file content end]

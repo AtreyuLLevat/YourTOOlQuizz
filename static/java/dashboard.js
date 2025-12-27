@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   /* ======================================================
      ESTADO GLOBAL
   ====================================================== */
   let currentApp = null;
   window.currentApp = null;
+  let currentUser = null; // Usuario actual
 
   /* ======================================================
      VARIABLES
@@ -14,35 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const createAppModal = document.getElementById('createAppModal');
   const cancelAppBtn = document.getElementById('cancelAppBtn');
   const newAppBtn = document.getElementById('newAppBtn');
-
-  // Elementos para búsqueda de usuarios
   const userSearchInput = document.getElementById('userSearch');
   const userRoleSelect = document.getElementById('userRole');
   const userSearchResults = document.getElementById('userSearchResults');
   const addUserBtn = document.getElementById('addUserBtn');
-
   const teamContainer = document.getElementById('team-members-container');
-
   const appDetailModal = document.getElementById('appDetailModal');
   const closeAppDetail = document.getElementById('closeAppDetail');
-
   const addCommunityBtn = document.getElementById('addCommunityBtn');
   const addCommunityForm = document.getElementById('addCommunityForm');
   const saveCommunityBtn = document.getElementById('saveCommunityBtn');
   const communityNameInput = document.getElementById('communityNameInput');
-
-  // Nuevos elementos para editar la app
   const saveAppChangesBtn = document.getElementById('save-app-changes');
   const changeLogoBtn = document.getElementById('change-logo-btn');
   const appLogoInput = document.getElementById('app-logo-input');
+  const deleteAppBtnContainer = document.getElementById('delete-app-btn-container');
 
-  // Verificación inicial
-  console.log('✅ dashboard.js iniciado');
-  console.log('Elementos encontrados:', {
-    appsList: !!appsList,
-    createAppForm: !!createAppForm,
-    appDetailModal: !!appDetailModal
-  });
+  // Obtener usuario actual desde variable global
+  try {
+    if (typeof window.currentUserData !== 'undefined') {
+      currentUser = window.currentUserData;
+      console.log('✅ Usuario actual cargado:', currentUser);
+    }
+  } catch (e) {
+    console.error('Error obteniendo usuario actual:', e);
+  }
 
   /* ======================================================
      FUNCIONES AUXILIARES
@@ -57,20 +53,16 @@ document.addEventListener('DOMContentLoaded', () => {
     alert(message);
   }
 
-  /* ======================================================
-     FUNCIONES PARA AVATAR Y REDES SOCIALES
-  ====================================================== */
   function getSocialEmoji(network) {
     const emojis = {
-      twitter: '🐦',   // U+1F426 Bird
-      linkedin: '🔗',  // U+1F517 Link
-      github: '🐙'     // U+1F419 Octopus
+      twitter: '🐦',
+      linkedin: '🔗',
+      github: '🐙'
     };
-    return emojis[network.toLowerCase()] || '';  // Vacío si no coincide
+    return emojis[network.toLowerCase()] || '';
   }
 
   function getDefaultAvatar() {
-    // Data URI para un placeholder simple (círculo gris)
     return 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgdmlld0JveD0iMCAwIDUwIDUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjI1IiBjeT0iMjUiIHI9IjI1IiBmaWxsPSIjY2NjIi8+PC9zdmc+';
   }
 
@@ -134,12 +126,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   });
 
-  // En dashboard.js, en la función addTeamMember, actualiza el HTML para incluir redes sociales:
   function addTeamMember(user) {
     const role = userRoleSelect.value;
     const memberId = `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     
-    // Extraer redes sociales del usuario
     const socials = user.socials || {};
     const socialLinks = [];
     
@@ -206,12 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.addEventListener('click', (e) => {
-    if (!userSearchResults.contains(e.target) && e.target !== userSearchInput) {
-      userSearchResults.style.display = 'none';
-    }
-  });
-
   /* ======================================================
      MODAL CREAR APP
   ====================================================== */
@@ -237,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(createAppForm);
       const members = [];
 
-      // Recolectar miembros del equipo
       document.querySelectorAll('.team-member-entry').forEach(div => {
         const inputs = div.querySelectorAll('input[type="hidden"]');
         const memberData = {};
@@ -260,27 +243,21 @@ document.addEventListener('DOMContentLoaded', () => {
         body: formData 
       });
       
-      if (!res.ok) {
-        throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error(`Error HTTP ${res.status}: ${res.statusText}`);
       
       const data = await res.json();
       
-      if (!data.success) {
-        throw new Error(data.message || 'Error al crear la app');
-      }
+      if (!data.success) throw new Error(data.message || 'Error al crear la app');
 
-      // Verificar que la app tiene ID
       if (!data.app || !data.app.id) {
         throw new Error('La app fue creada pero no se recibió un ID válido');
       }
 
       console.log('✅ App creada con ID:', data.app.id);
 
-      // Crear botón para la nueva app
       const btn = document.createElement('button');
       btn.className = 'app-item';
-      btn.dataset.appId = data.app.id.toString(); // Asegurar que es string
+      btn.dataset.appId = data.app.id.toString();
       
       const imageUrl = data.app.image_url || '/static/images/app-placeholder.png';
       
@@ -289,18 +266,15 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="app-name">${data.app.name}</span>
       `;
       
-      // Agregar listener al nuevo botón
       btn.addEventListener('click', function() {
         const id = this.dataset.appId;
         if (id) {
           openAppDetail(id);
         } else {
-          console.error('Botón sin data-app-id:', this);
           showError('Esta aplicación no tiene un ID válido');
         }
       });
       
-      // Agregar al principio de la lista
       if (appsList) {
         if (appsList.firstChild) {
           appsList.insertBefore(btn, appsList.firstChild);
@@ -309,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
       
-      // Limpiar y cerrar modal
       createAppForm.reset();
       teamContainer.innerHTML = '';
       createAppModal.classList.add('hidden');
@@ -325,39 +298,38 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      FETCH APP - MEJORADO CON MANEJO DE ERRORES
   ====================================================== */
-async function fetchAppData(appId) {
+  async function fetchAppData(appId) {
     console.log(`🔍 Solicitando datos para app ID: ${appId}`);
     
     if (!appId || appId === 'undefined' || appId === 'null') {
-        throw new Error('ID de aplicación no válido');
+      throw new Error('ID de aplicación no válido');
     }
     
     try {
-        const response = await fetch(`/account/apps/${appId}`);
-        
-        if (!response.ok) {
-            throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error(data.error || 'Error al obtener datos de la app');
-        }
-        
-        // Asegurar arrays
-        data.app.reviews = data.app.reviews || [];
-        data.app.communities = data.app.communities || [];
-        data.app.team_members = data.app.team_members || [];
-        
-        console.log('✅ Datos de app obtenidos:', data.app.name);
-        return data.app;
-        
+      const response = await fetch(`/account/apps/${appId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Error al obtener datos de la app');
+      }
+      
+      data.app.reviews = data.app.reviews || [];
+      data.app.communities = data.app.communities || [];
+      data.app.team_members = data.app.team_members || [];
+      
+      console.log('✅ Datos de app obtenidos:', data.app.name);
+      return data.app;
+      
     } catch (error) {
-        console.error('❌ Error en fetchAppData:', error);
-        throw error;
+      console.error('❌ Error en fetchAppData:', error);
+      throw error;
     }
-}
+  }
 
   /* ======================================================
      ABRIR MODAL APP - VERSIÓN MEJORADA
@@ -365,7 +337,6 @@ async function fetchAppData(appId) {
   async function openAppDetail(appId) {
     console.log(`📱 Abriendo app con ID: ${appId}`);
     
-    // Validación básica
     if (!appId || appId === 'undefined' || appId === 'null') {
       showError('ID de aplicación no válido');
       return;
@@ -380,24 +351,38 @@ async function fetchAppData(appId) {
         return;
       }
       
-      // Guardar el ID en el modal
       appDetailModal.dataset.appId = appId;
       
-      // Llena los inputs editables con los datos actuales
       document.getElementById('app-name-input').value = currentApp.name || '';
       document.getElementById('app-description-input').value = currentApp.description || '';
-      document.getElementById('app-date-input').value = currentApp.creation_date ? new Date(currentApp.creation_date).toISOString().split('T')[0] : '';
+      document.getElementById('app-date-input').value = currentApp.creation_date ? 
+        new Date(currentApp.creation_date).toISOString().split('T')[0] : '';
       document.getElementById('app-theme-input').value = currentApp.theme || 'General';
       document.getElementById('app-logo').src = currentApp.image_url || '/static/images/app-placeholder.png';
       
-      // Actualizar información básica
       updateAppBasicInfo();
-      
-      // Renderizar contenido
       renderReviewsAdmin(); 
       renderCommunities();
+      renderTeamMembers();
       
-      // Mostrar modal
+      // Agregar botón de eliminar si el usuario es el dueño
+      if (deleteAppBtnContainer) {
+        deleteAppBtnContainer.innerHTML = '';
+        
+        // Verificar si el usuario actual es el dueño de la app
+        const appOwnerId = currentApp.owner_id;
+        const userId = currentUser?.id || currentUser?.user_id;
+        
+        if (userId && appOwnerId && parseInt(appOwnerId) === parseInt(userId)) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn danger';
+          deleteBtn.id = 'delete-app-btn';
+          deleteBtn.textContent = 'Eliminar Aplicación';
+          deleteBtn.addEventListener('click', () => deleteApp(appId));
+          deleteAppBtnContainer.appendChild(deleteBtn);
+        }
+      }
+      
       appDetailModal.classList.remove('hidden');
       console.log('✅ Modal abierto correctamente');
       
@@ -407,30 +392,222 @@ async function fetchAppData(appId) {
     }
   }
   
-function updateAppBasicInfo() {
-  if (!appDetailModal || !currentApp) return;
-  
-  const elements = {
-    name: appDetailModal.querySelector('.app-name'),
-    description: appDetailModal.querySelector('.app-description'),
-    date: appDetailModal.querySelector('.app-date'),
-    theme: appDetailModal.querySelector('.app-theme')
-  };
-  
-  if (elements.name) elements.name.textContent = currentApp.name || '---';
-  if (elements.description) elements.description.textContent = currentApp.description || '---';
-  if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
-  if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
+  function updateAppBasicInfo() {
+    if (!appDetailModal || !currentApp) return;
+    
+    const elements = {
+      name: appDetailModal.querySelector('.app-name'),
+      description: appDetailModal.querySelector('.app-description'),
+      date: appDetailModal.querySelector('.app-date'),
+      theme: appDetailModal.querySelector('.app-theme')
+    };
+    
+    if (elements.name) elements.name.textContent = currentApp.name || '---';
+    if (elements.description) elements.description.textContent = currentApp.description || '---';
+    if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
+    if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
 
-  // 🔥 LOGO DE LA APP
-  const logoImg = document.getElementById("app-logo");
-  if (logoImg) {
-    logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
+    const logoImg = document.getElementById("app-logo");
+    if (logoImg) {
+      logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
+    }
   }
-}
 
   /* ======================================================
-     REVIEWS
+     ELIMINAR APLICACIÓN
+  ====================================================== */
+  async function deleteApp(appId) {
+    if (!confirm('¿Estás seguro de eliminar esta aplicación? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/account/delete_app/${appId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || 'Error al eliminar');
+
+      const appButton = document.querySelector(`.app-item[data-app-id="${appId}"]`);
+      if (appButton) appButton.remove();
+      
+      if (appDetailModal) {
+        appDetailModal.classList.add('hidden');
+        currentApp = null;
+        window.currentApp = null;
+      }
+      
+      showSuccess('Aplicación eliminada correctamente');
+      
+    } catch (error) {
+      console.error('❌ Error eliminando app:', error);
+      showError('No se pudo eliminar la aplicación: ' + error.message);
+    }
+  }
+
+  /* ======================================================
+     EDITAR MIEMBRO DEL EQUIPO
+  ====================================================== */
+  async function editTeamMember(memberId, currentRole) {
+    const newRole = prompt('Nuevo rol del miembro:', currentRole || '');
+    
+    if (newRole === null || newRole === currentRole) return;
+    
+    try {
+      const res = await fetch(`/account/team_member/${memberId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole })
+      });
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || 'Error al actualizar');
+
+      if (currentApp && currentApp.team_members) {
+        const member = currentApp.team_members.find(m => m.id === memberId);
+        if (member) {
+          member.role = newRole;
+          renderTeamMembers();
+        }
+      }
+      
+      showSuccess('Rol actualizado correctamente');
+      
+    } catch (error) {
+      console.error('❌ Error actualizando miembro:', error);
+      showError('No se pudo actualizar el rol: ' + error.message);
+    }
+  }
+
+  /* ======================================================
+     ELIMINAR MIEMBRO DEL EQUIPO
+  ====================================================== */
+  async function removeTeamMember(memberId, memberName) {
+    if (!confirm(`¿Eliminar a ${memberName} del equipo?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/account/team_member/${memberId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+      
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || 'Error al eliminar');
+
+      if (currentApp && currentApp.team_members) {
+        currentApp.team_members = currentApp.team_members.filter(m => m.id !== memberId);
+        renderTeamMembers();
+      }
+      
+      showSuccess('Miembro eliminado del equipo');
+      
+    } catch (error) {
+      console.error('❌ Error eliminando miembro:', error);
+      showError('No se pudo eliminar el miembro: ' + error.message);
+    }
+  }
+
+  /* ======================================================
+     RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTONES)
+  ====================================================== */
+  function renderTeamMembers() {
+    console.log('🎯 Renderizando miembros del equipo...');
+    
+    const list = document.getElementById('team-members-list');
+    if (!list) {
+      console.error('❌ No se encontró #team-members-list');
+      return;
+    }
+    
+    list.innerHTML = '';
+    
+    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
+      console.log('ℹ️ No hay miembros en el equipo');
+      list.innerHTML = '<p>No hay miembros en el equipo.</p>';
+      return;
+    }
+    
+    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
+    
+    // Verificar si el usuario actual es el dueño
+    const appOwnerId = currentApp.owner_id;
+    const userId = currentUser?.id || currentUser?.user_id;
+    const isOwner = userId && appOwnerId && parseInt(appOwnerId) === parseInt(userId);
+    
+    currentApp.team_members.forEach(member => {
+      const card = document.createElement('div');
+      card.className = 'team-member-card';
+      card.dataset.memberId = member.id;
+      
+      let socialHtml = '';
+      if (member.socials) {
+        Object.entries(member.socials).forEach(([network, url]) => {
+          if (url) {
+            const emoji = getSocialEmoji(network);
+            socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${emoji ? emoji + ' ' : ''}${network}</a> `;
+          }
+        });
+      }
+      
+      // Solo mostrar botones de edición si el usuario es el dueño de la app
+      const actionsHtml = isOwner ? `
+        <div class="team-member-actions">
+          <button class="btn-small edit-member-btn" data-member-id="${member.id}" data-role="${member.role || ''}">
+            Editar Rol
+          </button>
+          <button class="btn-small danger remove-member-btn" data-member-id="${member.id}" data-name="${member.name || ''}">
+            Eliminar
+          </button>
+        </div>
+      ` : '';
+      
+      card.innerHTML = `
+        <div class="team-member-info">
+          <img src="${member.avatar_url || getDefaultAvatar()}" alt="${member.name}" class="team-avatar">
+          <div>
+            <div class="team-name">${member.name || 'Sin nombre'}</div>
+            <div class="team-role">${member.role || 'Sin rol'}</div>
+            <div class="team-socials">${socialHtml}</div>
+          </div>
+        </div>
+        ${actionsHtml}
+      `;
+      
+      list.appendChild(card);
+    });
+    
+    // Agregar event listeners para los botones de edición/eliminación
+    list.querySelectorAll('.edit-member-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const memberId = btn.dataset.memberId;
+        const currentRole = btn.dataset.role;
+        editTeamMember(memberId, currentRole);
+      });
+    });
+    
+    list.querySelectorAll('.remove-member-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const memberId = btn.dataset.memberId;
+        const memberName = btn.dataset.name;
+        removeTeamMember(memberId, memberName);
+      });
+    });
+  }
+
+  /* ======================================================
+     REVIEWS (sin cambios)
   ====================================================== */
   function renderReviewsAdmin() {
     const reviewsList = document.getElementById('reviews-list');
@@ -454,12 +631,10 @@ function updateAppBasicInfo() {
       return;
     }
     
-    // Calcular promedio
     const totalReviews = currentApp.reviews.length;
     const averageRating = currentApp.reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviews;
     const roundedAverage = averageRating.toFixed(1);
     
-    // Actualizar contador y estrellas
     reviewsCount.textContent = `(${totalReviews})`;
     if (starsElement) {
       starsElement.innerHTML = `
@@ -473,7 +648,6 @@ function updateAppBasicInfo() {
       `;
     }
     
-    // Crear tarjetas de reseñas
     currentApp.reviews.forEach((review, index) => {
       const card = document.createElement('div');
       card.className = 'review-card';
@@ -519,7 +693,6 @@ function updateAppBasicInfo() {
         <div class="review-content">${review.content || 'Sin comentario'}</div>
       `;
       
-      // Agregar menú contextual
       card.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         openReviewActionsMenu(e, review.id || index);
@@ -528,74 +701,9 @@ function updateAppBasicInfo() {
       reviewsList.appendChild(card);
     });
   }
-  
-  function closeReviewActionsMenu() {
-    const menu = document.getElementById('review-actions-menu');
-    if (menu) menu.remove();
-  }
-  
-  function openReviewActionsMenu(event, reviewId) {
-    closeReviewActionsMenu();
-    
-    const menu = document.createElement('div');
-    menu.id = 'review-actions-menu';
-    menu.innerHTML = `<button class="danger">🗑 Eliminar reseña</button>`;
-    menu.style.cssText = `
-      position: fixed;
-      top: ${event.clientY}px;
-      left: ${event.clientX}px;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.15);
-      z-index: 9999;
-      padding: 6px;
-    `;
-    
-    menu.querySelector('button').onclick = () => {
-      deleteReview(reviewId);
-      closeReviewActionsMenu();
-    };
-    
-    document.body.appendChild(menu);
-  }
-  
-  document.addEventListener('click', closeReviewActionsMenu);
-  
-  async function deleteReview(reviewId) {
-    if (!confirm('¿Eliminar esta reseña definitivamente?')) return;
-    
-    const appId = appDetailModal?.dataset.appId;
-    if (!appId) {
-      showError('No se pudo identificar la app');
-      return;
-    }
-    
-    try {
-      const res = await fetch(`/account/review/${reviewId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Error al eliminar');
-      
-      // Actualizar lista localmente
-      currentApp.reviews = currentApp.reviews.filter(r => r.id !== reviewId);
-      renderReviewsAdmin();
-      
-      showSuccess('Reseña eliminada correctamente');
-      
-    } catch (error) {
-      console.error('Error eliminando reseña:', error);
-      showError('No se pudo eliminar la reseña: ' + error.message);
-    }
-  }
 
   /* ======================================================
-     COMMUNITIES
+     COMMUNITIES (sin cambios)
   ====================================================== */
   function renderCommunities() {
     console.log('🎯 Renderizando comunidades...');
@@ -641,7 +749,6 @@ function updateAppBasicInfo() {
         <div class="community-card-arrow">→</div>
       `;
       
-      // Estilos inline para consistencia
       a.style.cssText = `
         display: flex;
         justify-content: space-between;
@@ -658,7 +765,6 @@ function updateAppBasicInfo() {
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       `;
       
-      // Hover effects
       a.addEventListener('mouseenter', () => {
         a.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)';
         a.style.transform = 'translateY(-2px)';
@@ -671,7 +777,6 @@ function updateAppBasicInfo() {
         a.style.borderColor = '#e5e7eb';
       });
       
-      // Menú contextual para eliminar
       a.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -680,173 +785,6 @@ function updateAppBasicInfo() {
       
       li.appendChild(a);
       list.appendChild(li);
-    });
-    
-    console.log(`✅ Se crearon ${list.children.length} tarjetas de comunidad`);
-  }
-  
-  function openCommunityActionsMenu(event, communityId) {
-    closeCommunityActionsMenu();
-    
-    const menu = document.createElement('div');
-    menu.id = 'community-actions-menu';
-    menu.innerHTML = `<button class="danger">🗑 Eliminar comunidad</button>`;
-    menu.style.cssText = `
-      position: fixed;
-      top: ${event.clientY}px;
-      left: ${event.clientX}px;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.15);
-      z-index: 9999;
-      padding: 6px;
-    `;
-    
-    menu.querySelector('button').onclick = () => {
-      deleteCommunity(communityId);
-      closeCommunityActionsMenu();
-    };
-    
-    document.body.appendChild(menu);
-  }
-  
-  function closeCommunityActionsMenu() {
-    const menu = document.getElementById('community-actions-menu');
-    if (menu) menu.remove();
-  }
-  
-  document.addEventListener('click', closeCommunityActionsMenu);
-  
-  async function deleteCommunity(communityId) {
-    if (!confirm('¿Eliminar esta comunidad definitivamente?')) return;
-    
-    try {
-      const res = await fetch(`/account/community/${communityId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Error al eliminar');
-      
-      // Actualizar lista local
-      currentApp.communities = currentApp.communities.filter(c => c.id !== communityId);
-      renderCommunities();
-      
-      showSuccess('Comunidad eliminada correctamente');
-      
-    } catch (error) {
-      console.error('Error eliminando comunidad:', error);
-      showError('No se pudo eliminar la comunidad: ' + error.message);
-    }
-  }
-
-  /* ======================================================
-     AÑADIR COMUNIDAD
-  ====================================================== */
-  addCommunityBtn?.addEventListener('click', () => {
-    addCommunityForm.classList.toggle('hidden');
-  });
-
-  saveCommunityBtn?.addEventListener('click', async () => {
-    const name = communityNameInput.value.trim();
-    if (!name) {
-      showError('El nombre de la comunidad es obligatorio');
-      return;
-    }
-
-    const appId = appDetailModal?.dataset.appId;
-    if (!appId) {
-      showError('No se pudo identificar la aplicación');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/apps/${appId}/create_community`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
-      
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Error al crear comunidad');
-
-      // Asegurar que existe el array de comunidades
-      if (!currentApp.communities) {
-        currentApp.communities = [];
-      }
-      
-      // Agregar nueva comunidad
-      currentApp.communities.push(data.community);
-      
-      // Re-renderizar
-      renderCommunities();
-
-      // Limpiar y cerrar formulario
-      communityNameInput.value = '';
-      addCommunityForm.classList.add('hidden');
-      
-      showSuccess('¡Comunidad creada exitosamente!');
-      
-    } catch (error) {
-      console.error('Error al crear comunidad:', error);
-      showError('No se pudo crear la comunidad: ' + error.message);
-    }
-  });
-
-  /* ======================================================
-     NUEVA FUNCIÓN: RENDERIZAR MIEMBROS DEL EQUIPO
-  ====================================================== */
-  function renderTeamMembers() {
-    console.log('🎯 Renderizando miembros del equipo...');
-    
-    const list = document.getElementById('team-members-list');
-    if (!list) {
-      console.error('❌ No se encontró #team-members-list');
-      return;
-    }
-    
-    list.innerHTML = '';
-    
-    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
-      console.log('ℹ️ No hay miembros en el equipo');
-      list.innerHTML = '<p>No hay miembros en el equipo.</p>';
-      return;
-    }
-    
-    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
-    
-    currentApp.team_members.forEach(member => {
-      const card = document.createElement('div');
-      card.className = 'team-member-card';
-      
-      let socialHtml = '';
-      if (member.socials) {
-        Object.entries(member.socials).forEach(([network, url]) => {
-          if (url) {
-            const emoji = getSocialEmoji(network);
-            socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${emoji ? emoji + ' ' : ''}${network}</a> `;
-          }
-        });
-      }
-      
-      card.innerHTML = `
-        <div class="team-member-info">
-          <img src="${member.avatar_url || getDefaultAvatar()}" alt="${member.name}" class="team-avatar">
-          <div>
-            <div class="team-name">${member.name || 'Sin nombre'}</div>
-            <div class="team-role">${member.role || 'Sin rol'}</div>
-            <div class="team-socials">${socialHtml}</div>
-          </div>
-        </div>
-      `;
-      
-      list.appendChild(card);
     });
   }
 
@@ -872,7 +810,6 @@ function updateAppBasicInfo() {
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
       
-      // Actualizar currentApp y re-renderizar
       currentApp = { ...currentApp, ...updatedData };
       showSuccess('Cambios guardados correctamente');
       
@@ -928,7 +865,6 @@ function updateAppBasicInfo() {
     const appButtons = document.querySelectorAll('.app-item');
     
     appButtons.forEach(button => {
-      // Evitar agregar múltiples listeners
       button.removeEventListener('click', handleAppClick);
       button.addEventListener('click', handleAppClick);
     });
@@ -947,10 +883,8 @@ function updateAppBasicInfo() {
     openAppDetail(appId);
   }
   
-  // Configurar listeners iniciales
   setupAppClickListeners();
   
-  // También configurar para botones que se agreguen dinámicamente
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'childList') {
@@ -971,20 +905,16 @@ function updateAppBasicInfo() {
   
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Actualizar botones activos
       tabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
-      // Ocultar todos los contenidos
       tabContents.forEach(c => c.classList.add('hidden'));
       
-      // Mostrar contenido correspondiente
       const targetTab = document.getElementById(btn.dataset.tab);
       if (targetTab) {
         targetTab.classList.remove('hidden');
       }
       
-      // Re-renderizar si es necesario
       if (btn.dataset.tab === 'communities') {
         renderCommunities();
       } else if (btn.dataset.tab === 'team') {
@@ -993,7 +923,6 @@ function updateAppBasicInfo() {
     });
   });
 
-  // Cerrar modal al hacer clic fuera
   appDetailModal?.addEventListener('click', e => {
     if (e.target === appDetailModal) {
       appDetailModal.classList.add('hidden');
@@ -1001,275 +930,6 @@ function updateAppBasicInfo() {
       window.currentApp = null;
     }
   });
-  // ====== FUNCIONES NUEVAS PARA ELIMINAR Y EDITAR ======
-
-/**
- * Elimina una aplicación
- */
-async function deleteApp(appId) {
-    if (!confirm('¿Estás seguro de eliminar esta aplicación? Esta acción no se puede deshacer.')) {
-        return;
-    }
-
-    try {
-        const res = await fetch(`/account/delete_app/${appId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || 'Error al eliminar');
-
-        // Eliminar de la lista
-        const appButton = document.querySelector(`.app-item[data-app-id="${appId}"]`);
-        if (appButton) appButton.remove();
-        
-        // Cerrar modal si está abierto
-        if (appDetailModal) {
-            appDetailModal.classList.add('hidden');
-            currentApp = null;
-            window.currentApp = null;
-        }
-        
-        showSuccess('Aplicación eliminada correctamente');
-        
-    } catch (error) {
-        console.error('❌ Error eliminando app:', error);
-        showError('No se pudo eliminar la aplicación: ' + error.message);
-    }
-}
-
-/**
- * Edita el rol de un miembro del equipo
- */
-async function editTeamMember(memberId, currentRole) {
-    const newRole = prompt('Nuevo rol del miembro:', currentRole || '');
-    
-    if (newRole === null || newRole === currentRole) return; // Cancelado o sin cambios
-    
-    try {
-        const res = await fetch(`/account/team_member/${memberId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role: newRole })
-        });
-        
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || 'Error al actualizar');
-
-        // Actualizar en la app actual
-        if (currentApp && currentApp.team_members) {
-            const member = currentApp.team_members.find(m => m.id === memberId);
-            if (member) {
-                member.role = newRole;
-                renderTeamMembers();
-            }
-        }
-        
-        showSuccess('Rol actualizado correctamente');
-        
-    } catch (error) {
-        console.error('❌ Error actualizando miembro:', error);
-        showError('No se pudo actualizar el rol: ' + error.message);
-    }
-}
-
-/**
- * Elimina un miembro del equipo
- */
-async function removeTeamMember(memberId, memberName) {
-    if (!confirm(`¿Eliminar a ${memberName} del equipo?`)) {
-        return;
-    }
-
-    try {
-        const res = await fetch(`/account/team_member/${memberId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || 'Error al eliminar');
-
-        // Actualizar en la app actual
-        if (currentApp && currentApp.team_members) {
-            currentApp.team_members = currentApp.team_members.filter(m => m.id !== memberId);
-            renderTeamMembers();
-        }
-        
-        showSuccess('Miembro eliminado del equipo');
-        
-    } catch (error) {
-        console.error('❌ Error eliminando miembro:', error);
-        showError('No se pudo eliminar el miembro: ' + error.message);
-    }
-}
-
-// ====== MODIFICAR RENDER TEAM MEMBERS PARA INCLUIR BOTONES ======
-
-function renderTeamMembers() {
-    console.log('🎯 Renderizando miembros del equipo...');
-    
-    const list = document.getElementById('team-members-list');
-    if (!list) {
-        console.error('❌ No se encontró #team-members-list');
-        return;
-    }
-    
-    list.innerHTML = '';
-    
-    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
-        console.log('ℹ️ No hay miembros en el equipo');
-        list.innerHTML = '<p>No hay miembros en el equipo.</p>';
-        return;
-    }
-    
-    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
-    
-    currentApp.team_members.forEach(member => {
-        const card = document.createElement('div');
-        card.className = 'team-member-card';
-        card.dataset.memberId = member.id;
-        
-        let socialHtml = '';
-        if (member.socials) {
-            Object.entries(member.socials).forEach(([network, url]) => {
-                if (url) {
-                    const emoji = getSocialEmoji(network);
-                    socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${emoji ? emoji + ' ' : ''}${network}</a> `;
-                }
-            });
-        }
-        
-        // Solo mostrar botones de edición si el usuario es el dueño de la app
-        const isOwner = currentApp.owner_id === (currentUser?.id || '');
-        const actionsHtml = isOwner ? `
-            <div class="team-member-actions">
-                <button class="btn-small edit-member-btn" data-member-id="${member.id}" data-role="${member.role || ''}">
-                    Editar
-                </button>
-                <button class="btn-small danger remove-member-btn" data-member-id="${member.id}" data-name="${member.name || ''}">
-                    Eliminar
-                </button>
-            </div>
-        ` : '';
-        
-        card.innerHTML = `
-            <div class="team-member-info">
-                <img src="${member.avatar_url || getDefaultAvatar()}" alt="${member.name}" class="team-avatar">
-                <div>
-                    <div class="team-name">${member.name || 'Sin nombre'}</div>
-                    <div class="team-role">${member.role || 'Sin rol'}</div>
-                    <div class="team-socials">${socialHtml}</div>
-                </div>
-            </div>
-            ${actionsHtml}
-        `;
-        
-        list.appendChild(card);
-    });
-    
-    // Agregar event listeners para los botones de edición/eliminación
-    list.querySelectorAll('.edit-member-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const memberId = btn.dataset.memberId;
-            const currentRole = btn.dataset.role;
-            editTeamMember(memberId, currentRole);
-        });
-    });
-    
-    list.querySelectorAll('.remove-member-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const memberId = btn.dataset.memberId;
-            const memberName = btn.dataset.name;
-            removeTeamMember(memberId, memberName);
-        });
-    });
-}
-
-// ====== AGREGAR BOTÓN DE ELIMINAR APP EN EL MODAL ======
-
-// En la función openAppDetail, después de actualizar la información básica:
-async function openAppDetail(appId) {
-    console.log(`📱 Abriendo app con ID: ${appId}`);
-    
-    // ... código existente ...
-    
-    // Después de llenar los datos de la app:
-    // Agregar botón de eliminar si el usuario es el dueño
-    const deleteBtnContainer = document.getElementById('delete-app-btn-container');
-    if (deleteBtnContainer) {
-        deleteBtnContainer.innerHTML = '';
-        
-        if (currentApp.owner_id === (currentUser?.id || '')) {
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn danger';
-            deleteBtn.id = 'delete-app-btn';
-            deleteBtn.textContent = 'Eliminar Aplicación';
-            deleteBtn.addEventListener('click', () => deleteApp(appId));
-            deleteBtnContainer.appendChild(deleteBtn);
-        }
-    }
-    
-    // ... resto del código existente ...
-}
-
-// ====== AGREGAR DETECCIÓN DE USUARIO ACTUAL ======
-// Necesitamos saber quién es el usuario actual para mostrar/ocultar botones
-
-let currentUser = null;
-
-// Al inicio del dashboard.js, después de cargar el DOM:
-document.addEventListener('DOMContentLoaded', () => {
-    // Obtener usuario actual (puedes obtenerlo de una variable global o hacer una petición)
-    try {
-        // Si el usuario está en una variable global
-        if (typeof window.currentUserData !== 'undefined') {
-            currentUser = window.currentUserData;
-        } else {
-            // O hacer una petición para obtener el usuario actual
-            fetch('/api/current_user')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        currentUser = data.user;
-                    }
-                })
-                .catch(console.error);
-        }
-    } catch (e) {
-        console.error('Error obteniendo usuario actual:', e);
-    }
-    
-    // ... resto del código existente ...
-});
-
-  /* ======================================================
-     DEBUGGING INICIAL
-  ====================================================== */
-  setTimeout(() => {
-    console.log('🔍 Verificando botones de apps...');
-    const appButtons = document.querySelectorAll('.app-item');
-    console.log(`✅ Encontrados ${appButtons.length} botones de apps`);
-    
-    appButtons.forEach((btn, index) => {
-      const appId = btn.dataset.appId;
-      const isValid = appId && appId !== 'undefined' && appId !== 'null';
-      console.log(`App ${index + 1}:`, {
-        id: appId,
-        isValid: isValid,
-        text: btn.querySelector('.app-name')?.textContent || 'Sin nombre'
-      });
-    });
-  }, 500);
 
   console.log('✅ dashboard.js completamente cargado y listo');
 });
