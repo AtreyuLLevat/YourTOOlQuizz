@@ -454,169 +454,161 @@ document.addEventListener('DOMContentLoaded', () => {
   ====================================================== */
 // Agrega estas funciones después de renderTeamMembers()
 
-function editTeamMember(memberId, currentRole) {
-  const newRole = prompt("Ingrese el nuevo rol:", currentRole);
-  
-  if (newRole && newRole.trim() !== currentRole) {
-    fetch(`/account/team_member/${memberId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: newRole.trim() })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      if (data.success) {
-        // Actualizar UI sin recargar todo
-        const card = document.querySelector(`[data-member-id="${memberId}"]`);
-        if (card) {
-          const roleElem = card.querySelector('.team-role');
-          if (roleElem) roleElem.textContent = newRole;
-          
-          const editBtn = card.querySelector('.edit-member-btn');
-          if (editBtn) editBtn.dataset.role = newRole;
-        }
-        
-        // Actualizar estado local
-        const member = currentApp.team_members.find(m => m.id === parseInt(memberId));
-        if (member) member.role = newRole;
-        
-        showSuccess('Rol actualizado correctamente');
-      } else {
-        showError(data.message || 'Error al actualizar el rol');
-      }
-    })
-    .catch(err => {
-      console.error('Error en editTeamMember:', err);
-      showError('Error de red al actualizar el rol');
-    });
-  }
+function editTeamMember(memberId, currentRole = '') {
+  const input = prompt("Ingrese el nuevo rol:", currentRole);
+  if (input === null) return; // cancelado
+
+  const newRole = input.trim();
+  if (!newRole || newRole === currentRole) return;
+
+  fetch(`/account/team_member/${memberId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ role: newRole })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if (!data.success) {
+      showError(data.message || 'Error al actualizar el rol');
+      return;
+    }
+
+    // 🔄 UI
+    const card = document.querySelector(`[data-member-id="${memberId}"]`);
+    if (card) {
+      const roleElem = card.querySelector('.team-role');
+      if (roleElem) roleElem.textContent = newRole;
+
+      const editBtn = card.querySelector('.edit-member-btn');
+      if (editBtn) editBtn.dataset.role = newRole;
+    }
+
+    // 🔄 Estado local
+    const member = currentApp.team_members.find(m => String(m.id) === String(memberId));
+    if (member) member.role = newRole;
+
+    showSuccess('Rol actualizado correctamente');
+  })
+  .catch(err => {
+    console.error('editTeamMember error:', err);
+    showError('Error de red al actualizar el rol');
+  });
 }
 
-function removeTeamMember(memberId, memberName) {
-  if (confirm(`¿Estás seguro de eliminar a ${memberName || 'este miembro'} del equipo?`)) {
-    fetch(`/account/team_member/${memberId}`, {
-      method: 'DELETE'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      if (data.success) {
-        // Remover de la UI
-        const card = document.querySelector(`[data-member-id="${memberId}"]`);
-        if (card) card.remove();
-        
-        // Actualizar estado local
-        currentApp.team_members = currentApp.team_members.filter(m => m.id !== parseInt(memberId));
-        
-        if (currentApp.team_members.length === 0) {
-          renderTeamMembers();  // Re-render si no quedan miembros
-        }
-        
-        showSuccess('Miembro eliminado correctamente');
-      } else {
-        showError(data.message || 'Error al eliminar el miembro');
-      }
-    })
-    .catch(err => {
-      console.error('Error en removeTeamMember:', err);
-      showError('Error de red al eliminar el miembro');
-    });
-  }
+
+function removeTeamMember(memberId, memberName = '') {
+  if (!confirm(`¿Eliminar a ${memberName || 'este miembro'} del equipo?`)) return;
+
+  fetch(`/account/team_member/${memberId}`, {
+    method: 'DELETE'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if (!data.success) {
+      showError(data.message || 'Error al eliminar el miembro');
+      return;
+    }
+
+    // UI
+    const card = document.querySelector(`[data-member-id="${memberId}"]`);
+    if (card) card.remove();
+
+    // Estado local
+    currentApp.team_members = currentApp.team_members.filter(
+      m => String(m.id) !== String(memberId)
+    );
+
+    if (currentApp.team_members.length === 0) {
+      renderTeamMembers();
+    }
+
+    showSuccess('Miembro eliminado correctamente');
+  })
+  .catch(err => {
+    console.error('removeTeamMember error:', err);
+    showError('Error de red al eliminar el miembro');
+  });
 }
+
 
   /* ======================================================
      RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTONES)
   ====================================================== */
-  function renderTeamMembers() {
-    console.log('🎯 Renderizando miembros del equipo...');
-    
-    const list = document.getElementById('team-members-list');
-    if (!list) {
-      console.error('❌ No se encontró #team-members-list');
-      return;
-    }
-    
-    list.innerHTML = '';
-    
-    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
-      console.log('ℹ️ No hay miembros en el equipo');
-      list.innerHTML = '<p>No hay miembros en el equipo.</p>';
-      return;
-    }
-    
-    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
-    
-    // Verificar si el usuario actual es el dueño
-    const appOwnerId = currentApp.owner_id;
-    const userId = currentUser?.id || currentUser?.user_id;
-    const isOwner = userId && appOwnerId && parseInt(appOwnerId) === parseInt(userId);
-    
-    currentApp.team_members.forEach(member => {
-      const card = document.createElement('div');
-      card.className = 'team-member-card';
-      card.dataset.memberId = member.id;
-      
-      let socialHtml = '';
-      if (member.socials) {
-        Object.entries(member.socials).forEach(([network, url]) => {
-          if (url) {
-            const emoji = getSocialEmoji(network);
-            socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${emoji ? emoji + ' ' : ''}${network}</a> `;
-          }
-        });
-      }
-      
-      // Solo mostrar botones de edición si el usuario es el dueño de la app
-      const actionsHtml = isOwner ? `
-        <div class="team-member-actions">
-          <button class="btn-small edit-member-btn" data-member-id="${member.id}" data-role="${member.role || ''}">
-            Editar Rol
-          </button>
-          <button class="btn-small danger remove-member-btn" data-member-id="${member.id}" data-name="${member.name || ''}">
-            Eliminar
-          </button>
-        </div>
-      ` : '';
-      
-      card.innerHTML = `
-        <div class="team-member-info">
-          <img src="${member.avatar_url || getDefaultAvatar()}" alt="${member.name}" class="team-avatar">
-          <div>
-            <div class="team-name">${member.name || 'Sin nombre'}</div>
-            <div class="team-role">${member.role || 'Sin rol'}</div>
-            <div class="team-socials">${socialHtml}</div>
-          </div>
-        </div>
-        ${actionsHtml}
-      `;
-      
-      list.appendChild(card);
-    });
-    
-    // Agregar event listeners para los botones de edición/eliminación
-    list.querySelectorAll('.edit-member-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const memberId = btn.dataset.memberId;
-        const currentRole = btn.dataset.role;
-        editTeamMember(memberId, currentRole);
-      });
-    });
-    
-    list.querySelectorAll('.remove-member-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const memberId = btn.dataset.memberId;
-        const memberName = btn.dataset.name;
-        removeTeamMember(memberId, memberName);
-      });
-    });
+function renderTeamMembers() {
+  const list = document.getElementById('team-members-list');
+  if (!list) return;
+
+  list.innerHTML = '';
+
+  if (!currentApp?.team_members?.length) {
+    list.innerHTML = '<p>No hay miembros en el equipo.</p>';
+    return;
   }
+
+  const appOwnerId = String(currentApp.owner_id);
+  const userId = String(currentUser?.id || currentUser?.user_id || '');
+  const isOwner = appOwnerId && userId && appOwnerId === userId;
+
+  currentApp.team_members.forEach(member => {
+    const card = document.createElement('div');
+    card.className = 'team-member-card';
+    card.dataset.memberId = member.id;
+
+    let socialHtml = '';
+    if (member.socials) {
+      Object.entries(member.socials).forEach(([network, url]) => {
+        if (url) {
+          socialHtml += `<a href="${url}" target="_blank" class="team-social-link">${network}</a>`;
+        }
+      });
+    }
+
+    const actionsHtml = isOwner ? `
+      <div class="team-member-actions">
+        <button class="btn-small edit-member-btn"
+          data-member-id="${member.id}"
+          data-role="${member.role || ''}">
+          Editar Rol
+        </button>
+        <button class="btn-small danger remove-member-btn"
+          data-member-id="${member.id}"
+          data-name="${member.name || ''}">
+          Eliminar
+        </button>
+      </div>
+    ` : '';
+
+    card.innerHTML = `
+      <div class="team-member-info">
+        <img src="${member.avatar_url || getDefaultAvatar()}" class="team-avatar">
+        <div>
+          <div class="team-name">${member.name || 'Sin nombre'}</div>
+          <div class="team-role">${member.role || 'Sin rol'}</div>
+          <div class="team-socials">${socialHtml}</div>
+        </div>
+      </div>
+      ${actionsHtml}
+    `;
+
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.edit-member-btn').forEach(btn => {
+    btn.onclick = () => editTeamMember(btn.dataset.memberId, btn.dataset.role);
+  });
+
+  list.querySelectorAll('.remove-member-btn').forEach(btn => {
+    btn.onclick = () => removeTeamMember(btn.dataset.memberId, btn.dataset.name);
+  });
+}
 
   /* ======================================================
      REVIEWS (sin cambios)
