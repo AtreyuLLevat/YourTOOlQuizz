@@ -30,22 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const appLogoInput = document.getElementById('app-logo-input');
   const deleteAppBtnContainer = document.getElementById('delete-app-btn-container');
 
-  // Elementos del modal
-  const modalLogoImg = document.getElementById('app-logo');
-  const nameInput = document.getElementById('app-name-input');
-  const descriptionInput = document.getElementById('app-description-input');
-  const dateInput = document.getElementById('app-date-input');
-  const themeInput = document.getElementById('app-theme-input');
-  const starsEl = appDetailModal?.querySelector('.reviews-summary .stars');
-  const reviewsCountEl = appDetailModal?.querySelector('.reviews-summary .reviews-count');
-  const reviewsList = document.getElementById('reviews-list');
-  const communitiesList = appDetailModal?.querySelector('.community-list');
-  const teamList = document.getElementById('team-members-list');
-
-  // Pestañas
-  const tabButtons = appDetailModal?.querySelectorAll('.tab-btn');
-  const tabContents = appDetailModal?.querySelectorAll('.tab-content');
-
   // Obtener usuario actual desde variable global
   try {
     if (typeof window.currentUserData !== 'undefined') {
@@ -348,27 +332,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     GESTIÓN DE PESTAÑAS
-  ====================================================== */
-  function showTab(tabName) {
-    tabButtons?.forEach(btn => btn.classList.remove('active'));
-    tabContents?.forEach(c => c.classList.add('hidden'));
-
-    const activeBtn = appDetailModal?.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-    const activeContent = document.getElementById(tabName);
-
-    if (activeBtn && activeContent) {
-      activeBtn.classList.add('active');
-      activeContent.classList.remove('hidden');
-
-      // Cargar team SOLO cuando se abre la pestaña
-      if (tabName === 'team' && window.currentAppId) {
-        loadTeamMembers(window.currentAppId);
-      }
-    }
-  }
-
-  /* ======================================================
      ABRIR MODAL APP - VERSIÓN MEJORADA
   ====================================================== */
   async function openAppDetail(appId) {
@@ -390,60 +353,17 @@ document.addEventListener('DOMContentLoaded', () => {
       
       appDetailModal.dataset.appId = appId;
       
-      /* ===== RELLENAR DATOS ===== */
-      if (nameInput) nameInput.value = currentApp.name || '';
-      if (descriptionInput) descriptionInput.value = currentApp.description || '';
-      if (dateInput) {
-        dateInput.value = currentApp.creation_date ? 
-          new Date(currentApp.creation_date).toISOString().split('T')[0] : '';
-      }
-      if (themeInput) themeInput.value = currentApp.theme || 'General';
+      document.getElementById('app-name-input').value = currentApp.name || '';
+      document.getElementById('app-description-input').value = currentApp.description || '';
+      document.getElementById('app-date-input').value = currentApp.creation_date ? 
+        new Date(currentApp.creation_date).toISOString().split('T')[0] : '';
+      document.getElementById('app-theme-input').value = currentApp.theme || 'General';
+      document.getElementById('app-logo').src = currentApp.image_url || '/static/images/app-placeholder.png';
       
-      const logoImg = document.getElementById('app-logo');
-      if (logoImg) {
-        logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
-      }
-      
-      /* ===== REVIEWS ===== */
-      if (starsEl && reviewsCountEl) {
-        const rating = Math.round(currentApp.rating || 0);
-        starsEl.textContent = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-        reviewsCountEl.textContent = `(${currentApp.reviews_count || 0})`;
-      }
-
-      if (reviewsList) {
-        reviewsList.innerHTML = '';
-        (currentApp.reviews || []).forEach(r => {
-          const div = document.createElement('div');
-          div.className = 'review-card';
-          div.innerHTML = `
-            <div class="review-header">
-              <div class="review-user-info">
-                <div class="review-avatar">${(r.user_name || '?')[0]}</div>
-                <div class="review-user-details">
-                  <div class="review-username">${r.user_name || 'Usuario'}</div>
-                  <div class="review-date">${r.date || ''}</div>
-                </div>
-              </div>
-              <div class="review-rating">
-                ⭐ <span class="rating-value">${r.rating}</span>
-              </div>
-            </div>
-            <p class="review-content">${r.content || ''}</p>
-          `;
-          reviewsList.appendChild(div);
-        });
-      }
-      
-      /* ===== COMUNIDADES ===== */
-      if (communitiesList) {
-        communitiesList.innerHTML = '';
-        (currentApp.communities || []).forEach(c => {
-          const li = document.createElement('li');
-          li.textContent = c.name;
-          communitiesList.appendChild(li);
-        });
-      }
+      updateAppBasicInfo();
+      renderReviewsAdmin(); 
+      renderCommunities();
+      renderTeamMembers();
       
       // Agregar botón de eliminar si el usuario es el dueño
       if (deleteAppBtnContainer) {
@@ -464,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       appDetailModal.classList.remove('hidden');
-      showTab('reviews');
       console.log('✅ Modal abierto correctamente');
       
     } catch (error) {
@@ -488,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (elements.date) elements.date.textContent = currentApp.creation_date || '---';
     if (elements.theme) elements.theme.textContent = "Tema: " + (currentApp.theme || "General");
 
-    const logoImg = document.getElementById('app-logo');
+    const logoImg = document.getElementById("app-logo");
     if (logoImg) {
       logoImg.src = currentApp.image_url || '/static/images/app-placeholder.png';
     }
@@ -533,210 +452,166 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      EDITAR MIEMBRO DEL EQUIPO
   ====================================================== */
-  function editTeamMember(memberId, currentRole = '') {
-    const input = prompt('Ingrese el nuevo rol:', currentRole);
-    if (input === null) return; // cancelado
+// Agrega estas funciones después de renderTeamMembers()
 
-    const newRole = input.trim();
-    if (!newRole || newRole === currentRole) return;
+function editTeamMember(memberId, currentRole = '') {
+  const input = prompt("Ingrese el nuevo rol:", currentRole);
+  if (input === null) return; // cancelado
 
-    fetch(`/account/team_member/${memberId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ role: newRole })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      if (!data.success) {
-        showError(data.message || 'Error al actualizar el rol');
-        return;
-      }
+  const newRole = input.trim();
+  if (!newRole || newRole === currentRole) return;
 
-      // 🔄 UI
-      const card = document.querySelector(`[data-member-id="${memberId}"]`);
-      if (card) {
-        const roleElem = card.querySelector('.team-role');
-        if (roleElem) roleElem.textContent = newRole;
-
-        const editBtn = card.querySelector('.edit-member-btn');
-        if (editBtn) editBtn.dataset.role = newRole;
-      }
-
-      // 🔄 Estado local
-      const member = currentApp.team_members.find(m => String(m.id) === String(memberId));
-      if (member) member.role = newRole;
-
-      showSuccess('Rol actualizado correctamente');
-    })
-    .catch(err => {
-      console.error('editTeamMember error:', err);
-      showError('Error de red al actualizar el rol');
-    });
-  }
-
-  function removeTeamMember(memberId, memberName = '') {
-    if (!confirm(`¿Eliminar a ${memberName || 'este miembro'} del equipo?`)) return;
-
-    fetch(`/account/team_member/${memberId}`, {
-      method: 'DELETE'
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      if (!data.success) {
-        showError(data.message || 'Error al eliminar el miembro');
-        return;
-      }
-
-      // UI
-      const card = document.querySelector(`[data-member-id="${memberId}"]`);
-      if (card) card.remove();
-
-      // Estado local
-      currentApp.team_members = currentApp.team_members.filter(
-        m => String(m.id) !== String(memberId)
-      );
-
-      if (currentApp.team_members.length === 0) {
-        renderTeamMembers();
-      }
-
-      showSuccess('Miembro eliminado correctamente');
-    })
-    .catch(err => {
-      console.error('removeTeamMember error:', err);
-      showError('Error de red al eliminar el miembro');
-    });
-  }
-
-  /* ======================================================
-     TEAM MEMBERS (desde modal.js)
-  ====================================================== */
-  async function loadTeamMembers(appId) {
-    if (!teamList) return;
-
-    teamList.innerHTML = 'Cargando equipo...';
-
-    try {
-      const res = await fetch(`/apps/${appId}/team`);
-      const team = await res.json();
-
-      teamList.innerHTML = '';
-
-      if (!team.length) {
-        teamList.innerHTML = '<p style="color:#64748b;">No hay miembros en el equipo.</p>';
-        return;
-      }
-
-      team.forEach(m => {
-        const socials = Object.entries(m.socials || {})
-          .map(([k, v]) => `
-            <a href="${v}" target="_blank" class="social-badge ${k}">
-              @${k}
-            </a>
-          `).join('');
-
-        const card = document.createElement('div');
-        card.className = 'team-member-card';
-        card.innerHTML = `
-          <div class="team-member-info">
-            <img class="team-avatar" src="${m.avatar || '/static/images/default-avatar.png'}">
-            <div>
-              <div class="team-name">${m.name}</div>
-              <div class="team-role">${m.role || ''}</div>
-              <div class="social-badges">${socials}</div>
-            </div>
-          </div>
-        `;
-        teamList.appendChild(card);
-      });
-
-    } catch (err) {
-      console.error(err);
-      teamList.innerHTML = '<p>Error al cargar el equipo</p>';
+  fetch(`/account/team_member/${memberId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ role: newRole })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if (!data.success) {
+      showError(data.message || 'Error al actualizar el rol');
+      return;
     }
-  }
+
+    // 🔄 UI
+    const card = document.querySelector(`[data-member-id="${memberId}"]`);
+    if (card) {
+      const roleElem = card.querySelector('.team-role');
+      if (roleElem) roleElem.textContent = newRole;
+
+      const editBtn = card.querySelector('.edit-member-btn');
+      if (editBtn) editBtn.dataset.role = newRole;
+    }
+
+    // 🔄 Estado local
+    const member = currentApp.team_members.find(m => String(m.id) === String(memberId));
+    if (member) member.role = newRole;
+
+    showSuccess('Rol actualizado correctamente');
+  })
+  .catch(err => {
+    console.error('editTeamMember error:', err);
+    showError('Error de red al actualizar el rol');
+  });
+}
+
+
+function removeTeamMember(memberId, memberName = '') {
+  if (!confirm(`¿Eliminar a ${memberName || 'este miembro'} del equipo?`)) return;
+
+  fetch(`/account/team_member/${memberId}`, {
+    method: 'DELETE'
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if (!data.success) {
+      showError(data.message || 'Error al eliminar el miembro');
+      return;
+    }
+
+    // UI
+    const card = document.querySelector(`[data-member-id="${memberId}"]`);
+    if (card) card.remove();
+
+    // Estado local
+    currentApp.team_members = currentApp.team_members.filter(
+      m => String(m.id) !== String(memberId)
+    );
+
+    if (currentApp.team_members.length === 0) {
+      renderTeamMembers();
+    }
+
+    showSuccess('Miembro eliminado correctamente');
+  })
+  .catch(err => {
+    console.error('removeTeamMember error:', err);
+    showError('Error de red al eliminar el miembro');
+  });
+}
+
 
   /* ======================================================
      RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTONES)
   ====================================================== */
-  function renderTeamMembers() {
-    const list = document.getElementById('team-members-list');
-    if (!list) return;
+function renderTeamMembers() {
+  const list = document.getElementById('team-members-list');
+  if (!list) return;
 
-    list.innerHTML = '';
+  list.innerHTML = '';
 
-    if (!currentApp?.team_members?.length) {
-      list.innerHTML = '<p>No hay miembros en el equipo.</p>';
-      return;
-    }
-
-    const appOwnerId = String(currentApp.owner_id);
-    const userId = String(currentUser?.id || currentUser?.user_id || '');
-    const isOwner = appOwnerId && userId && appOwnerId === userId;
-
-    currentApp.team_members.forEach(member => {
-      const card = document.createElement('div');
-      card.className = 'team-member-card';
-      card.dataset.memberId = member.id;
-
-      let socialHtml = '';
-      if (member.socials) {
-        Object.entries(member.socials).forEach(([network, url]) => {
-          if (url) {
-            socialHtml += `<a href="${url}" target="_blank" class="team-social-link">${network}</a>`;
-          }
-        });
-      }
-
-      const actionsHtml = isOwner ? `
-        <div class="team-member-actions">
-          <button class="btn-small edit-member-btn"
-            data-member-id="${member.id}"
-            data-role="${member.role || ''}">
-            Editar Rol
-          </button>
-          <button class="btn-small danger remove-member-btn"
-            data-member-id="${member.id}"
-            data-name="${member.name || ''}">
-            Eliminar
-          </button>
-        </div>
-      ` : '';
-
-      card.innerHTML = `
-        <div class="team-member-info">
-          <img src="${member.avatar_url || getDefaultAvatar()}" class="team-avatar">
-          <div>
-            <div class="team-name">${member.name || 'Sin nombre'}</div>
-            <div class="team-role">${member.role || 'Sin rol'}</div>
-            <div class="team-socials">${socialHtml}</div>
-          </div>
-        </div>
-        ${actionsHtml}
-      `;
-
-      list.appendChild(card);
-    });
-
-    list.querySelectorAll('.edit-member-btn').forEach(btn => {
-      btn.onclick = () => editTeamMember(btn.dataset.memberId, btn.dataset.role);
-    });
-
-    list.querySelectorAll('.remove-member-btn').forEach(btn => {
-      btn.onclick = () => removeTeamMember(btn.dataset.memberId, btn.dataset.name);
-    });
+  if (!currentApp?.team_members?.length) {
+    list.innerHTML = '<p>No hay miembros en el equipo.</p>';
+    return;
   }
 
+  const appOwnerId = String(currentApp.owner_id);
+  const userId = String(currentUser?.id || currentUser?.user_id || '');
+  const isOwner = appOwnerId && userId && appOwnerId === userId;
+
+  currentApp.team_members.forEach(member => {
+    const card = document.createElement('div');
+    card.className = 'team-member-card';
+    card.dataset.memberId = member.id;
+
+    let socialHtml = '';
+    if (member.socials) {
+      Object.entries(member.socials).forEach(([network, url]) => {
+        if (url) {
+          socialHtml += `<a href="${url}" target="_blank" class="team-social-link">${network}</a>`;
+        }
+      });
+    }
+
+    const actionsHtml = isOwner ? `
+      <div class="team-member-actions">
+        <button class="btn-small edit-member-btn"
+          data-member-id="${member.id}"
+          data-role="${member.role || ''}">
+          Editar Rol
+        </button>
+        <button class="btn-small danger remove-member-btn"
+          data-member-id="${member.id}"
+          data-name="${member.name || ''}">
+          Eliminar
+        </button>
+      </div>
+    ` : '';
+
+    card.innerHTML = `
+      <div class="team-member-info">
+        <img src="${member.avatar_url || getDefaultAvatar()}" class="team-avatar">
+        <div>
+          <div class="team-name">${member.name || 'Sin nombre'}</div>
+          <div class="team-role">${member.role || 'Sin rol'}</div>
+          <div class="team-socials">${socialHtml}</div>
+        </div>
+      </div>
+      ${actionsHtml}
+    `;
+
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.edit-member-btn').forEach(btn => {
+    btn.onclick = () => editTeamMember(btn.dataset.memberId, btn.dataset.role);
+  });
+
+  list.querySelectorAll('.remove-member-btn').forEach(btn => {
+    btn.onclick = () => removeTeamMember(btn.dataset.memberId, btn.dataset.name);
+  });
+}
+
   /* ======================================================
-     REVIEWS (dashboard.js original)
+     REVIEWS (sin cambios)
   ====================================================== */
   function renderReviewsAdmin() {
     const reviewsList = document.getElementById('reviews-list');
@@ -832,7 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     COMMUNITIES
+     COMMUNITIES (sin cambios)
   ====================================================== */
   function renderCommunities() {
     console.log('🎯 Renderizando comunidades...');
@@ -987,14 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('🗑 Modal cerrado y estado limpiado');
   });
 
-  appDetailModal?.addEventListener('click', e => {
-    if (e.target === appDetailModal) {
-      appDetailModal.classList.add('hidden');
-      currentApp = null;
-      window.currentApp = null;
-    }
-  });
-
   /* ======================================================
      LISTENER PARA APPS EXISTENTES Y NUEVAS
   ====================================================== */
@@ -1035,12 +902,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ======================================================
-     LISTENERS DE PESTAÑAS
+     TABS DEL MODAL
   ====================================================== */
-  tabButtons?.forEach(btn => {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      showTab(btn.dataset.tab);
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      tabContents.forEach(c => c.classList.add('hidden'));
+      
+      const targetTab = document.getElementById(btn.dataset.tab);
+      if (targetTab) {
+        targetTab.classList.remove('hidden');
+      }
+      
+      if (btn.dataset.tab === 'communities') {
+        renderCommunities();
+      } else if (btn.dataset.tab === 'team') {
+        renderTeamMembers();
+      }
     });
+  });
+
+  appDetailModal?.addEventListener('click', e => {
+    if (e.target === appDetailModal) {
+      appDetailModal.classList.add('hidden');
+      currentApp = null;
+      window.currentApp = null;
+    }
   });
 
   console.log('✅ dashboard.js completamente cargado y listo');
