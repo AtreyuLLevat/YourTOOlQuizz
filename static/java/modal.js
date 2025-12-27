@@ -90,7 +90,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (nameInput) nameInput.value = app.name || "";
       if (descriptionInput) descriptionInput.value = app.description || "";
-      if (dateInput) dateInput.value = app.creation_date || "";
+      
+      // Adaptar fecha al formato YYYY-MM-DD
+      if (dateInput) {
+        dateInput.value = app.creation_date ? app.creation_date.split("T")[0] : "";
+      }
+
       if (themeInput) themeInput.value = app.theme || "General";
 
       /* ===== REVIEWS ===== */
