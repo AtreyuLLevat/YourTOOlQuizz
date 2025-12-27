@@ -8,21 +8,31 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      ELEMENTOS DEL MODAL
   ========================= */
+
+  // Logo
   const modalLogoImg = document.getElementById("app-logo");
+
+  // Inputs editables
   const nameInput = document.getElementById("app-name-input");
   const descriptionInput = document.getElementById("app-description-input");
   const dateInput = document.getElementById("app-date-input");
   const themeInput = document.getElementById("app-theme-input");
 
+  // Reviews
   const starsEl = appDetailModal.querySelector(".reviews-summary .stars");
   const reviewsCountEl = appDetailModal.querySelector(".reviews-summary .reviews-count");
   const reviewsList = document.getElementById("reviews-list");
+
+  // Comunidades
   const communitiesList = appDetailModal.querySelector(".community-list");
+
+  // Team
   const teamList = document.getElementById("team-members-list");
 
   /* =========================
      PESTAÑAS
   ========================= */
+
   const tabButtons = appDetailModal.querySelectorAll(".tab-btn");
   const tabContents = appDetailModal.querySelectorAll(".tab-content");
 
@@ -37,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       activeBtn.classList.add("active");
       activeContent.classList.remove("hidden");
 
+      // Cargar team SOLO cuando se abre la pestaña
       if (tabName === "team" && window.currentAppId) {
         loadTeamMembers(window.currentAppId);
       }
@@ -44,12 +55,15 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => showTab(btn.dataset.tab));
+    btn.addEventListener("click", () => {
+      showTab(btn.dataset.tab);
+    });
   });
 
   /* =========================
      ABRIR MODAL
   ========================= */
+
   appsList.addEventListener("click", async (e) => {
     const appBtn = e.target.closest(".app-item");
     if (!appBtn) return;
@@ -58,30 +72,29 @@ document.addEventListener("DOMContentLoaded", () => {
     window.currentAppId = appId;
 
     try {
-      const res = await fetch(`/account/apps/${appId}`);
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Error al cargar la app:", text);
-        alert("No se pudo cargar la app");
-        return;
-      }
-
+      const res = await fetch(`/account/get_app/${appId}`);
       const data = await res.json();
+
       if (!data.success) {
-        alert(data.message || "No se pudo cargar la app");
+        alert("No se pudo cargar la app");
         return;
       }
 
       const app = data.app;
 
-      // Rellenar datos
-      if (modalLogoImg) modalLogoImg.src = app.image_url || "/static/images/app-placeholder.png";
+      /* ===== RELLENAR DATOS ===== */
+
+      if (modalLogoImg) {
+        modalLogoImg.src = app.image_url || "/static/images/app-placeholder.png";
+      }
+
       if (nameInput) nameInput.value = app.name || "";
       if (descriptionInput) descriptionInput.value = app.description || "";
       if (dateInput) dateInput.value = app.creation_date || "";
       if (themeInput) themeInput.value = app.theme || "General";
 
-      // Reviews
+      /* ===== REVIEWS ===== */
+
       if (starsEl && reviewsCountEl) {
         const rating = Math.round(app.rating || 0);
         starsEl.textContent = "⭐".repeat(rating) + "☆".repeat(5 - rating);
@@ -96,10 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
           div.innerHTML = `
             <div class="review-header">
               <div class="review-user-info">
-                <div class="review-avatar">${(r.username || "?")[0]}</div>
+                <div class="review-avatar">${(r.user_name || "?")[0]}</div>
                 <div class="review-user-details">
-                  <div class="review-username">${r.username || "Usuario"}</div>
-                  <div class="review-date">${r.created_at || ""}</div>
+                  <div class="review-username">${r.user_name || "Usuario"}</div>
+                  <div class="review-date">${r.date || ""}</div>
                 </div>
               </div>
               <div class="review-rating">
@@ -112,7 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // Comunidades
+      /* ===== COMUNIDADES ===== */
+
       if (communitiesList) {
         communitiesList.innerHTML = "";
         (app.communities || []).forEach(c => {
@@ -121,6 +135,8 @@ document.addEventListener("DOMContentLoaded", () => {
           communitiesList.appendChild(li);
         });
       }
+
+      /* ===== MOSTRAR MODAL ===== */
 
       showTab("reviews");
       appDetailModal.classList.remove("hidden");
@@ -134,20 +150,16 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      TEAM MEMBERS
   ========================= */
+
   async function loadTeamMembers(appId) {
     if (!teamList) return;
+
     teamList.innerHTML = "Cargando equipo...";
 
     try {
       const res = await fetch(`/apps/${appId}/team`);
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Error al cargar equipo:", text);
-        teamList.innerHTML = "<p>Error al cargar el equipo</p>";
-        return;
-      }
-
       const team = await res.json();
+
       teamList.innerHTML = "";
 
       if (!team.length) {
@@ -157,8 +169,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       team.forEach(m => {
         const socials = Object.entries(m.socials || {})
-          .map(([k, v]) => `<a href="${v}" target="_blank" class="social-badge ${k}">@${k}</a>`)
-          .join("");
+          .map(([k, v]) => `
+            <a href="${v}" target="_blank" class="social-badge ${k}">
+              @${k}
+            </a>
+          `).join("");
 
         const card = document.createElement("div");
         card.className = "team-member-card";
@@ -184,11 +199,14 @@ document.addEventListener("DOMContentLoaded", () => {
   /* =========================
      CERRAR MODAL
   ========================= */
+
   closeAppDetail?.addEventListener("click", () => {
     appDetailModal.classList.add("hidden");
   });
 
   appDetailModal.addEventListener("click", (e) => {
-    if (e.target === appDetailModal) appDetailModal.classList.add("hidden");
+    if (e.target === appDetailModal) {
+      appDetailModal.classList.add("hidden");
+    }
   });
 });
