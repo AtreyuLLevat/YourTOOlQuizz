@@ -452,70 +452,82 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      EDITAR MIEMBRO DEL EQUIPO
   ====================================================== */
-  async function editTeamMember(memberId, currentRole) {
-    const newRole = prompt('Nuevo rol del miembro:', currentRole || '');
-    
-    if (newRole === null || newRole === currentRole) return;
-    
-    try {
-      const res = await fetch(`/account/team_member/${memberId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole })
-      });
-      
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Error al actualizar');
+// Agrega estas funciones después de renderTeamMembers()
 
-      if (currentApp && currentApp.team_members) {
-        const member = currentApp.team_members.find(m => m.id === memberId);
-        if (member) {
-          member.role = newRole;
-          renderTeamMembers();
+function editTeamMember(memberId, currentRole) {
+  const newRole = prompt("Ingrese el nuevo rol:", currentRole);
+  
+  if (newRole && newRole.trim() !== currentRole) {
+    fetch(`/account/team_member/${memberId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: newRole.trim() })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Actualizar UI sin recargar todo
+        const card = document.querySelector(`[data-member-id="${memberId}"]`);
+        if (card) {
+          const roleElem = card.querySelector('.team-role');
+          if (roleElem) roleElem.textContent = newRole;
+          
+          const editBtn = card.querySelector('.edit-member-btn');
+          if (editBtn) editBtn.dataset.role = newRole;
         }
+        
+        // Actualizar estado local
+        const member = currentApp.team_members.find(m => m.id === parseInt(memberId));
+        if (member) member.role = newRole;
+        
+        showSuccess('Rol actualizado correctamente');
+      } else {
+        showError(data.message || 'Error al actualizar el rol');
       }
-      
-      showSuccess('Rol actualizado correctamente');
-      
-    } catch (error) {
-      console.error('❌ Error actualizando miembro:', error);
-      showError('No se pudo actualizar el rol: ' + error.message);
-    }
+    })
+    .catch(err => {
+      console.error('Error en editTeamMember:', err);
+      showError('Error de red al actualizar el rol');
+    });
   }
+}
 
-  /* ======================================================
-     ELIMINAR MIEMBRO DEL EQUIPO
-  ====================================================== */
-  async function removeTeamMember(memberId, memberName) {
-    if (!confirm(`¿Eliminar a ${memberName} del equipo?`)) {
-      return;
-    }
-
-    try {
-      const res = await fetch(`/account/team_member/${memberId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      
-      const data = await res.json();
-      if (!data.success) throw new Error(data.message || 'Error al eliminar');
-
-      if (currentApp && currentApp.team_members) {
-        currentApp.team_members = currentApp.team_members.filter(m => m.id !== memberId);
-        renderTeamMembers();
+function removeTeamMember(memberId, memberName) {
+  if (confirm(`¿Estás seguro de eliminar a ${memberName || 'este miembro'} del equipo?`)) {
+    fetch(`/account/team_member/${memberId}`, {
+      method: 'DELETE'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Remover de la UI
+        const card = document.querySelector(`[data-member-id="${memberId}"]`);
+        if (card) card.remove();
+        
+        // Actualizar estado local
+        currentApp.team_members = currentApp.team_members.filter(m => m.id !== parseInt(memberId));
+        
+        if (currentApp.team_members.length === 0) {
+          renderTeamMembers();  // Re-render si no quedan miembros
+        }
+        
+        showSuccess('Miembro eliminado correctamente');
+      } else {
+        showError(data.message || 'Error al eliminar el miembro');
       }
-      
-      showSuccess('Miembro eliminado del equipo');
-      
-    } catch (error) {
-      console.error('❌ Error eliminando miembro:', error);
-      showError('No se pudo eliminar el miembro: ' + error.message);
-    }
+    })
+    .catch(err => {
+      console.error('Error en removeTeamMember:', err);
+      showError('Error de red al eliminar el miembro');
+    });
   }
+}
 
   /* ======================================================
      RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTONES)
