@@ -431,67 +431,6 @@ def create_app():
     def homepage():
         return render_template('homepage.html')
 
-    @app.route("/account/get_app/<string:id>")
-    def get_app(id):
-        try:
-            uuid_obj = UUID(id, version=4)
-        except ValueError:
-            return jsonify({"success": False, "error": "ID inválido"}), 400
-
-        app_data = App.query.filter_by(id=uuid_obj).first()
-        if not app_data:
-            return jsonify({"success": False, "error": "App no encontrada"}), 404
-
-        # Asegurar que las reviews se cargan
-        reviews_data = Review.query.filter_by(app_id=app_data.id).order_by(Review.created_at.desc()).all()
-        reviews = []
-        for r in reviews_data:
-            username = r.user.name if r.user else "Anónimo"
-            reviews.append({
-                "id": str(r.id),  # 🔥 Añadido
-                "username": username, 
-                "content": r.content, 
-                "rating": r.rating,
-                "created_at": r.created_at.isoformat() if r.created_at else None
-            })
-
-
-        # Asegurar que los team members se cargan
-        team_members_data = TeamMember.query.filter_by(app_id=app_data.id).all()
-        team_members = []
-        for t in team_members_data:
-            team_members.append({
-                "name": t.name, 
-                "role": t.role, 
-                "avatar_url": t.avatar_url
-            })
-
-        # 🔥 CORRECCIÓN CLAVE: Asegurar que las comunidades se cargan correctamente
-        communities_data = Community.query.filter_by(app_id=app_data.id).all()
-        communities = []
-        for c in communities_data:
-            communities.append({
-                "id": str(c.id),  # 🔥 Asegurar que es string
-                "name": c.name,
-                "description": c.description,
-                "created_at": c.created_at.isoformat() if c.created_at else None
-            })
-
-        return jsonify({
-            "success": True,
-            "app": {
-                "id": str(app_data.id),
-                "name": app_data.name,
-                "description": app_data.description,
-                "creation_date": app_data.creation_date.isoformat() if app_data.creation_date else None,
-                "theme": app_data.theme,
-                "image_url": app_data.image_url or get_app_placeholder_url(),  # CORRECCIÓN
-                "reviews": reviews,
-                "team_members": team_members,
-                "communities": communities
-            }
-        })
-
 
 
 
@@ -884,22 +823,32 @@ def create_app():
             })
 
         return jsonify(data)
-
     @app.route("/account/update_app/<uuid:app_id>", methods=["POST"])
     @login_required
     def update_app(app_id):
         app = App.query.get_or_404(app_id)
         if app.owner_id != current_user.id:
             return jsonify({"success": False, "message": "No autorizado"}), 403
-        
-        data = request.json
+
+        data = request.json or {}
+
         app.name = data.get("name", app.name)
         app.description = data.get("description", app.description)
-        app.creation_date = data.get("creation_date", app.creation_date)
         app.theme = data.get("theme", app.theme)
-        db.session.commit()
-        
-        return jsonify({"success": True})
+
+        # 🔥 SOLO actualizar creation_date si es válida
+        creation_date = data.get("creation_date")
+        if creation_date:
+            app.creation_date = creation_date
+
+        try:
+            db.session.commit()
+            return jsonify({"success": True})
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Error update_app: {e}")
+            return jsonify({"success": False, "message": "Error al actualizar la app"}), 500
+
 
     @app.route("/account/update_app_image/<uuid:app_id>", methods=["POST"])
     @login_required
