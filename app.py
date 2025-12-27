@@ -1010,44 +1010,54 @@ def create_app():
             print(f"❌ Error eliminando app: {e}")
             return jsonify({"success": False, "message": f"Error interno: {str(e)}"}), 500
 
-    @app.route("/account/team_member/<uuid:member_id>", methods=["PUT", "DELETE"])
+    @app.route("/account/team_member/<int:member_id>", methods=["DELETE"])
     @login_required
-    def handle_team_member(member_id):
-        """Actualiza o elimina un miembro del equipo."""
-        member = TeamMember.query.get_or_404(member_id)
-        app = App.query.get_or_404(member.app_id)
-        
-        # Verificar que el usuario es el propietario de la app
-        if app.owner_id != current_user.id:
-            return jsonify({"success": False, "message": "No autorizado"}), 403
-        
-        if request.method == "PUT":
-            # Actualizar rol del miembro
-            data = request.json
-            new_role = data.get("role", "").strip()
+    def delete_team_member(member_id):
+        try:
+            member = TeamMember.query.get_or_404(member_id)
+            app = App.query.get_or_404(member.app_id)
             
-            if not new_role:
+            if app.owner_id != current_user.id:
+                return jsonify({"success": False, "message": "No tienes permiso para eliminar este miembro"}), 403
+            
+            db.session.delete(member)
+            db.session.commit()
+            
+            return jsonify({"success": True, "message": "Miembro eliminado correctamente"})
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error al eliminar miembro: {e}")
+            return jsonify({"success": False, "message": "Error interno al eliminar"}), 500
+
+    @app.route("/account/team_member/<int:member_id>", methods=["PATCH"])
+    @login_required
+    def update_team_member(member_id):
+        try:
+            member = TeamMember.query.get_or_404(member_id)
+            app = App.query.get_or_404(member.app_id)
+            
+            if app.owner_id != current_user.id:
+                return jsonify({"success": False, "message": "No tienes permiso para modificar este miembro"}), 403
+            
+            data = request.json
+            if "role" not in data or not data["role"].strip():
                 return jsonify({"success": False, "message": "El rol es obligatorio"}), 400
             
-            member.role = new_role
+            member.role = data["role"].strip()
             db.session.commit()
             
             return jsonify({
-                "success": True, 
-                "message": "Rol actualizado",
+                "success": True,
+                "message": "Rol actualizado correctamente",
                 "member": {
-                    "id": str(member.id),
-                    "name": member.name,
-                    "role": member.role,
-                    "avatar_url": member.avatar_url
+                    "id": member.id,
+                    "role": member.role
                 }
             })
-        
-        elif request.method == "DELETE":
-            # Eliminar miembro
-            db.session.delete(member)
-            db.session.commit()
-            return jsonify({"success": True, "message": "Miembro eliminado"})
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error al actualizar miembro: {e}")
+            return jsonify({"success": False, "message": "Error interno al actualizar"}), 500
 
     @app.route("/account/apps/<uuid:app_id>", methods=["GET"])
     @login_required
