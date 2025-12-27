@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.currentAppId = appId;
 
     try {
-      const res = await fetch(`/account/get_app/${appId}`);
+      const res = await fetch(`/account/apps/${appId}`);
       const data = await res.json();
 
       if (!data.success) {
