@@ -1,0 +1,1687 @@
+{% extends "base.html" %}
+{% block title %}Centro de Cuenta | YourToolQuizz{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --text: #1e293b;
+  --muted: #64748b;
+  --danger: #dc2626;
+  --radius: 10px;
+  --shadow: 0 2px 6px rgba(0,0,0,0.04);
+  --sidebar-width: 220px;
+  --transition: all 0.2s ease;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* === ESTRUCTURA GENERAL DEL ÁREA PRINCIPAL === */
+.dashboard-container {
+  display: flex;
+  height: calc(100vh - 120px);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--card-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.sidebar .menu-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 6px;
+  transition: var(--transition);
+}
+
+.sidebar .menu-item:hover,
+.sidebar .menu-item.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* === CONTENIDO PRINCIPAL === */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 40px 60px;
+  box-sizing: border-box;
+}
+
+.content-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* === TITULOS Y TEXTOS === */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+/* === SECCIONES === */
+.section {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px 32px;
+  box-shadow: var(--shadow);
+}
+
+.section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--text);
+}
+
+.section p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* === CAMPOS === */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+input:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+/* === BOTONES === */
+.btn {
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn.danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn.danger:hover {
+  background: #b91c1c;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+/* === BOTÓN DE SALIDA === */
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition);
+  margin-top: 30px;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+/* === CHECKBOX === */
+input[type="checkbox"] {
+  transform: scale(1.1);
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+/* === ENLACES === */
+.link-hover {
+  color: var(--primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.link-hover:hover {
+  text-decoration: underline;
+}
+
+/* === CLASE PARA OCULTAR ELEMENTOS === */
+.hidden {
+  display: none !important;
+}
+
+/* === MODAL === */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: var(--radius);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.modal-btn.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.modal-btn.secondary {
+  background: #f1f5f9;
+  color: var(--text);
+}
+
+.modal-btn.danger {
+  background: var(--danger);
+  color: white;
+}
+
+/* === SCROLL === */
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+.main::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.main::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .sidebar {
+    display: none;
+  }
+  .main {
+    padding: 24px;
+  }
+  .content-inner {
+    max-width: 100%;
+    gap: 32px;
+  }
+}
+
+/* Apps - cabecera */
+.apps-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Lista de apps */
+.apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Cada app como botón completo */
+.app-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.app-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Imagen de la app */
+.app-img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* Nombre de la app */
+.app-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+#createAppForm textarea,
+#createAppForm select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition);
+}
+
+#createAppForm textarea:focus,
+#createAppForm select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+/* Modal base */
+.modal-backdrop.hidden { 
+  display: none; 
+}
+
+/* Modal de detalle de app - TAMAÑO FIJO */
+.modal-content.large {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* Contenedor principal de pestañas */
+.app-tabs-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
+}
+
+/* Pestañas */
+.app-tabs {
+  display: flex;
+  gap: 10px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tab-btn {
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  margin-bottom: -1px;
+  background: transparent;
+  color: #64748b;
+  border-radius: 0;
+  padding: 14px 18px;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  background: transparent;
+  border-bottom: 2px solid #2563eb;
+}
+
+/* Contenedor del contenido de las pestañas */
+.tab-content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Cada pestaña - tamaño fijo con scroll */
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 20px;
+  background: transparent;
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+/* Información básica */
+.app-basic {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.app-logo {
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+}
+
+.app-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.app-info h2, .app-info p {
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-info h2 {
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  z-index: 10;
+}
+
+.close-btn:hover {
+  color: #dc2626;
+}
+
+/* Estilos para reviews */
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Contenedor de reviews actualizado */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 4px 20px 4px;
+}
+
+/* Tarjeta de review moderna */
+.review-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fafcff 100%);
+  border-radius: 14px;
+  border: 1px solid #e5e9f2;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(37, 99, 235, 0.12),
+    0 3px 10px rgba(37, 99, 235, 0.06);
+  border-color: #c7d2fe;
+}
+
+/* Header de la review */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.review-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.review-user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-username {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 15px;
+}
+
+.review-date {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Estrellas de rating */
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid #fbbf24;
+}
+
+.star-icon {
+  color: #f59e0b;
+  font-size: 16px;
+}
+
+.rating-value {
+  font-weight: 700;
+  color: #92400e;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+/* Contenido de la review */
+.review-content {
+  color: #334155;
+  line-height: 1.6;
+  font-size: 14.5px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: all 0.2s ease;
+}
+
+/* Indicador de estado (opcional) */
+.review-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 6px 14px;
+  border-radius: 0 14px 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.review-status.positive {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: white;
+}
+
+.review-status.neutral {
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+  color: white;
+}
+
+.review-status.negative {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  color: white;
+}
+
+/* Animación de entrada */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.review-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Variantes de color según rating */
+.review-card[data-rating="5"] {
+  border-left: 4px solid #10b981;
+}
+
+.review-card[data-rating="4"] {
+  border-left: 4px solid #3b82f6;
+}
+
+.review-card[data-rating="3"] {
+  border-left: 4px solid #f59e0b;
+}
+
+.review-card[data-rating="1"],
+.review-card[data-rating="2"] {
+  border-left: 4px solid #ef4444;
+}
+
+/* Mensaje cuando no hay reviews */
+.no-reviews-message {
+  text-align: center;
+  padding: 60px 40px;
+  color: #64748b;
+}
+
+.no-reviews-message .icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-reviews-message h3 {
+  color: #475569;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.no-reviews-message p {
+  max-width: 300px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Estilos para comunidades */
+#communities {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.community-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.community-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.community-card-container {
+  list-style: none;
+}
+
+.community-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  color: #000000 !important;
+  text-decoration: none !important;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+}
+
+.community-card:hover {
+  transform: translateY(-1px);
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.community-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.community-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.community-card-meta {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.community-card-arrow {
+  font-size: 20px;
+  color: #374151;
+  font-weight: 300;
+  margin-left: 16px;
+  transition: transform 0.2s ease;
+}
+
+.community-card:hover .community-card-arrow {
+  transform: translateX(4px);
+}
+
+/* Formulario para añadir comunidad */
+#addCommunityForm {
+  margin-top: 10px;
+  padding: 15px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+#communityNameInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-small.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-small.secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.btn-small.danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-small.danger:hover {
+  background: #b91c1c;
+}
+
+/* Botón añadir comunidad */
+#addCommunityBtn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+#addCommunityBtn:hover {
+  background: #1d4ed8;
+}
+
+/* Scrollbar personalizado para las pestañas */
+.tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Estado cuando no hay contenido */
+.no-communities {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* Modal crear app */
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: var(--radius);
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.team-member-entry {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.team-member-entry input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.remove-member-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.remove-member-btn:hover {
+  background: #b91c1c;
+}
+
+.community-header,
+.reviews-summary {
+  border-bottom: none;
+  margin-bottom: 12px;
+}
+
+/* Estilos para resultados de búsqueda */
+.user-search-result:hover {
+  background: #f1f5f9;
+}
+
+.user-search-result {
+  transition: background 0.2s ease;
+}
+
+/* Ocultar resultados cuando no sea necesario */
+#userSearchResults:empty {
+  display: none !important;
+}
+
+/* Estilos para foto de perfil */
+#foto-perfil img {
+  transition: all 0.3s ease;
+}
+
+#foto-perfil img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+/* Modal específico para avatar */
+#avatarSetupModal .modal-content {
+  max-width: 500px;
+  text-align: center;
+}
+
+#avatarSetupModal .modal-buttons {
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* Estilos para enlaces de redes sociales en inputs */
+#socials input[type="url"] {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+#socials input[type="url"]:focus {
+  background: white;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Badges para redes sociales en tarjetas de equipo */
+.social-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.social-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+.social-badge.twitter {
+  background: rgba(29, 161, 242, 0.1);
+  color: #1da1f2;
+  border: 1px solid rgba(29, 161, 242, 0.3);
+}
+
+.social-badge.linkedin {
+  background: rgba(0, 119, 181, 0.1);
+  color: #0077b5;
+  border: 1px solid rgba(0, 119, 181, 0.3);
+}
+
+.social-badge.github {
+  background: rgba(51, 51, 51, 0.1);
+  color: #333;
+  border: 1px solid rgba(51, 51, 51, 0.3);
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.team-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 4px 20px 4px;
+}
+
+.team-member-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fafcff 100%);
+  border-radius: 14px;
+  border: 1px solid #e5e9f2;
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.team-member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.12), 0 3px 10px rgba(37, 99, 235, 0.06);
+  border-color: #c7d2fe;
+}
+
+.team-member-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.team-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.team-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.team-role {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.team-socials {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.team-socials a {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.team-socials a:hover {
+  text-decoration: underline;
+}
+
+/* Estilos para campos editables */
+.editable-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition);
+}
+
+.editable-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+.team-member-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Acciones para eliminar app */
+.app-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.app-danger-zone {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.app-danger-zone h4 {
+  color: #dc2626;
+  margin-bottom: 10px;
+}
+
+.app-danger-zone p {
+  color: #7f1d1d;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h3>Menú</h3>
+    <div class="menu-item active" data-target="configuracion">Configuración</div>
+    <div class="menu-item" data-target="apps">Apps</div>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="main">
+    <div class="content-inner">
+
+      <!-- CONFIGURACIÓN -->
+      <div id="configuracion">
+        <h1>Centro de Cuenta</h1>
+        <div class="sub">Administra tu información personal, seguridad y preferencias de privacidad.</div>
+
+        <!-- Perfil general -->
+        <section class="section" id="perfil">
+          <h2>Perfil general</h2>
+          <p>Tu información personal se usa para gestionar tu cuenta y ofrecerte una mejor experiencia.</p>
+
+          <div class="field">
+            <label for="name">Nombre</label>
+            <input id="name" type="text" value="{{ usuario.name or usuario.email.split('@')[0] }}">
+          </div>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <input id="email" type="email" value="{{ usuario.email }}">
+          </div>
+          <div class="actions">
+            <button class="btn primary hidden" id="saveProfile">Guardar cambios</button>
+          </div>
+        </section>
+
+        <!-- Foto de perfil -->
+        <section class="section" id="foto-perfil">
+          <h2>Foto de perfil</h2>
+          <p>Personaliza tu cuenta con una foto de perfil.</p>
+          
+          <div class="field" style="display: flex; align-items: center; gap: 20px;">
+            <div style="text-align: center;">
+              <img id="avatarPreview" 
+                   src="{{ usuario.avatar_url }}"
+                   style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0;"
+                   alt="Foto de perfil">
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+              <button type="button" id="uploadAvatarBtn" class="btn primary">
+                Cambiar foto
+              </button>
+              <button type="button" id="removeAvatarBtn" class="btn secondary">
+                Eliminar foto
+              </button>
+              <p style="font-size: 0.85rem; color: var(--muted);">
+                Formato recomendado: JPG o PNG, máximo 5MB
+              </p>
+            </div>
+          </div>
+          
+          <div id="avatarFeedback" style="margin-top: 10px; display: none;"></div>
+        </section>
+
+        <!-- Redes Sociales -->
+        <section class="section" id="socials">
+          <h2>Redes Sociales</h2>
+          <p>Conecta tus perfiles sociales para enriquecer tu perfil y facilitar la colaboración.</p>
+          
+          <div class="field">
+            <label for="twitter">Twitter / X</label>
+            <input id="twitter" type="url" 
+                   placeholder="https://twitter.com/tu_usuario"
+                   value="{{ usuario.socials.twitter if usuario.socials and usuario.socials.twitter else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://twitter.com/tu_usuario o @tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="linkedin">LinkedIn</label>
+            <input id="linkedin" type="url" 
+                   placeholder="https://linkedin.com/in/tu_usuario"
+                   value="{{ usuario.socials.linkedin if usuario.socials and usuario.socials.linkedin else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://linkedin.com/in/tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="github">GitHub</label>
+            <input id="github" type="url" 
+                   placeholder="https://github.com/tu_usuario"
+                   value="{{ usuario.socials.github if usuario.socials and usuario.socials.github else '' }}">
+            <small style="color: var(--muted); font-size: 0.85rem;">
+              Ejemplo: https://github.com/tu_usuario
+            </small>
+          </div>
+          
+          <div class="field">
+            <label for="website">Sitio Web Personal</label>
+            <input id="website" type="url" 
+                   placeholder="https://tusitio.com"
+                   value="{{ usuario.socials.website if usuario.socials and usuario.socials.website else '' }}">
+          </div>
+          
+          <div class="actions">
+            <button class="btn primary hidden" id="saveSocials">Guardar Redes Sociales</button>
+          </div>
+          
+          <div id="socialsFeedback" style="margin-top: 10px; display: none;"></div>
+        </section>
+
+        <!-- Seguridad -->
+        <section class="section">
+          <h2>Seguridad y Contraseña</h2>
+          <p>Protege tu cuenta cambiando tu contraseña o activando la verificación en dos pasos.</p>
+          <form id="changePasswordForm">
+            <div class="field">
+              <label for="current_password">Contraseña actual</label>
+              <input id="current_password" type="password" required>
+            </div>
+            <div class="field">
+              <label for="new_password">Nueva contraseña</label>
+              <input id="new_password" type="password" required>
+            </div>
+            <div class="field">
+              <label for="confirm_password">Confirmar nueva contraseña</label>
+              <input id="confirm_password" type="password" required>
+            </div>
+            <div class="actions">
+              <button type="submit" class="btn primary">Actualizar contraseña</button>
+            </div>
+          </form>
+          <div id="passwordFeedback" style="margin-top:10px;color:green;display:none;"></div>
+        </section>
+
+        <!-- Notificaciones -->
+        <section class="section" id="notificaciones">
+          <h2>Notificaciones</h2>
+          <p>Elige los tipos de notificaciones que deseas recibir.</p>
+          <div class="field">
+            <label><input type="checkbox" checked id="newsletters"> Boletines informativos</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="reminders"> Recordatorios de actividades</label>
+          </div>
+          <div class="field">
+            <label><input type="checkbox" id="offers"> Ofertas y novedades</label>
+          </div>
+          <div class="actions">
+            <button class="btn primary hidden" id="saveNotifications">Guardar Notificaciones</button>
+          </div>
+          <div id="notifMessage" class="notif-message" style="display:none;"></div>
+        </section>
+
+        <!-- Menú publicitario -->
+        <section class="section" id="privacidad">
+          <h2>Menú publicitario</h2>
+          <p>Controla tus servicios contratados en este menú.</p>
+          <div class="actions">
+            <a href="" class="btn primary" style="text-decoration: none;">Acceder al menú</a>
+          </div>
+        </section>
+
+        <!-- Cerrar sesión -->
+        <form action="{{ url_for('logout') }}" method="GET">
+          <button type="submit" class="logout-btn">Cerrar sesión</button>
+        </form>
+      </div>
+
+      <!-- APPS -->
+      <div id="apps" class="hidden">
+        <div class="apps-header">
+          <h1>Apps</h1>
+          <div class="actions" style="justify-content:flex-end;margin-bottom:20px;">
+            <button id="newAppBtn" class="btn primary">Nueva App</button>
+          </div>
+        </div>
+        <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
+
+        <div id="appsList" class="apps-list">
+          {% if apps %}
+            {% for app in apps %}
+              <!-- Convierte app.id a string -->
+              <button class="app-item" data-app-id="{{ app.id|string }}">
+                <img src="{{ app.image_url }}" class="app-img">
+                <span class="app-name">{{ app.name }}</span>
+              </button>
+            {% endfor %}
+          {% else %}
+            <p>No tienes aplicaciones creadas.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Detalle App - TAMAÑO FIJO CON SCROLL -->
+<div id="appDetailModal" class="modal-backdrop hidden">
+  <div class="modal-content large">
+    <button id="closeAppDetail" class="close-btn">&times;</button>
+
+    <!-- Información básica editable -->
+    <div class="app-basic">
+      <div class="app-logo">
+        <img id="app-logo" src="" alt="Logo App">
+        <input type="file" id="app-logo-input" accept="image/*" style="display: none;">
+        <button id="change-logo-btn" class="btn-small secondary" style="margin-top: 8px;">Cambiar Logo</button>
+      </div>
+      <div class="app-info">
+        <h2>
+          <input id="app-name-input" class="editable-input" type="text" value="">
+        </h2>
+        <p>
+          <textarea id="app-description-input" class="editable-input" rows="3"></textarea>
+        </p>
+        <p>
+          Fecha: <input id="app-date-input" class="editable-input" type="date" value="">
+        </p>
+        <p>
+          Tema: 
+          <select id="app-theme-input" class="editable-input">
+            <option value="General">General</option>
+            <option value="Productividad">Productividad</option>
+            <option value="Desarrollo">Desarrollo</option>
+            <option value="Diseño">Diseño</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Redes Sociales">Redes Sociales</option>
+            <option value="Educación">Educación</option>
+            <option value="Entretenimiento">Entretenimiento</option>
+            <option value="Salud">Salud</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </p>
+        <div class="actions">
+          <button id="save-app-changes" class="btn primary">Guardar Cambios</button>
+          <div id="delete-app-btn-container" style="margin-left: 10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor principal de pestañas -->
+    <div class="app-tabs-container">
+      <!-- Pestañas -->
+      <div class="app-tabs">
+        <button class="tab-btn active" data-tab="reviews">Reseñas</button>
+        <button class="tab-btn" data-tab="communities">Comunidades</button>
+        <button class="tab-btn" data-tab="team">Equipo</button>
+      </div>
+
+      <!-- Contenedor del contenido de las pestañas -->
+      <div class="tab-content-container">
+        <!-- Pestaña Reviews -->
+  <div class="tab-content hidden" id="reviews">
+
+          <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Gestión de reseñas</h3>
+
+          <div class="reviews-summary">
+            <span class="stars"></span>
+            <span class="reviews-count"></span>
+          </div>
+
+          <div id="reviews-list" class="reviews-list"></div>
+        </div>
+
+        <!-- Pestaña Communities -->
+        <div class="tab-content hidden" id="communities">
+          <div class="community-header">
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Comunidades</h3>
+            <button id="addCommunityBtn" class="btn-small primary">+ Añadir</button>
+          </div>
+
+          <div id="addCommunityForm" class="hidden">
+            <input
+              type="text"
+              id="communityNameInput"
+              placeholder="Nombre de la comunidad"
+            >
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+              <button id="saveCommunityBtn" class="btn-small primary">
+                Crear
+              </button>
+              <button id="cancelCommunityBtn" class="btn-small secondary">
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <ul class="community-list">
+            <!-- Las comunidades se cargarán aquí -->
+          </ul>
+        </div>
+
+        <!-- Pestaña Team -->
+        <div class="tab-content hidden" id="team">
+          <div class="team-header">
+            <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Miembros del Equipo</h3>
+          </div>
+          <div id="team-members-list" class="team-members-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear App -->
+<div id="createAppModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <h3>Crear Nueva App</h3>
+    <form id="createAppForm" method="POST" enctype="multipart/form-data">
+      <div class="field">
+        <label for="appName">Nombre</label>
+        <input id="appName" name="appName" type="text" required autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="appDescription">Descripción</label>
+        <textarea id="appDescription" name="appDescription" rows="3" required autocomplete="off"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="appImage">Foto de la App</label>
+        <input id="appImage" name="appImage" type="file" accept="image/*">
+      </div>
+
+      <div class="field">
+        <label>Equipo / Miembros</label>
+        <div class="team-search-container">
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input 
+              type="text" 
+              id="userSearch" 
+              placeholder="Buscar usuario por nombre o email" 
+              style="flex: 1;"
+            >
+            <select id="userRole">
+              <option value="Desarrollador">Desarrollador</option>
+              <option value="Diseñador">Diseñador</option>
+              <option value="Manager">Manager</option>
+              <option value="Tester">Tester</option>
+              <option value="Soporte">Soporte</option>
+              <option value="Otro">Otro</option>
+            </select>
+            <button type="button" id="addUserBtn">Agregar</button>
+          </div>
+          <div id="userSearchResults" style="border: 1px solid #ccc; border-radius: 4px; max-height: 150px; overflow-y: auto; display: none;"></div>
+        </div>
+
+        <div id="team-members-container">
+          <!-- Aquí se agregarán los miembros seleccionados -->
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="appTheme">Tema</label>
+        <select id="appTheme" name="appTheme" required>
+          <option value="">Selecciona un tema</option>
+          <option value="General">General</option>
+          <option value="Productividad">Productividad</option>
+          <option value="Desarrollo">Desarrollo</option>
+          <option value="Diseño">Diseño</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Redes Sociales">Redes Sociales</option>
+          <option value="Educación">Educación</option>
+          <option value="Entretenimiento">Entretenimiento</option>
+          <option value="Salud">Salud</option>
+          <option value="Finanzas">Finanzas</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="appCreationDate">Fecha de creación</label>
+        <input id="appCreationDate" name="appCreationDate" type="date" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="appStatus">Estado</label>
+        <select id="appStatus" name="appStatus">
+          <option value="desarrollo">En desarrollo</option>
+          <option value="finalizada">Finalizada</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="appOfficialId">Identificación / Propiedad</label>
+        <input id="appOfficialId" name="appOfficialId" type="text" autocomplete="off">
+      </div>
+
+      <div class="modal-buttons">
+        <button type="submit" class="modal-btn primary">Guardar</button>
+        <button type="button" id="cancelAppBtn" class="modal-btn secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal sin guardar -->
+<div id="unsavedModal" class="modal-backdrop hidden">
+  <div class="modal-content">
+    <h3>⚠️ Cambios sin guardar</h3>
+    <p>¿Deseas guardar tus cambios antes de salir?</p>
+    <div class="modal-buttons">
+      <button id="modalSave" class="modal-btn primary">Guardar</button>
+      <button id="modalDiscard" class="modal-btn secondary">Descartar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para foto de perfil (para nuevos usuarios) -->
+<div id="avatarSetupModal" class="modal-backdrop {{ 'hidden' if usuario.avatar_url else '' }}">
+  <div class="modal-content">
+    <h3>¡Bienvenido a YourToolQuizz! 👋</h3>
+    <p style="margin-bottom: 20px;">Para personalizar tu experiencia, añade una foto de perfil.</p>
+    
+    <div style="text-align: center; margin: 25px 0;">
+      <img id="avatarModalPreview" 
+          src="{{ usuario.avatar_url }}"
+           style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #2563eb; margin-bottom: 15px;">
+      
+      <div style="margin-top: 15px;">
+        <input type="file" id="avatarModalInput" accept="image/*" style="display: none;">
+        <button type="button" id="avatarModalChooseBtn" class="btn primary">
+          Elegir foto
+        </button>
+      </div>
+    </div>
+    
+    <p style="text-align: center; color: var(--muted); font-size: 0.9rem;">
+      Puedes omitir este paso y hacerlo más tarde desde tu cuenta.
+    </p>
+    
+    <div class="modal-buttons">
+      <button id="skipAvatarBtn" class="modal-btn secondary">
+        Omitir por ahora
+      </button>
+      <button id="saveAvatarModalBtn" class="modal-btn primary">
+        Guardar foto
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pasar usuario actual a JavaScript -->
+<script>
+  window.currentUserData = {{ {
+    "id": current_user.id,
+    "name": current_user.name,
+    "email": current_user.email,
+    "avatar_url": current_user.avatar_url,
+    "role": current_user.role
+  } | tojson }};
+  
+  console.log("👤 Usuario actual cargado:", window.currentUserData);
+</script>
+
+
+<!-- Scripts de funcionalidades -->
+<script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/notifications.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/modal.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
+<script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
+
+<!-- Scripts para navegación y modales -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const menuItems = document.querySelectorAll('.sidebar .menu-item');
+  const sections = {
+    configuracion: document.getElementById('configuracion'),
+    apps: document.getElementById('apps')
+  };
+
+  function changeSection(targetId) {
+    Object.values(sections).forEach(section => {
+      if (section) section.classList.add('hidden');
+    });
+
+    if (sections[targetId]) {
+      sections[targetId].classList.remove('hidden');
+    }
+
+    menuItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.dataset.target === targetId) item.classList.add('active');
+    });
+  }
+
+  menuItems.forEach(item =>
+    item.addEventListener('click', () => changeSection(item.dataset.target))
+  );
+
+  changeSection('configuracion');
+
+  // Script para crear app modal
+  const newAppBtn = document.getElementById('newAppBtn');
+  const createAppModal = document.getElementById('createAppModal');
+  const cancelAppBtn = document.getElementById('cancelAppBtn');
+
+  newAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.remove('hidden');
+  });
+
+  cancelAppBtn?.addEventListener('click', () => {
+    createAppModal.classList.add('hidden');
+  });
+
+  createAppModal?.addEventListener('click', (e) => {
+    if (e.target === createAppModal) createAppModal.classList.add('hidden');
+  });
+});
+</script>
+{% endblock %}
