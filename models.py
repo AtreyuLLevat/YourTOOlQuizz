@@ -182,6 +182,16 @@ class TeamMember(db.Model):
     user = db.relationship("User", foreign_keys=[user_id])
     app = db.relationship("App", back_populates="team_members")
     
+    @property
+    def socials(self):
+        """Return socials from the associated User if exists, otherwise empty dict."""
+        if self.user:
+            return self.user.socials or {}
+        return {}
+    
+    def __repr__(self):
+        return f"<TeamMember {self.name} ({self.role})>"
+    
 class Review(db.Model):
     __tablename__ = "reviews"
     
