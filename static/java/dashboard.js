@@ -325,39 +325,39 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ======================================================
      FETCH APP - MEJORADO CON MANEJO DE ERRORES
   ====================================================== */
-  async function fetchAppData(appId) {
+async function fetchAppData(appId) {
     console.log(`🔍 Solicitando datos para app ID: ${appId}`);
     
     if (!appId || appId === 'undefined' || appId === 'null') {
-      throw new Error('ID de aplicación no válido');
+        throw new Error('ID de aplicación no válido');
     }
     
     try {
-      const response = await fetch(`/account/get_app/${appId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      
-      if (!data.success) {
-        throw new Error(data.error || 'Error al obtener datos de la app');
-      }
-      
-      // Asegurar arrays
-      data.app.reviews = data.app.reviews || [];
-      data.app.communities = data.app.communities || [];
-      data.app.team_members = data.app.team_members || [];
-      
-      console.log('✅ Datos de app obtenidos:', data.app.name);
-      return data.app;
-      
+        const response = await fetch(`/account/apps/${appId}`);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Error al obtener datos de la app');
+        }
+        
+        // Asegurar arrays
+        data.app.reviews = data.app.reviews || [];
+        data.app.communities = data.app.communities || [];
+        data.app.team_members = data.app.team_members || [];
+        
+        console.log('✅ Datos de app obtenidos:', data.app.name);
+        return data.app;
+        
     } catch (error) {
-      console.error('❌ Error en fetchAppData:', error);
-      throw error;
+        console.error('❌ Error en fetchAppData:', error);
+        throw error;
     }
-  }
+}
 
   /* ======================================================
      ABRIR MODAL APP - VERSIÓN MEJORADA
@@ -1001,6 +1001,256 @@ function updateAppBasicInfo() {
       window.currentApp = null;
     }
   });
+  // ====== FUNCIONES NUEVAS PARA ELIMINAR Y EDITAR ======
+
+/**
+ * Elimina una aplicación
+ */
+async function deleteApp(appId) {
+    if (!confirm('¿Estás seguro de eliminar esta aplicación? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`/account/delete_app/${appId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Error al eliminar');
+
+        // Eliminar de la lista
+        const appButton = document.querySelector(`.app-item[data-app-id="${appId}"]`);
+        if (appButton) appButton.remove();
+        
+        // Cerrar modal si está abierto
+        if (appDetailModal) {
+            appDetailModal.classList.add('hidden');
+            currentApp = null;
+            window.currentApp = null;
+        }
+        
+        showSuccess('Aplicación eliminada correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error eliminando app:', error);
+        showError('No se pudo eliminar la aplicación: ' + error.message);
+    }
+}
+
+/**
+ * Edita el rol de un miembro del equipo
+ */
+async function editTeamMember(memberId, currentRole) {
+    const newRole = prompt('Nuevo rol del miembro:', currentRole || '');
+    
+    if (newRole === null || newRole === currentRole) return; // Cancelado o sin cambios
+    
+    try {
+        const res = await fetch(`/account/team_member/${memberId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: newRole })
+        });
+        
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Error al actualizar');
+
+        // Actualizar en la app actual
+        if (currentApp && currentApp.team_members) {
+            const member = currentApp.team_members.find(m => m.id === memberId);
+            if (member) {
+                member.role = newRole;
+                renderTeamMembers();
+            }
+        }
+        
+        showSuccess('Rol actualizado correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error actualizando miembro:', error);
+        showError('No se pudo actualizar el rol: ' + error.message);
+    }
+}
+
+/**
+ * Elimina un miembro del equipo
+ */
+async function removeTeamMember(memberId, memberName) {
+    if (!confirm(`¿Eliminar a ${memberName} del equipo?`)) {
+        return;
+    }
+
+    try {
+        const res = await fetch(`/account/team_member/${memberId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || 'Error al eliminar');
+
+        // Actualizar en la app actual
+        if (currentApp && currentApp.team_members) {
+            currentApp.team_members = currentApp.team_members.filter(m => m.id !== memberId);
+            renderTeamMembers();
+        }
+        
+        showSuccess('Miembro eliminado del equipo');
+        
+    } catch (error) {
+        console.error('❌ Error eliminando miembro:', error);
+        showError('No se pudo eliminar el miembro: ' + error.message);
+    }
+}
+
+// ====== MODIFICAR RENDER TEAM MEMBERS PARA INCLUIR BOTONES ======
+
+function renderTeamMembers() {
+    console.log('🎯 Renderizando miembros del equipo...');
+    
+    const list = document.getElementById('team-members-list');
+    if (!list) {
+        console.error('❌ No se encontró #team-members-list');
+        return;
+    }
+    
+    list.innerHTML = '';
+    
+    if (!currentApp || !currentApp.team_members || currentApp.team_members.length === 0) {
+        console.log('ℹ️ No hay miembros en el equipo');
+        list.innerHTML = '<p>No hay miembros en el equipo.</p>';
+        return;
+    }
+    
+    console.log(`🔄 Renderizando ${currentApp.team_members.length} miembros`);
+    
+    currentApp.team_members.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'team-member-card';
+        card.dataset.memberId = member.id;
+        
+        let socialHtml = '';
+        if (member.socials) {
+            Object.entries(member.socials).forEach(([network, url]) => {
+                if (url) {
+                    const emoji = getSocialEmoji(network);
+                    socialHtml += `<a href="${url}" target="_blank" class="team-social-link ${network.toLowerCase()}">${emoji ? emoji + ' ' : ''}${network}</a> `;
+                }
+            });
+        }
+        
+        // Solo mostrar botones de edición si el usuario es el dueño de la app
+        const isOwner = currentApp.owner_id === (currentUser?.id || '');
+        const actionsHtml = isOwner ? `
+            <div class="team-member-actions">
+                <button class="btn-small edit-member-btn" data-member-id="${member.id}" data-role="${member.role || ''}">
+                    Editar
+                </button>
+                <button class="btn-small danger remove-member-btn" data-member-id="${member.id}" data-name="${member.name || ''}">
+                    Eliminar
+                </button>
+            </div>
+        ` : '';
+        
+        card.innerHTML = `
+            <div class="team-member-info">
+                <img src="${member.avatar_url || getDefaultAvatar()}" alt="${member.name}" class="team-avatar">
+                <div>
+                    <div class="team-name">${member.name || 'Sin nombre'}</div>
+                    <div class="team-role">${member.role || 'Sin rol'}</div>
+                    <div class="team-socials">${socialHtml}</div>
+                </div>
+            </div>
+            ${actionsHtml}
+        `;
+        
+        list.appendChild(card);
+    });
+    
+    // Agregar event listeners para los botones de edición/eliminación
+    list.querySelectorAll('.edit-member-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.dataset.memberId;
+            const currentRole = btn.dataset.role;
+            editTeamMember(memberId, currentRole);
+        });
+    });
+    
+    list.querySelectorAll('.remove-member-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.dataset.memberId;
+            const memberName = btn.dataset.name;
+            removeTeamMember(memberId, memberName);
+        });
+    });
+}
+
+// ====== AGREGAR BOTÓN DE ELIMINAR APP EN EL MODAL ======
+
+// En la función openAppDetail, después de actualizar la información básica:
+async function openAppDetail(appId) {
+    console.log(`📱 Abriendo app con ID: ${appId}`);
+    
+    // ... código existente ...
+    
+    // Después de llenar los datos de la app:
+    // Agregar botón de eliminar si el usuario es el dueño
+    const deleteBtnContainer = document.getElementById('delete-app-btn-container');
+    if (deleteBtnContainer) {
+        deleteBtnContainer.innerHTML = '';
+        
+        if (currentApp.owner_id === (currentUser?.id || '')) {
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn danger';
+            deleteBtn.id = 'delete-app-btn';
+            deleteBtn.textContent = 'Eliminar Aplicación';
+            deleteBtn.addEventListener('click', () => deleteApp(appId));
+            deleteBtnContainer.appendChild(deleteBtn);
+        }
+    }
+    
+    // ... resto del código existente ...
+}
+
+// ====== AGREGAR DETECCIÓN DE USUARIO ACTUAL ======
+// Necesitamos saber quién es el usuario actual para mostrar/ocultar botones
+
+let currentUser = null;
+
+// Al inicio del dashboard.js, después de cargar el DOM:
+document.addEventListener('DOMContentLoaded', () => {
+    // Obtener usuario actual (puedes obtenerlo de una variable global o hacer una petición)
+    try {
+        // Si el usuario está en una variable global
+        if (typeof window.currentUserData !== 'undefined') {
+            currentUser = window.currentUserData;
+        } else {
+            // O hacer una petición para obtener el usuario actual
+            fetch('/api/current_user')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        currentUser = data.user;
+                    }
+                })
+                .catch(console.error);
+        }
+    } catch (e) {
+        console.error('Error obteniendo usuario actual:', e);
+    }
+    
+    // ... resto del código existente ...
+});
 
   /* ======================================================
      DEBUGGING INICIAL

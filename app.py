@@ -975,6 +975,148 @@ def create_app():
             "success": True,
             "socials": current_user.socials or {}
         })
+    
+    # Añade estas rutas en app.py después de las rutas existentes de team members
+
+    @app.route("/account/delete_app/<uuid:app_id>", methods=["DELETE"])
+    @login_required
+    def delete_app(app_id):
+        """Elimina una aplicación y todos sus datos asociados."""
+        app = App.query.get_or_404(app_id)
+        
+        # Verificar que el usuario es el propietario
+        if app.owner_id != current_user.id:
+            return jsonify({"success": False, "message": "No autorizado"}), 403
+        
+        try:
+            # Eliminar en cascada: primero datos relacionados
+            Review.query.filter_by(app_id=app.id).delete()
+            TeamMember.query.filter_by(app_id=app.id).delete()
+            
+            # Eliminar comunidades y sus mensajes/miembros
+            communities = Community.query.filter_by(app_id=app.id).all()
+            for community in communities:
+                GroupMember.query.filter_by(community_id=community.id).delete()
+                GroupMessage.query.filter_by(community_id=community.id).delete()
+                db.session.delete(community)
+            
+            # Finalmente eliminar la app
+            db.session.delete(app)
+            db.session.commit()
+            
+            return jsonify({"success": True, "message": "Aplicación eliminada correctamente"})
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Error eliminando app: {e}")
+            return jsonify({"success": False, "message": f"Error interno: {str(e)}"}), 500
+
+    @app.route("/account/team_member/<uuid:member_id>", methods=["PUT", "DELETE"])
+    @login_required
+    def handle_team_member(member_id):
+        """Actualiza o elimina un miembro del equipo."""
+        member = TeamMember.query.get_or_404(member_id)
+        app = App.query.get_or_404(member.app_id)
+        
+        # Verificar que el usuario es el propietario de la app
+        if app.owner_id != current_user.id:
+            return jsonify({"success": False, "message": "No autorizado"}), 403
+        
+        if request.method == "PUT":
+            # Actualizar rol del miembro
+            data = request.json
+            new_role = data.get("role", "").strip()
+            
+            if not new_role:
+                return jsonify({"success": False, "message": "El rol es obligatorio"}), 400
+            
+            member.role = new_role
+            db.session.commit()
+            
+            return jsonify({
+                "success": True, 
+                "message": "Rol actualizado",
+                "member": {
+                    "id": str(member.id),
+                    "name": member.name,
+                    "role": member.role,
+                    "avatar_url": member.avatar_url
+                }
+            })
+        
+        elif request.method == "DELETE":
+            # Eliminar miembro
+            db.session.delete(member)
+            db.session.commit()
+            return jsonify({"success": True, "message": "Miembro eliminado"})
+
+    @app.route("/account/apps/<uuid:app_id>", methods=["GET"])
+    @login_required
+    def get_app_details(app_id):
+        """Obtiene detalles completos de una app, incluyendo team members con IDs."""
+        app = App.query.get_or_404(app_id)
+        
+        # Verificar permisos (solo el dueño o miembros del equipo)
+        if app.owner_id != current_user.id:
+            # Verificar si el usuario es miembro del equipo
+            is_team_member = TeamMember.query.filter_by(
+                app_id=app.id, 
+                user_id=current_user.id
+            ).first()
+            if not is_team_member:
+                return jsonify({"success": False, "message": "No autorizado"}), 403
+        
+        # Cargar datos de la app
+        reviews_data = Review.query.filter_by(app_id=app.id).order_by(Review.created_at.desc()).all()
+        reviews = []
+        for r in reviews_data:
+            reviews.append({
+                "id": str(r.id),
+                "username": r.user.name if r.user else "Anónimo",
+                "content": r.content,
+                "rating": r.rating,
+                "created_at": r.created_at.isoformat() if r.created_at else None
+            })
+        
+        # Cargar team members CON SUS IDs
+        team_members_data = TeamMember.query.filter_by(app_id=app.id).all()
+        team_members = []
+        for t in team_members_data:
+            team_members.append({
+                "id": str(t.id),
+                "name": t.name,
+                "role": t.role,
+                "avatar_url": t.avatar_url,
+                "user_id": t.user_id,
+                "socials": t.socials or {}
+            })
+        
+        # Cargar comunidades
+        communities_data = Community.query.filter_by(app_id=app.id).all()
+        communities = []
+        for c in communities_data:
+            communities.append({
+                "id": str(c.id),
+                "name": c.name,
+                "description": c.description,
+                "members_count": GroupMember.query.filter_by(community_id=c.id).count(),
+                "created_at": c.created_at.isoformat() if c.created_at else None
+            })
+        
+        return jsonify({
+            "success": True,
+            "app": {
+                "id": str(app.id),
+                "name": app.name,
+                "description": app.description,
+                "creation_date": app.creation_date.isoformat() if app.creation_date else None,
+                "theme": app.theme,
+                "image_url": app.image_url or get_app_placeholder_url(),
+                "owner_id": str(app.owner_id),
+                "reviews": reviews,
+                "team_members": team_members,
+                "communities": communities
+            }
+        })
 
     @app.route('/listadodecosas')
     def explorador():
