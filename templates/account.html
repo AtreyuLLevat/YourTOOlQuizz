@@ -1464,10 +1464,6 @@ input[type="checkbox"] {
   </ul>
 </div>
 
-          <ul class="community-list">
-            <!-- Las comunidades se cargarán aquí -->
-          </ul>
-        </div>
 
         <!-- Pestaña Team -->
         <div class="tab-content hidden" id="team">
@@ -1644,9 +1640,10 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
 
-<!-- Scripts para navegación y modales -->
+<!-- Scripts para navegación -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Solo manejar navegación entre secciones
   const menuItems = document.querySelectorAll('.sidebar .menu-item');
   const sections = {
     configuracion: document.getElementById('configuracion'),
@@ -1673,100 +1670,9 @@ document.addEventListener('DOMContentLoaded', function() {
   );
 
   changeSection('configuracion');
-
-  // Script para crear app modal
-  const newAppBtn = document.getElementById('newAppBtn');
-  const createAppModal = document.getElementById('createAppModal');
-  const cancelAppBtn = document.getElementById('cancelAppBtn');
-
-  newAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.remove('hidden');
-  });
-
-  cancelAppBtn?.addEventListener('click', () => {
-    createAppModal.classList.add('hidden');
-  });
-
-  createAppModal?.addEventListener('click', (e) => {
-    if (e.target === createAppModal) createAppModal.classList.add('hidden');
-  });
-
-  // Manejar clic en apps para abrir el modal de detalle
-  const appsList = document.getElementById('appsList');
-  if (appsList) {
-    appsList.addEventListener('click', async function(e) {
-      const appItem = e.target.closest('.app-item');
-      if (appItem) {
-        const appId = appItem.dataset.appId;
-        if (appId) {
-          // Guardar el appId en el campo oculto
-          document.getElementById('currentAppId').value = appId;
-          
-          // Cargar los detalles de la app
-          const app = await loadAppDetails(appId);
-          if (app) {
-            // Aquí puedes actualizar los campos del modal con los datos de la app
-            const appDetailModal = document.getElementById('appDetailModal');
-            if (appDetailModal) {
-              appDetailModal.classList.remove('hidden');
-              
-              // Actualizar campos del modal
-              document.getElementById('app-name-input').value = app.name || '';
-              document.getElementById('app-description-input').value = app.description || '';
-              document.getElementById('app-date-input').value = app.creation_date?.split('T')[0] || '';
-              document.getElementById('app-theme-input').value = app.theme || 'General';
-              if (app.image_url) {
-                document.getElementById('app-logo').src = app.image_url;
-              }
-              
-              // Renderizar comunidades
-              renderCommunities();
-            }
-          }
-        }
-      }
-    });
-  }
-
-
-  // Cerrar modal de detalle de app
-  const closeAppDetail = document.getElementById('closeAppDetail');
-  const appDetailModal = document.getElementById('appDetailModal');
   
-  if (closeAppDetail && appDetailModal) {
-    closeAppDetail.addEventListener('click', () => {
-      appDetailModal.classList.add('hidden');
-    });
-    
-    appDetailModal.addEventListener('click', (e) => {
-      if (e.target === appDetailModal) {
-        appDetailModal.classList.add('hidden');
-      }  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-  
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const tabId = button.dataset.tab;
-      
-      // Remover clase active de todos los botones y contenidos
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.add('hidden'));
-      
-      // Activar la pestaña seleccionada
-      button.classList.add('active');
-      const selectedTab = document.getElementById(tabId);
-      if (selectedTab) {
-        selectedTab.classList.remove('hidden');
-        
-        // Si es la pestaña de comunidades, renderizarlas
-        if (tabId === 'communities') {
-          renderCommunities();
-        }
-      }
-    });
-  });
-    });
-  }
+  // Los modales y pestañas son manejados por dashboard.js
+  // NO añadas event listeners duplicados aquí
 });
 </script>
 
