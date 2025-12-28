@@ -478,7 +478,7 @@ function fillAppDetailModal(app) {
       initAppDetailTabs();
       fillAppDetailModal(currentApp);
       initAppDetailTabs();
-      
+
       console.log('✅ Modal abierto correctamente');
       
     } catch (error) {
@@ -805,88 +805,131 @@ function renderTeamMembers() {
   /* ======================================================
      COMMUNITIES (sin cambios)
   ====================================================== */
-  function renderCommunities() {
-    console.log('🎯 Renderizando comunidades...');
-    
-    if (!appDetailModal) {
-      console.error('❌ appDetailModal no encontrado');
-      return;
-    }
-    
-    const list = appDetailModal.querySelector('.community-list');
-    if (!list) {
-      console.error('❌ No se encontró .community-list en el modal');
-      return;
-    }
-    
-    list.innerHTML = '';
-    
-    if (!currentApp || !currentApp.communities || currentApp.communities.length === 0) {
-      console.log('ℹ️ No hay comunidades para mostrar');
-      list.innerHTML = '<li class="no-communities">Sin comunidades creadas</li>';
-      return;
-    }
-    
-    console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
-    
-    currentApp.communities.forEach((community, index) => {
-      if (!community || !community.id) return;
-      
-      const li = document.createElement('li');
-      li.className = 'community-card-container';
-      li.style.cssText = 'margin-bottom: 16px; list-style: none;';
-      
-      const a = document.createElement('a');
-      a.href = `/community/${community.id}`;
-      a.className = 'community-card';
-      a.target = '_blank';
-      
-      a.innerHTML = `
-        <div class="community-card-content">
-          <div class="community-card-name">${community.name || 'Comunidad sin nombre'}</div>
-          <div class="community-card-meta">${community.members_count || 0} miembros</div>
-        </div>
-        <div class="community-card-arrow">→</div>
-      `;
-      
-      a.style.cssText = `
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 24px;
-        background: #ffffff;
-        color: #000000 !important;
-        text-decoration: none !important;
-        border-radius: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      `;
-      
-      a.addEventListener('mouseenter', () => {
-        a.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)';
-        a.style.transform = 'translateY(-2px)';
-        a.style.borderColor = '#d1d5db';
-      });
-      
-      a.addEventListener('mouseleave', () => {
-        a.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)';
-        a.style.transform = 'translateY(0)';
-        a.style.borderColor = '#e5e7eb';
-      });
-      
-      a.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openCommunityActionsMenu(e, community.id);
-      });
-      
-      li.appendChild(a);
-      list.appendChild(li);
-    });
+function renderCommunities() {
+  console.log('🎯 Renderizando comunidades...');
+  
+  if (!appDetailModal) {
+    console.error('❌ appDetailModal no encontrado');
+    return;
   }
+  
+  const list = appDetailModal.querySelector('.community-list');
+  if (!list) {
+    console.error('❌ No se encontró .community-list en el modal');
+    return;
+  }
+  
+  list.innerHTML = '';
+  
+  if (!currentApp || !currentApp.communities || currentApp.communities.length === 0) {
+    console.log('ℹ️ No hay comunidades para mostrar');
+    list.innerHTML = '<li class="no-communities">Sin comunidades creadas</li>';
+    return;
+  }
+  
+  console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
+  
+  currentApp.communities.forEach((community, index) => {
+    if (!community || !community.id) return;
+    
+    const li = document.createElement('li');
+    li.className = 'community-card-container';
+    li.style.cssText = 'margin-bottom: 16px; list-style: none; position: relative;';
+    
+    const a = document.createElement('a');
+    a.href = `/community/${community.id}`;
+    a.className = 'community-card';
+    a.target = '_blank';
+    
+    a.innerHTML = `
+      <div class="community-card-content">
+        <div class="community-card-name">${community.name || 'Comunidad sin nombre'}</div>
+        <div class="community-card-meta">${community.members_count || 0} miembros • Creada ${formatDate(community.created_at)}</div>
+      </div>
+      <div class="community-card-arrow">→</div>
+    `;
+    
+    a.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: #ffffff;
+      color: #000000 !important;
+      text-decoration: none !important;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
+    
+    a.addEventListener('mouseenter', () => {
+      a.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06)';
+      a.style.transform = 'translateY(-2px)';
+      a.style.borderColor = '#d1d5db';
+    });
+    
+    a.addEventListener('mouseleave', () => {
+      a.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04)';
+      a.style.transform = 'translateY(0)';
+      a.style.borderColor = '#e5e7eb';
+    });
+    
+    // Botón de eliminar (solo visible para el propietario)
+    if (currentApp && currentApp.owner_id === window.currentUserData.id) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'btn-small danger delete-community-btn';
+      deleteBtn.dataset.communityId = community.id;
+      deleteBtn.innerHTML = 'Eliminar';
+      deleteBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+        font-size: 11px;
+        padding: 3px 8px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      `;
+      
+      li.addEventListener('mouseenter', () => {
+        deleteBtn.style.opacity = '1';
+      });
+      
+      li.addEventListener('mouseleave', () => {
+        deleteBtn.style.opacity = '0';
+      });
+      
+      li.appendChild(deleteBtn);
+    }
+    
+    li.appendChild(a);
+    list.appendChild(li);
+  });
+}
+
+// Función auxiliar para formatear fechas
+function formatDate(dateString) {
+  if (!dateString) return 'recientemente';
+  
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now - date);
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) return 'hoy';
+  if (diffDays === 1) return 'ayer';
+  if (diffDays < 7) return `hace ${diffDays} días`;
+  if (diffDays < 30) return `hace ${Math.floor(diffDays / 7)} semanas`;
+  
+  return date.toLocaleDateString('es-ES', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined 
+  });
+}
 
   /* ======================================================
      LISTENER PARA GUARDAR CAMBIOS EN LA APP
