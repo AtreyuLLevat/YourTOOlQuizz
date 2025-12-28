@@ -384,6 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       appDetailModal.classList.remove('hidden');
+      initAppDetailTabs();
+
       console.log('✅ Modal abierto correctamente');
       
     } catch (error) {
@@ -413,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  
   /* ======================================================
      ELIMINAR APLICACIÓN
   ====================================================== */
