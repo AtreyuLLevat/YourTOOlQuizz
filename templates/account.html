@@ -1421,7 +1421,8 @@ input[type="checkbox"] {
       <!-- Contenedor del contenido de las pestañas -->
       <div class="tab-content-container">
         <!-- Pestaña Reviews -->
-        <div class="tab-content" id="reviews">
+  <div class="tab-content hidden" id="reviews">
+
           <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Gestión de reseñas</h3>
 
           <div class="reviews-summary">
@@ -1624,14 +1625,205 @@ input[type="checkbox"] {
   
   console.log("👤 Usuario actual cargado:", window.currentUserData);
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Variables globales
+  let currentApp = null;
 
+  // Delegación de eventos para el modal de detalle de app
+  document.addEventListener('click', function(e) {
+    // Mostrar formulario para añadir comunidad
+    if (e.target && e.target.id === 'addCommunityBtn') {
+      e.preventDefault();
+      const form = document.getElementById('addCommunityForm');
+      if (form) {
+        form.classList.remove('hidden');
+        // Enfocar el input
+        const input = document.getElementById('communityNameInput');
+        if (input) input.focus();
+      }
+    }
+
+    // Cancelar creación de comunidad
+    if (e.target && e.target.id === 'cancelCommunityBtn') {
+      e.preventDefault();
+      const form = document.getElementById('addCommunityForm');
+      if (form) {
+        form.classList.add('hidden');
+        // Limpiar input
+        const input = document.getElementById('communityNameInput');
+        if (input) input.value = '';
+      }
+    }
+
+    // Crear nueva comunidad
+    if (e.target && e.target.id === 'saveCommunityBtn') {
+      e.preventDefault();
+      createCommunity();
+    }
+
+    // Eliminar comunidad (delegación para elementos dinámicos)
+    if (e.target && e.target.classList.contains('delete-community-btn')) {
+      e.preventDefault();
+      e.stopPropagation();
+      const communityId = e.target.dataset.communityId;
+      if (communityId && confirm('¿Estás seguro de que deseas eliminar esta comunidad?')) {
+        deleteCommunity(communityId);
+      }
+    }
+  });
+
+  // Función para crear comunidad
+  async function createCommunity() {
+    const input = document.getElementById('communityNameInput');
+    const name = input?.value.trim();
+    
+    if (!name) {
+      alert('Por favor, introduce un nombre para la comunidad.');
+      return;
+    }
+
+    if (!currentApp || !currentApp.id) {
+      alert('Error: No se ha cargado la aplicación actual.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/apps/${currentApp.id}/create_community`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: name })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Añadir la nueva comunidad a la lista
+        currentApp.communities = currentApp.communities || [];
+        currentApp.communities.push({
+          id: data.community.id,
+          name: data.community.name,
+          members_count: 0,
+          created_at: new Date().toISOString()
+        });
+        
+        // Renderizar comunidades actualizadas
+        renderCommunities();
+        
+        // Ocultar formulario y limpiar input
+        const form = document.getElementById('addCommunityForm');
+        if (form) form.classList.add('hidden');
+        if (input) input.value = '';
+        
+        // Mostrar mensaje de éxito
+        showNotification('Comunidad creada exitosamente', 'success');
+      } else {
+        alert('Error al crear la comunidad: ' + (data.error || 'Error desconocido'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al crear la comunidad. Verifica tu conexión.');
+    }
+  }
+
+  // Función para eliminar comunidad
+  async function deleteCommunity(communityId) {
+    try {
+      const response = await fetch(`/account/community/${communityId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Remover comunidad de la lista
+        if (currentApp && currentApp.communities) {
+          currentApp.communities = currentApp.communities.filter(
+            community => community.id !== communityId
+          );
+          renderCommunities();
+          showNotification('Comunidad eliminada exitosamente', 'success');
+        }
+      } else {
+        alert('Error al eliminar la comunidad: ' + (data.error || 'Error desconocido'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar la comunidad.');
+    }
+  }
+
+  // Función para mostrar notificación
+  function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+      <span>${message}</span>
+      <button class="notification-close">&times;</button>
+    `;
+    
+    // Estilos CSS para la notificación
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : '#3b82f6'};
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s ease-out;
+    `;
+    
+    // Añadir al documento
+    document.body.appendChild(notification);
+    
+    // Botón para cerrar
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+      notification.remove();
+    });
+    
+    // Auto-eliminar después de 5 segundos
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 5000);
+  }
+
+  // Añadir animación CSS para la notificación
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
 
 <!-- Scripts de funcionalidades -->
 <script type="module" src="{{ url_for('static', filename='java/changepassword.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/notifications.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/app.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
-
 <script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
 
