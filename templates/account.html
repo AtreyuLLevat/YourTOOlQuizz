@@ -1639,7 +1639,10 @@ input[type="checkbox"] {
 <script>
 // Variable global para almacenar la app actual
 let currentApp = null;
-
+  const addCommunityBtn = document.getElementById('addCommunityBtn');
+  const addCommunityForm = document.getElementById('addCommunityForm');
+  const saveCommunityBtn = document.getElementById('saveCommunityBtn');
+  const communityNameInput = document.getElementById('communityNameInput');
 // Función para cargar los detalles de la app
 async function loadAppDetails(appId) {
   try {
