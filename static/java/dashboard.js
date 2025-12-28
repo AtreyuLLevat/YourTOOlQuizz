@@ -330,6 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
       throw error;
     }
   }
+
+
+
 function initAppDetailTabs() {
   if (!appDetailModal) return;
 
@@ -382,6 +385,45 @@ function initAppDetailTabs() {
   showTab('general');
 }
 
+/* ======================================================
+   RELLENAR MODAL APP (BASE PARA TABS)
+====================================================== */
+function fillAppDetailModal(app) {
+  if (!appDetailModal || !app) return;
+
+  /* ===== DATOS BÁSICOS ===== */
+
+  const modalLogoImg = document.getElementById('app-logo');
+  const nameInput = document.getElementById('app-name-input');
+  const descriptionInput = document.getElementById('app-description-input');
+  const dateInput = document.getElementById('app-date-input');
+  const themeInput = document.getElementById('app-theme-input');
+
+  if (modalLogoImg) {
+    modalLogoImg.src = app.image_url || '/static/images/app-placeholder.png';
+  }
+
+  if (nameInput) nameInput.value = app.name || '';
+  if (descriptionInput) descriptionInput.value = app.description || '';
+
+  if (dateInput) {
+    dateInput.value = app.creation_date
+      ? app.creation_date.split('T')[0]
+      : '';
+  }
+
+  if (themeInput) themeInput.value = app.theme || 'General';
+
+  /* ===== REVIEWS ===== */
+  renderReviewsAdmin();
+
+  /* ===== COMUNIDADES ===== */
+  renderCommunities();
+
+  /* ===== TEAM ===== */
+  renderTeamMembers();
+}
+
   /* ======================================================
      ABRIR MODAL APP - VERSIÓN MEJORADA
   ====================================================== */
@@ -411,10 +453,8 @@ function initAppDetailTabs() {
       document.getElementById('app-theme-input').value = currentApp.theme || 'General';
       document.getElementById('app-logo').src = currentApp.image_url || '/static/images/app-placeholder.png';
       
-      updateAppBasicInfo();
-      renderReviewsAdmin(); 
-      renderCommunities();
-      renderTeamMembers();
+
+
       
       // Agregar botón de eliminar si el usuario es el dueño
       if (deleteAppBtnContainer) {
@@ -436,7 +476,9 @@ function initAppDetailTabs() {
       
       appDetailModal.classList.remove('hidden');
       initAppDetailTabs();
-
+      fillAppDetailModal(currentApp);
+      initAppDetailTabs();
+      
       console.log('✅ Modal abierto correctamente');
       
     } catch (error) {
