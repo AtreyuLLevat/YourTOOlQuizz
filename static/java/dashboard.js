@@ -477,7 +477,6 @@ function fillAppDetailModal(app) {
       appDetailModal.classList.remove('hidden');
       initAppDetailTabs();
       fillAppDetailModal(currentApp);
-      initAppDetailTabs();
 
       console.log('✅ Modal abierto correctamente');
       
@@ -1038,9 +1037,10 @@ function renderCommunities() {
     return;
   }
   
-  const list = appDetailModal.querySelector('.community-list');
+  // Cambiar a seleccionar por ID si es posible, o usar selector más específico
+  const list = document.querySelector('#communities .community-list');
   if (!list) {
-    console.error('❌ No se encontró .community-list en el modal');
+    console.error('❌ No se encontró .community-list');
     return;
   }
   
@@ -1530,6 +1530,13 @@ function formatDate(dateString) {
       window.currentApp = null;
     }
   });
+
+// Al final de dashboard.js, añade:
+window.loadAppDetails = fetchAppData;
+window.openAppDetail = openAppDetail;
+window.renderCommunities = renderCommunities;
+window.renderTeamMembers = renderTeamMembers;
+window.renderReviewsAdmin = renderReviewsAdmin;
 
   console.log('✅ dashboard.js completamente cargado y listo');
 });
