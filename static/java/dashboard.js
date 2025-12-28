@@ -330,6 +330,57 @@ document.addEventListener('DOMContentLoaded', () => {
       throw error;
     }
   }
+function initAppDetailTabs() {
+  if (!appDetailModal) return;
+
+  const tabButtons = appDetailModal.querySelectorAll('.tab-btn');
+  const tabContents = appDetailModal.querySelectorAll('.tab-content');
+
+  function showTab(tabName) {
+    // Reset botones
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(content => content.classList.add('hidden'));
+
+    // Activar botón
+    const activeBtn = appDetailModal.querySelector(
+      `.tab-btn[data-tab="${tabName}"]`
+    );
+    const activeContent = appDetailModal.querySelector(
+      `#${tabName}`
+    );
+
+    if (!activeBtn || !activeContent) return;
+
+    activeBtn.classList.add('active');
+    activeContent.classList.remove('hidden');
+
+    // 🔁 Cargas bajo demanda
+    if (tabName === 'team') {
+      renderTeamMembers();
+    }
+
+    if (tabName === 'communities') {
+      renderCommunities();
+    }
+
+    if (tabName === 'reviews') {
+      renderReviewsAdmin();
+    }
+  }
+
+  // Click listeners
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.dataset.tab;
+      if (tabName) {
+        showTab(tabName);
+      }
+    });
+  });
+
+  // 👉 Tab inicial por defecto
+  showTab('general');
+}
 
   /* ======================================================
      ABRIR MODAL APP - VERSIÓN MEJORADA
