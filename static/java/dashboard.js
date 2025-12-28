@@ -801,13 +801,238 @@ function renderTeamMembers() {
       reviewsList.appendChild(card);
     });
   }
+/* ======================================================
+   MENÚ DE ACCIONES PARA REVIEWS (clic derecho)
+====================================================== */
+function openReviewActionsMenu(e, reviewId) {
+  const menu = document.createElement('div');
+  menu.className = 'context-menu';
+  menu.id = 'review-context-menu';
+  menu.style.cssText = `
+    position: fixed;
+    top: ${e.clientY}px;
+    left: ${e.clientX}px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 180px;
+  `;
+  
+  const review = currentApp?.reviews?.find(r => String(r.id) === String(reviewId));
+  if (!review) return;
+  
+  menu.innerHTML = `
+    <div style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #64748b;">
+      Acciones para reseña
+    </div>
+    <div class="context-menu-item" data-action="view">
+      <span>👁️ Ver detalles</span>
+    </div>
+    <div class="context-menu-item" data-action="reply">
+      <span>↩️ Responder</span>
+    </div>
+    <div class="context-menu-item" data-action="report" style="color: #ef4444;">
+      <span>🚨 Reportar</span>
+    </div>
+    ${currentApp?.owner_id === currentUser?.id ? 
+      `<div class="context-menu-item" data-action="delete" style="color: #ef4444;">
+        <span>🗑️ Eliminar reseña</span>
+      </div>` : ''
+    }
+  `;
+  
+  document.body.appendChild(menu);
+  
+  // Estilos para los items del menú
+  const items = menu.querySelectorAll('.context-menu-item');
+  items.forEach(item => {
+    item.style.cssText = `
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    `;
+    
+    item.addEventListener('mouseenter', () => {
+      item.style.background = '#f8fafc';
+    });
+    
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent';
+    });
+    
+    item.addEventListener('click', () => {
+      const action = item.dataset.action;
+      handleReviewAction(action, reviewId, review);
+      menu.remove();
+    });
+  });
+  
+  // Cerrar menú al hacer clic fuera
+  setTimeout(() => {
+    const closeMenu = (event) => {
+      if (!menu.contains(event.target)) {
+        menu.remove();
+        document.removeEventListener('click', closeMenu);
+      }
+    };
+    document.addEventListener('click', closeMenu);
+  }, 100);
+}
 
-  /* ======================================================
-     COMMUNITIES (sin cambios)
-  ====================================================== */
+function handleReviewAction(action, reviewId, review) {
+  switch(action) {
+    case 'view':
+      alert(`Reseña de ${review.username || 'Usuario'}\n\n"${review.content || 'Sin comentario'}"\n\nCalificación: ${review.rating}/5`);
+      break;
+      
+    case 'reply':
+      const reply = prompt(`Responder a ${review.username || 'el usuario'}:`);
+      if (reply) {
+        console.log(`Respuesta a review ${reviewId}:`, reply);
+        showNotification('Respuesta enviada (función en desarrollo)', 'info');
+      }
+      break;
+      
+    case 'report':
+      const reason = prompt('¿Por qué quieres reportar esta reseña?');
+      if (reason) {
+        console.log(`Review ${reviewId} reportada:`, reason);
+        showNotification('Reseña reportada', 'info');
+      }
+      break;
+      
+    case 'delete':
+      if (confirm(`¿Eliminar esta reseña de ${review.username || 'el usuario'}?`)) {
+        deleteReview(reviewId);
+      }
+      break;
+  }
+}
+
+async function deleteReview(reviewId) {
+  try {
+    const res = await fetch(`/account/review/${reviewId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      // Actualizar reviews locales
+      currentApp.reviews = currentApp.reviews.filter(r => String(r.id) !== String(reviewId));
+      renderReviewsAdmin();
+      showNotification('Reseña eliminada', 'success');
+    } else {
+      throw new Error(data.message);
+    }
+  } catch (err) {
+    showError('Error al eliminar reseña: ' + err.message);
+  }
+}
+
+function showNotification(message, type) {
+  // Usa tu función existente o crea una básica
+  alert(`${type === 'success' ? '✅' : 'ℹ️'} ${message}`);
+}
+/* ======================================================
+   CREACIÓN DE COMUNIDADES
+====================================================== */
+
+// Mostrar/ocultar formulario de comunidad
+addCommunityBtn?.addEventListener('click', () => {
+  if (addCommunityForm) {
+    addCommunityForm.classList.remove('hidden');
+    if (communityNameInput) {
+      communityNameInput.focus();
+    }
+  }
+});
+
+// Cancelar creación
+document.getElementById('cancelCommunityBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (addCommunityForm) {
+    addCommunityForm.classList.add('hidden');
+  }
+  if (communityNameInput) {
+    communityNameInput.value = '';
+  }
+});
+
+// Crear comunidad
+saveCommunityBtn?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  await createCommunity();
+});
+
+// Enter para crear comunidad
+communityNameInput?.addEventListener('keypress', async (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    await createCommunity();
+  }
+});
+
+async function createCommunity() {
+  const name = communityNameInput?.value.trim();
+  
+  if (!name) {
+    alert('Por favor, introduce un nombre para la comunidad.');
+    return;
+  }
+
+  if (!currentApp || !currentApp.id) {
+    alert('Error: No se ha identificado la aplicación actual.');
+    return;
+  }
+
+  console.log(`🔄 Creando comunidad para app ${currentApp.id}: ${name}`);
+
+  try {
+    const response = await fetch(`/apps/${currentApp.id}/create_community`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name: name })
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      // Recargar los detalles de la app para actualizar la lista de comunidades
+      currentApp = await fetchAppData(currentApp.id);
+      
+      // Renderizar comunidades actualizadas
+      renderCommunities();
+      
+      // Ocultar formulario y limpiar input
+      if (addCommunityForm) addCommunityForm.classList.add('hidden');
+      if (communityNameInput) communityNameInput.value = '';
+      
+      // Mostrar mensaje de éxito
+      showNotification('Comunidad creada exitosamente', 'success');
+    } else {
+      alert('Error al crear la comunidad: ' + (data.error || 'Error desconocido'));
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error al crear la comunidad. Verifica tu conexión.');
+  }
+}
+
+/* ======================================================
+   RENDERIZAR COMUNIDADES - VERSIÓN MEJORADA
+====================================================== */
 function renderCommunities() {
   console.log('🎯 Renderizando comunidades...');
   
+  const appDetailModal = document.getElementById('appDetailModal');
   if (!appDetailModal) {
     console.error('❌ appDetailModal no encontrado');
     return;
@@ -829,7 +1054,7 @@ function renderCommunities() {
   
   console.log(`🔄 Renderizando ${currentApp.communities.length} comunidades`);
   
-  currentApp.communities.forEach((community, index) => {
+  currentApp.communities.forEach((community) => {
     if (!community || !community.id) return;
     
     const li = document.createElement('li');
@@ -844,7 +1069,7 @@ function renderCommunities() {
     a.innerHTML = `
       <div class="community-card-content">
         <div class="community-card-name">${community.name || 'Comunidad sin nombre'}</div>
-        <div class="community-card-meta">${community.members_count || 0} miembros • Creada ${formatDate(community.created_at)}</div>
+        <div class="community-card-meta">${community.members_count || 0} miembros</div>
       </div>
       <div class="community-card-arrow">→</div>
     `;
@@ -878,7 +1103,7 @@ function renderCommunities() {
     });
     
     // Botón de eliminar (solo visible para el propietario)
-    if (currentApp && currentApp.owner_id === window.currentUserData.id) {
+    if (currentApp && currentApp.owner_id === currentUser?.id) {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'btn-small danger delete-community-btn';
       deleteBtn.dataset.communityId = community.id;
@@ -902,12 +1127,244 @@ function renderCommunities() {
         deleteBtn.style.opacity = '0';
       });
       
+      deleteBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await openCommunityDeleteModal(community.id, community.name);
+      });
+      
       li.appendChild(deleteBtn);
     }
     
     li.appendChild(a);
     list.appendChild(li);
   });
+}
+
+/* ======================================================
+   ELIMINAR COMUNIDAD - CON MINI MODAL
+====================================================== */
+async function openCommunityDeleteModal(communityId, communityName) {
+  // Crear mini modal
+  const modal = document.createElement('div');
+  modal.id = 'delete-community-mini-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    ">
+      <h3 style="
+        margin-bottom: 16px;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 600;
+      ">¿Eliminar comunidad?</h3>
+      
+      <p style="
+        margin-bottom: 20px;
+        color: #64748b;
+        line-height: 1.5;
+      ">
+        Vas a eliminar la comunidad <strong>"${communityName}"</strong>.
+        Esta acción no se puede deshacer y todos los miembros perderán acceso.
+      </p>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="cancel-delete-community" style="
+          padding: 8px 20px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          background: white;
+          color: #475569;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+        ">
+          Cancelar
+        </button>
+        <button id="confirm-delete-community" style="
+          padding: 8px 20px;
+          border: none;
+          border-radius: 6px;
+          background: #ef4444;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background 0.2s;
+        ">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Añadir estilos para hover
+  const cancelBtn = modal.querySelector('#cancel-delete-community');
+  const confirmBtn = modal.querySelector('#confirm-delete-community');
+  
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#f8fafc';
+  });
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = 'white';
+  });
+  
+  confirmBtn.addEventListener('mouseenter', () => {
+    confirmBtn.style.background = '#dc2626';
+  });
+  confirmBtn.addEventListener('mouseleave', () => {
+    confirmBtn.style.background = '#ef4444';
+  });
+  
+  // Event listeners
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  confirmBtn.addEventListener('click', async () => {
+    await deleteCommunity(communityId);
+    modal.remove();
+  });
+  
+  // Cerrar al hacer clic fuera
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
+
+async function deleteCommunity(communityId) {
+  try {
+    const response = await fetch(`/account/community/${communityId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      // Actualizar la app localmente
+      currentApp.communities = currentApp.communities.filter(c => c.id !== communityId);
+      
+      // Renderizar comunidades actualizadas
+      renderCommunities();
+      
+      // Mostrar notificación
+      showNotification('Comunidad eliminada exitosamente', 'success');
+    } else {
+      throw new Error(data.error || 'Error desconocido');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showError('Error al eliminar la comunidad: ' + error.message);
+  }
+}
+
+/* ======================================================
+   FUNCIÓN DE NOTIFICACIONES
+====================================================== */
+function showNotification(message, type = 'info') {
+  // Si ya existe una notificación, removerla
+  const existingNotification = document.querySelector('.notification');
+  if (existingNotification) {
+    existingNotification.remove();
+  }
+  
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <span>${message}</span>
+    <button class="notification-close">&times;</button>
+  `;
+  
+  // Estilos de la notificación
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease-out;
+    font-size: 14px;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Botón para cerrar
+  notification.querySelector('.notification-close').addEventListener('click', () => {
+    notification.remove();
+  });
+  
+  // Auto-remover después de 5 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 5000);
+  
+  // Añadir estilos CSS para la animación si no existen
+  if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      
+      .notification-close {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+      
+      .notification-close:hover {
+        opacity: 1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
 
 // Función auxiliar para formatear fechas
