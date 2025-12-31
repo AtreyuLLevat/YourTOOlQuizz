@@ -711,6 +711,9 @@ function renderTeamMembers() {
  /* ======================================================
    REVIEWS SIMPLIFICADO
 ====================================================== */
+/* ======================================================
+   REVIEWS - SIN VERIFICACIONES DE PROPIEDAD
+====================================================== */
 function renderReviewsAdmin() {
   const reviewsList = document.getElementById('reviews-list');
   const reviewsCount = document.querySelector('.reviews-count');
@@ -795,15 +798,14 @@ function renderReviewsAdmin() {
       <div class="review-content">${review.content || 'Sin comentario'}</div>
     `;
     
-    // Evento simplificado: clic derecho para eliminar
+    // Clic derecho para eliminar - SIEMPRE DISPONIBLE
     card.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       openReviewActionsMenu(e, review.id || index);
     });
     
-    // También permitir clic normal (opcional)
+    // Clic normal también abre el modal - SIEMPRE DISPONIBLE
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.review-status, .review-rating')) return;
       openReviewActionsMenu(e, review.id || index);
     });
     
@@ -816,21 +818,16 @@ function renderReviewsAdmin() {
 /* ======================================================
    MENÚ DE ACCIONES PARA REVIEWS (clic derecho) - SIMPLIFICADO
 ====================================================== */
+/* ======================================================
+   MENÚ DE ACCIONES PARA REVIEWS (clic derecho) - SIN VERIFICAR PROPIETARIO
+====================================================== */
 function openReviewActionsMenu(e, reviewId) {
   e.preventDefault();
   
   const review = currentApp?.reviews?.find(r => String(r.id) === String(reviewId));
   if (!review) return;
   
-  // Verificar si el usuario es el propietario
-  const isOwner = currentApp?.owner_id === currentUser?.id;
-  if (!isOwner) {
-    // Si no es propietario, mostrar mensaje
-    alert('Solo el propietario de la app puede eliminar reseñas');
-    return;
-  }
-  
-  // Crear mini modal de confirmación
+  // Crear mini modal de confirmación - SIEMPRE DISPONIBLE
   const modal = document.createElement('div');
   modal.id = 'delete-review-mini-modal';
   modal.style.cssText = `
@@ -970,7 +967,7 @@ function openReviewActionsMenu(e, reviewId) {
 }
 
 /* ======================================================
-   ELIMINAR RESEÑA
+   ELIMINAR RESEÑA (SIN VERIFICACIÓN)
 ====================================================== */
 async function deleteReview(reviewId) {
   try {
@@ -1001,25 +998,20 @@ async function deleteReview(reviewId) {
 }
 
 /* ======================================================
-   NOTIFICACIÓN SIMPLIFICADA
+   FUNCIÓN DE NOTIFICACIONES
 ====================================================== */
 function showNotification(message, type = 'info') {
-  // Eliminar notificaciones existentes
-  const existingNotifications = document.querySelectorAll('.notification');
-  existingNotifications.forEach(notification => notification.remove());
-  
   const notification = document.createElement('div');
   notification.className = 'notification';
   notification.innerHTML = `
     <span>${message}</span>
   `;
   
-  // Estilos básicos
   notification.style.cssText = `
     position: fixed;
     top: 20px;
     right: 20px;
-    background: ${type === 'success' ? '#10b981' : '#3b82f6'};
+    background: ${type === 'success' ? '#10b981' : '#ef4444'};
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
@@ -1031,7 +1023,6 @@ function showNotification(message, type = 'info') {
   
   document.body.appendChild(notification);
   
-  // Auto-remover después de 3 segundos
   setTimeout(() => {
     if (notification.parentNode) {
       notification.remove();
