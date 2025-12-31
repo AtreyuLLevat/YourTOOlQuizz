@@ -708,235 +708,335 @@ function renderTeamMembers() {
   /* ======================================================
      REVIEWS (sin cambios)
   ====================================================== */
-  function renderReviewsAdmin() {
-    const reviewsList = document.getElementById('reviews-list');
-    const reviewsCount = document.querySelector('.reviews-count');
-    const starsElement = document.querySelector('.stars');
-    
-    if (!reviewsList || !reviewsCount) return;
-    
-    reviewsList.innerHTML = '';
-    
-    if (!currentApp.reviews || currentApp.reviews.length === 0) {
-      reviewsList.innerHTML = `
-        <div class="no-reviews-message">
-          <div class="icon">💬</div>
-          <h3>Sin reseñas aún</h3>
-          <p>Esta app no tiene reseñas. Los usuarios podrán añadirlas cuando prueben tu aplicación.</p>
-        </div>
-      `;
-      reviewsCount.textContent = '(0)';
-      if (starsElement) starsElement.innerHTML = '★☆☆☆☆ (0.0)';
-      return;
-    }
-    
-    const totalReviews = currentApp.reviews.length;
-    const averageRating = currentApp.reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviews;
-    const roundedAverage = averageRating.toFixed(1);
-    
-    reviewsCount.textContent = `(${totalReviews})`;
-    if (starsElement) {
-      starsElement.innerHTML = `
-        <span style="display:flex;align-items:center;gap:4px;">
-          <span style="color:#f59e0b;font-size:18px;">
-            ${'★'.repeat(Math.floor(averageRating))}${'☆'.repeat(5 - Math.floor(averageRating))}
-          </span>
-          <span style="font-weight:600;color:#1e293b;">${roundedAverage}</span>
-          <span style="color:#64748b;font-size:14px;">(${totalReviews} ${totalReviews === 1 ? 'reseña' : 'reseñas'})</span>
-        </span>
-      `;
-    }
-    
-    currentApp.reviews.forEach((review, index) => {
-      const card = document.createElement('div');
-      card.className = 'review-card';
-      card.dataset.reviewId = review.id || index;
-      card.dataset.rating = review.rating || 0;
-      
-      const rating = Number(review.rating) || 0;
-      let statusClass = 'neutral';
-      let statusText = 'Neutral';
-      
-      if (rating >= 4) {
-        statusClass = 'positive';
-        statusText = 'Positivo';
-      } else if (rating <= 2) {
-        statusClass = 'negative';
-        statusText = 'Negativo';
-      }
-      
-      const stars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-      const initials = (review.username || 'U').charAt(0).toUpperCase();
-      const reviewDate = review.created_at ? 
-        new Date(review.created_at).toLocaleDateString('es-ES', { 
-          day: 'numeric', 
-          month: 'short', 
-          year: 'numeric' 
-        }) : 'Fecha no disponible';
-      
-      card.innerHTML = `
-        <div class="review-status ${statusClass}">${statusText}</div>
-        <div class="review-header">
-          <div class="review-user-info">
-            <div class="review-avatar">${initials}</div>
-            <div class="review-user-details">
-              <div class="review-username">@${review.username || 'Usuario'}</div>
-              <div class="review-date">${reviewDate}</div>
-            </div>
-          </div>
-          <div class="review-rating">
-            <span class="star-icon">${stars}</span>
-            <span class="rating-value">${rating}/5</span>
-          </div>
-        </div>
-        <div class="review-content">${review.content || 'Sin comentario'}</div>
-      `;
-      
-      card.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        openReviewActionsMenu(e, review.id || index);
-      });
-      
-      reviewsList.appendChild(card);
-    });
+ /* ======================================================
+   REVIEWS SIMPLIFICADO
+====================================================== */
+function renderReviewsAdmin() {
+  const reviewsList = document.getElementById('reviews-list');
+  const reviewsCount = document.querySelector('.reviews-count');
+  const starsElement = document.querySelector('.stars');
+  
+  if (!reviewsList || !reviewsCount) return;
+  
+  reviewsList.innerHTML = '';
+  
+  if (!currentApp.reviews || currentApp.reviews.length === 0) {
+    reviewsList.innerHTML = `
+      <div class="no-reviews-message">
+        <div class="icon">💬</div>
+        <h3>Sin reseñas aún</h3>
+        <p>Esta app no tiene reseñas. Los usuarios podrán añadirlas cuando prueben tu aplicación.</p>
+      </div>
+    `;
+    reviewsCount.textContent = '(0)';
+    if (starsElement) starsElement.innerHTML = '★☆☆☆☆ (0.0)';
+    return;
   }
+  
+  const totalReviews = currentApp.reviews.length;
+  const averageRating = currentApp.reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) / totalReviews;
+  const roundedAverage = averageRating.toFixed(1);
+  
+  reviewsCount.textContent = `(${totalReviews})`;
+  if (starsElement) {
+    starsElement.innerHTML = `
+      <span style="display:flex;align-items:center;gap:4px;">
+        <span style="color:#f59e0b;font-size:18px;">
+          ${'★'.repeat(Math.floor(averageRating))}${'☆'.repeat(5 - Math.floor(averageRating))}
+        </span>
+        <span style="font-weight:600;color:#1e293b;">${roundedAverage}</span>
+        <span style="color:#64748b;font-size:14px;">(${totalReviews} ${totalReviews === 1 ? 'reseña' : 'reseñas'})</span>
+      </span>
+    `;
+  }
+  
+  currentApp.reviews.forEach((review, index) => {
+    const card = document.createElement('div');
+    card.className = 'review-card';
+    card.dataset.reviewId = review.id || index;
+    card.dataset.rating = review.rating || 0;
+    
+    const rating = Number(review.rating) || 0;
+    let statusClass = 'neutral';
+    let statusText = 'Neutral';
+    
+    if (rating >= 4) {
+      statusClass = 'positive';
+      statusText = 'Positivo';
+    } else if (rating <= 2) {
+      statusClass = 'negative';
+      statusText = 'Negativo';
+    }
+    
+    const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const initials = (review.username || 'U').charAt(0).toUpperCase();
+    const reviewDate = review.created_at ? 
+      new Date(review.created_at).toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+      }) : 'Fecha no disponible';
+    
+    card.innerHTML = `
+      <div class="review-status ${statusClass}">${statusText}</div>
+      <div class="review-header">
+        <div class="review-user-info">
+          <div class="review-avatar">${initials}</div>
+          <div class="review-user-details">
+            <div class="review-username">@${review.username || 'Usuario'}</div>
+            <div class="review-date">${reviewDate}</div>
+          </div>
+        </div>
+        <div class="review-rating">
+          <span class="star-icon">${stars}</span>
+          <span class="rating-value">${rating}/5</span>
+        </div>
+      </div>
+      <div class="review-content">${review.content || 'Sin comentario'}</div>
+    `;
+    
+    // Evento simplificado: clic derecho para eliminar
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      openReviewActionsMenu(e, review.id || index);
+    });
+    
+    // También permitir clic normal (opcional)
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.review-status, .review-rating')) return;
+      openReviewActionsMenu(e, review.id || index);
+    });
+    
+    reviewsList.appendChild(card);
+  });
+}
 /* ======================================================
    MENÚ DE ACCIONES PARA REVIEWS (clic derecho)
 ====================================================== */
+/* ======================================================
+   MENÚ DE ACCIONES PARA REVIEWS (clic derecho) - SIMPLIFICADO
+====================================================== */
 function openReviewActionsMenu(e, reviewId) {
-  const menu = document.createElement('div');
-  menu.className = 'context-menu';
-  menu.id = 'review-context-menu';
-  menu.style.cssText = `
-    position: fixed;
-    top: ${e.clientY}px;
-    left: ${e.clientX}px;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-    z-index: 1000;
-    min-width: 180px;
-  `;
+  e.preventDefault();
   
   const review = currentApp?.reviews?.find(r => String(r.id) === String(reviewId));
   if (!review) return;
   
-  menu.innerHTML = `
-    <div style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #64748b;">
-      Acciones para reseña
-    </div>
-    <div class="context-menu-item" data-action="view">
-      <span>👁️ Ver detalles</span>
-    </div>
-    <div class="context-menu-item" data-action="reply">
-      <span>↩️ Responder</span>
-    </div>
-    <div class="context-menu-item" data-action="report" style="color: #ef4444;">
-      <span>🚨 Reportar</span>
-    </div>
-    ${currentApp?.owner_id === currentUser?.id ? 
-      `<div class="context-menu-item" data-action="delete" style="color: #ef4444;">
-        <span>🗑️ Eliminar reseña</span>
-      </div>` : ''
-    }
+  // Verificar si el usuario es el propietario
+  const isOwner = currentApp?.owner_id === currentUser?.id;
+  if (!isOwner) {
+    // Si no es propietario, mostrar mensaje
+    alert('Solo el propietario de la app puede eliminar reseñas');
+    return;
+  }
+  
+  // Crear mini modal de confirmación
+  const modal = document.createElement('div');
+  modal.id = 'delete-review-mini-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
   `;
   
-  document.body.appendChild(menu);
+  const reviewUsername = review.username || 'Usuario anónimo';
+  const reviewContent = review.content ? 
+    (review.content.length > 100 ? review.content.substring(0, 100) + '...' : review.content) : 
+    'Sin comentario';
+  const reviewRating = review.rating || 0;
   
-  // Estilos para los items del menú
-  const items = menu.querySelectorAll('.context-menu-item');
-  items.forEach(item => {
-    item.style.cssText = `
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
-    `;
-    
-    item.addEventListener('mouseenter', () => {
-      item.style.background = '#f8fafc';
-    });
-    
-    item.addEventListener('mouseleave', () => {
-      item.style.background = 'transparent';
-    });
-    
-    item.addEventListener('click', () => {
-      const action = item.dataset.action;
-      handleReviewAction(action, reviewId, review);
-      menu.remove();
-    });
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    ">
+      <h3 style="
+        margin-bottom: 16px;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 600;
+      ">¿Eliminar reseña?</h3>
+      
+      <div style="
+        margin-bottom: 20px;
+        padding: 16px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      ">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <div style="font-weight: 500; color: #1e293b;">${reviewUsername}</div>
+          <div style="color: #f59e0b; font-weight: 600;">${reviewRating}/5</div>
+        </div>
+        <div style="color: #64748b; font-size: 14px; line-height: 1.5;">
+          "${reviewContent}"
+        </div>
+      </div>
+      
+      <p style="
+        margin-bottom: 20px;
+        color: #64748b;
+        line-height: 1.5;
+        font-size: 14px;
+      ">
+        Esta acción no se puede deshacer. La reseña será eliminada permanentemente.
+      </p>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="cancel-delete-review" style="
+          padding: 8px 20px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          background: white;
+          color: #475569;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+        ">
+          Cancelar
+        </button>
+        <button id="confirm-delete-review" style="
+          padding: 8px 20px;
+          border: none;
+          border-radius: 6px;
+          background: #ef4444;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background 0.2s;
+        ">
+          Eliminar Reseña
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Añadir estilos para hover
+  const cancelBtn = modal.querySelector('#cancel-delete-review');
+  const confirmBtn = modal.querySelector('#confirm-delete-review');
+  
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#f8fafc';
+  });
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = 'white';
   });
   
-  // Cerrar menú al hacer clic fuera
-  setTimeout(() => {
-    const closeMenu = (event) => {
-      if (!menu.contains(event.target)) {
-        menu.remove();
-        document.removeEventListener('click', closeMenu);
-      }
-    };
-    document.addEventListener('click', closeMenu);
-  }, 100);
+  confirmBtn.addEventListener('mouseenter', () => {
+    confirmBtn.style.background = '#dc2626';
+  });
+  confirmBtn.addEventListener('mouseleave', () => {
+    confirmBtn.style.background = '#ef4444';
+  });
+  
+  // Event listeners
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  confirmBtn.addEventListener('click', async () => {
+    await deleteReview(reviewId);
+    modal.remove();
+  });
+  
+  // Cerrar al hacer clic fuera
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+  
+  // Cerrar con Escape key
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
 }
 
-function handleReviewAction(action, reviewId, review) {
-  switch(action) {
-    case 'view':
-      alert(`Reseña de ${review.username || 'Usuario'}\n\n"${review.content || 'Sin comentario'}"\n\nCalificación: ${review.rating}/5`);
-      break;
-      
-    case 'reply':
-      const reply = prompt(`Responder a ${review.username || 'el usuario'}:`);
-      if (reply) {
-        console.log(`Respuesta a review ${reviewId}:`, reply);
-        showNotification('Respuesta enviada (función en desarrollo)', 'info');
-      }
-      break;
-      
-    case 'report':
-      const reason = prompt('¿Por qué quieres reportar esta reseña?');
-      if (reason) {
-        console.log(`Review ${reviewId} reportada:`, reason);
-        showNotification('Reseña reportada', 'info');
-      }
-      break;
-      
-    case 'delete':
-      if (confirm(`¿Eliminar esta reseña de ${review.username || 'el usuario'}?`)) {
-        deleteReview(reviewId);
-      }
-      break;
-  }
-}
-
+/* ======================================================
+   ELIMINAR RESEÑA
+====================================================== */
 async function deleteReview(reviewId) {
   try {
     const res = await fetch(`/account/review/${reviewId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
     });
     
     const data = await res.json();
     if (data.success) {
       // Actualizar reviews locales
       currentApp.reviews = currentApp.reviews.filter(r => String(r.id) !== String(reviewId));
+      
+      // Renderizar reviews actualizadas
       renderReviewsAdmin();
-      showNotification('Reseña eliminada', 'success');
+      
+      // Mostrar notificación
+      showNotification('Reseña eliminada correctamente', 'success');
     } else {
-      throw new Error(data.message);
+      throw new Error(data.message || 'Error al eliminar la reseña');
     }
   } catch (err) {
-    showError('Error al eliminar reseña: ' + err.message);
+    console.error('❌ Error eliminando reseña:', err);
+    showError('Error al eliminar la reseña: ' + err.message);
   }
 }
 
-function showNotification(message, type) {
-  // Usa tu función existente o crea una básica
-  alert(`${type === 'success' ? '✅' : 'ℹ️'} ${message}`);
+/* ======================================================
+   NOTIFICACIÓN SIMPLIFICADA
+====================================================== */
+function showNotification(message, type = 'info') {
+  // Eliminar notificaciones existentes
+  const existingNotifications = document.querySelectorAll('.notification');
+  existingNotifications.forEach(notification => notification.remove());
+  
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.innerHTML = `
+    <span>${message}</span>
+  `;
+  
+  // Estilos básicos
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : '#3b82f6'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remover después de 3 segundos
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
 }
 /* ======================================================
    CREACIÓN DE COMUNIDADES
