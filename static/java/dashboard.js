@@ -547,15 +547,158 @@ function fillAppDetailModal(app) {
   /* ======================================================
      EDITAR MIEMBRO DEL EQUIPO
   ====================================================== */
-// Agrega estas funciones después de renderTeamMembers()
-
+/* ======================================================
+   EDITAR MIEMBRO DEL EQUIPO - CON SELECT DE ROLES
+====================================================== */
 function editTeamMember(memberId, currentRole = '') {
-  const input = prompt("Ingrese el nuevo rol:", currentRole);
-  if (input === null) return; // cancelado
+  // Crear modal para seleccionar rol
+  const modal = document.createElement('div');
+  modal.id = 'edit-role-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 320px;
+      width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    ">
+      <h3 style="
+        margin-bottom: 16px;
+        color: #1e293b;
+        font-size: 18px;
+        font-weight: 600;
+      ">Cambiar rol</h3>
+      
+      <select id="role-select" style="
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 20px;
+        background-color: white;
+        color: #1e293b;
+      ">
+        <option value="" ${!currentRole ? 'selected' : ''}>Seleccionar rol...</option>
+        <option value="Desarrollador" ${currentRole === 'Desarrollador' ? 'selected' : ''}>Desarrollador</option>
+        <option value="Diseñador" ${currentRole === 'Diseñador' ? 'selected' : ''}>Diseñador</option>
+        <option value="Manager" ${currentRole === 'Manager' ? 'selected' : ''}>Manager</option>
+        <option value="Tester" ${currentRole === 'Tester' ? 'selected' : ''}>Tester</option>
+        <option value="Soporte" ${currentRole === 'Soporte' ? 'selected' : ''}>Soporte</option>
+        <option value="Otro" ${currentRole === 'Otro' ? 'selected' : ''}>Otro</option>
+      </select>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="cancel-edit-role" style="
+          padding: 8px 20px;
+          border: 1px solid #cbd5e1;
+          border-radius: 6px;
+          background: white;
+          color: #475569;
+          cursor: pointer;
+          font-size: 14px;
+          transition: all 0.2s;
+        ">
+          Cancelar
+        </button>
+        <button id="confirm-edit-role" style="
+          padding: 8px 20px;
+          border: none;
+          border-radius: 6px;
+          background: #3b82f6;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          transition: background 0.2s;
+        ">
+          Guardar
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Estilos para hover
+  const cancelBtn = modal.querySelector('#cancel-edit-role');
+  const confirmBtn = modal.querySelector('#confirm-edit-role');
+  const select = modal.querySelector('#role-select');
+  
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#f8fafc';
+  });
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = 'white';
+  });
+  
+  confirmBtn.addEventListener('mouseenter', () => {
+    confirmBtn.style.background = '#2563eb';
+  });
+  confirmBtn.addEventListener('mouseleave', () => {
+    confirmBtn.style.background = '#3b82f6';
+  });
+  
+  // Event listeners
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  confirmBtn.addEventListener('click', () => {
+    const newRole = select.value.trim();
+    
+    if (!newRole) {
+      alert('Por favor selecciona un rol');
+      return;
+    }
+    
+    if (newRole === currentRole) {
+      modal.remove();
+      return;
+    }
+    
+    // Enviar solicitud para cambiar el rol
+    updateTeamMemberRole(memberId, newRole, currentRole);
+    modal.remove();
+  });
+  
+  // Cerrar con Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+  
+  // Cerrar al hacer clic fuera
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+  
+  // Enfocar el select al abrir
+  select.focus();
+}
 
-  const newRole = input.trim();
-  if (!newRole || newRole === currentRole) return;
-
+/* ======================================================
+   ACTUALIZAR ROL DEL MIEMBRO (función auxiliar)
+====================================================== */
+function updateTeamMemberRole(memberId, newRole, oldRole) {
   fetch(`/account/team_member/${memberId}`, {
     method: 'PATCH',
     headers: {
@@ -573,7 +716,7 @@ function editTeamMember(memberId, currentRole = '') {
       return;
     }
 
-    // 🔄 UI
+    // Actualizar UI
     const card = document.querySelector(`[data-member-id="${memberId}"]`);
     if (card) {
       const roleElem = card.querySelector('.team-role');
@@ -583,14 +726,14 @@ function editTeamMember(memberId, currentRole = '') {
       if (editBtn) editBtn.dataset.role = newRole;
     }
 
-    // 🔄 Estado local
+    // Actualizar estado local
     const member = currentApp.team_members.find(m => String(m.id) === String(memberId));
     if (member) member.role = newRole;
 
     showSuccess('Rol actualizado correctamente');
   })
   .catch(err => {
-    console.error('editTeamMember error:', err);
+    console.error('updateTeamMemberRole error:', err);
     showError('Error de red al actualizar el rol');
   });
 }
