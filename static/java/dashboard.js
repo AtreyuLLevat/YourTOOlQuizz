@@ -780,20 +780,44 @@ function removeTeamMember(memberId, memberName = '') {
   /* ======================================================
      RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTONES)
   ====================================================== */
+/* ======================================================
+   RENDERIZAR MIEMBROS DEL EQUIPO (CON BOTÓN PARA AÑADIR)
+====================================================== */
 function renderTeamMembers() {
   const list = document.getElementById('team-members-list');
   if (!list) return;
 
   list.innerHTML = '';
 
-  if (!currentApp?.team_members?.length) {
-    list.innerHTML = '<p>No hay miembros en el equipo.</p>';
-    return;
-  }
-
   const appOwnerId = String(currentApp.owner_id);
   const userId = String(currentUser?.id || currentUser?.user_id || '');
   const isOwner = appOwnerId && userId && appOwnerId === userId;
+
+  // Cabecera con botón de añadir
+  const header = document.createElement('div');
+  header.className = 'team-header';
+  header.innerHTML = `
+    <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Miembros del Equipo</h3>
+    ${isOwner ? `<button id="add-team-member-btn" class="btn-small primary">+ Añadir Miembro</button>` : ''}
+  `;
+  list.appendChild(header);
+
+  // Contenedor para miembros
+  const membersContainer = document.createElement('div');
+  membersContainer.className = 'team-members-container';
+  membersContainer.style.cssText = 'display: flex; flex-direction: column; gap: 16px; margin-top: 16px;';
+
+  if (!currentApp?.team_members?.length) {
+    membersContainer.innerHTML = `
+      <div style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc; border-radius: 12px; border: 1px dashed #e2e8f0;">
+        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">👥</div>
+        <h4 style="color: #475569; margin-bottom: 8px; font-weight: 600;">Sin miembros en el equipo</h4>
+        <p>Agrega miembros para colaborar en esta aplicación.</p>
+      </div>
+    `;
+    list.appendChild(membersContainer);
+    return;
+  }
 
   currentApp.team_members.forEach(member => {
     const card = document.createElement('div');
@@ -836,18 +860,417 @@ function renderTeamMembers() {
       ${actionsHtml}
     `;
 
-    list.appendChild(card);
+    membersContainer.appendChild(card);
   });
 
-  list.querySelectorAll('.edit-member-btn').forEach(btn => {
+  list.appendChild(membersContainer);
+
+  // Configurar listeners para botones de edición/eliminación
+  membersContainer.querySelectorAll('.edit-member-btn').forEach(btn => {
     btn.onclick = () => editTeamMember(btn.dataset.memberId, btn.dataset.role);
   });
 
-  list.querySelectorAll('.remove-member-btn').forEach(btn => {
+  membersContainer.querySelectorAll('.remove-member-btn').forEach(btn => {
     btn.onclick = () => removeTeamMember(btn.dataset.memberId, btn.dataset.name);
   });
+
+  // Configurar listener para el botón de añadir miembro
+  const addBtn = document.getElementById('add-team-member-btn');
+  if (addBtn) {
+    addBtn.onclick = () => openAddTeamMemberModal();
+  }
 }
 
+/* ======================================================
+   MODAL PARA AÑADIR NUEVO MIEMBRO DEL EQUIPO
+====================================================== */
+function openAddTeamMemberModal() {
+  // Crear modal para añadir miembro
+  const modal = document.createElement('div');
+  modal.id = 'add-team-member-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    ">
+      <h3 style="
+        margin-bottom: 20px;
+        color: #1e293b;
+        font-size: 20px;
+        font-weight: 700;
+      ">Añadir miembro al equipo</h3>
+      
+      <!-- Búsqueda de usuario -->
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #374151;">
+          Buscar usuario
+        </label>
+        <div style="position: relative;">
+          <input type="text" id="add-member-search" 
+            placeholder="Nombre o email del usuario"
+            style="
+              width: 100%;
+              padding: 12px 16px;
+              border: 1px solid #d1d5db;
+              border-radius: 8px;
+              font-size: 14px;
+              transition: all 0.2s ease;
+            "
+          >
+          <div id="add-member-results" 
+            style="
+              position: absolute;
+              top: 100%;
+              left: 0;
+              right: 0;
+              background: white;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              margin-top: 4px;
+              max-height: 200px;
+              overflow-y: auto;
+              box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+              display: none;
+              z-index: 100;
+            "
+          ></div>
+        </div>
+      </div>
+      
+      <!-- Información del miembro seleccionado -->
+      <div id="selected-member-info" style="
+        margin-bottom: 20px;
+        padding: 16px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px dashed #d1d5db;
+        display: none;
+      ">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div id="selected-member-avatar" style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 18px;
+          "></div>
+          <div>
+            <div id="selected-member-name" style="
+              font-weight: 600;
+              color: #111827;
+              font-size: 15px;
+            "></div>
+            <div id="selected-member-email" style="
+              font-size: 13px;
+              color: #6b7280;
+            "></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Campo para rol -->
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #374151;">
+          Rol en el equipo
+        </label>
+        <select id="add-member-role" style="
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          font-size: 14px;
+          background-color: white;
+          color: #1e293b;
+        ">
+          <option value="Desarrollador">Desarrollador</option>
+          <option value="Diseñador">Diseñador</option>
+          <option value="Manager">Manager</option>
+          <option value="Tester">Tester</option>
+          <option value="Soporte">Soporte</option>
+          <option value="Otro">Otro</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="cancel-add-member" style="
+          padding: 10px 24px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          background: white;
+          color: #374151;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        ">
+          Cancelar
+        </button>
+        <button id="confirm-add-member" style="
+          padding: 10px 24px;
+          border: none;
+          border-radius: 8px;
+          background: #2563eb;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: background 0.2s ease;
+          opacity: 0.5;
+          cursor: not-allowed;
+        " disabled>
+          Añadir al equipo
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Variables de estado
+  let selectedUser = null;
+  let searchTimeout = null;
+  
+  // Referencias a elementos del modal
+  const searchInput = modal.querySelector('#add-member-search');
+  const searchResults = modal.querySelector('#add-member-results');
+  const selectedInfo = modal.querySelector('#selected-member-info');
+  const roleSelect = modal.querySelector('#add-member-role');
+  const confirmBtn = modal.querySelector('#confirm-add-member');
+  const cancelBtn = modal.querySelector('#cancel-add-member');
+  
+  // Función para buscar usuarios
+  async function searchUsers(query) {
+    if (query.length < 2) {
+      searchResults.style.display = 'none';
+      return;
+    }
+    
+    try {
+      const res = await fetch(`/search_users?q=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error(`Error ${res.status}`);
+      
+      const users = await res.json();
+      searchResults.innerHTML = '';
+      
+      if (!users || users.length === 0) {
+        searchResults.style.display = 'none';
+        return;
+      }
+      
+      users.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user-search-result';
+        div.style.cssText = `
+          padding: 12px 16px;
+          cursor: pointer;
+          border-bottom: 1px solid #f3f4f6;
+          transition: background 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        `;
+        
+        div.innerHTML = `
+          ${user.avatar_url ? 
+            `<img src="${user.avatar_url}" style="width:32px;height:32px;border-radius:50%;">` : 
+            `<div style="width:32px;height:32px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:14px;">
+              ${user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>`
+          }
+          <div style="flex: 1;">
+            <div style="font-weight: 500; color: #111827; font-size: 14px;">
+              ${user.name || 'Sin nombre'}
+            </div>
+            <div style="font-size: 13px; color: #6b7280;">
+              ${user.email || 'Sin email'}
+            </div>
+          </div>
+        `;
+        
+        div.addEventListener('click', () => {
+          selectUser(user);
+          searchResults.style.display = 'none';
+          searchInput.value = user.name || user.email || '';
+        });
+        
+        div.addEventListener('mouseenter', () => {
+          div.style.background = '#f9fafb';
+        });
+        
+        div.addEventListener('mouseleave', () => {
+          div.style.background = 'white';
+        });
+        
+        searchResults.appendChild(div);
+      });
+      
+      searchResults.style.display = 'block';
+    } catch (err) {
+      console.error('Error buscando usuarios:', err);
+      searchResults.style.display = 'none';
+    }
+  }
+  
+  // Función para seleccionar usuario
+  function selectUser(user) {
+    selectedUser = user;
+    
+    // Mostrar información del usuario seleccionado
+    const avatarDiv = selectedInfo.querySelector('#selected-member-avatar');
+    const nameDiv = selectedInfo.querySelector('#selected-member-name');
+    const emailDiv = selectedInfo.querySelector('#selected-member-email');
+    
+    if (user.avatar_url) {
+      avatarDiv.innerHTML = `<img src="${user.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    } else {
+      avatarDiv.innerHTML = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+      avatarDiv.style.background = '#3b82f6';
+      avatarDiv.style.color = 'white';
+    }
+    
+    nameDiv.textContent = user.name || 'Usuario sin nombre';
+    emailDiv.textContent = user.email || 'Sin email';
+    
+    selectedInfo.style.display = 'block';
+    
+    // Habilitar botón de confirmación
+    confirmBtn.disabled = false;
+    confirmBtn.style.opacity = '1';
+    confirmBtn.style.cursor = 'pointer';
+  }
+  
+  // Event listeners
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
+    
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchUsers(query);
+    }, 300);
+  });
+  
+  searchInput.addEventListener('focus', () => {
+    if (searchInput.value.trim().length >= 2) {
+      searchUsers(searchInput.value.trim());
+    }
+  });
+  
+  // Cerrar resultados al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (!searchResults.contains(e.target) && e.target !== searchInput) {
+      searchResults.style.display = 'none';
+    }
+  });
+  
+  // Botón cancelar
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  // Botón confirmar
+  confirmBtn.addEventListener('click', async () => {
+    if (!selectedUser) return;
+    
+    try {
+      // Enviar solicitud para añadir miembro
+      const response = await fetch(`/account/apps/${currentApp.id}/add_team_member`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_id: selectedUser.id,
+          role: roleSelect.value,
+          name: selectedUser.name,
+          avatar_url: selectedUser.avatar_url,
+          socials: selectedUser.socials || {}
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Actualizar la app localmente
+        currentApp.team_members.push(data.member);
+        
+        // Renderizar equipo actualizado
+        renderTeamMembers();
+        
+        // Cerrar modal
+        modal.remove();
+        
+        // Mostrar notificación
+        showNotification('Miembro añadido correctamente al equipo', 'success');
+      } else {
+        throw new Error(data.message || 'Error al añadir miembro');
+      }
+    } catch (error) {
+      console.error('Error añadiendo miembro:', error);
+      showError('Error al añadir miembro: ' + error.message);
+    }
+  });
+  
+  // Estilos para hover de botones
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#f9fafb';
+  });
+  
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = 'white';
+  });
+  
+  confirmBtn.addEventListener('mouseenter', () => {
+    if (!confirmBtn.disabled) {
+      confirmBtn.style.background = '#1d4ed8';
+    }
+  });
+  
+  confirmBtn.addEventListener('mouseleave', () => {
+    if (!confirmBtn.disabled) {
+      confirmBtn.style.background = '#2563eb';
+    }
+  });
+  
+  // Cerrar con Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+  
+  // Cerrar al hacer clic fuera del modal
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+  
+  // Enfocar el input de búsqueda
+  searchInput.focus();
+}
   /* ======================================================
      REVIEWS (sin cambios)
   ====================================================== */
