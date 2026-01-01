@@ -1189,25 +1189,27 @@ function openAddTeamMemberModal() {
   });
   
   // Botón confirmar
-  confirmBtn.addEventListener('click', async () => {
-    if (!selectedUser) return;
+ confirmBtn.addEventListener('click', async () => {
+  if (!selectedUser) return;
+  
+  try {
+    const response = await fetch(`/account/apps/${currentApp.id}/add_team_member`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        user_id: selectedUser.id,
+        role: roleSelect.value,
+        name: selectedUser.name,
+        avatar_url: selectedUser.avatar_url,
+        socials: selectedUser.socials || {}
+      })
+    });
     
-    try {
-      // Enviar solicitud para añadir miembro
-      const response = await fetch(`/account/apps/${currentApp.id}/add_team_member`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          user_id: selectedUser.id,
-          role: roleSelect.value,
-          name: selectedUser.name,
-          avatar_url: selectedUser.avatar_url,
-          socials: selectedUser.socials || {}
-        })
-      });
-      
+    // Primero verificar si la respuesta es JSON
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
       const data = await response.json();
       
       if (data.success) {
@@ -1225,9 +1227,23 @@ function openAddTeamMemberModal() {
       } else {
         throw new Error(data.message || 'Error al añadir miembro');
       }
-    } catch (error) {
-      console.error('Error añadiendo miembro:', error);
-      showError('Error al añadir miembro: ' + error.message);
+    } else {
+      // Si no es JSON, probablemente sea un error HTML
+      const text = await response.text();
+      console.error("Server returned HTML:", text.substring(0, 200));
+      
+      if (response.status === 404) {
+        throw new Error('La función de añadir miembros no está disponible temporalmente');
+      } else if (response.status === 403) {
+        throw new Error('No tienes permisos para añadir miembros');
+      } else {
+        throw new Error('Error del servidor: ' + response.statusText);
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error añadiendo miembro:', error);
+    showError('Error al añadir miembro: ' + error.message);
     }
   });
   
