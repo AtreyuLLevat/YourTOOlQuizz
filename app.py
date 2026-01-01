@@ -1077,6 +1077,71 @@ def create_app():
             }
         })
 
+    @app.route("/account/apps/<uuid:app_id>/add_team_member", methods=["POST"])
+    @login_required
+    def add_team_member(app_id):
+        try:
+            # Verificar que la app existe
+            app = App.query.get_or_404(app_id)
+            
+            # Verificar que el usuario es el dueño
+            if app.owner_id != current_user.id:
+                return jsonify({"success": False, "message": "No tienes permiso para añadir miembros"}), 403
+            
+            data = request.get_json()
+            
+            # Validar datos requeridos
+            if not data.get("user_id"):
+                return jsonify({"success": False, "message": "Se requiere user_id"}), 400
+            
+            # Buscar el usuario a añadir
+            user_to_add = User.query.get(data["user_id"])
+            if not user_to_add:
+                return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
+            
+            # Verificar que el usuario no esté ya en el equipo
+            existing_member = TeamMember.query.filter_by(
+                app_id=app.id,
+                user_id=user_to_add.id
+            ).first()
+            
+            if existing_member:
+                return jsonify({"success": False, "message": "Este usuario ya está en el equipo"}), 400
+            
+            # Crear nuevo miembro del equipo
+            new_member = TeamMember(
+                app_id=app.id,
+                user_id=user_to_add.id,
+                role=data.get("role", "Desarrollador"),
+                name=data.get("name", user_to_add.name),
+                avatar_url=data.get("avatar_url", user_to_add.avatar_url),
+                socials=data.get("socials", user_to_add.socials) if hasattr(user_to_add, 'socials') else {}
+            )
+            
+            db.session.add(new_member)
+            db.session.commit()
+            
+            # Preparar respuesta
+            member_data = {
+                "id": str(new_member.id),
+                "user_id": new_member.user_id,
+                "name": new_member.name,
+                "role": new_member.role,
+                "avatar_url": new_member.avatar_url,
+                "socials": new_member.socials or {}
+            }
+            
+            return jsonify({
+                "success": True,
+                "message": "Miembro añadido correctamente",
+                "member": member_data
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error añadiendo miembro: {e}")
+            return jsonify({"success": False, "message": "Error interno del servidor"}), 500
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
