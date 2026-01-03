@@ -1698,9 +1698,7 @@ async function createCommunity() {
   }
 }
 
-/* ======================================================
-   RENDERIZAR COMUNIDADES - VERSIÓN MEJORADA
-====================================================== */
+
 function renderCommunities() {
   console.log('🎯 Renderizando comunidades...');
   
@@ -1710,8 +1708,29 @@ function renderCommunities() {
     return;
   }
   
-  // Cambiar a seleccionar por ID si es posible, o usar selector más específico
-  const list = document.querySelector('#communities .community-list');
+  // Asegúrate de que el contenedor de comunidades existe
+  const communitiesTab = document.getElementById('communities');
+  if (!communitiesTab) {
+    console.error('❌ Tab de comunidades no encontrada');
+    return;
+  }
+  
+  // Limpiar y reconstruir la estructura completa
+  communitiesTab.innerHTML = `
+    <div class="communities-header">
+      <h3>Comunidades de la App</h3>
+      <div class="communities-actions">
+        <button id="addCommunityBtn" class="btn-small primary">
+          + Crear Comunidad
+        </button>
+      </div>
+    </div>
+    <div class="communities-container">
+      <ul class="community-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+    </div>
+  `;
+  
+  const list = communitiesTab.querySelector('.community-list');
   if (!list) {
     console.error('❌ No se encontró .community-list');
     return;
@@ -1721,7 +1740,23 @@ function renderCommunities() {
   
   if (!currentApp || !currentApp.communities || currentApp.communities.length === 0) {
     console.log('ℹ️ No hay comunidades para mostrar');
-    list.innerHTML = '<li class="no-communities">Sin comunidades creadas</li>';
+    list.innerHTML = `
+      <div style="
+        text-align: center;
+        padding: 40px 20px;
+        color: #64748b;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px dashed #e2e8f0;
+        margin-top: 20px;
+      ">
+        <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">👥</div>
+        <h4 style="color: #475569; margin-bottom: 8px; font-weight: 600;">
+          Sin comunidades creadas
+        </h4>
+        <p>Crea una comunidad para que los usuarios puedan interactuar.</p>
+      </div>
+    `;
     return;
   }
   
@@ -1812,8 +1847,177 @@ function renderCommunities() {
     li.appendChild(a);
     list.appendChild(li);
   });
+  
+  // Configurar el nuevo botón de crear comunidad
+  const addCommunityBtn = document.getElementById('addCommunityBtn');
+  if (addCommunityBtn) {
+    addCommunityBtn.addEventListener('click', () => {
+      openCreateCommunityModal(currentApp.id);
+    });
+  }
 }
-
+/* ======================================================
+   MODAL PARA CREAR COMUNIDAD
+====================================================== */
+function openCreateCommunityModal(appId) {
+  if (!appId) {
+    showError('No se puede identificar la aplicación');
+    return;
+  }
+  
+  // Crear modal
+  const modal = document.createElement('div');
+  modal.id = 'create-community-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: white;
+      padding: 28px;
+      border-radius: 14px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    ">
+      <h3 style="
+        margin-bottom: 20px;
+        color: #1e293b;
+        font-size: 20px;
+        font-weight: 700;
+      ">Crear nueva comunidad</h3>
+      
+      <div style="margin-bottom: 24px;">
+        <label style="display: block; font-weight: 500; margin-bottom: 8px; color: #374151;">
+          Nombre de la comunidad
+        </label>
+        <input type="text" id="new-community-name" 
+          placeholder="Ej: Soporte Técnico, Beta Testers, Ideas"
+          style="
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+          "
+        >
+        <p style="margin-top: 8px; color: #6b7280; font-size: 13px;">
+          Los usuarios podrán unirse a esta comunidad para discutir sobre la app.
+        </p>
+      </div>
+      
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button id="cancel-create-community" style="
+          padding: 10px 24px;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          background: white;
+          color: #374151;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+        ">
+          Cancelar
+        </button>
+        <button id="confirm-create-community" style="
+          padding: 10px 24px;
+          border: none;
+          border-radius: 8px;
+          background: #2563eb;
+          color: white;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: background 0.2s ease;
+        ">
+          Crear Comunidad
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Referencias
+  const nameInput = modal.querySelector('#new-community-name');
+  const cancelBtn = modal.querySelector('#cancel-create-community');
+  const confirmBtn = modal.querySelector('#confirm-create-community');
+  
+  // Enfocar input
+  nameInput.focus();
+  
+  // Enter para confirmar
+  nameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && nameInput.value.trim()) {
+      createCommunity(appId, nameInput.value.trim());
+    }
+  });
+  
+  // Botón cancelar
+  cancelBtn.addEventListener('click', () => {
+    modal.remove();
+  });
+  
+  // Botón confirmar
+  confirmBtn.addEventListener('click', async () => {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.style.borderColor = '#ef4444';
+      setTimeout(() => {
+        nameInput.style.borderColor = '#d1d5db';
+      }, 1000);
+      return;
+    }
+    
+    await createCommunity(appId, name);
+    modal.remove();
+  });
+  
+  // Estilos hover
+  cancelBtn.addEventListener('mouseenter', () => {
+    cancelBtn.style.background = '#f9fafb';
+  });
+  
+  cancelBtn.addEventListener('mouseleave', () => {
+    cancelBtn.style.background = 'white';
+  });
+  
+  confirmBtn.addEventListener('mouseenter', () => {
+    confirmBtn.style.background = '#1d4ed8';
+  });
+  
+  confirmBtn.addEventListener('mouseleave', () => {
+    confirmBtn.style.background = '#2563eb';
+  });
+  
+  // Cerrar con Escape
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      modal.remove();
+      document.removeEventListener('keydown', handleEscape);
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+  
+  // Cerrar al hacer clic fuera
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  });
+}
 /* ======================================================
    ELIMINAR COMUNIDAD - CON MINI MODAL
 ====================================================== */
