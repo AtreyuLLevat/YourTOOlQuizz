@@ -1245,6 +1245,68 @@ input[type="checkbox"] {
 .team-member-card:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+/* Estilos para comunidades */
+.communities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.community-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.community-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+.community-card:hover {
+  transform: translateY(-2px);
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.community-card-content {
+  flex: 1;
+}
+
+.community-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.community-card-meta {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.community-card-arrow {
+  color: #374151;
+  font-size: 18px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.community-card:hover .community-card-arrow {
+  transform: translateX(4px);
+}
 </style>
 {% endblock %}
 
@@ -1535,22 +1597,34 @@ input[type="checkbox"] {
     <form id="createCommunityForm">
       <!-- Información básica -->
       <div class="section" style="margin-bottom: 20px;">
-        <h3 style="margin-bottom: 15px; font-size: 1rem;">Información básica</h3>
+        <h3 style="margin-bottom: 15px; font-size: 1rem; color: #374151;">Información básica</h3>
         
-        <div class="field">
-          <label for="communityName">Nombre de la comunidad *</label>
-          <input type="text" id="communityName" name="name" required 
+        <div class="field" style="margin-bottom: 15px;">
+          <label for="communityName" style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+            Nombre de la comunidad *
+          </label>
+          <input type="text" 
+                 id="communityName" 
+                 name="name" 
+                 required 
                  placeholder="Ej: Desarrolladores de YourToolQuizz"
-                 maxlength="200">
+                 maxlength="200"
+                 style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+          <div id="nameError" style="color: #dc2626; font-size: 0.85rem; margin-top: 5px; display: none;"></div>
         </div>
         
-        <div class="field">
-          <label for="communityDescription">Descripción</label>
-          <textarea id="communityDescription" name="description" rows="3" 
+        <div class="field" style="margin-bottom: 15px;">
+          <label for="communityDescription" style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+            Descripción
+          </label>
+          <textarea id="communityDescription" 
+                    name="description" 
+                    rows="3" 
                     placeholder="Describe el propósito de esta comunidad..."
-                    maxlength="500"></textarea>
+                    maxlength="500"
+                    style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
         </div>
-        
+
         <div class="field">
           <label for="communityRules">Reglas de la comunidad</label>
           <textarea id="communityRules" name="rules" rows="4" 

@@ -1,24 +1,36 @@
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('✅ create_community.js cargado');
+  
   let currentAppId = null;
   let addedMembers = [];
   
   // Elementos del DOM
   const modal = document.getElementById('createCommunityModal');
   const form = document.getElementById('createCommunityForm');
-  const searchTeamUserInput = document.getElementById('searchTeamUser');
-  const teamUserRoleSelect = document.getElementById('teamUserRole');
-  const addTeamUserBtn = document.getElementById('addTeamUserBtn');
-  const externalUserEmailInput = document.getElementById('externalUserEmail');
-  const externalUserRoleSelect = document.getElementById('externalUserRole');
-  const addExternalUserBtn = document.getElementById('addExternalUserBtn');
-  const membersList = document.getElementById('communityMembersList');
-  const cancelBtn = document.getElementById('cancelCommunityModal');
+  const nameInput = document.getElementById('communityName');
+  const nameError = document.getElementById('nameError');
   
-  // Función para abrir el modal
+  // Verificar que los elementos existen
+  if (!modal || !form || !nameInput) {
+    console.error('❌ Elementos del modal no encontrados');
+    return;
+  }
+  
+  // Función para abrir el modal - VERSIÓN MEJORADA
   window.openCreateCommunityModal = function(appId) {
+    console.log('🔄 Abriendo modal de comunidad para app:', appId);
+    
+    if (!appId) {
+      console.error('❌ No se proporcionó appId');
+      return;
+    }
+    
     currentAppId = appId;
     addedMembers = [];
-    updateMembersList();
+    
+    // Limpiar formulario
+    if (form) form.reset();
+    if (nameError) nameError.style.display = 'none';
     
     // El owner por defecto es el usuario actual
     const currentUserData = window.currentUserData;
@@ -31,19 +43,199 @@ document.addEventListener('DOMContentLoaded', function() {
         role: 'owner',
         is_external: false
       });
-      updateMembersList();
+      console.log('✅ Owner añadido:', currentUserData.name);
     }
     
+    updateMembersList();
+    
+    // Mostrar modal
     modal.classList.remove('hidden');
+    
+    // Enfocar el campo de nombre después de un pequeño delay
+    setTimeout(() => {
+      if (nameInput) {
+        nameInput.focus();
+        console.log('🎯 Campo de nombre enfocado');
+      }
+    }, 100);
   };
   
   // Función para cerrar el modal
   function closeModal() {
+    console.log('🗑 Cerrando modal de comunidad');
     modal.classList.add('hidden');
-    form.reset();
+    if (form) form.reset();
     addedMembers = [];
     currentAppId = null;
+    if (nameError) nameError.style.display = 'none';
   }
+  
+  // Función para validar el nombre
+  function validateName() {
+    const name = nameInput ? nameInput.value.trim() : '';
+    
+    if (!name) {
+      if (nameError) {
+        nameError.textContent = 'El nombre es obligatorio';
+        nameError.style.display = 'block';
+      }
+      return false;
+    }
+    
+    if (name.length < 3) {
+      if (nameError) {
+        nameError.textContent = 'El nombre debe tener al menos 3 caracteres';
+        nameError.style.display = 'block';
+      }
+      return false;
+    }
+    
+    if (nameError) {
+      nameError.style.display = 'none';
+    }
+    return true;
+  }
+  
+  // Event listener para el input de nombre
+  if (nameInput) {
+    nameInput.addEventListener('input', function() {
+      console.log('⌨️ Input detectado:', this.value);
+      validateName();
+    });
+    
+    nameInput.addEventListener('keydown', function(e) {
+      console.log('⌨️ Tecla presionada:', e.key);
+    });
+    
+    nameInput.addEventListener('focus', function() {
+      console.log('🎯 Input de nombre enfocado');
+    });
+    
+    nameInput.addEventListener('blur', function() {
+      validateName();
+    });
+  } else {
+    console.error('❌ Input de nombre no encontrado');
+  }
+  
+  // Enviar formulario - VERSIÓN MEJORADA
+  if (form) {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      console.log('📤 Enviando formulario...');
+      
+      // Validar nombre
+      if (!validateName()) {
+        console.error('❌ Validación de nombre fallida');
+        return;
+      }
+      
+      // Validar que hay al menos un owner
+      const owners = addedMembers.filter(m => m.role === 'owner');
+      if (owners.length !== 1) {
+        alert('Debe haber exactamente un owner en la comunidad');
+        return;
+      }
+      
+      // Validar límites de administradores
+      const admins = addedMembers.filter(m => m.role === 'admin');
+      if (admins.length > 3) {
+        alert('Máximo 3 administradores permitidos');
+        return;
+      }
+      
+      // Preparar datos
+      const formData = {
+        name: nameInput ? nameInput.value.trim() : '',
+        description: document.getElementById('communityDescription') ? 
+                     document.getElementById('communityDescription').value.trim() : '',
+        rules: document.getElementById('communityRules') ? 
+               document.getElementById('communityRules').value.trim() : '',
+        is_public: document.getElementById('communityVisibility') ? 
+                   document.getElementById('communityVisibility').value : 'public',
+        allow_public_join: document.getElementById('communityJoinPolicy') ? 
+                          document.getElementById('communityJoinPolicy').value : 'yes',
+        members: addedMembers.map(member => ({
+          user_id: member.user_id,
+          email: member.email,
+          role: member.role
+        }))
+      };
+      
+      console.log('📦 Datos a enviar:', formData);
+      
+      if (!currentAppId) {
+        console.error('❌ No hay appId');
+        alert('Error: No se ha identificado la aplicación');
+        return;
+      }
+      
+      try {
+        // Mostrar indicador de carga
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Creando...';
+        submitBtn.disabled = true;
+        
+        const response = await fetch(`/apps/${currentAppId}/create_community_v2`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        console.log('📥 Respuesta recibida:', response.status);
+        
+        const data = await response.json();
+        console.log('📊 Datos de respuesta:', data);
+        
+        // Restaurar botón
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        
+        if (data.success) {
+          console.log('✅ Comunidad creada exitosamente');
+          alert('¡Comunidad creada exitosamente!');
+          closeModal();
+          
+          // Recargar la lista de comunidades si estamos en el modal de detalle
+          if (window.renderCommunities && typeof window.renderCommunities === 'function') {
+            console.log('🔄 Recargando lista de comunidades');
+            window.renderCommunities();
+          }
+        } else {
+          console.error('❌ Error del servidor:', data.error);
+          alert('Error al crear la comunidad: ' + (data.error || 'Error desconocido'));
+        }
+      } catch (error) {
+        console.error('❌ Error de red:', error);
+        alert('Error de conexión. Por favor, verifica tu internet e intenta de nuevo.');
+        
+        // Restaurar botón
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.textContent = 'Crear Comunidad';
+          submitBtn.disabled = false;
+        }
+      }
+    });
+  }
+  
+  // Cerrar modal al hacer clic fuera
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+  
+  // Cerrar con tecla Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+  
   
   // Buscar usuarios del equipo
   searchTeamUserInput.addEventListener('input', async function(e) {
