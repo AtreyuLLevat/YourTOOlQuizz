@@ -1,23 +1,29 @@
-// community-setup.js - Archivo único para el modal de configuración de equipo
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Iniciando sistema de configuración de equipo');
+    console.log('🚀 Iniciando configuración de equipo (MODO DEBUG FORZADO)');
     
-    // Verificar si somos el owner y si el equipo no está configurado
     const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) return;
-    
-    const communityId = chatContainer.dataset.communityId;
-    const isOwner = chatContainer.dataset.isOwner === 'true';
-    const teamConfigured = chatContainer.dataset.teamConfigured === 'true';
-    const currentUserName = chatContainer.dataset.userName || 'Usuario';
-    
-    // Si no es owner o ya está configurado, no mostrar nada
-    if (!isOwner || teamConfigured) {
-        console.log('ℹ️ No se necesita configuración de equipo');
+    if (!chatContainer) {
+        console.error('❌ NO HAY chat-container');
         return;
     }
     
-    console.log('🎯 Mostrando modal de configuración para owner');
+    // FORZAR VALORES PARA TESTING
+    const communityId = chatContainer.dataset.communityId;
+    const currentUserName = chatContainer.dataset.userName || 'Usuario';
+    const userId = chatContainer.dataset.userId;
+    
+    console.log('🔧 FORZANDO isOwner = true para testing');
+    const isOwner = true; // ← AQUÍ ESTÁ LA MAGIA
+    const teamConfigured = chatContainer.dataset.teamConfigured === 'true';
+    
+    console.log('📊 Valores:', { isOwner, teamConfigured, communityId, userId });
+    
+    if (!isOwner || teamConfigured) {
+        console.log('⚠️ No mostrar modal:', { isOwner, teamConfigured });
+        return;
+    }
+    
+    console.log('✅ Mostrando modal...');
     
     // Crear e insertar el HTML del modal
     createModalHTML();
@@ -872,4 +878,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar el botón de completar
     updateCompleteButton();
+
+        const debugBtn = document.createElement('button');
+    debugBtn.innerHTML = '🐛 Debug Info';
+    debugBtn.style.cssText = 'position:fixed;bottom:20px;right:20px;background:red;color:white;padding:10px;z-index:99999;';
+    debugBtn.onclick = () => {
+        alert(`Debug:\nUser ID: ${userId}\nCommunity ID: ${communityId}\nisOwner: ${isOwner}\nteamConfigured: ${teamConfigured}`);
+    };
+    document.body.appendChild(debugBtn);
 });
