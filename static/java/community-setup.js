@@ -477,19 +477,16 @@ async function loadTeamMembers() {
                         align-items: center;
                         justify-content: space-between;
                     ">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                           <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
-     alt="${member.name}"
-     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
-     onerror="this.src='${DEFAULT_AVATAR_URL}'">
-                                 alt="${member.name}"
-                                 style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
-                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNCIgY3k9IjI0IiByPSIyNCIgZmlsbD0iI0U1RTVFNSIvPjx0ZXh0IHg9IjI0IiB5PSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIj4${btoa((member.name?.charAt(0) || 'U').toUpperCase())}</dGV4dD48L3N2Zz4='">
-                            <div>
-                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">${member.name}</h4>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280;">${member.role || 'Miembro del equipo'}</p>
-                            </div>
-                        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+                 alt="${member.name}"  <!-- AQUÍ ESTÁ EL ERROR: debería ser member.name -->
+                 style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;"
+                 onerror="this.src='${DEFAULT_AVATAR_URL}'">
+            <div>
+                <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
+                <div style="font-size: 12px; color: #6b7280;">${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}</div>
+            </div>
+        </div>
                         <button class="select-member-btn" style="
                             padding: 8px 16px;
                             background: #10b981;
