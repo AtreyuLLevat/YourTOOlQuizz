@@ -48,339 +48,400 @@ document.addEventListener('DOMContentLoaded', function() {
        FUNCIONES PRINCIPALES
     ============================================ */
     
-    function createModalHTML() {
-        const modalHTML = `
-        <div id="teamSetupModal" class="team-setup-modal" style="
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(4px);
+ function createModalHTML() {
+    const modalHTML = `
+    <div id="teamSetupModal" class="team-setup-modal" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    ">
+        <div style="
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e1e5e9;
         ">
+            <!-- Header -->
             <div style="
-                background: white;
-                border-radius: 20px;
-                width: 90%;
-                max-width: 1200px;
-                max-height: 90vh;
-                overflow-y: auto;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                animation: slideUp 0.4s ease-out;
+                padding: 28px 40px;
+                border-bottom: 1px solid #eaeaea;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             ">
-                <!-- Header -->
-                <div style="
-                    padding: 30px 40px 20px;
-                    border-bottom: 1px solid #e5e7eb;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border-radius: 20px 20px 0 0;
-                ">
-                    <h2 style="font-size: 28px; margin-bottom: 8px;">👥 Configurar Equipo</h2>
-                    <p style="font-size: 16px; opacity: 0.9;">Asigna roles a los miembros de la comunidad</p>
+                <div>
+                    <h2 style="font-size: 24px; margin: 0; color: #1a1a1a; font-weight: 600;">Configure Team</h2>
+                    <p style="font-size: 14px; color: #666; margin: 8px 0 0 0;">Assign roles to community members</p>
+                </div>
+                <button id="closeModalBtn" style="
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    color: #999;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s;
+                " onmouseover="this.style.background='#f5f5f5';this.style.color='#333'"
+                   onmouseout="this.style.background='none';this.style.color='#999'">
+                    ×
+                </button>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 0 40px 40px;">
+                <!-- Role Selection -->
+                <div style="margin: 32px 0;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px;">ROLES</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                        <!-- Owner -->
+                        <div style="
+                            padding: 20px;
+                            border: 1px solid #eaeaea;
+                            border-radius: 8px;
+                            border-left: 3px solid #f0b90b;
+                            transition: border-color 0.2s;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="width: 36px; height: 36px; background: #fef8e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f0b90b;">
+                                    <span style="font-size: 18px;">👑</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Owner</h4>
+                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Full control</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin -->
+                        <div style="
+                            padding: 20px;
+                            border: 1px solid #eaeaea;
+                            border-radius: 8px;
+                            border-left: 3px solid #0066ff;
+                            transition: border-color 0.2s;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="width: 36px; height: 36px; background: #e6f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0066ff;">
+                                    <span style="font-size: 18px;">⚙️</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Admin</h4>
+                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Daily operations</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Moderator -->
+                        <div style="
+                            padding: 20px;
+                            border: 1px solid #eaeaea;
+                            border-radius: 8px;
+                            border-left: 3px solid #00a86b;
+                            transition: border-color 0.2s;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="width: 36px; height: 36px; background: #e6f5ef; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #00a86b;">
+                                    <span style="font-size: 18px;">👁️</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Moderator</h4>
+                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Content quality</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Collaborator -->
+                        <div style="
+                            padding: 20px;
+                            border: 1px solid #eaeaea;
+                            border-radius: 8px;
+                            border-left: 3px solid #8a2be2;
+                            transition: border-color 0.2s;
+                        ">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                <div style="width: 36px; height: 36px; background: #f3e8ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8a2be2;">
+                                    <span style="font-size: 18px;">🤝</span>
+                                </div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Collaborator</h4>
+                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Support role</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Body -->
-                <div style="padding: 30px 40px;">
-                    <!-- Grid de roles -->
+                <!-- Team Members -->
+                <div style="margin: 40px 0;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px;">TEAM MEMBERS</h3>
+                    
+                    <!-- Current Owner -->
                     <div style="
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                        gap: 20px;
-                        margin-bottom: 40px;
+                        padding: 16px;
+                        background: #fef8e6;
+                        border-radius: 8px;
+                        border: 1px solid #ffeeba;
+                        margin-bottom: 24px;
                     ">
-                        <!-- Owner Card -->
-                        <div style="
-                            padding: 25px;
-                            border-radius: 16px;
-                            border: 1px solid #e5e7eb;
-                            border-left: 5px solid #dc2626;
-                            transition: all 0.3s ease;
-                        ">
-                            <div style="font-size: 40px; margin-bottom: 15px;">👑</div>
-                            <div>
-                                <h3 style="font-size: 18px; margin-bottom: 12px; color: #1e293b;">Owner / Creador</h3>
-                                <ul style="list-style: none; padding: 0; margin: 0 0 15px 0;">
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Control total de la comunidad
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Asigna y revoca roles
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Acceso completo a métricas
-                                    </li>
-                                </ul>
-                                <div style="font-size: 13px; color: #6b7280; font-style: italic; padding-top: 10px; border-top: 1px dashed #e5e7eb;">
-                                    👉 Solo debe haber 1
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; background: #f0b90b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                    ${currentUserName?.charAt(0) || 'Y'}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">${currentUserName} (You)</div>
+                                    <div style="font-size: 13px; color: #666; margin-top: 2px;">Owner</div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Admin Card -->
-                        <div style="
-                            padding: 25px;
-                            border-radius: 16px;
-                            border: 1px solid #e5e7eb;
-                            border-left: 5px solid #2563eb;
-                            transition: all 0.3s ease;
-                        ">
-                            <div style="font-size: 40px; margin-bottom: 15px;">🛡️</div>
-                            <div>
-                                <h3 style="font-size: 18px; margin-bottom: 12px; color: #1e293b;">Administrador</h3>
-                                <ul style="list-style: none; padding: 0; margin: 0 0 15px 0;">
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Gestionan funcionamiento diario
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Publican anuncios oficiales
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Crean encuestas y fijan mensajes
-                                    </li>
-                                </ul>
-                                <div style="font-size: 13px; color: #6b7280; font-style: italic; padding-top: 10px; border-top: 1px dashed #e5e7eb;">
-                                    👉 1–3 máximo
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Moderator Card -->
-                        <div style="
-                            padding: 25px;
-                            border-radius: 16px;
-                            border: 1px solid #e5e7eb;
-                            border-left: 5px solid #059669;
-                            transition: all 0.3s ease;
-                        ">
-                            <div style="font-size: 40px; margin-bottom: 15px;">⚖️</div>
-                            <div>
-                                <h3 style="font-size: 18px; margin-bottom: 12px; color: #1e293b;">Moderador</h3>
-                                <ul style="list-style: none; padding: 0; margin: 0 0 15px 0;">
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Mantienen orden y calidad
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Borran mensajes inapropiados
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Silencian/expulsan temporalmente
-                                    </li>
-                                </ul>
-                                <div style="font-size: 13px; color: #6b7280; font-style: italic; padding-top: 10px; border-top: 1px dashed #e5e7eb;">
-                                    👉 Rol más importante día a día
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Collaborator Card -->
-                        <div style="
-                            padding: 25px;
-                            border-radius: 16px;
-                            border: 1px solid #e5e7eb;
-                            border-left: 5px solid #7c3aed;
-                            transition: all 0.3s ease;
-                        ">
-                            <div style="font-size: 40px; margin-bottom: 15px;">🤝</div>
-                            <div>
-                                <h3 style="font-size: 18px; margin-bottom: 12px; color: #1e293b;">Colaborador</h3>
-                                <ul style="list-style: none; padding: 0; margin: 0 0 15px 0;">
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Apoyo sin poder disciplinario
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Responden dudas y guían
-                                    </li>
-                                    <li style="font-size: 14px; color: #64748b; margin-bottom: 6px; padding-left: 20px; position: relative;">
-                                        <span style="position: absolute; left: 0; color: #10b981; font-weight: bold;">✓</span>
-                                        Marcan feedback útil
-                                    </li>
-                                </ul>
-                                <div style="font-size: 13px; color: #6b7280; font-style: italic; padding-top: 10px; border-top: 1px dashed #e5e7eb;">
-                                    👉 Ideal para no dar poder excesivo
-                                </div>
-                            </div>
+                            <span style="
+                                padding: 6px 12px;
+                                background: #f0b90b;
+                                color: white;
+                                border-radius: 12px;
+                                font-size: 12px;
+                                font-weight: 500;
+                            ">Owner</span>
                         </div>
                     </div>
                     
-                    <!-- Formulario de configuración -->
-                    <div style="margin-bottom: 30px;">
-                        <!-- Buscar miembros del equipo -->
+                    <!-- Add Team Members -->
+                    <div style="margin-bottom: 24px;">
                         <div style="
-                            margin-bottom: 30px;
-                            padding: 25px;
-                            background: #f8fafc;
-                            border-radius: 12px;
-                            border: 1px solid #e2e8f0;
+                            display: grid;
+                            grid-template-columns: 1fr 180px auto;
+                            gap: 12px;
+                            margin-bottom: 20px;
                         ">
-                            <h3 style="font-size: 18px; margin-bottom: 8px; color: #1e293b;">👥 Añadir Miembros del Equipo</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">
-                                Busca miembros que ya están en el equipo de la app
-                            </p>
-                            
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                <input type="text" 
-                                       id="teamSearchInput" 
-                                       placeholder="Buscar por nombre o email..."
-                                       style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-                                <select id="teamRoleSelect" style="width: 180px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-                                    <option value="admin">🛡️ Administrador</option>
-                                    <option value="moderator">⚖️ Moderador</option>
-                                    <option value="collaborator">🤝 Colaborador</option>
-                                </select>
-                                <button id="addTeamMemberBtn" style="padding: 12px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                                    Añadir
-                                </button>
-                            </div>
-                            <div id="teamSearchResults" style="
-                                border: 1px solid #e5e7eb;
-                                border-radius: 8px;
-                                max-height: 200px;
-                                overflow-y: auto;
+                            <input type="text" 
+                                   id="teamSearchInput" 
+                                   placeholder="Search by name or email..."
+                                   style="
+                                        padding: 12px 16px;
+                                        border: 1px solid #ddd;
+                                        border-radius: 6px;
+                                        font-size: 14px;
+                                        outline: none;
+                                        transition: border-color 0.2s;
+                                   " onfocus="this.style.borderColor='#0066ff'"
+                                   onblur="this.style.borderColor='#ddd'">
+                            <select id="teamRoleSelect" style="
+                                padding: 12px 16px;
+                                border: 1px solid #ddd;
+                                border-radius: 6px;
+                                font-size: 14px;
                                 background: white;
-                                display: none;
-                            "></div>
-                        </div>
-                        
-                        <!-- Invitar usuarios externos -->
-                        <div style="
-                            margin-bottom: 30px;
-                            padding: 25px;
-                            background: #f8fafc;
-                            border-radius: 12px;
-                            border: 1px solid #e2e8f0;
-                        ">
-                            <h3 style="font-size: 18px; margin-bottom: 8px; color: #1e293b;">📧 Invitar Usuarios Externos</h3>
-                            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">
-                                Invita a personas que no están en el equipo de la app
-                            </p>
-                            
-                            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                                <input type="text" 
-                                       id="externalUserName" 
-                                       placeholder="Nombre del invitado"
-                                       style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-                                <input type="email" 
-                                       id="externalUserEmail" 
-                                       placeholder="Email del invitado"
-                                       style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-                                <select id="externalUserRole" style="width: 180px; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
-                                    <option value="admin">🛡️ Administrador</option>
-                                    <option value="moderator">⚖️ Moderador</option>
-                                    <option value="collaborator">🤝 Colaborador</option>
-                                </select>
-                                <button id="inviteUserBtn" style="padding: 12px 20px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                                    Invitar
-                                </button>
-                            </div>
-                            <p style="font-size: 13px; color: #6b7280; margin-top: 10px;">
-                                El usuario recibirá un email de invitación
-                            </p>
-                        </div>
-                        
-                        <!-- Miembros actuales -->
-                        <div style="
-                            margin-bottom: 30px;
-                            padding: 25px;
-                            background: #f8fafc;
-                            border-radius: 12px;
-                            border: 1px solid #e2e8f0;
-                        ">
-                            <h3 style="font-size: 18px; margin-bottom: 8px; color: #1e293b;">✅ Miembros Configurados</h3>
-                            <div id="currentMembersList" style="min-height: 150px; margin-bottom: 20px;">
-                                <div id="noMembersMessage" style="text-align: center; padding: 40px 20px; color: #9ca3af;">
-                                    <div style="font-size: 48px; margin-bottom: 10px; opacity: 0.5;">👤</div>
-                                    <p>Añade miembros usando los formularios de arriba</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Owner actual -->
-                            <div id="ownerInfo" style="
-                                display: flex;
-                                align-items: center;
-                                gap: 15px;
-                                padding: 15px;
-                                background: #fef3c7;
-                                border-radius: 10px;
-                                border: 1px solid #fbbf24;
+                                color: #333;
+                                outline: none;
                             ">
-                                <div style="font-size: 24px;">👑</div>
-                                <div style="flex: 1;">
-                                    <strong>${currentUserName}</strong> (Tú)
-                                    <div style="font-size: 13px; color: #92400e;">Owner de esta comunidad</div>
-                                </div>
-                            </div>
+                                <option value="admin">Admin</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="collaborator">Collaborator</option>
+                            </select>
+                            <button id="addTeamMemberBtn" style="
+                                padding: 12px 24px;
+                                background: #0066ff;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                font-size: 14px;
+                                transition: background 0.2s;
+                            " onmouseover="this.style.background='#0052cc'"
+                               onmouseout="this.style.background='#0066ff'">
+                                Add Member
+                            </button>
+                        </div>
+                        
+                        <div id="teamSearchResults" style="
+                            border: 1px solid #eaeaea;
+                            border-radius: 6px;
+                            max-height: 200px;
+                            overflow-y: auto;
+                            background: white;
+                            display: none;
+                            margin-top: 8px;
+                        "></div>
+                    </div>
+                    
+                    <!-- External Invite -->
+                    <div style="
+                        padding: 24px;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        border: 1px solid #eaeaea;
+                        margin-bottom: 32px;
+                    ">
+                        <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Invite New Member</h4>
+                        <div style="
+                            display: grid;
+                            grid-template-columns: 1fr 1fr 180px auto;
+                            gap: 12px;
+                        ">
+                            <input type="text" 
+                                   id="externalUserName" 
+                                   placeholder="Name"
+                                   style="
+                                        padding: 12px 16px;
+                                        border: 1px solid #ddd;
+                                        border-radius: 6px;
+                                        font-size: 14px;
+                                        outline: none;
+                                   ">
+                            <input type="email" 
+                                   id="externalUserEmail" 
+                                   placeholder="Email"
+                                   style="
+                                        padding: 12px 16px;
+                                        border: 1px solid #ddd;
+                                        border-radius: 6px;
+                                        font-size: 14px;
+                                        outline: none;
+                                   ">
+                            <select id="externalUserRole" style="
+                                padding: 12px 16px;
+                                border: 1px solid #ddd;
+                                border-radius: 6px;
+                                font-size: 14px;
+                                background: white;
+                                color: #333;
+                            ">
+                                <option value="admin">Admin</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="collaborator">Collaborator</option>
+                            </select>
+                            <button id="inviteUserBtn" style="
+                                padding: 12px 24px;
+                                background: #1a1a1a;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                cursor: pointer;
+                                font-weight: 500;
+                                font-size: 14px;
+                                transition: background 0.2s;
+                            " onmouseover="this.style.background='#333'"
+                               onmouseout="this.style.background='#1a1a1a'">
+                                Send Invite
+                            </button>
+                        </div>
+                        <p style="font-size: 13px; color: #666; margin-top: 12px; margin-bottom: 0;">
+                            An email invitation will be sent
+                        </p>
+                    </div>
+                    
+                    <!-- Current Members List -->
+                    <div id="currentMembersList" style="
+                        min-height: 100px;
+                        margin-bottom: 32px;
+                    ">
+                        <div id="noMembersMessage" style="
+                            text-align: center;
+                            padding: 40px 20px;
+                            color: #999;
+                            border: 2px dashed #eaeaea;
+                            border-radius: 8px;
+                            background: #fafafa;
+                        ">
+                            <div style="font-size: 36px; margin-bottom: 16px; opacity: 0.5;">👥</div>
+                            <p style="margin: 0; font-size: 14px;">Add team members using the forms above</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Footer -->
-                <div style="
-                    padding: 25px 40px;
-                    background: #f9fafb;
-                    border-top: 1px solid #e5e7eb;
-                    display: flex;
-                    justify-content: space-between;
-                    border-radius: 0 0 20px 20px;
-                ">
+            </div>
+            
+            <!-- Footer -->
+            <div style="
+                padding: 24px 40px;
+                background: #f8f9fa;
+                border-top: 1px solid #eaeaea;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-radius: 0 0 12px 12px;
+            ">
+                <div style="font-size: 14px; color: #666;">
+                    <span id="memberCount" style="font-weight: 600; color: #1a1a1a;">1</span> member configured
+                </div>
+                <div style="display: flex; gap: 12px;">
                     <button id="skipSetupBtn" style="
-                        padding: 14px 28px;
-                        border-radius: 10px;
-                        font-size: 16px;
-                        font-weight: 600;
+                        padding: 12px 28px;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
                         cursor: pointer;
                         background: white;
-                        color: #64748b;
-                        border: 1px solid #d1d5db;
-                    ">
-                        ⏭️ Configurar después
+                        color: #666;
+                        border: 1px solid #ddd;
+                        transition: all 0.2s;
+                    " onmouseover="this.style.borderColor='#999';this.style.color='#333'"
+                       onmouseout="this.style.borderColor='#ddd';this.style.color='#666'">
+                        Configure Later
                     </button>
                     <button id="completeSetupBtn" style="
-                        padding: 14px 28px;
-                        border-radius: 10px;
-                        font-size: 16px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        background: #9ca3af;
-                        color: white;
-                        border: none;
+                        padding: 12px 28px;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        font-weight: 500;
                         cursor: not-allowed;
+                        background: #eaeaea;
+                        color: #999;
+                        border: none;
+                        transition: all 0.2s;
                     " disabled>
-                        ✅ Completar Configuración
+                        Complete Setup
                     </button>
                 </div>
             </div>
         </div>
-        `;
+    </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Añadir animación CSS para el modal
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
-        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        #teamSetupModal > div {
+            animation: modalFadeIn 0.3s ease-out;
+        }
         
-        // Añadir animación CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideUp {
-                from { opacity: 0; transform: translateY(30px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
+        .user-result:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .member-item {
+            transition: box-shadow 0.2s;
+        }
+        
+        .member-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+    `;
+    document.head.appendChild(style);
+}
     
     function addOwnerToMembers() {
         currentMembers.push({
