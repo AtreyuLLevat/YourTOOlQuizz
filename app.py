@@ -1290,6 +1290,228 @@ def create_app():
 
         return jsonify(results)
 
+
+    # En app.py, añade estas rutas:
+
+    @app.route('/community/<uuid:community_id>/setup_team')
+    @login_required
+    def community_setup_team(community_id):
+        """Página para configurar el equipo de la comunidad"""
+        community = Community.query.get_or_404(community_id)
+        
+        # Verificar que el usuario es el owner
+        if community.owner_id != current_user.id:
+            abort(403, "Solo el owner puede configurar el equipo")
+        
+        # Verificar que el equipo no esté ya configurado
+        if community.team_configured:
+            flash("El equipo ya fue configurado", "info")
+            return redirect(url_for('community_view', community_id=community.id))
+        
+        # Obtener usuarios del equipo de la app
+        team_members = TeamMember.query.filter_by(app_id=community.app_id).all()
+        team_users = []
+        for tm in team_members:
+            if tm.user:
+                team_users.append({
+                    'id': tm.user.id,
+                    'name': tm.user.name,
+                    'email': tm.user.email,
+                    'avatar_url': tm.user.avatar_url,
+                    'current_role': tm.role,
+                    'socials': tm.user.socials or {}
+                })
+        
+        return render_template('community_setup_team.html',
+                            community=community,
+                            team_users=team_users)
+
+    @app.route('/api/community/<uuid:community_id>/add_member_role', methods=['POST'])
+    @login_required
+    def add_community_member_role(community_id):
+        """Añadir un miembro con rol a la comunidad"""
+        community = Community.query.get_or_404(community_id)
+        
+        # Verificar permisos
+        if community.owner_id != current_user.id:
+            return jsonify({"success": False, "error": "No autorizado"}), 403
+        
+        data = request.json
+        user_id = data.get('user_id')
+        email = data.get('email', '').strip()
+        role = data.get('role')
+        name = data.get('name', '').strip()
+        
+        if not role or role not in ['owner', 'admin', 'moderator', 'collaborator']:
+            return jsonify({"success": False, "error": "Rol inválido"}), 400
+        
+        # Validar límites de roles
+        if role == 'owner':
+            existing_owner = CommunityMemberRole.query.filter_by(
+                community_id=community.id,
+                role='owner'
+            ).first()
+            if existing_owner:
+                return jsonify({"success": False, "error": "Ya existe un owner"}), 400
+        
+        if role == 'admin':
+            admin_count = CommunityMemberRole.query.filter_by(
+                community_id=community.id,
+                role='admin'
+            ).count()
+            if admin_count >= community.max_admins:
+                return jsonify({"success": False, "error": f"Máximo {community.max_admins} administradores"}), 400
+        
+        user_to_add = None
+        
+        # Si es usuario existente
+        if user_id:
+            user_to_add = User.query.get(user_id)
+            if not user_to_add:
+                return jsonify({"success": False, "error": "Usuario no encontrado"}), 404
+        
+        # Si es usuario externo (por email)
+        elif email:
+            # Buscar usuario por email
+            user_to_add = User.query.filter_by(email=email).first()
+            
+            # Si no existe, crear usuario invitado
+            if not user_to_add:
+                user_to_add = User(
+                    name=name or email.split('@')[0],
+                    email=email,
+                    password=generate_password_hash(str(uuid.uuid4())),
+                    is_verified=False,
+                    role='guest',
+                    avatar_url=f"https://ui-avatars.com/api/?name={name or email}&background=random"
+                )
+                db.session.add(user_to_add)
+                db.session.flush()
+                
+                # Enviar invitación por email
+                try:
+                    send_invitation_email(email, community.name, current_user.name)
+                except Exception as e:
+                    print(f"Error enviando invitación: {e}")
+        
+        if not user_to_add:
+            return jsonify({"success": False, "error": "No se pudo añadir el usuario"}), 400
+        
+        # Verificar que no tenga ya un rol
+        existing_role = CommunityMemberRole.query.filter_by(
+            community_id=community.id,
+            user_id=user_to_add.id
+        ).first()
+        
+        if existing_role:
+            return jsonify({"success": False, "error": "Este usuario ya tiene un rol"}), 400
+        
+        # Crear rol
+        member_role = CommunityMemberRole(
+            community_id=community.id,
+            user_id=user_to_add.id,
+            role=role,
+            assigned_by=current_user.id
+        )
+        db.session.add(member_role)
+        
+        # Añadir como miembro del grupo si no lo está
+        if not GroupMember.query.filter_by(
+            community_id=community.id,
+            user_id=user_to_add.id
+        ).first():
+            group_member = GroupMember(
+                community_id=community.id,
+                app_id=community.app_id,
+                user_id=user_to_add.id,
+                is_active=True
+            )
+            db.session.add(group_member)
+        
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "member": {
+                "id": user_to_add.id,
+                "name": user_to_add.name,
+                "email": user_to_add.email,
+                "avatar_url": user_to_add.avatar_url,
+                "role": role,
+                "is_external": not user_id  # True si fue añadido por email
+            }
+        })
+
+    @app.route('/api/community/<uuid:community_id>/complete_setup', methods=['POST'])
+    @login_required
+    def complete_community_setup(community_id):
+        """Marcar que la configuración del equipo está completa"""
+        community = Community.query.get_or_404(community_id)
+        
+        if community.owner_id != current_user.id:
+            return jsonify({"success": False, "error": "No autorizado"}), 403
+        
+        # Verificar que haya al menos un owner
+        owner_count = CommunityMemberRole.query.filter_by(
+            community_id=community.id,
+            role='owner'
+        ).count()
+        
+        if owner_count != 1:
+            return jsonify({"success": False, "error": "Debe haber exactamente un owner"}), 400
+        
+        # Marcar como configurado
+        community.team_configured = True
+        db.session.commit()
+        
+        return jsonify({"success": True})
+
+    def send_invitation_email(to_email, community_name, inviter_name):
+        """Enviar email de invitación a la comunidad"""
+        subject = f"🎉 Te han invitado a la comunidad '{community_name}'"
+        
+        html_body = f"""
+        <div style="font-family: Arial, sans-serif; background: #f9fafb; padding: 30px;">
+            <div style="max-width: 480px; margin: auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <div style="text-align:center; margin-bottom: 25px;">
+                    <img src="https://yourtoolquizz.site/static/Imagenes/logo.png" alt="YourToolQuizz" style="width: 100px; height:auto;" />
+                </div>
+                
+                <h2 style="color:#111827; text-align:center;">¡Invitación a comunidad!</h2>
+                
+                <p style="color:#374151; font-size:15px;">
+                    <strong>{inviter_name}</strong> te ha invitado a unirte a la comunidad
+                    <strong>"{community_name}"</strong> en YourToolQuizz.
+                </p>
+                
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <p style="margin: 0; color: #0369a1;">
+                        <strong>📢 Acceso inmediato:</strong> Ya puedes participar en la comunidad.
+                    </p>
+                </div>
+                
+                <p style="color:#374151; font-size:15px;">
+                    Inicia sesión en YourToolQuizz para comenzar a participar.
+                </p>
+                
+                <div style="text-align:center; margin:30px 0;">
+                    <a href="https://yourtoolquizz.site/login" 
+                    style="background:#2563eb; color:#fff; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:600;">
+                        Ir a YourToolQuizz
+                    </a>
+                </div>
+                
+                <p style="font-size:12px; color:#9ca3af; text-align:center;">
+                    © {datetime.utcnow().year} YourToolQuizz — Todos los derechos reservados.
+                </p>
+            </div>
+        </div>
+        """
+        
+        msg = Message(subject, recipients=[to_email])
+        msg.html = html_body
+        mail.send(msg)
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')

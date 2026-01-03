@@ -301,12 +301,16 @@ class Community(db.Model):
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
-    cover_image_url = db.Column(db.String(500))  # Nueva campo para foto/portada
+    cover_image_url = db.Column(db.String(500))
     is_public = db.Column(db.Boolean, default=True)
     allow_public_join = db.Column(db.Boolean, default=False)
-    rules = db.Column(db.Text)  # Reglas de la comunidad
-    max_admins = db.Column(db.Integer, default=3)  # Máximo de administradores
-    max_moderators = db.Column(db.Integer, default=10)  # Máximo de moderadores
+    rules = db.Column(db.Text)
+    max_admins = db.Column(db.Integer, default=3)
+    max_moderators = db.Column(db.Integer, default=10)
+    
+    # 🔥 NUEVO: Indica si el equipo ya fue configurado
+    team_configured = db.Column(db.Boolean, default=False)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -314,33 +318,26 @@ class Community(db.Model):
     app = db.relationship("App", back_populates="communities")
     members = db.relationship("GroupMember", back_populates="community", cascade="all, delete-orphan")
     messages = db.relationship("GroupMessage", back_populates="community", cascade="all, delete-orphan")
-    
-    # Nueva relación para roles especiales
     special_members = db.relationship("CommunityMemberRole", backref="community_ref", cascade="all, delete-orphan")
 
     @property
     def owner_id(self):
-        """Devuelve el id del owner de la comunidad (heredado del owner de la app)"""
         return self.app.owner_id
     
     @property
     def owner(self):
-        """Devuelve el usuario owner"""
         return self.app.owner
     
     @property
     def admins(self):
-        """Devuelve los administradores"""
         return [role.user for role in self.special_members if role.role == 'admin']
     
     @property
     def moderators(self):
-        """Devuelve los moderadores"""
         return [role.user for role in self.special_members if role.role == 'moderator']
     
     @property
     def collaborators(self):
-        """Devuelve los colaboradores"""
         return [role.user for role in self.special_members if role.role == 'collaborator']
 
 
