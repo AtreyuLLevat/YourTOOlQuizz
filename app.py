@@ -1108,15 +1108,15 @@ def create_app():
             if existing_member:
                 return jsonify({"success": False, "message": "Este usuario ya está en el equipo"}), 400
             
-            # Crear nuevo miembro del equipo
+                        # Crear nuevo miembro del equipo
             new_member = TeamMember(
                 app_id=app.id,
                 user_id=user_to_add.id,
                 role=data.get("role", "Desarrollador"),
                 name=data.get("name", user_to_add.name),
-                avatar_url=data.get("avatar_url", user_to_add.avatar_url),
-                socials=data.get("socials", user_to_add.socials) if hasattr(user_to_add, 'socials') else {}
+                avatar_url=data.get("avatar_url", user_to_add.avatar_url)
             )
+
             
             db.session.add(new_member)
             db.session.commit()
