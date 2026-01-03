@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
        FUNCIONES PRINCIPALES
     ============================================ */
     
- function createModalHTML() {
+function createModalHTML() {
     const modalHTML = `
     <div id="teamSetupModal" class="team-setup-modal" style="
         position: fixed;
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             background: white;
             border-radius: 12px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -108,81 +108,108 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="padding: 0 40px 40px;">
                 <!-- Role Selection -->
                 <div style="margin: 32px 0;">
-                    <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px;">ROLES</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;">SELECT ROLE</h3>
+                        <button id="roleInfoBtn" style="
+                            background: none;
+                            border: none;
+                            color: #0066ff;
+                            cursor: pointer;
+                            font-size: 14px;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                            padding: 6px 12px;
+                            border-radius: 4px;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#f0f7ff'"
+                           onmouseout="this.style.background='none'">
+                            <span style="font-size: 16px;">ℹ️</span>
+                            Role Information
+                        </button>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                         <!-- Owner -->
                         <div style="
-                            padding: 20px;
+                            padding: 16px;
                             border: 1px solid #eaeaea;
                             border-radius: 8px;
-                            border-left: 3px solid #f0b90b;
-                            transition: border-color 0.2s;
+                            cursor: default;
+                            position: relative;
                         ">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                <div style="width: 36px; height: 36px; background: #fef8e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f0b90b;">
-                                    <span style="font-size: 18px;">👑</span>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 32px; height: 32px; background: #fef8e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f0b90b;">
+                                        <span style="font-size: 16px;">👑</span>
+                                    </div>
+                                    <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Owner</h4>
                                 </div>
-                                <div>
-                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Owner</h4>
-                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Full control</p>
-                                </div>
+                                <span style="
+                                    font-size: 11px;
+                                    font-weight: 500;
+                                    color: #f0b90b;
+                                    background: #fef8e6;
+                                    padding: 2px 8px;
+                                    border-radius: 10px;
+                                ">You</span>
+                            </div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
+                                Full control over community
                             </div>
                         </div>
                         
                         <!-- Admin -->
                         <div style="
-                            padding: 20px;
+                            padding: 16px;
                             border: 1px solid #eaeaea;
                             border-radius: 8px;
-                            border-left: 3px solid #0066ff;
-                            transition: border-color 0.2s;
+                            cursor: default;
                         ">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                <div style="width: 36px; height: 36px; background: #e6f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0066ff;">
-                                    <span style="font-size: 18px;">⚙️</span>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <div style="width: 32px; height: 32px; background: #e6f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0066ff;">
+                                    <span style="font-size: 16px;">⚙️</span>
                                 </div>
-                                <div>
-                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Admin</h4>
-                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Daily operations</p>
-                                </div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Admin</h4>
+                            </div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
+                                Manages daily operations, posts official announcements
                             </div>
                         </div>
                         
                         <!-- Moderator -->
                         <div style="
-                            padding: 20px;
+                            padding: 16px;
                             border: 1px solid #eaeaea;
                             border-radius: 8px;
-                            border-left: 3px solid #00a86b;
-                            transition: border-color 0.2s;
+                            cursor: default;
                         ">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                <div style="width: 36px; height: 36px; background: #e6f5ef; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #00a86b;">
-                                    <span style="font-size: 18px;">👁️</span>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <div style="width: 32px; height: 32px; background: #e6f5ef; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #00a86b;">
+                                    <span style="font-size: 16px;">👁️</span>
                                 </div>
-                                <div>
-                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Moderator</h4>
-                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Content quality</p>
-                                </div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Moderator</h4>
+                            </div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
+                                Maintains order and content quality
                             </div>
                         </div>
                         
                         <!-- Collaborator -->
                         <div style="
-                            padding: 20px;
+                            padding: 16px;
                             border: 1px solid #eaeaea;
                             border-radius: 8px;
-                            border-left: 3px solid #8a2be2;
-                            transition: border-color 0.2s;
+                            cursor: default;
                         ">
-                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                                <div style="width: 36px; height: 36px; background: #f3e8ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8a2be2;">
-                                    <span style="font-size: 18px;">🤝</span>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <div style="width: 32px; height: 32px; background: #f3e8ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8a2be2;">
+                                    <span style="font-size: 16px;">🤝</span>
                                 </div>
-                                <div>
-                                    <h4 style="margin: 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Collaborator</h4>
-                                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Support role</p>
-                                </div>
+                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Collaborator</h4>
+                            </div>
+                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
+                                Support role without disciplinary power
                             </div>
                         </div>
                     </div>
@@ -192,37 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div style="margin: 40px 0;">
                     <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px;">TEAM MEMBERS</h3>
                     
-                    <!-- Current Owner -->
-                    <div style="
-                        padding: 16px;
-                        background: #fef8e6;
-                        border-radius: 8px;
-                        border: 1px solid #ffeeba;
-                        margin-bottom: 24px;
-                    ">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 40px; height: 40px; background: #f0b90b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
-                                    ${currentUserName?.charAt(0) || 'Y'}
-                                </div>
-                                <div>
-                                    <div style="font-weight: 600; color: #1a1a1a;">${currentUserName} (You)</div>
-                                    <div style="font-size: 13px; color: #666; margin-top: 2px;">Owner</div>
-                                </div>
-                            </div>
-                            <span style="
-                                padding: 6px 12px;
-                                background: #f0b90b;
-                                color: white;
-                                border-radius: 12px;
-                                font-size: 12px;
-                                font-weight: 500;
-                            ">Owner</span>
-                        </div>
-                    </div>
-                    
                     <!-- Add Team Members -->
-                    <div style="margin-bottom: 24px;">
+                    <div style="margin-bottom: 32px;">
                         <div style="
                             display: grid;
                             grid-template-columns: 1fr 180px auto;
@@ -249,6 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 background: white;
                                 color: #333;
                                 outline: none;
+                                cursor: pointer;
                             ">
                                 <option value="admin">Admin</option>
                                 <option value="moderator">Moderator</option>
@@ -322,6 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 font-size: 14px;
                                 background: white;
                                 color: #333;
+                                cursor: pointer;
                             ">
                                 <option value="admin">Admin</option>
                                 <option value="moderator">Moderator</option>
@@ -412,11 +412,167 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
+    
+    <!-- Role Info Modal -->
+    <div id="roleInfoModal" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    ">
+        <div style="
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        ">
+            <div style="
+                padding: 24px;
+                border-bottom: 1px solid #eaeaea;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            ">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #1a1a1a;">Role Information</h3>
+                <button onclick="document.getElementById('roleInfoModal').style.display='none'" style="
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    color: #999;
+                    cursor: pointer;
+                    padding: 0;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.2s;
+                " onmouseover="this.style.background='#f5f5f5';this.style.color='#333'"
+                   onmouseout="this.style.background='none';this.style.color='#999'">
+                    ×
+                </button>
+            </div>
+            
+            <div style="padding: 24px;">
+                <div style="display: grid; gap: 20px;">
+                    <!-- Owner -->
+                    <div style="padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: #fef8e6; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #f0b90b;">
+                                <span style="font-size: 20px;">👑</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">Owner</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 13px; color: #999;">Full control</p>
+                            </div>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6;">
+                            <li style="margin-bottom: 8px;">Complete control over the community</li>
+                            <li style="margin-bottom: 8px;">Assigns and revokes roles</li>
+                            <li style="margin-bottom: 8px;">Access to all metrics and settings</li>
+                            <li style="color: #f0b90b; font-weight: 500;">Only one owner per community</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Admin -->
+                    <div style="padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: #e6f0ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0066ff;">
+                                <span style="font-size: 20px;">⚙️</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">Admin</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 13px; color: #999;">Daily operations</p>
+                            </div>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6;">
+                            <li style="margin-bottom: 8px;">Manages daily community operations</li>
+                            <li style="margin-bottom: 8px;">Posts official announcements</li>
+                            <li style="margin-bottom: 8px;">Creates polls and pins messages</li>
+                            <li style="color: #0066ff; font-weight: 500;">Maximum 3 administrators</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Moderator -->
+                    <div style="padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: #e6f5ef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #00a86b;">
+                                <span style="font-size: 20px;">👁️</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">Moderator</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 13px; color: #999;">Content quality</p>
+                            </div>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6;">
+                            <li style="margin-bottom: 8px;">Maintains order and quality standards</li>
+                            <li style="margin-bottom: 8px;">Removes inappropriate messages</li>
+                            <li style="margin-bottom: 8px;">Temporarily mutes or bans users</li>
+                            <li style="color: #00a86b; font-weight: 500;">Most important day-to-day role</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Collaborator -->
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                            <div style="width: 40px; height: 40px; background: #f3e8ff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #8a2be2;">
+                                <span style="font-size: 20px;">🤝</span>
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">Collaborator</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 13px; color: #999;">Support role</p>
+                            </div>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; font-size: 14px; color: #333; line-height: 1.6;">
+                            <li style="margin-bottom: 8px;">Support without disciplinary power</li>
+                            <li style="margin-bottom: 8px;">Answers questions and guides users</li>
+                            <li style="margin-bottom: 8px;">Flags useful feedback for review</li>
+                            <li style="color: #8a2be2; font-weight: 500;">Ideal for limited access roles</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="
+                padding: 20px 24px;
+                background: #f8f9fa;
+                border-top: 1px solid #eaeaea;
+                border-radius: 0 0 12px 12px;
+                display: flex;
+                justify-content: flex-end;
+            ">
+                <button onclick="document.getElementById('roleInfoModal').style.display='none'" style="
+                    padding: 10px 24px;
+                    background: #0066ff;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 14px;
+                    transition: background 0.2s;
+                " onmouseover="this.style.background='#0052cc'"
+                   onmouseout="this.style.background='#0066ff'">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // Añadir animación CSS para el modal
+    // Añadir animación CSS
     const style = document.createElement('style');
     style.textContent = `
         @keyframes modalFadeIn {
@@ -424,7 +580,13 @@ document.addEventListener('DOMContentLoaded', function() {
             to { opacity: 1; transform: translateY(0); }
         }
         
-        #teamSetupModal > div {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #teamSetupModal > div,
+        #roleInfoModal > div {
             animation: modalFadeIn 0.3s ease-out;
         }
         
@@ -439,10 +601,70 @@ document.addEventListener('DOMContentLoaded', function() {
         .member-item:hover {
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
+        
+        #roleInfoModal {
+            animation: fadeIn 0.2s ease-out;
+        }
     `;
     document.head.appendChild(style);
-}
     
+    // Configurar evento para el botón de información de roles
+    const roleInfoBtn = document.getElementById('roleInfoBtn');
+    if (roleInfoBtn) {
+        roleInfoBtn.addEventListener('click', () => {
+            document.getElementById('roleInfoModal').style.display = 'flex';
+        });
+    }
+    
+    // Configurar evento para cerrar modal principal
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            if (currentMembers.length <= 1) {
+                if (confirm('Are you sure? You haven\'t added any team members yet.')) {
+                    closeModal();
+                }
+            } else {
+                closeModal();
+            }
+        });
+    }
+    
+    // Cerrar modal de información al hacer clic fuera
+    const roleInfoModal = document.getElementById('roleInfoModal');
+    if (roleInfoModal) {
+        roleInfoModal.addEventListener('click', (e) => {
+            if (e.target === roleInfoModal) {
+                roleInfoModal.style.display = 'none';
+            }
+        });
+    }
+}
+
+// Añadir esta función para actualizar el contador de miembros
+function updateMemberCounter() {
+    const memberCount = document.getElementById('memberCount');
+    if (memberCount) {
+        // Contar solo miembros que no sean el owner actual
+        const additionalMembers = currentMembers.filter(m => !m.is_current_user).length;
+        memberCount.textContent = additionalMembers + 1; // +1 para el owner
+    }
+}
+
+// Llamar a updateMemberCounter después de añadir o remover miembros
+// En la función addMemberToUI:
+function addMemberToUI(member) {
+    currentMembers.push(member);
+    // ... resto del código ...
+    updateMemberCounter(); // <-- Añadir esto
+}
+
+// En la función removeMember:
+window.removeMember = function(email) {
+    currentMembers = currentMembers.filter(m => m.email !== email);
+    // ... resto del código ...
+    updateMemberCounter(); // <-- Añadir esto
+};
     function addOwnerToMembers() {
         currentMembers.push({
             id: chatContainer.dataset.userId,
