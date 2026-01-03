@@ -691,7 +691,7 @@ function handleTeamSearch(e) {
     searchTimeout = setTimeout(async () => {
         try {
             // Buscar en los miembros del equipo
-            const response = await fetch(`/search_team_users/${communityId}?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`/search_team_users_c/${communityId}?q=${encodeURIComponent(query)}`);
             const users = await response.json();
             
             if (!users || users.length === 0) {
@@ -985,7 +985,7 @@ function createExternalInvitation(name, email, role) {
         searchTimeout = setTimeout(async () => {
             try {
                 // Buscar en el equipo de la app
-                const response = await fetch(`/search_team_users/${communityId}?q=${encodeURIComponent(query)}`);
+                const response = await fetch(`/search_team_users_c/${communityId}?q=${encodeURIComponent(query)}`);
                 const users = await response.json();
                 
                 if (!users || users.length === 0) {
@@ -1042,7 +1042,7 @@ function createExternalInvitation(name, email, role) {
         }
         
         // Buscar usuarios y añadir el primero
-        fetch(`/search_team_users/${communityId}?q=${encodeURIComponent(query)}`)
+        fetch(`/search_team_users_c/${communityId}?q=${encodeURIComponent(query)}`)
             .then(res => res.json())
             .then(users => {
                 if (users && users.length > 0) {
