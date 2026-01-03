@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
        FUNCIONES PRINCIPALES
     ============================================ */
     
-function createModalHTML() {
+ function createModalHTML() {
     const modalHTML = `
     <div id="teamSetupModal" class="team-setup-modal" style="
         position: fixed;
@@ -106,10 +106,10 @@ function createModalHTML() {
             
             <!-- Content -->
             <div style="padding: 0 40px 40px;">
-                <!-- Role Selection -->
+                <!-- Team Members -->
                 <div style="margin: 32px 0;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                        <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;">SELECT ROLE</h3>
+                        <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;">TEAM MEMBERS</h3>
                         <button id="roleInfoBtn" style="
                             background: none;
                             border: none;
@@ -129,98 +129,39 @@ function createModalHTML() {
                         </button>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                        <!-- Owner -->
-                        <div style="
-                            padding: 16px;
-                            border: 1px solid #eaeaea;
-                            border-radius: 8px;
-                            cursor: default;
-                            position: relative;
-                        ">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 32px; height: 32px; background: #fef8e6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #f0b90b;">
-                                        <span style="font-size: 16px;">👑</span>
-                                    </div>
-                                    <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Owner</h4>
+                    <!-- Current Owner -->
+                    <div style="
+                        padding: 16px;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        border: 1px solid #eaeaea;
+                        margin-bottom: 24px;
+                    ">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 40px; height: 40px; background: #fef8e6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #f0b90b; font-weight: 600;">
+                                    ${currentUserName?.charAt(0) || 'Y'}
                                 </div>
-                                <span style="
-                                    font-size: 11px;
-                                    font-weight: 500;
-                                    color: #f0b90b;
-                                    background: #fef8e6;
-                                    padding: 2px 8px;
-                                    border-radius: 10px;
-                                ">You</span>
-                            </div>
-                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
-                                Full control over community
-                            </div>
-                        </div>
-                        
-                        <!-- Admin -->
-                        <div style="
-                            padding: 16px;
-                            border: 1px solid #eaeaea;
-                            border-radius: 8px;
-                            cursor: default;
-                        ">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                <div style="width: 32px; height: 32px; background: #e6f0ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0066ff;">
-                                    <span style="font-size: 16px;">⚙️</span>
+                                <div>
+                                    <div style="font-weight: 600; color: #1a1a1a;">${currentUserName} (You)</div>
+                                    <div style="font-size: 13px; color: #666; margin-top: 2px;">Owner</div>
                                 </div>
-                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Admin</h4>
                             </div>
-                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
-                                Manages daily operations, posts official announcements
-                            </div>
-                        </div>
-                        
-                        <!-- Moderator -->
-                        <div style="
-                            padding: 16px;
-                            border: 1px solid #eaeaea;
-                            border-radius: 8px;
-                            cursor: default;
-                        ">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                <div style="width: 32px; height: 32px; background: #e6f5ef; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #00a86b;">
-                                    <span style="font-size: 16px;">👁️</span>
-                                </div>
-                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Moderator</h4>
-                            </div>
-                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
-                                Maintains order and content quality
-                            </div>
-                        </div>
-                        
-                        <!-- Collaborator -->
-                        <div style="
-                            padding: 16px;
-                            border: 1px solid #eaeaea;
-                            border-radius: 8px;
-                            cursor: default;
-                        ">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                <div style="width: 32px; height: 32px; background: #f3e8ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #8a2be2;">
-                                    <span style="font-size: 16px;">🤝</span>
-                                </div>
-                                <h4 style="margin: 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">Collaborator</h4>
-                            </div>
-                            <div style="font-size: 13px; color: #666; line-height: 1.4;">
-                                Support role without disciplinary power
-                            </div>
+                            <span style="
+                                padding: 6px 12px;
+                                background: #fef8e6;
+                                color: #f0b90b;
+                                border-radius: 12px;
+                                font-size: 12px;
+                                font-weight: 500;
+                                border: 1px solid #f0b90b;
+                            ">Owner</span>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Team Members -->
-                <div style="margin: 40px 0;">
-                    <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 20px;">TEAM MEMBERS</h3>
                     
                     <!-- Add Team Members -->
                     <div style="margin-bottom: 32px;">
+                        <h4 style="font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0;">ADD FROM EXISTING TEAM</h4>
                         <div style="
                             display: grid;
                             grid-template-columns: 1fr 180px auto;
@@ -288,7 +229,7 @@ function createModalHTML() {
                         border: 1px solid #eaeaea;
                         margin-bottom: 32px;
                     ">
-                        <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: #1a1a1a;">Invite New Member</h4>
+                        <h4 style="margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: #1a1a1a;">INVITE NEW MEMBER</h4>
                         <div style="
                             display: grid;
                             grid-template-columns: 1fr 1fr 180px auto;
@@ -640,31 +581,7 @@ function createModalHTML() {
         });
     }
 }
-
-// Añadir esta función para actualizar el contador de miembros
-function updateMemberCounter() {
-    const memberCount = document.getElementById('memberCount');
-    if (memberCount) {
-        // Contar solo miembros que no sean el owner actual
-        const additionalMembers = currentMembers.filter(m => !m.is_current_user).length;
-        memberCount.textContent = additionalMembers + 1; // +1 para el owner
-    }
-}
-
-// Llamar a updateMemberCounter después de añadir o remover miembros
-// En la función addMemberToUI:
-function addMemberToUI(member) {
-    currentMembers.push(member);
-    // ... resto del código ...
-    updateMemberCounter(); // <-- Añadir esto
-}
-
-// En la función removeMember:
-window.removeMember = function(email) {
-    currentMembers = currentMembers.filter(m => m.email !== email);
-    // ... resto del código ...
-    updateMemberCounter(); // <-- Añadir esto
-};
+    
     function addOwnerToMembers() {
         currentMembers.push({
             id: chatContainer.dataset.userId,
