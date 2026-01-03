@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Iniciando configuración de equipo (MODO DEBUG FORZADO)');
     
-    const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) {
-        console.error('❌ NO HAY chat-container');
-        return;
+    function getSafeAvatar(url, name = '') {
+        // Si no hay URL o es inválida, usar avatar por defecto
+        if (!url || url.trim() === '' || url.includes('undefined') || url.includes('null')) {
+            return DEFAULT_AVATAR_URL;
+        }
+        return url;
     }
     
+    const chatContainer = document.getElementById('chat-container');
     // FORZAR VALORES PARA TESTING
     const communityId = chatContainer.dataset.communityId;
     const currentUserName = chatContainer.dataset.userName || 'Usuario';
@@ -47,7 +50,12 @@ document.addEventListener('DOMContentLoaded', function() {
     /* ============================================
        FUNCIONES PRINCIPALES
     ============================================ */
+        // URL DEL AVATAR POR DEFECTO DESDE SUPABASE (misma que backend)
+    const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";
     
+    // FUNCIÓN PARA OBTENER AVATAR SEGURO
+
+
 function createModalHTML() {
     const modalHTML = `
     <div id="teamSetupModal" class="team-setup-modal" style="
@@ -470,7 +478,10 @@ async function loadTeamMembers() {
                         justify-content: space-between;
                     ">
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="${member.avatar_url || getDefaultAvatar()}" 
+                           <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+     alt="${member.name}"
+     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
+     onerror="this.src='${DEFAULT_AVATAR_URL}'">
                                  alt="${member.name}"
                                  style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
                                  onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyNCIgY3k9IjI0IiByPSIyNCIgZmlsbD0iI0U1RTVFNSIvPjx0ZXh0IHg9IjI0IiB5PSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMCIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIj4${btoa((member.name?.charAt(0) || 'U').toUpperCase())}</dGV4dD48L3N2Zz4='">
@@ -591,10 +602,9 @@ async function searchExternalUsers(query) {
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        ${user.avatar_url ? 
-                          `<img src="${user.avatar_url}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : 
-                          `<div style="width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #6b7280;">${user.name?.charAt(0) || 'U'}</div>`
-                        }
+<img src="${getSafeAvatar(user.avatar_url, user.name)}" 
+     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+     onerror="this.src='${DEFAULT_AVATAR_URL}'">
                         <div>
                             <div style="font-weight: 600; color: #1a1a1a;">${user.name || 'Usuario'}</div>
                             <div style="font-size: 14px; color: #6b7280;">${user.email || 'Sin email'}</div>
@@ -749,7 +759,10 @@ function addToCommunityList(member) {
             justify-content: space-between;
         ">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <img src="${member.avatar_url || getDefaultAvatar()}" 
+                <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+     alt="${member.name}"
+     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
+     onerror="this.src='${DEFAULT_AVATAR_URL}'">
                      alt="${member.name}"
                      style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
                 <div>
