@@ -1563,23 +1563,6 @@ def create_app():
 # RUTAS PARA CONFIGURACIÓN DE EQUIPO DE COMUNIDAD
 # ============================================
 
-
-    @app.route('/api/community/<uuid:community_id>/complete_setup', methods=['POST'])
-    @login_required
-    def complete_community_setup(community_id):
-        """Versión simplificada"""
-        try:
-            community = Community.query.get_or_404(community_id)
-            
-            if community.owner_id != current_user.id:
-                return jsonify({"success": False, "error": "No autorizado"}), 403
-            
-            # Simplemente devolver éxito - no guardamos estado
-            return jsonify({"success": True})
-            
-        except Exception as e:
-            print(f"❌ Error: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')
