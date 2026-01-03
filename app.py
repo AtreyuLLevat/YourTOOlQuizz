@@ -1512,9 +1512,9 @@ def create_app():
         msg.html = html_body
         mail.send(msg)
     
-    @app.route("/search_team_users/<uuid:community_id>")
+    @app.route("/search_team_users_c/<uuid:community_id>")
     @login_required
-    def search_team_users(community_id):
+    def search_team_users_c(community_id):
         """Busca usuarios que ya son miembros del equipo de la app"""
         community = Community.query.get_or_404(community_id)
         
