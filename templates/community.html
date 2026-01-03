@@ -154,6 +154,7 @@ body { display: flex; height: 100vh; background: #fafafa; }
 <div id="chat-container"
      data-community-id="{{ community.id }}"
      data-user-id="{{ current_user.id }}"
+     data-app-id="{{ community.app_id }}"
      data-user-name="{{ current_user.name }}"
      data-is-admin="{{ current_user.role == 'admin' }}"
      data-is-owner="{{ current_user.id == community.owner_id }}"
