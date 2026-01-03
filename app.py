@@ -1562,52 +1562,7 @@ def create_app():
 # ============================================
 # RUTAS PARA CONFIGURACIÓN DE EQUIPO DE COMUNIDAD
 # ============================================
-    @app.route('/api/community/<uuid:community_id>/add_member_role', methods=['POST'])
-    @login_required
-    def add_community_member_role(community_id):
-        """Versión simplificada sin campo role en GroupMember"""
-        try:
-            community = Community.query.get_or_404(community_id)
-            
-            if community.owner_id != current_user.id:
-                return jsonify({"success": False, "error": "No autorizado"}), 403
-            
-            data = request.json
-            user_id = data.get('user_id')
-            
-            if not user_id:
-                return jsonify({"success": False, "error": "User ID requerido"}), 400
-            
-            user_to_add = User.query.get(user_id)
-            if not user_to_add:
-                return jsonify({"success": False, "error": "Usuario no encontrado"}), 404
-            
-            # Verificar si ya es miembro
-            existing_member = GroupMember.query.filter_by(
-                community_id=community.id,
-                user_id=user_to_add.id
-            ).first()
-            
-            if not existing_member:
-                # Añadir como miembro
-                new_member = GroupMember(
-                    community_id=community.id,
-                    app_id=community.app_id,
-                    user_id=user_to_add.id,
-                    is_active=True
-                )
-                db.session.add(new_member)
-                db.session.commit()
-            
-            return jsonify({
-                "success": True,
-                "message": "Miembro añadido a la comunidad"
-            })
-            
-        except Exception as e:
-            db.session.rollback()
-            print(f"❌ Error añadiendo miembro: {e}")
-            return jsonify({"success": False, "error": str(e)}), 500
+
 
     @app.route('/api/community/<uuid:community_id>/complete_setup', methods=['POST'])
     @login_required
