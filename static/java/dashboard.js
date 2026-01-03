@@ -1193,7 +1193,7 @@ function openAddTeamMemberModal() {
   if (!selectedUser) return;
   
   try {
-    const response = await fetch(`/account/apps/${currentApp.id}/add_team_member`, {
+    const response = await fetch(`/account/apps/${currentApp.id}/add_team_member_two`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
