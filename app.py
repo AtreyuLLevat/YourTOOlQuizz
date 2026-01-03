@@ -1142,6 +1142,154 @@ def create_app():
             print(f"Error añadiendo miembro: {e}")
             return jsonify({"success": False, "message": "Error interno del servidor"}), 500
 
+
+    # Ruta para buscar usuarios (complementaria)
+    @app.route('/apps/<string:app_id>/create_community_v2', methods=['POST'])
+    @login_required
+    def create_community_v2(app_id):
+        """
+        Versión mejorada del formulario de creación de comunidades
+        """
+        try:
+            uuid_obj = UUID(app_id, version=4)
+        except ValueError:
+            return jsonify({"success": False, "error": "ID inválido"}), 400
+
+        app_obj = App.query.filter_by(id=uuid_obj).first()
+        if not app_obj:
+            return jsonify({"success": False, "error": "App no encontrada"}), 404
+
+        data = request.json
+        name = data.get('name', '').strip()
+        description = data.get('description', '').strip()
+        rules = data.get('rules', '').strip()
+        is_public = data.get('is_public', 'public') == 'public'
+        allow_public_join = data.get('allow_public_join', 'yes') == 'yes'
+        
+        # Miembros con roles
+        members_data = data.get('members', [])
+        
+        if not name:
+            return jsonify({"success": False, "error": "Nombre obligatorio"}), 400
+        
+        # Validar que solo haya un owner
+        owners = [m for m in members_data if m.get('role') == 'owner']
+        if len(owners) != 1:
+            return jsonify({"success": False, "error": "Debe haber exactamente un owner"}), 400
+        
+        # Validar límites de roles
+        admins = [m for m in members_data if m.get('role') == 'admin']
+        if len(admins) > 3:
+            return jsonify({"success": False, "error": "Máximo 3 administradores permitidos"}), 400
+
+        # Crear comunidad
+        community = Community(
+            name=name,
+            description=description,
+            rules=rules,
+            is_public=is_public,
+            allow_public_join=allow_public_join,
+            app_id=app_obj.id
+        )
+        
+        db.session.add(community)
+        db.session.flush()  # Para obtener el ID
+        
+        # Procesar miembros con roles
+        for member_data in members_data:
+            user_id = member_data.get('user_id')
+            role = member_data.get('role')
+            email = member_data.get('email', '').strip()
+            
+            # Si es usuario externo, buscar o crear usuario placeholder
+            if not user_id and email:
+                # Buscar usuario por email
+                user = User.query.filter_by(email=email).first()
+                if not user:
+                    # Crear usuario placeholder (invitado)
+                    # En un sistema real, enviarías invitación por email
+                    user = User(
+                        name=email.split('@')[0],
+                        email=email,
+                        password='invited',
+                        is_verified=False,
+                        role='guest'
+                    )
+                    db.session.add(user)
+                    db.session.flush()
+                user_id = user.id
+            
+            if user_id and role:
+                # Crear relación de rol
+                member_role = CommunityMemberRole(
+                    community_id=community.id,
+                    user_id=user_id,
+                    role=role,
+                    assigned_by=current_user.id
+                )
+                db.session.add(member_role)
+                
+                # También añadir como miembro del grupo
+                if not GroupMember.query.filter_by(
+                    community_id=community.id,
+                    user_id=user_id
+                ).first():
+                    group_member = GroupMember(
+                        community_id=community.id,
+                        app_id=app_obj.id,
+                        user_id=user_id,
+                        is_active=True
+                    )
+                    db.session.add(group_member)
+        
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "community": {
+                "id": str(community.id),
+                "name": community.name,
+                "description": community.description
+            }
+        })
+
+    # Ruta para buscar usuarios (complementaria)
+    @app.route("/search_team_users/<uuid:app_id>")
+    @login_required
+    def search_team_users(app_id):
+        """Busca usuarios que ya son miembros del equipo de la app"""
+        query = request.args.get("q", "").strip()
+        if not query or len(query) < 2:
+            return jsonify([])
+
+        # Buscar usuarios del equipo de la app
+        team_members = TeamMember.query.filter_by(app_id=app_id).all()
+        team_user_ids = [tm.user_id for tm in team_members if tm.user_id]
+        
+        # Buscar usuarios por nombre o email
+        users = User.query.filter(
+            or_(
+                User.name.ilike(f"%{query}%"),
+                User.email.ilike(f"%{query}%")
+            ),
+            User.id.in_(team_user_ids)  # Solo usuarios del equipo
+        ).limit(10).all()
+
+        results = []
+        for user in users:
+            # Obtener rol en el equipo
+            team_member = next((tm for tm in team_members if tm.user_id == user.id), None)
+            
+            results.append({
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "avatar_url": user.avatar_url,
+                "team_role": team_member.role if team_member else None
+            })
+
+        return jsonify(results)
+
     @app.route('/listadodecosas')
     def explorador():
         return render_template('listadodecosas.html')

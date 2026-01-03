@@ -301,17 +301,47 @@ class Community(db.Model):
     app_id = db.Column(UUID(as_uuid=True), db.ForeignKey("apps.id"), nullable=False)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
+    cover_image_url = db.Column(db.String(500))  # Nueva campo para foto/portada
+    is_public = db.Column(db.Boolean, default=True)
+    allow_public_join = db.Column(db.Boolean, default=False)
+    rules = db.Column(db.Text)  # Reglas de la comunidad
+    max_admins = db.Column(db.Integer, default=3)  # Máximo de administradores
+    max_moderators = db.Column(db.Integer, default=10)  # Máximo de moderadores
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     # Relaciones
     app = db.relationship("App", back_populates="communities")
     members = db.relationship("GroupMember", back_populates="community", cascade="all, delete-orphan")
     messages = db.relationship("GroupMessage", back_populates="community", cascade="all, delete-orphan")
+    
+    # Nueva relación para roles especiales
+    special_members = db.relationship("CommunityMemberRole", backref="community_ref", cascade="all, delete-orphan")
 
     @property
     def owner_id(self):
         """Devuelve el id del owner de la comunidad (heredado del owner de la app)"""
         return self.app.owner_id
+    
+    @property
+    def owner(self):
+        """Devuelve el usuario owner"""
+        return self.app.owner
+    
+    @property
+    def admins(self):
+        """Devuelve los administradores"""
+        return [role.user for role in self.special_members if role.role == 'admin']
+    
+    @property
+    def moderators(self):
+        """Devuelve los moderadores"""
+        return [role.user for role in self.special_members if role.role == 'moderator']
+    
+    @property
+    def collaborators(self):
+        """Devuelve los colaboradores"""
+        return [role.user for role in self.special_members if role.role == 'collaborator']
 
 
 # -------------------------
@@ -449,6 +479,74 @@ class Message(db.Model):
 
     def __repr__(self):
         return f"<Message {self.id} Chat={self.chat_id} User={self.user_id}>"
+
+
+class CommunityMemberRole(db.Model):
+    """Roles de los miembros en las comunidades"""
+    __tablename__ = "community_member_roles"
+    
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    community_id = db.Column(UUID(as_uuid=True), db.ForeignKey("communities.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    role = db.Column(db.String(50), nullable=False)  # owner, admin, moderator, collaborator
+    assigned_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relaciones
+    community = db.relationship("Community", backref="member_roles")
+    user = db.relationship("User", foreign_keys=[user_id])
+    assigner = db.relationship("User", foreign_keys=[assigned_by])
+    
+    # Permisos basados en rol
+    @property
+    def permissions(self):
+        permissions_map = {
+            'owner': {
+                'can_manage_roles': True,
+                'can_delete_messages': True,
+                'can_ban_users': True,
+                'can_pin_messages': True,
+                'can_create_polls': True,
+                'can_post_announcements': True,
+                'can_edit_community': True,
+                'can_delete_community': True,
+                'can_view_analytics': True
+            },
+            'admin': {
+                'can_manage_roles': True,
+                'can_delete_messages': True,
+                'can_ban_users': True,
+                'can_pin_messages': True,
+                'can_create_polls': True,
+                'can_post_announcements': True,
+                'can_edit_community': False,
+                'can_delete_community': False,
+                'can_view_analytics': True
+            },
+            'moderator': {
+                'can_manage_roles': False,
+                'can_delete_messages': True,
+                'can_ban_users': True,
+                'can_pin_messages': True,
+                'can_create_polls': False,
+                'can_post_announcements': False,
+                'can_edit_community': False,
+                'can_delete_community': False,
+                'can_view_analytics': False
+            },
+            'collaborator': {
+                'can_manage_roles': False,
+                'can_delete_messages': False,
+                'can_ban_users': False,
+                'can_pin_messages': False,
+                'can_create_polls': False,
+                'can_post_announcements': False,
+                'can_edit_community': False,
+                'can_delete_community': False,
+                'can_view_analytics': False
+            }
+        }
+        return permissions_map.get(self.role, {})
 
 
 # -------------------------
