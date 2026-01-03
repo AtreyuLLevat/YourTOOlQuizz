@@ -1511,6 +1511,53 @@ def create_app():
         msg = Message(subject, recipients=[to_email])
         msg.html = html_body
         mail.send(msg)
+    
+    @app.route("/search_team_users/<uuid:community_id>")
+    @login_required
+    def search_team_users(community_id):
+        """Busca usuarios que ya son miembros del equipo de la app"""
+        community = Community.query.get_or_404(community_id)
+        
+        # Verificar que el usuario es el dueño de la comunidad
+        if community.owner_id != current_user.id:
+            return jsonify([]), 403
+        
+        query = request.args.get("q", "").strip()
+        if not query or len(query) < 2:
+            return jsonify([])
+
+        # Obtener la app asociada a esta comunidad
+        app = App.query.get(community.app_id)
+        if not app:
+            return jsonify([])
+
+        # Buscar miembros del equipo de la app
+        team_members = TeamMember.query.filter_by(app_id=app.id).all()
+        team_user_ids = [tm.user_id for tm in team_members if tm.user_id]
+        
+        # Buscar usuarios por nombre o email (solo usuarios del equipo)
+        users = User.query.filter(
+            or_(
+                User.name.ilike(f"%{query}%"),
+                User.email.ilike(f"%{query}%")
+            ),
+            User.id.in_(team_user_ids)  # Solo usuarios del equipo
+        ).limit(10).all()
+
+        results = []
+        for user in users:
+            # Obtener rol en el equipo
+            team_member = next((tm for tm in team_members if tm.user_id == user.id), None)
+            
+            results.append({
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "avatar_url": user.avatar_url,
+                "team_role": team_member.role if team_member else None
+            })
+
+        return jsonify(results)
 
     @app.route('/listadodecosas')
     def explorador():
