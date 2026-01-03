@@ -594,65 +594,379 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function setupEventListeners() {
-        // Buscar miembros del equipo
-        const searchInput = document.getElementById('teamSearchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', handleTeamSearch);
-        }
-        
-        // Añadir miembro del equipo
-        const addTeamBtn = document.getElementById('addTeamMemberBtn');
-        if (addTeamBtn) {
-            addTeamBtn.addEventListener('click', addTeamMember);
-        }
-        
-        // Invitar usuario externo
-        const inviteBtn = document.getElementById('inviteUserBtn');
-        if (inviteBtn) {
-            inviteBtn.addEventListener('click', inviteExternalUser);
-        }
-        
-        // Botones del footer
-        const skipBtn = document.getElementById('skipSetupBtn');
-        if (skipBtn) {
-            skipBtn.addEventListener('click', skipSetup);
-        }
-        
-        const completeBtn = document.getElementById('completeSetupBtn');
-        if (completeBtn) {
-            completeBtn.addEventListener('click', completeSetup);
-        }
-        
-        // Cerrar modal al hacer clic fuera
-        const modal = document.getElementById('teamSetupModal');
-        if (modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    // No permitir cerrar sin completar
-                    showNotification('Completa la configuración o haz clic en "Configurar después"', 'warning');
-                }
-            });
-        }
-        
-        // Enter en inputs
-        const inputs = ['teamSearchInput', 'externalUserName', 'externalUserEmail'];
-        inputs.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        if (id === 'teamSearchInput') {
-                            addTeamMember();
-                        } else {
-                            inviteExternalUser();
-                        }
-                    }
-                });
+ function setupEventListeners() {
+    // Cargar miembros del equipo al inicio
+    loadTeamMembers();
+    
+    // Buscar miembros del equipo (ya están listados)
+    const searchInput = document.getElementById('teamSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleTeamSearch);
+    }
+    
+    // Añadir miembro del equipo
+    const addTeamBtn = document.getElementById('addTeamMemberBtn');
+    if (addTeamBtn) {
+        addTeamBtn.addEventListener('click', addTeamMember);
+    }
+    
+    // Invitar usuario externo (busca en todos los usuarios)
+    const inviteBtn = document.getElementById('inviteUserBtn');
+    if (inviteBtn) {
+        inviteBtn.addEventListener('click', inviteExternalUser);
+    }
+    
+    // Botones del footer
+    const skipBtn = document.getElementById('skipSetupBtn');
+    if (skipBtn) {
+        skipBtn.addEventListener('click', skipSetup);
+    }
+    
+    const completeBtn = document.getElementById('completeSetupBtn');
+    if (completeBtn) {
+        completeBtn.addEventListener('click', completeSetup);
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    const modal = document.getElementById('teamSetupModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                // No permitir cerrar sin completar
+                showNotification('Completa la configuración o haz clic en "Configurar después"', 'warning');
             }
         });
     }
+}
+
+/* ============================================
+   NUEVA FUNCIÓN: Cargar miembros del equipo
+============================================ */
+async function loadTeamMembers() {
+    try {
+        // Obtener la app_id desde el chat container
+        const appId = chatContainer.dataset.appId;
+        if (!appId) {
+            console.error('No se encontró appId');
+            return;
+        }
+        
+        // Obtener miembros del equipo de la app
+        const response = await fetch(`/account/apps/${appId}`);
+        const data = await response.json();
+        
+        if (data.success && data.app.team_members) {
+            // Filtrar para no incluir al owner actual (ya está añadido)
+            data.app.team_members.forEach(member => {
+                if (member.user_id && member.user_id != userId) {
+                    addTeamMemberFromResult({
+                        id: member.user_id,
+                        name: member.name,
+                        email: '', // No tenemos email en team_members
+                        avatar_url: member.avatar_url,
+                        team_role: member.role
+                    }, 'collaborator'); // Rol por defecto
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error cargando miembros del equipo:', error);
+    }
+}
+
+/* ============================================
+   MODIFICAR FUNCIÓN handleTeamSearch
+   (REEMPLAZA la función existente)
+============================================ */
+function handleTeamSearch(e) {
+    const query = e.target.value.trim();
+    const resultsDiv = document.getElementById('teamSearchResults');
+    
+    if (!query || query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+    
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+        try {
+            // Buscar en los miembros del equipo
+            const response = await fetch(`/search_team_users/${communityId}?q=${encodeURIComponent(query)}`);
+            const users = await response.json();
+            
+            if (!users || users.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding: 12px 16px; color: #6b7280;">No se encontraron usuarios en el equipo</div>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            resultsDiv.innerHTML = '';
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'user-result';
+                div.style.cssText = 'padding: 12px 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer;';
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${user.avatar_url ? 
+                          `<img src="${user.avatar_url}" style="width: 32px; height: 32px; border-radius: 50%;">` : 
+                          `<div style="width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center;">${user.name?.charAt(0) || 'U'}</div>`
+                        }
+                        <div style="flex: 1;">
+                            <div style="font-weight: 500;">${user.name || 'Sin nombre'}</div>
+                            <div style="font-size: 13px; color: #6b7280;">${user.email || 'Sin email'}</div>
+                            ${user.team_role ? `<div style="font-size: 12px; color: #3b82f6;">Rol actual: ${user.team_role}</div>` : ''}
+                        </div>
+                        <div>
+                            <select class="user-role-select" data-user-id="${user.id}" style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="admin">Admin</option>
+                                <option value="moderator">Moderator</option>
+                                <option value="collaborator" selected>Collaborator</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                
+                div.addEventListener('click', (e) => {
+                    // Solo añadir si no se hace clic en el select
+                    if (!e.target.classList.contains('user-role-select')) {
+                        const roleSelect = div.querySelector('.user-role-select');
+                        addTeamMemberFromResult(user, roleSelect.value);
+                        searchInput.value = user.name || user.email || '';
+                        resultsDiv.style.display = 'none';
+                    }
+                });
+                
+                resultsDiv.appendChild(div);
+            });
+            
+            resultsDiv.style.display = 'block';
+        } catch (error) {
+            console.error('Error buscando usuarios:', error);
+            resultsDiv.innerHTML = '<div style="padding: 12px 16px; color: #ef4444;">Error en la búsqueda</div>';
+            resultsDiv.style.display = 'block';
+        }
+    }, 300);
+}
+
+/* ============================================
+   MODIFICAR FUNCIÓN inviteExternalUser
+   (REEMPLAZA la función existente)
+============================================ */
+async function inviteExternalUser() {
+    const nameInput = document.getElementById('externalUserName');
+    const emailInput = document.getElementById('externalUserEmail');
+    const roleSelect = document.getElementById('externalUserRole');
+    
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const role = roleSelect.value;
+    
+    if (!name && !email) {
+        showNotification('Ingresa un nombre o email para buscar', 'warning');
+        return;
+    }
+    
+    try {
+        // Buscar en TODOS los usuarios registrados
+        const query = name || email;
+        const response = await fetch(`/search_users?q=${encodeURIComponent(query)}`);
+        const users = await response.json();
+        
+        if (users && users.length > 0) {
+            // Mostrar resultados para seleccionar
+            showUserSelectionModal(users, role);
+        } else {
+            // Si no existe, crear invitación
+            createExternalInvitation(name, email, role);
+        }
+    } catch (error) {
+        console.error('Error buscando usuario:', error);
+        // Fallback: crear invitación
+        createExternalInvitation(name, email, role);
+    }
+}
+
+/* ============================================
+   NUEVA FUNCIÓN: Mostrar selección de usuarios
+============================================ */
+function showUserSelectionModal(users, defaultRole) {
+    const modal = document.createElement('div');
+    modal.id = 'userSelectionModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10001;
+    `;
+    
+    let usersHTML = '';
+    users.forEach((user, index) => {
+        usersHTML += `
+            <div class="user-selection-item" style="
+                padding: 12px 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    ${user.avatar_url ? 
+                      `<img src="${user.avatar_url}" style="width: 40px; height: 40px; border-radius: 50%;">` : 
+                      `<div style="width: 40px; height: 40px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 600;">${user.name?.charAt(0) || 'U'}</div>`
+                    }
+                    <div>
+                        <div style="font-weight: 600;">${user.name || 'Usuario'}</div>
+                        <div style="font-size: 13px; color: #6b7280;">${user.email || ''}</div>
+                    </div>
+                </div>
+                <select class="selection-role-select" data-user-id="${user.id}" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="admin" ${defaultRole === 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="moderator" ${defaultRole === 'moderator' ? 'selected' : ''}>Moderator</option>
+                    <option value="collaborator" ${defaultRole === 'collaborator' ? 'selected' : ''}>Collaborator</option>
+                </select>
+            </div>
+        `;
+    });
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        ">
+            <div style="
+                padding: 20px;
+                border-bottom: 1px solid #e5e7eb;
+            ">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Seleccionar Usuario</h3>
+                <p style="margin: 8px 0 0 0; color: #6b7280; font-size: 14px;">
+                    Se encontraron ${users.length} usuario(s). Selecciona uno:
+                </p>
+            </div>
+            
+            <div style="padding: 20px; max-height: 300px; overflow-y: auto;">
+                ${usersHTML}
+            </div>
+            
+            <div style="
+                padding: 20px;
+                border-top: 1px solid #e5e7eb;
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+            ">
+                <button id="cancelSelection" style="
+                    padding: 10px 20px;
+                    border: 1px solid #ddd;
+                    background: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                ">Cancelar</button>
+                <button id="inviteNewUser" style="
+                    padding: 10px 20px;
+                    border: none;
+                    background: #666;
+                    color: white;
+                    border-radius: 6px;
+                    cursor: pointer;
+                ">Invitar Nuevo Usuario</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Configurar eventos
+    modal.querySelectorAll('.user-selection-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('selection-role-select')) {
+                const userId = item.querySelector('.selection-role-select').dataset.userId;
+                const user = users.find(u => u.id == userId);
+                const role = item.querySelector('.selection-role-select').value;
+                
+                addTeamMemberFromResult(user, role);
+                modal.remove();
+                
+                // Limpiar formulario
+                document.getElementById('externalUserName').value = '';
+                document.getElementById('externalUserEmail').value = '';
+            }
+        });
+    });
+    
+    document.getElementById('cancelSelection').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    document.getElementById('inviteNewUser').addEventListener('click', () => {
+        modal.remove();
+        createExternalInvitation(
+            document.getElementById('externalUserName').value.trim(),
+            document.getElementById('externalUserEmail').value.trim(),
+            defaultRole
+        );
+    });
+}
+
+/* ============================================
+   NUEVA FUNCIÓN: Crear invitación externa
+============================================ */
+function createExternalInvitation(name, email, role) {
+    if (!email) {
+        showNotification('Email es requerido para invitaciones', 'warning');
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showNotification('Email inválido', 'warning');
+        return;
+    }
+    
+    // Verificar si ya existe
+    if (currentMembers.some(m => m.email === email)) {
+        showNotification('Este email ya está en la lista', 'warning');
+        return;
+    }
+    
+    // Validar límites para admin
+    if (role === 'admin') {
+        const adminCount = currentMembers.filter(m => m.role === 'admin').length;
+        if (adminCount >= 3) {
+            showNotification('Máximo 3 administradores permitidos', 'warning');
+            return;
+        }
+    }
+    
+    const member = {
+        id: null,
+        name: name || email.split('@')[0],
+        email: email,
+        avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(name || email)}&background=random`,
+        role: role,
+        is_external: true,
+        needs_invitation: true
+    };
+    
+    addMemberToUI(member);
+    updateCompleteButton();
+    
+    // Limpiar formulario
+    document.getElementById('externalUserName').value = '';
+    document.getElementById('externalUserEmail').value = '';
+}
     
     /* ============================================
        FUNCIONES DE BÚSQUEDA Y AÑADIR MIEMBROS
