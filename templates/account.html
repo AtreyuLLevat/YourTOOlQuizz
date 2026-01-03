@@ -1182,6 +1182,69 @@ input[type="checkbox"] {
   background: #1d4ed8;
   transform: translateY(-1px);
 }
+/* Estilos para el formulario de comunidad */
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.user-search-result:hover {
+  background: #f8fafc;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.role-badge.owner {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.role-badge.admin {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.role-badge.moderator {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.role-badge.collaborator {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.team-member-card {
+  transition: all 0.2s ease;
+}
+
+.team-member-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
 </style>
 {% endblock %}
 
@@ -1464,23 +1527,166 @@ input[type="checkbox"] {
     <button id="addCommunityBtn" class="btn-small primary">+ Añadir</button>
   </div>
 
-  <div id="addCommunityForm" class="hidden">
-    <input
-      type="text"
-      id="communityNameInput"
-      placeholder="Nombre de la comunidad"
-      style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 10px; font-size: 14px;"
-    >
-    <div style="display: flex; gap: 8px; margin-top: 10px;">
-      <button id="saveCommunityBtn" class="btn-small primary">
-        Crear
-      </button>
-      <button id="cancelCommunityBtn" class="btn-small secondary">
-        Cancelar
-      </button>
-    </div>
+<!-- Modal para creación de comunidad -->
+<div id="createCommunityModal" class="modal-backdrop hidden">
+  <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+    <h2 style="margin-bottom: 20px;">Crear Nueva Comunidad</h2>
+    
+    <form id="createCommunityForm">
+      <!-- Información básica -->
+      <div class="section" style="margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px; font-size: 1rem;">Información básica</h3>
+        
+        <div class="field">
+          <label for="communityName">Nombre de la comunidad *</label>
+          <input type="text" id="communityName" name="name" required 
+                 placeholder="Ej: Desarrolladores de YourToolQuizz"
+                 maxlength="200">
+        </div>
+        
+        <div class="field">
+          <label for="communityDescription">Descripción</label>
+          <textarea id="communityDescription" name="description" rows="3" 
+                    placeholder="Describe el propósito de esta comunidad..."
+                    maxlength="500"></textarea>
+        </div>
+        
+        <div class="field">
+          <label for="communityRules">Reglas de la comunidad</label>
+          <textarea id="communityRules" name="rules" rows="4" 
+                    placeholder="Establece las normas básicas de convivencia..."
+                    maxlength="1000"></textarea>
+        </div>
+        
+        <div class="field" style="display: flex; gap: 20px;">
+          <div style="flex: 1;">
+            <label for="communityVisibility">Visibilidad</label>
+            <select id="communityVisibility" name="is_public">
+              <option value="public">Pública - Cualquiera puede ver</option>
+              <option value="private">Privada - Solo miembros</option>
+            </select>
+          </div>
+          
+          <div style="flex: 1;">
+            <label for="communityJoinPolicy">Permitir unirse</label>
+            <select id="communityJoinPolicy" name="allow_public_join">
+              <option value="yes">Sí - Cualquiera puede solicitar</option>
+              <option value="no">No - Solo por invitación</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Equipo y roles -->
+      <div class="section" style="margin-bottom: 20px;">
+        <h3 style="margin-bottom: 15px; font-size: 1rem;">Organización del equipo</h3>
+        
+        <!-- Buscar miembros del equipo de la app -->
+        <div class="field" style="margin-bottom: 20px;">
+          <label>Añadir miembros del equipo de la app</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="searchTeamUser" placeholder="Buscar por nombre o email..." 
+                   style="flex: 1;">
+            <select id="teamUserRole">
+              <option value="owner">Owner / Creador</option>
+              <option value="admin">Administrador</option>
+              <option value="moderator">Moderador</option>
+              <option value="collaborator">Colaborador / Team</option>
+            </select>
+            <button type="button" id="addTeamUserBtn" class="btn-small primary">Añadir</button>
+          </div>
+          <div id="teamSearchResults" style="display: none; margin-top: 10px;"></div>
+        </div>
+        
+        <!-- Añadir usuarios externos -->
+        <div class="field" style="margin-bottom: 20px;">
+          <label>Añadir usuarios externos</label>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="email" id="externalUserEmail" placeholder="Email del usuario externo" 
+                   style="flex: 1;">
+            <select id="externalUserRole">
+              <option value="admin">Administrador</option>
+              <option value="moderator">Moderador</option>
+              <option value="collaborator">Colaborador / Team</option>
+            </select>
+            <button type="button" id="addExternalUserBtn" class="btn-small primary">Invitar</button>
+          </div>
+          <p style="font-size: 0.85rem; color: #64748b;">
+            Los usuarios externos recibirán una invitación por email
+          </p>
+        </div>
+        
+        <!-- Lista de miembros añadidos -->
+        <div class="field">
+          <label>Miembros de la comunidad</label>
+          <div id="communityMembersList" style="margin-top: 10px;">
+            <!-- Los miembros se añadirán aquí dinámicamente -->
+            <div style="text-align: center; padding: 20px; color: #64748b; border: 1px dashed #e2e8f0; border-radius: 8px;">
+              Añade miembros para configurar los roles
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Información de roles -->
+      <div class="section" style="margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px;">
+        <h3 style="margin-bottom: 10px; font-size: 0.95rem;">📋 Información sobre roles</h3>
+        
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 250px;">
+            <h4 style="font-size: 0.9rem; color: #dc2626; margin-bottom: 5px;">👑 Owner / Creador</h4>
+            <ul style="font-size: 0.85rem; color: #475569; margin: 0; padding-left: 15px;">
+              <li>Control total de la comunidad</li>
+              <li>Asigna y revoca roles</li>
+              <li>Puede eliminar la comunidad</li>
+              <li><strong>Solo debe haber 1</strong></li>
+            </ul>
+          </div>
+          
+          <div style="flex: 1; min-width: 250px;">
+            <h4 style="font-size: 0.9rem; color: #2563eb; margin-bottom: 5px;">🛡️ Administrador</h4>
+            <ul style="font-size: 0.85rem; color: #475569; margin: 0; padding-left: 15px;">
+              <li>Gestionan funcionamiento diario</li>
+              <li>Publican anuncios oficiales</li>
+              <li>Crean encuestas</li>
+              <li><strong>1-3 máximo</strong></li>
+            </ul>
+          </div>
+          
+          <div style="flex: 1; min-width: 250px;">
+            <h4 style="font-size: 0.9rem; color: #059669; margin-bottom: 5px;">⚖️ Moderador</h4>
+            <ul style="font-size: 0.85rem; color: #475569; margin: 0; padding-left: 15px;">
+              <li>Mantienen orden y calidad</li>
+              <li>Borran mensajes inapropiados</li>
+              <li>Silencian/expulsan temporalmente</li>
+              <li>Rol más importante día a día</li>
+            </ul>
+          </div>
+          
+          <div style="flex: 1; min-width: 250px;">
+            <h4 style="font-size: 0.9rem; color: #7c3aed; margin-bottom: 5px;">🤝 Colaborador</h4>
+            <ul style="font-size: 0.85rem; color: #475569; margin: 0; padding-left: 15px;">
+              <li>Apoyo sin poder disciplinario</li>
+              <li>Responden dudas y guían</li>
+              <li>Marcan feedback útil</li>
+              <li>Ideal para no dar poder excesivo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botones -->
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+        <button type="button" id="cancelCommunityModal" class="modal-btn secondary">
+          Cancelar
+        </button>
+        <button type="submit" class="modal-btn primary">
+          Crear Comunidad
+        </button>
+      </div>
+    </form>
   </div>
-
+</div>
   <ul class="community-list">
     <!-- Las comunidades se cargarán aquí dinámicamente -->
   </ul>
@@ -1660,7 +1866,7 @@ input[type="checkbox"] {
 <script type="module" src="{{ url_for('static', filename='java/dashboard.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/avatar.js') }}" defer></script>
 <script type="module" src="{{ url_for('static', filename='java/socials.js') }}" defer></script>
-
+<script type="module" src="{{ url_for('static', filename='java/create_community.js') }}" defer></script>
 <!-- Scripts para navegación -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
