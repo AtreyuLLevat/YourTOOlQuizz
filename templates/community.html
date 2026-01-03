@@ -156,7 +156,8 @@ body { display: flex; height: 100vh; background: #fafafa; }
      data-user-id="{{ current_user.id }}"
      data-user-name="{{ current_user.name }}"
      data-is-admin="{{ current_user.role == 'admin' }}"
-     data-is-owner="{{ current_user.id == community.owner_id }}">
+     data-is-owner="{{ current_user.id == community.owner_id }}"
+     data-team-configured="{{ 'true' if community.team_configured else 'false' }}">
 </div>
 
 <script src="{{ url_for('static', filename='java/socket.io.min.js') }}"></script>

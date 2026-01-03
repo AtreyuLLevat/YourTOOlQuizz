@@ -2144,45 +2144,58 @@ function openCreateCommunityModalSimple(appId) {
    FUNCIÓN PARA CREAR COMUNIDAD (común a ambos modales)
 ====================================================== */
 async function createCommunity(appId, name) {
-  console.log(`🔄 Creando comunidad: "${name}" para app: ${appId}`);
-  
-  try {
-    const response = await fetch(`/apps/${appId}/create_community_v2`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: name,
-        description: '',
-        rules: '',
-        is_public: 'public',
-        allow_public_join: 'yes',
-        members: [] // Aquí irían los miembros con roles en el formulario completo
-      })
-    });
+    console.log(`🔄 Creando comunidad: "${name}" para app: ${appId}`);
     
-    const data = await response.json();
-    
-    if (data.success) {
-      console.log('✅ Comunidad creada exitosamente:', data.community);
-      
-      // Recargar los datos de la app
-      if (currentApp && currentApp.id === appId) {
-        currentApp = await fetchAppData(appId);
-        renderCommunities();
-      }
-      
-      showNotification('Comunidad creada exitosamente', 'success');
-      return data.community;
-    } else {
-      throw new Error(data.error || 'Error al crear la comunidad');
+    try {
+        const response = await fetch(`/apps/${appId}/create_community`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                name: name,
+                description: '',
+                rules: '',
+                is_public: 'public',
+                allow_public_join: 'yes'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('✅ Comunidad creada exitosamente:', data);
+            
+            // 🔥 IMPORTANTE: Redirigir a la nueva comunidad en NUEVA PESTAÑA
+            if (data.community && data.community.id) {
+                const communityUrl = `/community/${data.community.id}`;
+                console.log('🌐 Redirigiendo a:', communityUrl);
+                
+                // Abrir en nueva pestaña
+                window.open(communityUrl, '_blank');
+                
+                // También cerrar el modal
+                const modal = document.getElementById('createCommunityModal') || 
+                              document.getElementById('create-community-simple-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+                
+                // Recargar lista de comunidades en el dashboard
+                if (window.renderCommunities && typeof window.renderCommunities === 'function') {
+                    window.renderCommunities();
+                }
+            }
+            
+            return data.community;
+        } else {
+            throw new Error(data.error || 'Error al crear la comunidad');
+        }
+    } catch (error) {
+        console.error('❌ Error creando comunidad:', error);
+        showError('Error: ' + error.message);
+        return null;
     }
-  } catch (error) {
-    console.error('❌ Error creando comunidad:', error);
-    showError('Error: ' + error.message);
-    return null;
-  }
 }
 /* ======================================================
    ELIMINAR COMUNIDAD - CON MINI MODAL
