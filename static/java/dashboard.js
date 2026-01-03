@@ -1889,35 +1889,66 @@ function renderCommunities() {
     });
   }
   
-  // Configurar el botón de crear comunidad (si existe)
-  const addCommunityBtn = document.getElementById('addCommunityBtn');
-  if (addCommunityBtn) {
-    // Remover event listeners anteriores para evitar duplicados
-    addCommunityBtn.replaceWith(addCommunityBtn.cloneNode(true));
-    
-    const newBtn = document.getElementById('addCommunityBtn');
-    newBtn.addEventListener('click', (e) => {
+const addCommunityBtn = document.getElementById('addCommunityBtn');
+if (addCommunityBtn) {
+  // En lugar de clonar, usar un enfoque más directo
+  // Guardar el HTML original del botón
+  const btnHTML = addCommunityBtn.outerHTML;
+  
+  // Reemplazar el botón con una copia limpia
+  addCommunityBtn.outerHTML = btnHTML;
+  
+  // Obtener la nueva referencia del botón
+  const newAddCommunityBtn = document.getElementById('addCommunityBtn');
+  
+  if (newAddCommunityBtn) {
+    // Configurar el event listener correctamente
+    newAddCommunityBtn.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('🔄 Botón clickeado, appId:', currentApp.id);
+      console.log('🔄 Botón de crear comunidad clickeado');
+      console.log('📱 App actual:', currentApp);
       
       if (!currentApp || !currentApp.id) {
+        console.error('❌ No hay app seleccionada o no tiene ID');
         showError('No se puede identificar la aplicación');
         return;
       }
       
-      // Usar el modal COMPLETO que diseñé (no el simple)
+      // Verificar que currentApp.id sea un UUID válido
+      const appId = String(currentApp.id);
+      console.log('🎯 Intentando abrir modal para app ID:', appId);
+      
+      // Primero intentar con el modal completo si existe
       if (typeof window.openCreateCommunityModal === 'function') {
-        window.openCreateCommunityModal(currentApp.id);
-      } else {
-        // Fallback: usar modal simple
-        openCreateCommunityModalSimple(currentApp.id);
+        console.log('✅ Usando modal completo de create_community.js');
+        window.openCreateCommunityModal(appId);
+      } 
+      // Si no, usar el modal simple local
+      else if (typeof openCreateCommunityModalSimple === 'function') {
+        console.log('ℹ️ Usando modal simple (fallback)');
+        openCreateCommunityModalSimple(appId);
+      }
+      // Si no hay ninguna función disponible, mostrar error
+      else {
+        console.error('❌ No se encontró ninguna función para abrir el modal');
+        showError('La función para crear comunidades no está disponible en este momento');
       }
     });
+    
+    // También añadir un atributo para debugging
+    newAddCommunityBtn.setAttribute('data-app-id', currentApp?.id || 'no-app');
+    
+    console.log('✅ Botón de crear comunidad configurado correctamente');
+  } else {
+    console.error('❌ No se pudo obtener el nuevo botón después del reemplazo');
   }
+} else {
+  console.log('ℹ️ Botón addCommunityBtn no encontrado en el DOM');
 }
 
+}
 /* ======================================================
    MODAL SIMPLE (FALLBACK) - Solo si no existe el complejo
 ====================================================== */

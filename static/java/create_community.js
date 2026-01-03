@@ -1,403 +1,84 @@
+// create_community.js - Versión corregida
 document.addEventListener('DOMContentLoaded', function() {
   console.log('✅ create_community.js cargado');
   
   let currentAppId = null;
   let addedMembers = [];
+  let membersList = null; // 🔥 DECLARAR LA VARIABLE GLOBALMENTE
   
-  // Elementos del DOM
+  // Elementos del DOM - solo los esenciales
   const modal = document.getElementById('createCommunityModal');
-  const form = document.getElementById('createCommunityForm');
-  const nameInput = document.getElementById('communityName');
-  const nameError = document.getElementById('nameError');
   
-  // Verificar que los elementos existen
-  if (!modal || !form || !nameInput) {
-    console.error('❌ Elementos del modal no encontrados');
-    return;
+  // Verificar que el modal existe
+  if (!modal) {
+    console.log('ℹ️ Modal createCommunityModal no encontrado, será creado dinámicamente');
   }
   
-  // Función para abrir el modal - VERSIÓN MEJORADA
-  window.openCreateCommunityModal = function(appId) {
-    console.log('🔄 Abriendo modal de comunidad para app:', appId);
+  // Función para inicializar el membersList
+  function initMembersList() {
+    // Buscar el contenedor de miembros
+    membersList = document.getElementById('communityMembersList');
     
-    if (!appId) {
-      console.error('❌ No se proporcionó appId');
-      return;
-    }
-    
-    currentAppId = appId;
-    addedMembers = [];
-    
-    // Limpiar formulario
-    if (form) form.reset();
-    if (nameError) nameError.style.display = 'none';
-    
-    // El owner por defecto es el usuario actual
-    const currentUserData = window.currentUserData;
-    if (currentUserData) {
-      addedMembers.push({
-        user_id: currentUserData.id,
-        name: currentUserData.name,
-        email: currentUserData.email,
-        avatar_url: currentUserData.avatar_url,
-        role: 'owner',
-        is_external: false
-      });
-      console.log('✅ Owner añadido:', currentUserData.name);
-    }
-    
-    updateMembersList();
-    
-    // Mostrar modal
-    modal.classList.remove('hidden');
-    
-    // Enfocar el campo de nombre después de un pequeño delay
-    setTimeout(() => {
-      if (nameInput) {
-        nameInput.focus();
-        console.log('🎯 Campo de nombre enfocado');
-      }
-    }, 100);
-  };
-  
-  // Función para cerrar el modal
-  function closeModal() {
-    console.log('🗑 Cerrando modal de comunidad');
-    modal.classList.add('hidden');
-    if (form) form.reset();
-    addedMembers = [];
-    currentAppId = null;
-    if (nameError) nameError.style.display = 'none';
-  }
-  
-  // Función para validar el nombre
-  function validateName() {
-    const name = nameInput ? nameInput.value.trim() : '';
-    
-    if (!name) {
-      if (nameError) {
-        nameError.textContent = 'El nombre es obligatorio';
-        nameError.style.display = 'block';
-      }
-      return false;
-    }
-    
-    if (name.length < 3) {
-      if (nameError) {
-        nameError.textContent = 'El nombre debe tener al menos 3 caracteres';
-        nameError.style.display = 'block';
-      }
-      return false;
-    }
-    
-    if (nameError) {
-      nameError.style.display = 'none';
-    }
-    return true;
-  }
-  
-  // Event listener para el input de nombre
-  if (nameInput) {
-    nameInput.addEventListener('input', function() {
-      console.log('⌨️ Input detectado:', this.value);
-      validateName();
-    });
-    
-    nameInput.addEventListener('keydown', function(e) {
-      console.log('⌨️ Tecla presionada:', e.key);
-    });
-    
-    nameInput.addEventListener('focus', function() {
-      console.log('🎯 Input de nombre enfocado');
-    });
-    
-    nameInput.addEventListener('blur', function() {
-      validateName();
-    });
-  } else {
-    console.error('❌ Input de nombre no encontrado');
-  }
-  
-  // Enviar formulario - VERSIÓN MEJORADA
-  if (form) {
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      console.log('📤 Enviando formulario...');
+    // Si no existe, crearlo dinámicamente
+    if (!membersList) {
+      console.log('ℹ️ Creando communityMembersList dinámicamente');
+      const container = document.createElement('div');
+      container.id = 'communityMembersList';
+      container.style.cssText = 'margin-top: 10px; min-height: 100px;';
       
-      // Validar nombre
-      if (!validateName()) {
-        console.error('❌ Validación de nombre fallida');
-        return;
-      }
-      
-      // Validar que hay al menos un owner
-      const owners = addedMembers.filter(m => m.role === 'owner');
-      if (owners.length !== 1) {
-        alert('Debe haber exactamente un owner en la comunidad');
-        return;
-      }
-      
-      // Validar límites de administradores
-      const admins = addedMembers.filter(m => m.role === 'admin');
-      if (admins.length > 3) {
-        alert('Máximo 3 administradores permitidos');
-        return;
-      }
-      
-      // Preparar datos
-      const formData = {
-        name: nameInput ? nameInput.value.trim() : '',
-        description: document.getElementById('communityDescription') ? 
-                     document.getElementById('communityDescription').value.trim() : '',
-        rules: document.getElementById('communityRules') ? 
-               document.getElementById('communityRules').value.trim() : '',
-        is_public: document.getElementById('communityVisibility') ? 
-                   document.getElementById('communityVisibility').value : 'public',
-        allow_public_join: document.getElementById('communityJoinPolicy') ? 
-                          document.getElementById('communityJoinPolicy').value : 'yes',
-        members: addedMembers.map(member => ({
-          user_id: member.user_id,
-          email: member.email,
-          role: member.role
-        }))
-      };
-      
-      console.log('📦 Datos a enviar:', formData);
-      
-      if (!currentAppId) {
-        console.error('❌ No hay appId');
-        alert('Error: No se ha identificado la aplicación');
-        return;
-      }
-      
-      try {
-        // Mostrar indicador de carga
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = 'Creando...';
-        submitBtn.disabled = true;
-        
-        const response = await fetch(`/apps/${currentAppId}/create_community_v2`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        console.log('📥 Respuesta recibida:', response.status);
-        
-        const data = await response.json();
-        console.log('📊 Datos de respuesta:', data);
-        
-        // Restaurar botón
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        
-        if (data.success) {
-          console.log('✅ Comunidad creada exitosamente');
-          alert('¡Comunidad creada exitosamente!');
-          closeModal();
-          
-          // Recargar la lista de comunidades si estamos en el modal de detalle
-          if (window.renderCommunities && typeof window.renderCommunities === 'function') {
-            console.log('🔄 Recargando lista de comunidades');
-            window.renderCommunities();
-          }
-        } else {
-          console.error('❌ Error del servidor:', data.error);
-          alert('Error al crear la comunidad: ' + (data.error || 'Error desconocido'));
-        }
-      } catch (error) {
-        console.error('❌ Error de red:', error);
-        alert('Error de conexión. Por favor, verifica tu internet e intenta de nuevo.');
-        
-        // Restaurar botón
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-          submitBtn.textContent = 'Crear Comunidad';
-          submitBtn.disabled = false;
+      // Buscar un lugar donde insertarlo
+      const form = document.getElementById('createCommunityForm');
+      if (form) {
+        const membersSection = form.querySelector('.field:last-child');
+        if (membersSection) {
+          membersSection.appendChild(container);
+          membersList = container;
         }
       }
-    });
+    }
+    
+    return membersList;
   }
   
-  // Cerrar modal al hacer clic fuera
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-  
-  // Cerrar con tecla Escape
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-      closeModal();
-    }
-  });
-  
-  
-  // Buscar usuarios del equipo
-  searchTeamUserInput.addEventListener('input', async function(e) {
-    const query = e.target.value.trim();
-    
-    if (query.length < 2) {
-      document.getElementById('teamSearchResults').style.display = 'none';
-      return;
-    }
-    
-    try {
-      const response = await fetch(`/search_team_users/${currentAppId}?q=${encodeURIComponent(query)}`);
-      const users = await response.json();
-      
-      const resultsDiv = document.getElementById('teamSearchResults');
-      resultsDiv.innerHTML = '';
-      
-      if (users.length === 0) {
-        resultsDiv.style.display = 'none';
-        return;
-      }
-      
-      users.forEach(user => {
-        const userDiv = document.createElement('div');
-        userDiv.className = 'user-search-result';
-        userDiv.style.cssText = 'padding: 10px; border-bottom: 1px solid #e2e8f0; cursor: pointer;';
-        
-        userDiv.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${user.avatar_url || '/static/images/default-avatar.png'}" 
-                 style="width: 32px; height: 32px; border-radius: 50%;">
-            <div>
-              <div style="font-weight: 500;">${user.name}</div>
-              <div style="font-size: 0.85rem; color: #64748b;">${user.email}</div>
-              ${user.team_role ? `<div style="font-size: 0.8rem; color: #3b82f6;">${user.team_role}</div>` : ''}
-            </div>
-          </div>
-        `;
-        
-        userDiv.addEventListener('click', () => {
-          addTeamMember(user);
-          searchTeamUserInput.value = '';
-          resultsDiv.style.display = 'none';
-        });
-        
-        resultsDiv.appendChild(userDiv);
-      });
-      
-      resultsDiv.style.display = 'block';
-    } catch (error) {
-      console.error('Error buscando usuarios:', error);
-    }
-  });
-  
-  // Añadir usuario del equipo
-  addTeamUserBtn.addEventListener('click', async function() {
-    const query = searchTeamUserInput.value.trim();
-    
-    if (query) {
-      try {
-        const response = await fetch(`/search_team_users/${currentAppId}?q=${encodeURIComponent(query)}`);
-        const users = await response.json();
-        
-        if (users.length > 0) {
-          const user = users[0];
-          addTeamMember(user);
-          searchTeamUserInput.value = '';
-          document.getElementById('teamSearchResults').style.display = 'none';
-        }
-      } catch (error) {
-        console.error('Error buscando usuario:', error);
-      }
-    }
-  });
-  
-  // Añadir usuario externo
-  addExternalUserBtn.addEventListener('click', function() {
-    const email = externalUserEmailInput.value.trim();
-    const role = externalUserRoleSelect.value;
-    
-    if (!email || !validateEmail(email)) {
-      alert('Por favor, introduce un email válido');
-      return;
-    }
-    
-    // Verificar si ya está en la lista
-    if (addedMembers.some(m => m.email === email)) {
-      alert('Este usuario ya está en la lista');
-      return;
-    }
-    
-    // Añadir usuario externo
-    addedMembers.push({
-      user_id: null,
-      name: email.split('@')[0],
-      email: email,
-      avatar_url: null,
-      role: role,
-      is_external: true
-    });
-    
-    externalUserEmailInput.value = '';
-    updateMembersList();
-  });
-  
-  // Función para añadir miembro del equipo
-  function addTeamMember(user) {
-    const role = teamUserRoleSelect.value;
-    
-    // Verificar límites de roles
-    const owners = addedMembers.filter(m => m.role === 'owner');
-    const admins = addedMembers.filter(m => m.role === 'admin');
-    
-    if (role === 'owner' && owners.length >= 1) {
-      alert('Solo puede haber un owner en la comunidad');
-      return;
-    }
-    
-    if (role === 'admin' && admins.length >= 3) {
-      alert('Máximo 3 administradores permitidos');
-      return;
-    }
-    
-    // Verificar si ya está en la lista
-    if (addedMembers.some(m => m.user_id === user.id)) {
-      alert('Este usuario ya está en la lista');
-      return;
-    }
-    
-    addedMembers.push({
-      user_id: user.id,
-      name: user.name,
-      email: user.email,
-      avatar_url: user.avatar_url,
-      role: role,
-      is_external: false
-    });
-    
-    updateMembersList();
-  }
-  
-  // Actualizar lista de miembros
+  // Función para actualizar la lista de miembros - VERSIÓN CORREGIDA
   function updateMembersList() {
+    // Asegurarse de que membersList esté inicializado
+    if (!membersList) {
+      membersList = initMembersList();
+    }
+    
+    if (!membersList) {
+      console.error('❌ No se pudo inicializar membersList');
+      return;
+    }
+    
     membersList.innerHTML = '';
     
     if (addedMembers.length === 0) {
       membersList.innerHTML = `
         <div style="text-align: center; padding: 20px; color: #64748b; border: 1px dashed #e2e8f0; border-radius: 8px;">
-          Añade miembros para configurar los roles
+          <div style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;">👥</div>
+          <p>Añade miembros para configurar los roles</p>
+          <p style="font-size: 0.85rem; margin-top: 5px;">Puedes añadir miembros después de crear la comunidad</p>
         </div>
       `;
       return;
     }
     
-    // Ordenar por rol (owner primero, luego admin, etc.)
+    // Ordenar por rol
     const roleOrder = { owner: 1, admin: 2, moderator: 3, collaborator: 4 };
     addedMembers.sort((a, b) => roleOrder[a.role] - roleOrder[b.role]);
     
     addedMembers.forEach((member, index) => {
       const memberDiv = document.createElement('div');
       memberDiv.className = 'team-member-card';
-      memberDiv.style.cssText = 'margin-bottom: 10px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;';
+      memberDiv.style.cssText = `
+        margin-bottom: 10px; 
+        padding: 12px; 
+        border: 1px solid #e2e8f0; 
+        border-radius: 8px;
+        background: white;
+      `;
       
       const roleBadgeColor = {
         owner: '#dc2626',
@@ -410,26 +91,22 @@ document.addEventListener('DOMContentLoaded', function() {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
             <img src="${member.avatar_url || '/static/images/default-avatar.png'}" 
-                 style="width: 40px; height: 40px; border-radius: 50%;">
+                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
             <div style="flex: 1;">
-              <div style="font-weight: 500;">${member.name}</div>
+              <div style="font-weight: 500; color: #1e293b;">${member.name}</div>
               <div style="font-size: 0.85rem; color: #64748b;">${member.email}</div>
-              ${member.is_external ? '<span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px;">Invitar por email</span>' : ''}
+              ${member.is_external ? 
+                '<span style="font-size: 0.7rem; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px;">Invitación por email</span>' : ''}
             </div>
           </div>
           
-          <div style="display: flex; align-items: center; gap: 15px;">
-            <select class="member-role-select" data-index="${index}" 
-                    style="padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem;">
-              <option value="owner" ${member.role === 'owner' ? 'selected' : ''}>👑 Owner</option>
-              <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>🛡️ Admin</option>
-              <option value="moderator" ${member.role === 'moderator' ? 'selected' : ''}>⚖️ Moderador</option>
-              <option value="collaborator" ${member.role === 'collaborator' ? 'selected' : ''}>🤝 Colaborador</option>
-            </select>
-            
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 0.85rem; padding: 4px 8px; border-radius: 12px; background: ${roleBadgeColor}20; color: ${roleBadgeColor}; font-weight: 600;">
+              ${getRoleLabel(member.role)}
+            </span>
             <button type="button" class="remove-member-btn" data-index="${index}" 
-                    style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 0.85rem;">
-              Eliminar
+                    style="background: #ef4444; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 0.85rem;">
+              ×
             </button>
           </div>
         </div>
@@ -438,35 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
       membersList.appendChild(memberDiv);
     });
     
-    // Añadir event listeners para los selectores de rol
-    document.querySelectorAll('.member-role-select').forEach(select => {
-      select.addEventListener('change', function(e) {
-        const index = parseInt(this.dataset.index);
-        const newRole = this.value;
-        
-        // Validar límites
-        const owners = addedMembers.filter(m => m.role === 'owner');
-        const admins = addedMembers.filter(m => m.role === 'admin');
-        
-        if (newRole === 'owner' && owners.length >= 1 && addedMembers[index].role !== 'owner') {
-          alert('Solo puede haber un owner en la comunidad');
-          this.value = addedMembers[index].role; // Revertir cambio
-          return;
-        }
-        
-        if (newRole === 'admin' && admins.length >= 3 && addedMembers[index].role !== 'admin') {
-          alert('Máximo 3 administradores permitidos');
-          this.value = addedMembers[index].role; // Revertir cambio
-          return;
-        }
-        
-        addedMembers[index].role = newRole;
-        updateMembersList();
-      });
-    });
-    
-    // Añadir event listeners para los botones de eliminar
-    document.querySelectorAll('.remove-member-btn').forEach(btn => {
+    // Añadir event listeners para eliminar
+    membersList.querySelectorAll('.remove-member-btn').forEach(btn => {
       btn.addEventListener('click', function(e) {
         const index = parseInt(this.dataset.index);
         const member = addedMembers[index];
@@ -483,31 +133,228 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Enviar formulario
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
+  // Función auxiliar para etiquetas de roles
+  function getRoleLabel(role) {
+    const labels = {
+      owner: '👑 Owner',
+      admin: '🛡️ Admin',
+      moderator: '⚖️ Moderador',
+      collaborator: '🤝 Colaborador'
+    };
+    return labels[role] || role;
+  }
+  
+  // Función para abrir el modal - VERSIÓN SIMPLIFICADA
+  window.openCreateCommunityModal = function(appId) {
+    console.log('🔄 Abriendo modal de comunidad para app:', appId);
     
-    // Validar que hay al menos un owner
-    const owners = addedMembers.filter(m => m.role === 'owner');
-    if (owners.length !== 1) {
-      alert('Debe haber exactamente un owner en la comunidad');
+    if (!appId) {
+      console.error('❌ No se proporcionó appId');
+      showError('No se puede identificar la aplicación');
       return;
     }
     
-    // Validar límites de administradores
-    const admins = addedMembers.filter(m => m.role === 'admin');
-    if (admins.length > 3) {
-      alert('Máximo 3 administradores permitidos');
+    currentAppId = appId;
+    addedMembers = [];
+    
+    // Crear modal dinámicamente si no existe
+    if (!document.getElementById('createCommunityModal')) {
+      createModalStructure();
+    }
+    
+    const modal = document.getElementById('createCommunityModal');
+    if (!modal) {
+      console.error('❌ No se pudo crear/obtener el modal');
       return;
     }
     
-    // Preparar datos
+    // Resetear formulario
+    const form = document.getElementById('createCommunityForm');
+    if (form) {
+      form.reset();
+    }
+    
+    // Añadir owner por defecto (usuario actual)
+    if (window.currentUserData) {
+      addedMembers.push({
+        user_id: window.currentUserData.id,
+        name: window.currentUserData.name,
+        email: window.currentUserData.email,
+        avatar_url: window.currentUserData.avatar_url,
+        role: 'owner',
+        is_external: false
+      });
+    }
+    
+    // Inicializar membersList y actualizar
+    membersList = initMembersList();
+    updateMembersList();
+    
+    // Mostrar modal
+    modal.classList.remove('hidden');
+    
+    // Enfocar campo de nombre
+    setTimeout(() => {
+      const nameInput = document.getElementById('communityName');
+      if (nameInput) {
+        nameInput.focus();
+      }
+    }, 100);
+  };
+  
+  // Función para crear la estructura del modal
+  function createModalStructure() {
+    console.log('🏗️ Creando estructura del modal');
+    
+    const modalHTML = `
+    <div id="createCommunityModal" class="modal-backdrop hidden">
+      <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <h2 style="margin-bottom: 20px; color: #1e293b;">Crear Nueva Comunidad</h2>
+        
+        <form id="createCommunityForm">
+          <!-- Información básica -->
+          <div style="margin-bottom: 25px;">
+            <h3 style="margin-bottom: 15px; font-size: 1rem; color: #374151;">Información básica</h3>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+                Nombre de la comunidad *
+              </label>
+              <input type="text" 
+                     id="communityName" 
+                     name="name" 
+                     required 
+                     placeholder="Ej: Desarrolladores de YourToolQuizz"
+                     maxlength="200"
+                     style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+              <div id="nameError" style="color: #dc2626; font-size: 0.85rem; margin-top: 5px; display: none;"></div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #374151;">
+                Descripción (opcional)
+              </label>
+              <textarea id="communityDescription" 
+                        name="description" 
+                        rows="3" 
+                        placeholder="Describe el propósito de esta comunidad..."
+                        maxlength="500"
+                        style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; resize: vertical;"></textarea>
+            </div>
+          </div>
+          
+          <!-- Equipo y roles - SIMPLIFICADO PARA PRUEBAS -->
+          <div style="margin-bottom: 25px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+            <h3 style="margin-bottom: 15px; font-size: 1rem; color: #374151;">Organización del equipo</h3>
+            
+            <div style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
+              <p>Por defecto, tú eres el <strong>👑 Owner</strong> de esta comunidad.</p>
+              <p>Puedes añadir más miembros después de crear la comunidad.</p>
+            </div>
+            
+            <!-- Contenedor de miembros -->
+            <div id="communityMembersContainer">
+              <!-- Aquí se cargará la lista de miembros -->
+            </div>
+          </div>
+          
+          <!-- Botones -->
+          <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px;">
+            <button type="button" id="cancelCommunityBtn" class="modal-btn secondary" style="padding: 10px 20px;">
+              Cancelar
+            </button>
+            <button type="submit" id="submitCommunityBtn" class="modal-btn primary" style="padding: 10px 20px;">
+              Crear Comunidad
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    `;
+    
+    // Insertar en el body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Configurar event listeners básicos
+    setupModalListeners();
+  }
+  
+  // Configurar listeners del modal
+  function setupModalListeners() {
+    const modal = document.getElementById('createCommunityModal');
+    const form = document.getElementById('createCommunityForm');
+    const cancelBtn = document.getElementById('cancelCommunityBtn');
+    const nameInput = document.getElementById('communityName');
+    const nameError = document.getElementById('nameError');
+    
+    if (!modal || !form) return;
+    
+    // Cerrar modal al hacer clic fuera
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+    
+    // Botón cancelar
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', closeModal);
+    }
+    
+    // Validar nombre
+    if (nameInput && nameError) {
+      nameInput.addEventListener('input', function() {
+        const name = this.value.trim();
+        
+        if (!name) {
+          nameError.textContent = 'El nombre es obligatorio';
+          nameError.style.display = 'block';
+        } else if (name.length < 3) {
+          nameError.textContent = 'El nombre debe tener al menos 3 caracteres';
+          nameError.style.display = 'block';
+        } else {
+          nameError.style.display = 'none';
+        }
+      });
+    }
+    
+    // Enviar formulario
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      await submitCommunityForm();
+    });
+  }
+  
+  // Función para cerrar modal
+  function closeModal() {
+    const modal = document.getElementById('createCommunityModal');
+    if (modal) {
+      modal.classList.add('hidden');
+    }
+    currentAppId = null;
+    addedMembers = [];
+  }
+  
+  // Función para enviar formulario
+  async function submitCommunityForm() {
+    const nameInput = document.getElementById('communityName');
+    const descriptionInput = document.getElementById('communityDescription');
+    
+    if (!nameInput || !currentAppId) {
+      showError('Datos incompletos');
+      return;
+    }
+    
+    const name = nameInput.value.trim();
+    if (!name || name.length < 3) {
+      showError('El nombre debe tener al menos 3 caracteres');
+      return;
+    }
+    
+    // Preparar datos simplificados (solo nombre y descripción por ahora)
     const formData = {
-      name: document.getElementById('communityName').value.trim(),
-      description: document.getElementById('communityDescription').value.trim(),
-      rules: document.getElementById('communityRules').value.trim(),
-      is_public: document.getElementById('communityVisibility').value,
-      allow_public_join: document.getElementById('communityJoinPolicy').value,
+      name: name,
+      description: descriptionInput ? descriptionInput.value.trim() : '',
       members: addedMembers.map(member => ({
         user_id: member.user_id,
         email: member.email,
@@ -515,8 +362,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }))
     };
     
+    console.log('📤 Enviando datos:', formData);
+    
     try {
-      const response = await fetch(`/apps/${currentAppId}/create_community_v2`, {
+      // Mostrar loading
+      const submitBtn = document.getElementById('submitCommunityBtn');
+      const originalText = submitBtn ? submitBtn.textContent : 'Crear';
+      if (submitBtn) {
+        submitBtn.textContent = 'Creando...';
+        submitBtn.disabled = true;
+      }
+      
+      // Usar la ruta existente (la simple) o la nueva
+      const endpoint = `/apps/${currentAppId}/create_community`;
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -526,40 +386,81 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const data = await response.json();
       
+      // Restaurar botón
+      if (submitBtn) {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+      
       if (data.success) {
-        alert('Comunidad creada exitosamente');
+        console.log('✅ Comunidad creada:', data);
+        showNotification('¡Comunidad creada exitosamente!', 'success');
         closeModal();
         
-        // Recargar la lista de comunidades si estamos en el modal de detalle
-        if (window.renderCommunities) {
+        // Recargar comunidades en el dashboard
+        if (window.renderCommunities && typeof window.renderCommunities === 'function') {
           window.renderCommunities();
         }
-        
-        // Opcional: redirigir a la nueva comunidad
-        // window.location.href = `/community/${data.community.id}`;
       } else {
-        alert('Error: ' + data.error);
+        throw new Error(data.error || 'Error desconocido');
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear la comunidad. Por favor, intenta de nuevo.');
+      console.error('❌ Error:', error);
+      showError('Error al crear la comunidad: ' + error.message);
+      
+      // Restaurar botón
+      const submitBtn = document.getElementById('submitCommunityBtn');
+      if (submitBtn) {
+        submitBtn.textContent = 'Crear Comunidad';
+        submitBtn.disabled = false;
+      }
     }
-  });
-  
-  // Cerrar modal
-  cancelBtn.addEventListener('click', closeModal);
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-  
-  // Validar email
-  function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
   }
   
-  // Exportar función para uso global
-  window.openCreateCommunityModal = openCreateCommunityModal;
+  // Funciones auxiliares para notificaciones
+  function showError(message) {
+    console.error('❌ Error:', message);
+    alert(message);
+  }
+  
+  function showNotification(message, type = 'success') {
+    console.log('📢 Notificación:', message);
+    
+    // Crear notificación
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : '#ef4444'};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9999;
+      animation: slideIn 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+      <span>${message}</span>
+      <button onclick="this.parentElement.remove()" style="
+        background: transparent; 
+        border: none; 
+        color: white; 
+        margin-left: 10px; 
+        cursor: pointer;
+      ">×</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remover después de 3 segundos
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
+    }, 3000);
+  }
+  
+  console.log('✅ create_community.js inicializado correctamente');
 });
