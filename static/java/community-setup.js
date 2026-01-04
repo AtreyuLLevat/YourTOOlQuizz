@@ -1,212 +1,32 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 =========== DEPURACIÓN TEAM MEMBERS ===========');
+    console.log('🚀 Iniciando configuración de equipo (MODO DEBUG FORZADO)');
     
-    // ============ FUNCIONES DE DEPURACIÓN ============
-    async function debugCheckTeamMembersAPI(appId) {
-        console.log('🔍 === VERIFICANDO API DE TEAM MEMBERS ===');
-        console.log(`📡 URL de API: /account/apps/${appId}`);
-        
-        try {
-            const response = await fetch(`/account/apps/${appId}`);
-            console.log(`📊 Status: ${response.status} ${response.statusText}`);
-            
-            if (!response.ok) {
-                console.error(`❌ Error HTTP: ${response.status}`);
-                return null;
-            }
-            
-            const data = await response.json();
-            console.log('✅ Datos recibidos de la API:');
-            console.log(`   • Success: ${data.success}`);
-            console.log(`   • App Name: ${data.app?.name || 'No disponible'}`);
-            console.log(`   • Total Team Members: ${data.app?.team_members?.length || 0}`);
-            
-            if (data.app?.team_members && data.app.team_members.length > 0) {
-                console.log('👥 === LISTA DE TEAM MEMBERS ===');
-                data.app.team_members.forEach((member, index) => {
-                    console.log(`   ${index + 1}. ${member.name || 'Sin nombre'}`);
-                    console.log(`      ID: ${member.user_id}`);
-                    console.log(`      Role: ${member.role || 'No especificado'}`);
-                    console.log(`      Avatar: ${member.avatar_url ? 'Sí' : 'No'}`);
-                    console.log(`      User ID presente: ${!!member.user_id ? '✅' : '❌'}`);
-                    console.log(`      Mismo que usuario actual: ${member.user_id === userId ? '⚠️ Mismo usuario' : 'Distinto'}`);
-                    console.log('   ---');
-                });
-            } else {
-                console.warn('⚠️ No se encontraron team members en la respuesta');
-            }
-            
-            return data;
-        } catch (error) {
-            console.error('❌ Error en la solicitud a la API:', error);
-            console.error('Detalles:', error.message);
-            return null;
+    function getSafeAvatar(url, name = '') {
+        // Si no hay URL o es inválida, usar avatar por defecto
+        if (!url || url.trim() === '' || url.includes('undefined') || url.includes('null')) {
+            return DEFAULT_AVATAR_URL;
         }
+        return url;
     }
-    
-    function debugLogDOMData() {
-        const chatContainer = document.getElementById('chat-container');
-        console.log('🏷️ === DATOS DEL DOM ===');
-        console.log(`   • Elemento chat-container encontrado: ${!!chatContainer ? '✅' : '❌'}`);
-        
-        if (chatContainer) {
-            console.log(`   • Community ID: ${chatContainer.dataset.communityId}`);
-            console.log(`   • User ID: ${chatContainer.dataset.userId}`);
-            console.log(`   • App ID: ${chatContainer.dataset.appId}`);
-            console.log(`   • User Name: ${chatContainer.dataset.userName}`);
-            console.log(`   • isOwner: ${chatContainer.dataset.isOwner}`);
-            console.log(`   • teamConfigured: ${chatContainer.dataset.teamConfigured}`);
-        }
-    }
-    
-    async function debugTestTeamSearchAPI(appId, query = "") {
-        console.log('🔎 === TESTING TEAM SEARCH API ===');
-        console.log(`📡 URL: /search_team_users_c/${communityId}?q=${query}`);
-        
-        try {
-            const response = await fetch(`/search_team_users_c/${communityId}?q=${query}`);
-            console.log(`📊 Status: ${response.status} ${response.statusText}`);
-            
-            const data = await response.json();
-            console.log(`📦 Resultados: ${Array.isArray(data) ? data.length : 'No es array'}`);
-            
-            if (Array.isArray(data) && data.length > 0) {
-                console.log('👤 Usuarios encontrados en search_team_users_c:');
-                data.forEach((user, i) => {
-                    console.log(`   ${i + 1}. ${user.name} (${user.email})`);
-                });
-            } else {
-                console.log('ℹ️ No se encontraron usuarios o respuesta vacía');
-            }
-        } catch (error) {
-            console.error('❌ Error en search API:', error);
-        }
-    }
-    
-    // ============ VERIFICACIONES INICIALES ============
-    debugLogDOMData();
     
     const chatContainer = document.getElementById('chat-container');
-    if (!chatContainer) {
-        console.error('❌ ERROR CRÍTICO: No se encuentra chat-container');
-        return;
-    }
-    
+    // FORZAR VALORES PARA TESTING
     const communityId = chatContainer.dataset.communityId;
+    const currentUserName = chatContainer.dataset.userName || 'Usuario';
     const userId = chatContainer.dataset.userId;
-    const appId = chatContainer.dataset.appId;
     
-    console.log('📋 === RESUMEN DE DATOS ===');
-    console.log(`   • App ID para buscar: ${appId}`);
-    console.log(`   • Community ID: ${communityId}`);
-    console.log(`   • Current User ID: ${userId}`);
-    
-    // ============ EJECUTAR PRUEBAS AUTOMÁTICAS ============
-    console.log('\n🔬 === EJECUTANDO PRUEBAS AUTOMÁTICAS ===');
-    
-    // 1. Verificar API principal
-    if (appId) {
-        const apiData = await debugCheckTeamMembersAPI(appId);
-        
-        // 2. Verificar si hay datos válidos
-        if (apiData && apiData.success) {
-            const teamCount = apiData.app?.team_members?.length || 0;
-            console.log(`\n📊 RESUMEN FINAL:`);
-            console.log(`   • Total team members: ${teamCount}`);
-            
-            // Filtrar team members que no son el usuario actual
-            const otherMembers = apiData.app?.team_members?.filter(m => m.user_id && m.user_id !== userId) || [];
-            console.log(`   • Otros miembros (sin el actual): ${otherMembers.length}`);
-            
-            if (otherMembers.length === 0) {
-                console.warn('⚠️ ADVERTENCIA: No hay otros miembros en el equipo');
-                console.log('   Solo el owner está en el equipo.');
-            }
-        } else {
-            console.error('❌ No se pudieron obtener datos de la API');
-        }
-    } else {
-        console.error('❌ No hay App ID disponible');
-    }
-    
-    // 3. Probar API de búsqueda (opcional)
-    if (communityId && appId) {
-        console.log('\n🔍 Probando API de búsqueda...');
-        await debugTestTeamSearchAPI(appId, "");
-    }
-    
-    console.log('\n🎯 =========== DEPURACIÓN COMPLETADA ===========\n');
-    
-    // ============ CREAR BOTONES DE DEPURACIÓN EN PÁGINA ============
-    function createDebugButtons() {
-        const debugDiv = document.createElement('div');
-        debugDiv.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1a1a1a;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            z-index: 9999;
-            font-family: monospace;
-            font-size: 12px;
-            border: 2px solid #3b82f6;
-        `;
-        
-        debugDiv.innerHTML = `
-            <div style="margin-bottom: 8px; font-weight: bold;">🐛 DEPURACIÓN</div>
-            <button onclick="window.location.reload()" style="background: #3b82f6; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin: 2px; cursor: pointer;">
-                🔄 Recargar
-            </button>
-            <button onclick="debugCheckTeamMembers()" style="background: #10b981; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin: 2px; cursor: pointer;">
-                👥 Ver Team
-            </button>
-            <button onclick="debugShowAppData()" style="background: #f59e0b; color: white; border: none; padding: 5px 10px; border-radius: 4px; margin: 2px; cursor: pointer;">
-                📊 App Data
-            </button>
-        `;
-        
-        document.body.appendChild(debugDiv);
-        
-        // Hacer funciones disponibles globalmente
-        window.debugCheckTeamMembers = async function() {
-            if (appId) {
-                await debugCheckTeamMembersAPI(appId);
-            } else {
-                console.error('❌ No hay App ID disponible');
-            }
-        };
-        
-        window.debugShowAppData = function() {
-            console.log('📋 === DATOS COMPLETOS DEL CHAT-CONTAINER ===');
-            console.log('Dataset completo:', chatContainer.dataset);
-            
-            // Mostrar todos los data-attributes
-            for (const key in chatContainer.dataset) {
-                console.log(`   • data-${key}: ${chatContainer.dataset[key]}`);
-            }
-        };
-    }
-    
-    createDebugButtons();
-    console.log('🎛️ Botones de depuración creados (esquina inferior derecha)');
-    
-    // ============ CÓDIGO ORIGINAL MODIFICADO (SOLO LO ESENCIAL) ============
-    const isOwner = chatContainer.dataset.isOwner === 'true';
+    console.log('🔧 FORZANDO isOwner = true para testing');
+    const isOwner = true; // ← AQUÍ ESTÁ LA MAGIA
     const teamConfigured = chatContainer.dataset.teamConfigured === 'true';
     
-    console.log('\n⚙️ === CONDICIONES PARA MODAL ===');
-    console.log(`   • isOwner: ${isOwner} ${isOwner ? '✅' : '❌'}`);
-    console.log(`   • teamConfigured: ${teamConfigured} ${teamConfigured ? '✅' : '❌'}`);
-    console.log(`   • Mostrar modal: ${(isOwner && !teamConfigured) ? '✅ SÍ' : '❌ NO'}`);
+    console.log('📊 Valores:', { isOwner, teamConfigured, communityId, userId });
     
     if (!isOwner || teamConfigured) {
-        console.log('ℹ️ Modal NO se mostrará - condiciones no cumplidas');
+        console.log('⚠️ No mostrar modal:', { isOwner, teamConfigured });
         return;
     }
     
-    console.log('🎪 Modal SE MOSTRARÁ - iniciando configuración...');
+    console.log('✅ Mostrando modal...');
     
     // Crear e insertar el HTML del modal
     createModalHTML();
