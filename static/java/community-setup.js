@@ -1408,87 +1408,90 @@ function createExternalInvitation(name, email, role) {
         emailInput.value = '';
     }
     
-    function addMemberToUI(member) {
-        currentMembers.push(member);
-        
-        // Ocultar mensaje de "sin miembros"
-        const noMembersMsg = document.getElementById('noMembersMessage');
-        if (noMembersMsg) {
-            noMembersMsg.style.display = 'none';
-        }
-        
-        // Crear elemento
-        const membersList = document.getElementById('currentMembersList');
-        const memberDiv = document.createElement('div');
-        memberDiv.className = 'member-item';
-        memberDiv.style.cssText = `
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: white;
+function addMemberToUI(member) {
+    currentMembers.push(member);
+
+    // Ocultar mensaje de "no miembros"
+    const noMembersMsg = document.getElementById('noCommunityMembers');
+    if (noMembersMsg) {
+        noMembersMsg.style.display = 'none';
+    }
+
+    // CONTENEDOR CORRECTO
+    const membersList = document.getElementById('communityMembersList');
+    if (!membersList) {
+        console.error('❌ communityMembersList no existe en el DOM');
+        return;
+    }
+
+    const memberDiv = document.createElement('div');
+    memberDiv.className = 'community-member-item';
+    memberDiv.dataset.userId = member.id;
+
+    const roleColors = {
+        owner:        { bg: '#fee2e2', color: '#dc2626', label: '👑 Owner' },
+        admin:        { bg: '#dbeafe', color: '#2563eb', label: '🛡️ Admin' },
+        moderator:    { bg: '#d1fae5', color: '#059669', label: '⚖️ Moderador' },
+        collaborator: { bg: '#f3e8ff', color: '#7c3aed', label: '🤝 Colaborador' }
+    };
+
+    const roleInfo = roleColors[member.role] || roleColors.collaborator;
+
+    memberDiv.innerHTML = `
+        <div style="
+            padding: 12px;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        `;
-        
-        const roleColors = {
-            'owner': { bg: '#fee2e2', color: '#dc2626', label: '👑 Owner' },
-            'admin': { bg: '#dbeafe', color: '#2563eb', label: '🛡️ Admin' },
-            'moderator': { bg: '#d1fae5', color: '#059669', label: '⚖️ Moderador' },
-            'collaborator': { bg: '#f3e8ff', color: '#7c3aed', label: '🤝 Colaborador' }
-        };
-        
-        const roleInfo = roleColors[member.role] || roleColors.collaborator;
-        
-        memberDiv.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <img src="${member.avatar_url}" 
-                     alt="${member.name}" 
-                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iI0U1RTVFNSIvPjx0ZXh0IHg9IjIwIiB5PSIyNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzk5OSIgZm9udC1mYW1pbHk9IkFyaWFsIj4${btoa(member.name?.charAt(0) || 'U')}</dGV4dD48L3N2Zz4='">
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${getSafeAvatar(member.avatar_url, member.name)}"
+                     alt="${member.name}"
+                     style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;"
+                     onerror="this.src='${DEFAULT_AVATAR_URL}'">
                 <div>
-                    <h4 style="margin: 0; font-size: 16px;">${member.name}</h4>
-                    <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280;">${member.email || 'Sin email'}</p>
-                    ${member.needs_invitation ? 
-                      '<span style="font-size: 12px; background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block;">Invitación pendiente</span>' : 
-                      ''}
+                    <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
+                    <div style="font-size: 12px; color: #6b7280;">
+                        ${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}
+                    </div>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <span style="padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; background: ${roleInfo.bg}; color: ${roleInfo.color};">
-                    ${roleInfo.label}
-                </span>
-                ${member.role !== 'owner' ? 
-                  `<button onclick="removeMember('${member.email}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 20px; padding: 5px;">×</button>` : 
-                  ''}
+
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    background: ${roleInfo.bg};
+                    color: ${roleInfo.color};
+                ">${roleInfo.label}</span>
+
+                ${member.role !== 'owner' ? `
+                    <button onclick="removeCommunityMember('${member.id}')"
+                            style="
+                                background: none;
+                                border: none;
+                                color: #ef4444;
+                                cursor: pointer;
+                                font-size: 16px;
+                            ">×</button>
+                ` : ''}
             </div>
-        `;
-        
-        membersList.appendChild(memberDiv);
-        
-        // Añadir función removeMember al scope global temporalmente
-        window.removeMember = function(email) {
-            currentMembers = currentMembers.filter(m => m.email !== email);
-            
-            // Remover del DOM
-            const memberDivs = document.querySelectorAll('.member-item');
-            memberDivs.forEach(div => {
-                if (div.querySelector('p')?.textContent.includes(email)) {
-                    div.remove();
-                }
-            });
-            
-            // Mostrar mensaje si no hay miembros (excepto owner)
-            if (currentMembers.length === 1) {
-                if (noMembersMsg) {
-                    noMembersMsg.style.display = 'block';
-                }
-            }
-            
-            updateCompleteButton();
-        };
-    }
+        </div>
+    `;
+
+    membersList.appendChild(memberDiv);
+
+    updateSelectedCount();
+    updateCommunityMemberCount();
+    updateCompleteButton();
+}
+
     
     /* ============================================
        FUNCIONES DE CONFIGURACIÓN
