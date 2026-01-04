@@ -1562,6 +1562,54 @@ def create_app():
 # ============================================
 # RUTAS PARA CONFIGURACIÓN DE EQUIPO DE COMUNIDAD
 # ============================================
+    @app.route('/api/community/<uuid:community_id>/members', methods=['GET'])
+    @login_required
+    def get_community_members(community_id):
+        community = Community.query.get_or_404(community_id)
+
+        members = []
+
+        # OWNER (siempre existe)
+        owner = User.query.get(community.owner_id)
+        if owner:
+            members.append({
+                "id": owner.id,
+                "name": owner.name,
+                "email": owner.email,
+                "avatar_url": owner.avatar_url,
+                "role": "owner",
+                "source": "team"
+            })
+
+        # MIEMBROS CON ROL
+        roles = CommunityMemberRole.query.filter_by(
+            community_id=community.id
+        ).all()
+
+        for role in roles:
+            user = User.query.get(role.user_id)
+            if not user:
+                continue
+
+            # ¿Viene del equipo de la app?
+            is_team_member = TeamMember.query.filter_by(
+                app_id=community.app_id,
+                user_id=user.id
+            ).first() is not None
+
+            members.append({
+                "id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "avatar_url": user.avatar_url,
+                "role": role.role,
+                "source": "team" if is_team_member else "external"
+            })
+
+        return jsonify({
+            "success": True,
+            "members": members
+        })
 
     @app.route('/listadodecosas')
     def explorador():
