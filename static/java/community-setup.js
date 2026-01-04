@@ -459,9 +459,12 @@ async function loadTeamMembers() {
         
         if (data.success && data.app && data.app.team_members) {
             // Filtrar para no incluir al owner actual
-            const teamMembers = data.app.team_members.filter(member => 
-                member.user_id && member.user_id != userId
-            );
+const currentUserId = String(userId);
+
+const teamMembers = data.app.team_members.filter(member =>
+    String(member.user_id) !== currentUserId
+);
+
             
             console.log(`👥 Miembros del equipo (sin owner): ${teamMembers.length}`);
             
@@ -934,35 +937,154 @@ window.removeCommunityMember = function(userId) {
 ============================================ */
 async function loadTeamMembers() {
     try {
-        // Obtener la app_id desde el chat container
         const appId = chatContainer.dataset.appId;
         if (!appId) {
-            console.error('No se encontró appId');
+            console.error('❌ No se encontró appId');
             return;
         }
-        
-        // Obtener miembros del equipo de la app
-        const response = await fetch(`/account/apps/${appId}`);
-        const data = await response.json();
-        
-        if (data.success && data.app.team_members) {
-            // Filtrar para no incluir al owner actual (ya está añadido)
-            data.app.team_members.forEach(member => {
-                if (member.user_id && member.user_id != userId) {
-                    addTeamMemberFromResult({
-                        id: member.user_id,
-                        name: member.name,
-                        email: '', // No tenemos email en team_members
-                        avatar_url: member.avatar_url,
-                        team_role: member.role
-                    }, 'collaborator'); // Rol por defecto
-                }
-            });
+
+        const teamList = document.getElementById('teamMembersList');
+        const loadingDiv = document.getElementById('loadingTeamMembers');
+
+        if (!teamList || !loadingDiv) {
+            console.error('❌ Elementos del DOM no encontrados');
+            return;
         }
+
+        console.log('🔍 Cargando miembros del equipo para app:', appId);
+
+        // Estado inicial
+        loadingDiv.style.display = 'block';
+        teamList.innerHTML = '';
+
+        // 🔗 Cargar equipo de la app
+        const response = await fetch(`/account/apps/${appId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('📦 Respuesta API app:', data);
+
+        loadingDiv.style.display = 'none';
+
+        if (!data?.success || !data?.app?.team_members) {
+            teamList.innerHTML = `
+                <div style="text-align:center;padding:32px;color:#666;">
+                    No se pudieron cargar los miembros del equipo
+                </div>
+            `;
+            return;
+        }
+
+        const currentUserId = String(userId);
+
+        // ✅ FILTRO CORRECTO (no mata el array)
+        const teamMembers = data.app.team_members.filter(member =>
+            String(member.user_id) !== currentUserId
+        );
+
+        console.log(`👥 Miembros del equipo encontrados: ${teamMembers.length}`);
+
+        if (teamMembers.length === 0) {
+            teamList.innerHTML = `
+                <div style="text-align:center;padding:32px;color:#999;">
+                    No hay otros miembros en el equipo de la app
+                </div>
+            `;
+            return;
+        }
+
+        // 🎴 Render tarjetas
+        teamMembers.forEach(member => {
+            const displayName = member.name || member.email || 'Miembro del equipo';
+            const avatarUrl = member.avatar_url || '';
+
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            card.dataset.userId = member.user_id ?? '';
+            card.dataset.userName = displayName;
+            card.dataset.avatarUrl = avatarUrl;
+
+            card.innerHTML = `
+                <div style="
+                    padding: 16px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 10px;
+                    background: white;
+                    margin-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                ">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${getSafeAvatar(avatarUrl, displayName)}"
+                             alt="${displayName}"
+                             style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;"
+                             onerror="this.src='${DEFAULT_AVATAR_URL}'">
+                        <div>
+                            <div style="font-weight: 600; font-size: 14px;">
+                                ${displayName}
+                            </div>
+                            <div style="font-size: 12px; color: #6b7280;">
+                                Miembro del equipo
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="select-member-btn"
+                        style="
+                            padding: 8px 16px;
+                            background: #10b981;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 500;
+                        ">
+                        Añadir
+                    </button>
+                </div>
+            `;
+
+            // ➕ Acción añadir
+            card.querySelector('.select-member-btn').addEventListener('click', function () {
+                selectTeamMember(
+                    member.user_id,
+                    displayName,
+                    avatarUrl,
+                    getSelectedRole()
+                );
+
+                card.classList.add('selected');
+                card.style.borderColor = '#3b82f6';
+                card.style.background = '#eff6ff';
+
+                this.textContent = '✓ Añadido';
+                this.style.background = '#6b7280';
+                this.disabled = true;
+
+                updateSelectedCount();
+            });
+
+            teamList.appendChild(card);
+        });
+
     } catch (error) {
-        console.error('Error cargando miembros del equipo:', error);
+        console.error('❌ Error cargando miembros del equipo:', error);
+
+        const loadingDiv = document.getElementById('loadingTeamMembers');
+        if (loadingDiv) {
+            loadingDiv.innerHTML = `
+                <div style="text-align:center;padding:32px;color:#ef4444;">
+                    Error cargando miembros del equipo
+                </div>
+            `;
+        }
     }
 }
+
 
 /* ============================================
    MODIFICAR FUNCIÓN handleTeamSearch
