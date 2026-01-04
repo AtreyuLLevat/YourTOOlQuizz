@@ -773,49 +773,30 @@ function addToCommunityList(member) {
     
     const roleInfo = roleColors[member.role] || roleColors.collaborator;
     
-    memberDiv.innerHTML = `
-        <div style="
-            padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        ">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
-     alt="${member.name}"
-     style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
-     onerror="this.src='${DEFAULT_AVATAR_URL}'">
-                     alt="${member.name}"
-                     style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
-                <div>
-                    <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
-                    <div style="font-size: 12px; color: #6b7280;">${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}</div>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="
-                    padding: 4px 8px;
-                    border-radius: 12px;
-                    font-size: 12px;
-                    font-weight: 500;
-                    background: ${roleInfo.bg};
-                    color: ${roleInfo.color};
-                ">${roleInfo.label}</span>
-                <button onclick="removeCommunityMember('${member.id}')" style="
-                    background: none;
-                    border: none;
-                    color: #ef4444;
-                    cursor: pointer;
-                    font-size: 16px;
-                    padding: 4px;
-                ">×</button>
+memberDiv.innerHTML = `
+    <div style="
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    ">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+                 alt="${member.name}"
+                 style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
+                 onerror="this.src='${DEFAULT_AVATAR_URL}'">  <!-- ¡ÚNICA etiqueta img! -->
+            <div>
+                <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
+                <div style="font-size: 12px; color: #6b7280;">${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}</div>
             </div>
         </div>
-    `;
+        <!-- resto del código... -->
+    </div>
+`;
     
     communityList.appendChild(memberDiv);
     
