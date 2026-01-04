@@ -430,23 +430,40 @@ async function loadTeamMembers() {
         const appId = chatContainer.dataset.appId;
         if (!appId) {
             console.error('No se encontró appId');
+            const loadingDiv = document.getElementById('loadingTeamMembers');
+            if (loadingDiv) loadingDiv.innerHTML = '❌ Error: No appId';
             return;
         }
         
+        console.log('🔍 Cargando miembros del equipo para app:', appId);
+        
         // Obtener miembros del equipo de la app
         const response = await fetch(`/account/apps/${appId}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
+        console.log('📊 Respuesta de API:', data);
         
         const loadingDiv = document.getElementById('loadingTeamMembers');
         const teamList = document.getElementById('teamMembersList');
         
-        if (data.success && data.app.team_members) {
-            loadingDiv.style.display = 'none';
-            
+        if (!loadingDiv || !teamList) {
+            console.error('Elementos del DOM no encontrados');
+            return;
+        }
+        
+        loadingDiv.style.display = 'none';
+        
+        if (data.success && data.app && data.app.team_members) {
             // Filtrar para no incluir al owner actual
             const teamMembers = data.app.team_members.filter(member => 
                 member.user_id && member.user_id != userId
             );
+            
+            console.log(`👥 Miembros del equipo (sin owner): ${teamMembers.length}`);
             
             if (teamMembers.length === 0) {
                 teamList.innerHTML = `
@@ -477,16 +494,16 @@ async function loadTeamMembers() {
                         align-items: center;
                         justify-content: space-between;
                     ">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
-                 alt="${member.name}"  <!-- AQUÍ ESTÁ EL ERROR: debería ser member.name -->
-                 style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;"
-                 onerror="this.src='${DEFAULT_AVATAR_URL}'">
-            <div>
-                <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
-                <div style="font-size: 12px; color: #6b7280;">${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}</div>
-            </div>
-        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+                                 alt="${member.name}"
+                                 style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;"
+                                 onerror="this.src='${DEFAULT_AVATAR_URL}'">
+                            <div>
+                                <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
+                                <div style="font-size: 12px; color: #6b7280;">Miembro del equipo</div>
+                            </div>
+                        </div>
                         <button class="select-member-btn" style="
                             padding: 8px 16px;
                             background: #10b981;
@@ -526,15 +543,24 @@ async function loadTeamMembers() {
                 
                 teamList.appendChild(card);
             });
+        } else {
+            teamList.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: #666;">
+                    <div style="font-size: 36px; margin-bottom: 16px;">❓</div>
+                    <p style="margin: 0; font-size: 14px;">No se encontraron datos de miembros</p>
+                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Respuesta: ${JSON.stringify(data).substring(0, 100)}...</p>
+                </div>
+            `;
         }
     } catch (error) {
-        console.error('Error cargando miembros del equipo:', error);
+        console.error('❌ Error cargando miembros del equipo:', error);
         const loadingDiv = document.getElementById('loadingTeamMembers');
         if (loadingDiv) {
             loadingDiv.innerHTML = `
                 <div style="text-align: center; padding: 40px 20px; color: #ef4444;">
                     <div style="font-size: 36px; margin-bottom: 16px;">❌</div>
                     <p style="margin: 0; font-size: 14px;">Error cargando miembros</p>
+                    <p style="margin: 4px 0 0 0; font-size: 12px;">${error.message}</p>
                 </div>
             `;
         }
