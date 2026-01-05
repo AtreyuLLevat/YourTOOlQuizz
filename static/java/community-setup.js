@@ -356,6 +356,7 @@ function createModalHTML() {
     // Configurar eventos
     setupModalEvents();
 }
+
 /* ============================================
    NUEVA FUNCIÓN: Configurar eventos del modal
 ============================================ */
@@ -376,27 +377,21 @@ function setupModalEvents() {
     
     // Botones de rol
     document.querySelectorAll('.role-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Remover clase active de todos
-            document.querySelectorAll('.role-btn').forEach(b => {
-                b.classList.remove('active');
-                b.style.background = b.dataset.role === 'admin' ? '#dbeafe' : 
-                                   b.dataset.role === 'moderator' ? '#d1fae5' : '#f3e8ff';
-                b.style.borderColor = b.dataset.role === 'admin' ? '#dbeafe' : 
-                                    b.dataset.role === 'moderator' ? '#d1fae5' : '#f3e8ff';
-                b.style.color = b.dataset.role === 'admin' ? '#1e40af' : 
-                              b.dataset.role === 'moderator' ? '#065f46' : '#7c3aed';
-            });
-            
-            // Añadir clase active al seleccionado
-            this.classList.add('active');
-            this.style.background = '#3b82f6';
-            this.style.borderColor = '#3b82f6';
-            this.style.color = 'white';
-            
-            // Guardar rol seleccionado
-            selectedRole = this.dataset.role;
-        });
+btn.addEventListener('click', function () {
+    selectedRole = this.dataset.role;
+
+    document.querySelectorAll('.role-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.opacity = '0.5';
+    });
+
+    this.classList.add('active');
+    this.style.opacity = '1';
+
+    // feedback inmediato
+    showNotification(`Rol seleccionado: ${this.textContent.trim()}`, 'success');
+});
+
     });
     
     // Búsqueda de usuarios externos
@@ -525,24 +520,15 @@ const teamMembers = data.app.team_members.filter(member =>
                 `;
                 
                 // Evento para seleccionar miembro
-                card.querySelector('.select-member-btn').addEventListener('click', function() {
-                    selectTeamMember(
-                        member.user_id,
-                        member.name,
-                        member.avatar_url || '',
-                        getSelectedRole()
-                    );
-                    
-                    // Marcar como seleccionado
-                    card.classList.add('selected');
-                    card.style.borderColor = '#3b82f6';
-                    card.style.background = '#eff6ff';
-                    this.textContent = '✓ Añadido';
-                    this.style.background = '#6b7280';
-                    this.disabled = true;
-                    
-                    updateSelectedCount();
-                });
+// Evento para seleccionar miembro (team member)
+const addBtn = card.querySelector('.select-member-btn');
+
+addBtn.addEventListener('click', function () {
+    openRolePicker(card, member);
+});
+
+
+
                 
                 teamList.appendChild(card);
             });
@@ -568,6 +554,79 @@ const teamMembers = data.app.team_members.filter(member =>
             `;
         }
     }
+}
+function openRolePicker(card, member) {
+    if (card.querySelector('.inline-role-picker')) return;
+
+    const picker = document.createElement('div');
+    picker.className = 'inline-role-picker';
+    picker.style.cssText = `
+        margin-top: 10px;
+        padding: 12px;
+        border: 1px dashed #3b82f6;
+        border-radius: 8px;
+        background: #f9fafb;
+    `;
+
+    let selectedRole = null;
+
+    picker.innerHTML = `
+        <div style="font-size:13px;margin-bottom:8px;color:#374151;">
+            Selecciona un rol (obligatorio)
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+            ${["owner","admin","moderator","collaborator"].map(r => `
+                <button data-role="${r}" style="
+                    padding:6px 10px;
+                    border:1px solid #d1d5db;
+                    border-radius:6px;
+                    background:white;
+                    cursor:pointer;
+                    font-size:12px;
+                ">${r}</button>
+            `).join("")}
+        </div>
+        <button class="confirm-role-btn" disabled style="
+            padding:8px 14px;
+            background:#3b82f6;
+            color:white;
+            border:none;
+            border-radius:6px;
+            opacity:0.4;
+            cursor:not-allowed;
+        ">Confirmar</button>
+    `;
+
+    picker.querySelectorAll('button[data-role]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedRole = btn.dataset.role;
+
+            picker.querySelectorAll('button[data-role]').forEach(b => {
+                b.style.background = 'white';
+            });
+
+            btn.style.background = '#dbeafe';
+
+            const confirm = picker.querySelector('.confirm-role-btn');
+            confirm.disabled = false;
+            confirm.style.opacity = '1';
+            confirm.style.cursor = 'pointer';
+        });
+    });
+
+    picker.querySelector('.confirm-role-btn').addEventListener('click', () => {
+        selectTeamMember(
+            member.user_id,
+            member.name,
+            member.avatar_url || '',
+            selectedRole
+        );
+
+        card.classList.add('selected');
+        picker.remove();
+    });
+
+    card.appendChild(picker);
 }
 
 /* ============================================
@@ -705,7 +764,29 @@ async function searchExternalUsers(query) {
 /* ============================================
    FUNCIONES AUXILIARES
 ============================================ */
-let selectedRole = 'collaborator';
+selectedRole = null;
+document.querySelectorAll('.role-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.opacity = '0.5';
+});
+
+function resetRoleUI() {
+    document.querySelectorAll('.role-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.opacity = '0.5';
+    });
+}
+
+function requireRoleOrWarn(anchorElement) {
+    if (!selectedRole) {
+        anchorElement.style.outline = '2px solid #ef4444';
+        showNotification('Debes seleccionar un rol antes de añadir un miembro', 'error');
+        return false;
+    }
+    return true;
+}
+
+
 
 function getSelectedRole() {
     return selectedRole;
@@ -1030,24 +1111,20 @@ async function loadTeamMembers() {
             `;
 
             // ➕ Acción añadir
-            card.querySelector('.select-member-btn').addEventListener('click', function () {
-                selectTeamMember(
-                    member.user_id,
-                    displayName,
-                    avatarUrl,
-                    getSelectedRole()
-                );
+card.querySelector('.select-member-btn').addEventListener('click', function () {
+    if (!requireRoleOrWarn(this)) return;
 
-                card.classList.add('selected');
-                card.style.borderColor = '#3b82f6';
-                card.style.background = '#eff6ff';
+    selectTeamMember(
+        member.user_id,
+        member.name,
+        member.avatar_url || '',
+        selectedRole
+    );
 
-                this.textContent = '✓ Añadido';
-                this.style.background = '#6b7280';
-                this.disabled = true;
+    selectedRole = null; // reset consciente
+    resetRoleUI();
+});
 
-                updateSelectedCount();
-            });
 
             teamList.appendChild(card);
         });
