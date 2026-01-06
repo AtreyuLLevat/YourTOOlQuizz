@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let searchTimeout = null;
     
     // Añadir el owner actual a la lista
-    addOwnerToMembers();
+  initializeCurrentMembers();
     
     // Configurar event listeners
     setupEventListeners();
@@ -55,7 +55,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // FUNCIÓN PARA OBTENER AVATAR SEGURO
 
-
+function initializeCurrentMembers() {
+    currentMembers = [];
+    addOwnerToMembers();
+}
 function createModalHTML() {
     const modalHTML = `
     <div id="teamSetupModal" class="team-setup-modal" style="
@@ -1214,9 +1217,8 @@ function selectTeamMember(userId, userName, avatarUrl, role) {
     
     addToCommunityList(member);
 }
-
 function addExternalUser(userId, userName, userEmail, avatarUrl, role) {
-    if (currentMembers.some(m => m.id === userId)) {
+    if (currentMembers.some(m => m.id === userId || m.email === userEmail)) {
         showNotification('Este usuario ya está en la lista', 'warning');
         return;
     }
@@ -1234,10 +1236,65 @@ function addExternalUser(userId, userName, userEmail, avatarUrl, role) {
     addToCommunityList(member);
 }
 
+function addOwnerToMembers() {
+    currentMembers.push({
+        id: chatContainer.dataset.userId,
+        name: currentUserName,
+        email: '', // No tenemos email en los datos
+        avatar_url: '',
+        role: 'owner',
+        is_external: false,
+        is_current_user: true,
+        source: 'owner'
+    });
+    
+    // Añadir también al UI inmediatamente
+    const communityList = document.getElementById('communityMembersList');
+    if (communityList) {
+        const ownerDiv = document.createElement('div');
+        ownerDiv.className = 'community-member-item';
+        ownerDiv.dataset.userId = chatContainer.dataset.userId;
+        ownerDiv.dataset.source = 'owner';
+        
+        ownerDiv.innerHTML = `
+            <div style="
+                padding: 12px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                margin-bottom: 8px;
+                background: #fef3c7;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            ">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="${getSafeAvatar('', currentUserName)}" 
+                         alt="${currentUserName}"
+                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                         onerror="this.src='${DEFAULT_AVATAR_URL}'">
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px;">${currentUserName}</div>
+                        <div style="font-size: 12px; color: #666;">Tú (Owner)</div>
+                    </div>
+                </div>
+                <span style="
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    background: #fee2e2;
+                    color: #dc2626;
+                ">👑 Owner</span>
+            </div>
+        `;
+        
+        communityList.appendChild(ownerDiv);
+    }
+}
 function addToCommunityList(member) {
     currentMembers.push(member);
     
-    // Ocultar mensaje de "no miembros"
+    // Ocultar mensaje de "no miembros" si existe
     const noMembersMsg = document.getElementById('noCommunityMembers');
     if (noMembersMsg) {
         noMembersMsg.style.display = 'none';
@@ -1245,9 +1302,17 @@ function addToCommunityList(member) {
     
     // Crear elemento en la lista de comunidad
     const communityList = document.getElementById('communityMembersList');
+    
+    // Si communityList no existe, crearlo dinámicamente
+    if (!communityList) {
+        console.error('❌ communityMembersList no encontrado en el DOM');
+        return;
+    }
+    
     const memberDiv = document.createElement('div');
     memberDiv.className = 'community-member-item';
-    memberDiv.dataset.userId = member.id;
+    memberDiv.dataset.userId = member.id || member.email;
+    memberDiv.dataset.source = member.source;
     
     const roleColors = {
         'owner': { bg: '#fee2e2', color: '#dc2626', label: '👑 Owner' },
@@ -1258,85 +1323,142 @@ function addToCommunityList(member) {
     
     const roleInfo = roleColors[member.role] || roleColors.collaborator;
     
-memberDiv.innerHTML = `
-    <div style="
-        padding: 12px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    ">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
-                 alt="${member.name}"
-                 style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
-                 onerror="this.src='${DEFAULT_AVATAR_URL}'">  <!-- ¡ÚNICA etiqueta img! -->
-            <div>
-                <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
-                <div style="font-size: 12px; color: #6b7280;">${member.source === 'team' ? 'Miembro del equipo' : 'Usuario externo'}</div>
+    // Determinar el tipo de miembro para mostrar
+    let memberType = '';
+    if (member.source === 'team') {
+        memberType = 'Miembro del equipo';
+    } else if (member.source === 'external') {
+        memberType = 'Usuario registrado';
+    } else if (member.source === 'invitation') {
+        memberType = 'Invitación pendiente';
+    } else if (member.is_current_user) {
+        memberType = 'Tú (Owner)';
+    }
+    
+    memberDiv.innerHTML = `
+        <div style="
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="${getSafeAvatar(member.avatar_url, member.name)}" 
+                     alt="${member.name}"
+                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                     onerror="this.src='${DEFAULT_AVATAR_URL}'">
+                <div>
+                    <div style="font-weight: 600; font-size: 14px;">${member.name}</div>
+                    <div style="font-size: 12px; color: #6b7280;">
+                        ${memberType}
+                        ${member.email ? `<br>${member.email}` : ''}
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    background: ${roleInfo.bg};
+                    color: ${roleInfo.color};
+                ">${roleInfo.label}</span>
+                
+                ${member.role !== 'owner' && !member.is_current_user ? `
+                    <button onclick="removeCommunityMember('${member.id || member.email}')" 
+                            style="
+                                background: none;
+                                border: none;
+                                color: #ef4444;
+                                cursor: pointer;
+                                font-size: 18px;
+                                padding: 0 8px;
+                                line-height: 1;
+                            " title="Eliminar">×</button>
+                ` : ''}
             </div>
         </div>
-        <!-- resto del código... -->
-    </div>
-`;
+    `;
     
     communityList.appendChild(memberDiv);
     
-    // Actualizar contadores
-    updateSelectedCount();
-    updateCommunityMemberCount();
-    updateCompleteButton();
+    // Actualizar todas las estadísticas
+    updateCommunityUI();
 }
 
-function updateSelectedCount() {
-    const selectedCount = currentMembers.filter(m => m.source === 'team').length;
-    document.getElementById('selectedCount').textContent = selectedCount;
-}
+
 
 function updateCommunityMemberCount() {
-    document.getElementById('communityMemberCount').textContent = currentMembers.length;
+    const totalMembers = currentMembers.length;
+    const ownerIncluded = currentMembers.some(m => m.is_current_user);
+    
+    // Mostrar solo miembros adicionales (sin contar al owner)
+    const additionalMembers = ownerIncluded ? totalMembers - 1 : totalMembers;
+    document.getElementById('communityMemberCount').textContent = 
+        `(${additionalMembers} miembro${additionalMembers !== 1 ? 's' : ''})`;
 }
-
 // Añadir al scope global
-window.removeCommunityMember = function(userId) {
+window.removeCommunityMember = function(identifier) {
     // Remover de la lista
-    currentMembers = currentMembers.filter(m => m.id !== userId);
+    currentMembers = currentMembers.filter(m => 
+        (m.id !== identifier && m.email !== identifier)
+    );
     
     // Remover del DOM
     const memberDivs = document.querySelectorAll('.community-member-item');
     memberDivs.forEach(div => {
-        if (div.dataset.userId === userId) {
+        if (div.dataset.userId === identifier || div.dataset.userId === 'invite_' + identifier) {
             div.remove();
         }
     });
     
-    // Activar botón de añadir en la tarjeta correspondiente
-    const teamCard = document.querySelector(`.member-card[data-user-id="${userId}"]`);
+    // Si era un team member, restaurar su botón
+    const teamCard = document.querySelector(`.member-card[data-user-id="${identifier}"]`);
     if (teamCard) {
         teamCard.classList.remove('selected');
-        teamCard.style.borderColor = '#e5e7eb';
-        teamCard.style.background = 'white';
-        const btn = teamCard.querySelector('.select-member-btn');
-        if (btn) {
-            btn.textContent = 'Añadir';
-            btn.style.background = '#10b981';
-            btn.disabled = false;
+        const selectBtn = teamCard.querySelector('.select-team-btn');
+        if (selectBtn) {
+            selectBtn.textContent = 'Seleccionar';
+            selectBtn.style.background = '#f3f4f6';
+            selectBtn.style.color = '#374151';
+            selectBtn.style.borderColor = '#d1d5db';
+        }
+        
+        // Ocultar role picker si está visible
+        const rolePicker = teamCard.querySelector('.role-picker');
+        if (rolePicker) {
+            rolePicker.style.display = 'none';
         }
     }
     
-    // Actualizar contadores
-    updateSelectedCount();
-    updateCommunityMemberCount();
-    updateCompleteButton();
+    // Si era una invitación, remover de la lista de invitaciones
+    const invitationDiv = document.querySelector(`.invitation-item[data-email="${identifier}"]`);
+    if (invitationDiv) {
+        invitationDiv.remove();
+    }
+    
+    // Actualizar UI
+    updateCommunityUI();
     
     // Mostrar mensaje de "no miembros" si está vacío
     if (currentMembers.length === 0) {
         const noMembersMsg = document.getElementById('noCommunityMembers');
         if (noMembersMsg) {
             noMembersMsg.style.display = 'block';
+        }
+    }
+    
+    // Verificar si hay invitaciones pendientes
+    const invitationsList = document.getElementById('invitationsList');
+    if (invitationsList && invitationsList.children.length === 1) { // Solo tiene el mensaje "no hay invitaciones"
+        const noInvitations = document.getElementById('noInvitations');
+        if (noInvitations) {
+            noInvitations.style.display = 'block';
         }
     }
 };
@@ -1357,24 +1479,6 @@ window.removeCommunityMember = function(userId) {
     // Cargar miembros del equipo al inicio
     loadTeamMembers();
     
-    // Buscar miembros del equipo (ya están listados)
-    const searchInput = document.getElementById('teamSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleTeamSearch);
-    }
-    
-    // Añadir miembro del equipo
-    const addTeamBtn = document.getElementById('addTeamMemberBtn');
-    if (addTeamBtn) {
-        addTeamBtn.addEventListener('click', addTeamMember);
-    }
-    
-    // Invitar usuario externo (busca en todos los usuarios)
-    const inviteBtn = document.getElementById('inviteUserBtn');
-    if (inviteBtn) {
-        inviteBtn.addEventListener('click', inviteExternalUser);
-    }
-    
     // Botones del footer
     const skipBtn = document.getElementById('skipSetupBtn');
     if (skipBtn) {
@@ -1391,7 +1495,6 @@ window.removeCommunityMember = function(userId) {
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
-                // No permitir cerrar sin completar
                 showNotification('Completa la configuración o haz clic en "Configurar después"', 'warning');
             }
         });
@@ -2107,29 +2210,32 @@ function addMemberToUI(member) {
        FUNCIONES DE CONFIGURACIÓN
     ============================================ */
     
-    function updateCompleteButton() {
-        const completeBtn = document.getElementById('completeSetupBtn');
-        if (!completeBtn) return;
-        
-        // Verificar que haya al menos un owner (siempre está)
-        const owners = currentMembers.filter(m => m.role === 'owner');
-        
-        if (owners.length === 1 && currentMembers.length > 1) {
-            completeBtn.disabled = false;
-            completeBtn.style.background = '#10b981';
-            completeBtn.style.cursor = 'pointer';
-        } else {
-            completeBtn.disabled = true;
-            completeBtn.style.background = '#9ca3af';
-            completeBtn.style.cursor = 'not-allowed';
-        }
-    }
+function updateCompleteButton() {
+    const completeBtn = document.getElementById('completeSetupBtn');
+    if (!completeBtn) return;
     
-    async function skipSetup() {
-        if (confirm('¿Seguro que quieres configurar el equipo después? Podrás hacerlo desde la configuración de la comunidad.')) {
-            closeModal();
-        }
+    // Verificar que haya al menos un owner (siempre está)
+    const owners = currentMembers.filter(m => m.role === 'owner');
+    const hasOwner = owners.length >= 1;
+    
+    // Verificar que haya al menos un miembro adicional
+    const additionalMembers = currentMembers.filter(m => !m.is_current_user);
+    
+    if (hasOwner && additionalMembers.length > 0) {
+        completeBtn.disabled = false;
+        completeBtn.style.background = '#10b981';
+        completeBtn.style.cursor = 'pointer';
+        completeBtn.innerHTML = 'Completar Configuración';
+    } else {
+        completeBtn.disabled = true;
+        completeBtn.style.background = '#eaeaea';
+        completeBtn.style.cursor = 'not-allowed';
+        completeBtn.innerHTML = additionalMembers.length === 0 ? 
+            'Añade al menos un miembro' : 
+            'Completar Configuración';
     }
+}
+
     
     async function completeSetup() {
         const completeBtn = document.getElementById('completeSetupBtn');
