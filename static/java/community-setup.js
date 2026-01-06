@@ -74,7 +74,7 @@ function createModalHTML() {
             background: white;
             border-radius: 12px;
             width: 90%;
-            max-width: 1000px;
+            max-width: 1200px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -112,51 +112,60 @@ function createModalHTML() {
                 </button>
             </div>
             
-            <!-- Content - Dos columnas -->
+            <!-- Content - Tres columnas -->
             <div style="padding: 0; display: flex; min-height: 500px;">
-                <!-- Columna izquierda: Miembros del equipo de la app -->
+                <!-- Columna 1: Miembros del equipo de la app -->
                 <div style="flex: 1; padding: 32px; border-right: 1px solid #eaeaea;">
                     <div style="margin-bottom: 32px;">
                         <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-                            <span>👥</span> Miembros del Equipo
+                            <span>👥</span> Miembros del Equipo App
                         </h3>
                         <p style="font-size: 14px; color: #666; margin: 0 0 24px 0;">
                             Usuarios que ya forman parte del equipo de tu aplicación.
                         </p>
                         
+                        <!-- Estado de selección -->
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                            <div style="font-size: 14px; color: #666;">
+                                <span id="teamSelectedCount">0</span> seleccionados para la comunidad
+                            </div>
+                            <button id="clearTeamSelections" style="
+                                margin-left: auto;
+                                padding: 4px 12px;
+                                background: none;
+                                border: 1px solid #ddd;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                color: #666;
+                                cursor: pointer;
+                            ">Limpiar</button>
+                        </div>
+                        
                         <!-- Lista de miembros del equipo -->
                         <div id="teamMembersList" style="
-                            min-height: 200px;
+                            max-height: 300px;
+                            overflow-y: auto;
                             margin-bottom: 24px;
+                            border: 1px solid #eaeaea;
+                            border-radius: 8px;
+                            padding: 8px;
                         ">
                             <div id="loadingTeamMembers" style="text-align: center; padding: 40px 0;">
                                 <div style="display: inline-block; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                                 <p style="color: #666; margin-top: 10px;">Cargando miembros...</p>
                             </div>
                         </div>
-                        
-                        <!-- Contador de seleccionados -->
-                        <div style="
-                            padding: 12px 16px;
-                            background: #f8f9fa;
-                            border-radius: 8px;
-                            border: 1px solid #eaeaea;
-                            font-size: 14px;
-                            color: #666;
-                        ">
-                            <span id="selectedCount">0</span> miembros seleccionados para la comunidad
-                        </div>
                     </div>
                 </div>
                 
-                <!-- Columna derecha: Búsqueda de usuarios externos -->
-                <div style="flex: 1; padding: 32px;">
+                <!-- Columna 2: Búsqueda de usuarios externos -->
+                <div style="flex: 1; padding: 32px; border-right: 1px solid #eaeaea;">
                     <div style="margin-bottom: 32px;">
                         <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
-                            <span>🔍</span> Buscar Usuarios Externos
+                            <span>🔍</span> Buscar Usuarios Registrados
                         </h3>
                         <p style="font-size: 14px; color: #666; margin: 0 0 24px 0;">
-                            Invita usuarios registrados en YourToolQuizz que no están en tu equipo.
+                            Busca usuarios que ya tienen cuenta en YourToolQuizz.
                         </p>
                         
                         <!-- Campo de búsqueda -->
@@ -191,75 +200,164 @@ function createModalHTML() {
                             margin-bottom: 24px;
                         "></div>
                         
-                        <!-- Roles disponibles -->
-                        <div style="margin-bottom: 24px;">
-                            <h4 style="font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0 0 12px 0;">Rol para nuevos miembros</h4>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                                <button class="role-btn" data-role="admin" style="
-                                    padding: 10px;
-                                    border: 2px solid #dbeafe;
-                                    background: #dbeafe;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-size: 13px;
-                                    font-weight: 500;
-                                    color: #1e40af;
-                                    transition: all 0.2s;
-                                " onmouseover="this.style.borderColor='#93c5fd'" 
-                                   onmouseout="this.style.borderColor='#dbeafe'">
-                                    👑 Admin
-                                </button>
-                                <button class="role-btn" data-role="moderator" style="
-                                    padding: 10px;
-                                    border: 2px solid #d1fae5;
-                                    background: #d1fae5;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-size: 13px;
-                                    font-weight: 500;
-                                    color: #065f46;
-                                    transition: all 0.2s;
-                                " onmouseover="this.style.borderColor='#6ee7b7'" 
-                                   onmouseout="this.style.borderColor='#d1fae5'">
-                                    ⚖️ Moderador
-                                </button>
-                                <button class="role-btn active" data-role="collaborator" style="
-                                    padding: 10px;
-                                    border: 2px solid #3b82f6;
-                                    background: #3b82f6;
-                                    border-radius: 8px;
-                                    cursor: pointer;
-                                    font-size: 13px;
-                                    font-weight: 500;
-                                    color: white;
-                                    transition: all 0.2s;
-                                ">
-                                    🤝 Colaborador
-                                </button>
+                        <!-- Contador de usuarios externos añadidos -->
+                        <div style="
+                            padding: 8px 12px;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            font-size: 13px;
+                            color: #666;
+                            margin-top: 16px;
+                            display: none;
+                        " id="externalAddedCount">
+                            <span id="externalAddedNumber">0</span> usuarios añadidos desde búsqueda
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Columna 3: Invitar por email -->
+                <div style="flex: 1; padding: 32px;">
+                    <div style="margin-bottom: 32px;">
+                        <h3 style="font-size: 18px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
+                            <span>📧</span> Invitar por Email
+                        </h3>
+                        <p style="font-size: 14px; color: #666; margin: 0 0 24px 0;">
+                            Invita usuarios que aún no tienen cuenta registrada.
+                        </p>
+                        
+                        <!-- Formulario de invitación por email -->
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea;">
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px;">Email del usuario</label>
+                                <input type="email" 
+                                       id="inviteEmail" 
+                                       placeholder="ejemplo@email.com"
+                                       style="
+                                            width: 100%;
+                                            padding: 12px;
+                                            border: 1px solid #ddd;
+                                            border-radius: 6px;
+                                            font-size: 14px;
+                                            outline: none;
+                                       ">
+                            </div>
+                            
+                            <div style="margin-bottom: 16px;">
+                                <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px;">Rol en la comunidad</label>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                                    <button class="invite-role-btn" data-role="admin" style="
+                                        padding: 8px;
+                                        border: 1px solid #dbeafe;
+                                        background: #dbeafe;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        color: #1e40af;
+                                        transition: all 0.2s;
+                                    " onmouseover="this.style.borderColor='#93c5fd'" 
+                                       onmouseout="this.style.borderColor='#dbeafe'">
+                                        👑 Admin
+                                    </button>
+                                    <button class="invite-role-btn" data-role="moderator" style="
+                                        padding: 8px;
+                                        border: 1px solid #d1fae5;
+                                        background: #d1fae5;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        color: #065f46;
+                                        transition: all 0.2s;
+                                    " onmouseover="this.style.borderColor='#6ee7b7'" 
+                                       onmouseout="this.style.borderColor='#d1fae5'">
+                                        ⚖️ Moderador
+                                    </button>
+                                    <button class="invite-role-btn active" data-role="collaborator" style="
+                                        padding: 8px;
+                                        border: 1px solid #f3e8ff;
+                                        background: #f3e8ff;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-size: 12px;
+                                        font-weight: 500;
+                                        color: #7c3aed;
+                                        transition: all 0.2s;
+                                    ">
+                                        🤝 Colaborador
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button id="sendInviteBtn" style="
+                                width: 100%;
+                                padding: 12px;
+                                background: #10b981;
+                                color: white;
+                                border: none;
+                                border-radius: 6px;
+                                font-size: 14px;
+                                font-weight: 500;
+                                cursor: pointer;
+                                transition: background 0.2s;
+                            " onmouseover="this.style.background='#0da271'" 
+                               onmouseout="this.style.background='#10b981'">
+                                Enviar Invitación
+                            </button>
+                        </div>
+                        
+                        <!-- Lista de invitaciones pendientes -->
+                        <div style="margin-top: 24px;">
+                            <h4 style="font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 0 0 12px 0;">Invitaciones enviadas</h4>
+                            <div id="invitationsList" style="
+                                max-height: 200px;
+                                overflow-y: auto;
+                                border: 1px solid #eaeaea;
+                                border-radius: 6px;
+                                padding: 8px;
+                                background: #fafafa;
+                            ">
+                                <div id="noInvitations" style="text-align: center; padding: 20px; color: #999;">
+                                    No hay invitaciones pendientes
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Miembros seleccionados para la comunidad -->
-                    <div>
-                        <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0 0 16px 0;">Miembros de la Comunidad</h3>
-                        
-                        <div id="communityMembersList" style="
-                            min-height: 100px;
-                            margin-bottom: 24px;
-                        ">
-                            <div id="noCommunityMembers" style="
-                                text-align: center;
-                                padding: 40px 20px;
-                                color: #999;
-                                border: 2px dashed #eaeaea;
-                                border-radius: 8px;
-                                background: #fafafa;
-                            ">
-                                <div style="font-size: 36px; margin-bottom: 16px; opacity: 0.5;">👥</div>
-                                <p style="margin: 0; font-size: 14px;">Añade miembros usando las opciones de la izquierda</p>
-                            </div>
-                        </div>
+                </div>
+            </div>
+            
+            <!-- Sección de miembros seleccionados -->
+            <div style="
+                padding: 24px 40px;
+                border-top: 1px solid #eaeaea;
+                background: #f8f9fa;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #1a1a1a; margin: 0;">
+                        Miembros de la Comunidad
+                        <span id="communityMemberCount" style="font-weight: 400; color: #666; margin-left: 8px;">(0 miembros)</span>
+                    </h3>
+                    <div style="font-size: 14px; color: #666;">
+                        <span id="totalMembersBreakdown">0 team members • 0 externos • 0 invitados</span>
+                    </div>
+                </div>
+                
+                <!-- Lista de miembros de la comunidad -->
+                <div id="communityMembersList" style="
+                    max-height: 200px;
+                    overflow-y: auto;
+                    background: white;
+                    border: 1px solid #eaeaea;
+                    border-radius: 8px;
+                    padding: 12px;
+                ">
+                    <div id="noCommunityMembers" style="
+                        text-align: center;
+                        padding: 40px 20px;
+                        color: #999;
+                    ">
+                        <div style="font-size: 36px; margin-bottom: 16px; opacity: 0.5;">👥</div>
+                        <p style="margin: 0; font-size: 14px;">Añade miembros usando las opciones de arriba</p>
                     </div>
                 </div>
             </div>
@@ -275,7 +373,7 @@ function createModalHTML() {
                 border-radius: 0 0 12px 12px;
             ">
                 <div style="font-size: 14px; color: #666;">
-                    <span id="communityMemberCount" style="font-weight: 600; color: #1a1a1a;">0</span> miembros configurados para la comunidad
+                    <div>📝 <strong>Resumen:</strong> <span id="finalSummary">No hay miembros añadidos</span></div>
                 </div>
                 <div style="display: flex; gap: 12px;">
                     <button id="skipSetupBtn" style="
@@ -329,11 +427,13 @@ function createModalHTML() {
         .member-card {
             transition: all 0.2s;
             cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 8px;
         }
         
         .member-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
         }
         
         .member-card.selected {
@@ -341,12 +441,52 @@ function createModalHTML() {
             background-color: #eff6ff;
         }
         
-        .role-btn.active {
+        .role-btn.active, .invite-role-btn.active {
             transform: scale(0.98);
+            border-width: 2px !important;
         }
         
         .user-result:hover {
             background-color: #f8f9fa;
+        }
+        
+        .role-picker {
+            display: none;
+            margin-top: 8px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 6px;
+            border: 1px dashed #3b82f6;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .role-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            margin: 2px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .role-option:hover {
+            background: #f3f4f6;
+        }
+        
+        .role-option.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
         }
     </style>
     `;
@@ -360,6 +500,9 @@ function createModalHTML() {
 /* ============================================
    NUEVA FUNCIÓN: Configurar eventos del modal
 ============================================ */
+let inviteEmailRole = 'collaborator';
+
+// Configuración de eventos del modal actualizada
 function setupModalEvents() {
     // Cerrar modal
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -375,24 +518,33 @@ function setupModalEvents() {
         });
     }
     
-    // Botones de rol
-    document.querySelectorAll('.role-btn').forEach(btn => {
-btn.addEventListener('click', function () {
-    selectedRole = this.dataset.role;
-
-    document.querySelectorAll('.role-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.opacity = '0.5';
+    // Limpiar selecciones de team members
+    const clearTeamBtn = document.getElementById('clearTeamSelections');
+    if (clearTeamBtn) {
+        clearTeamBtn.addEventListener('click', clearTeamSelections);
+    }
+    
+    // Botones de rol para invitaciones por email
+    document.querySelectorAll('.invite-role-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            inviteEmailRole = this.dataset.role;
+            
+            // Actualizar UI
+            document.querySelectorAll('.invite-role-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.borderWidth = '1px';
+            });
+            
+            this.classList.add('active');
+            this.style.borderWidth = '2px';
+        });
     });
-
-    this.classList.add('active');
-    this.style.opacity = '1';
-
-    // feedback inmediato
-    showNotification(`Rol seleccionado: ${this.textContent.trim()}`, 'success');
-});
-
-    });
+    
+    // Enviar invitación por email
+    const sendInviteBtn = document.getElementById('sendInviteBtn');
+    if (sendInviteBtn) {
+        sendInviteBtn.addEventListener('click', sendEmailInvitation);
+    }
     
     // Búsqueda de usuarios externos
     const searchInput = document.getElementById('externalUserSearch');
@@ -417,6 +569,7 @@ btn.addEventListener('click', function () {
     }
 }
 
+
 /* ============================================
    NUEVA FUNCIÓN: Cargar miembros del equipo
 ============================================ */
@@ -432,7 +585,6 @@ async function loadTeamMembers() {
         
         console.log('🔍 Cargando miembros del equipo para app:', appId);
         
-        // Obtener miembros del equipo de la app
         const response = await fetch(`/account/apps/${appId}`);
         
         if (!response.ok) {
@@ -454,12 +606,10 @@ async function loadTeamMembers() {
         
         if (data.success && data.app && data.app.team_members) {
             // Filtrar para no incluir al owner actual
-const currentUserId = String(userId);
-
-const teamMembers = data.app.team_members.filter(member =>
-    String(member.user_id) !== currentUserId
-);
-
+            const currentUserId = String(userId);
+            const teamMembers = data.app.team_members.filter(member =>
+                String(member.user_id) !== currentUserId
+            );
             
             console.log(`👥 Miembros del equipo (sin owner): ${teamMembers.length}`);
             
@@ -483,11 +633,10 @@ const teamMembers = data.app.team_members.filter(member =>
                 
                 card.innerHTML = `
                     <div style="
-                        padding: 16px;
+                        padding: 12px;
                         border: 1px solid #e5e7eb;
-                        border-radius: 10px;
+                        border-radius: 8px;
                         background: white;
-                        margin-bottom: 12px;
                         display: flex;
                         align-items: center;
                         justify-content: space-between;
@@ -502,44 +651,119 @@ const teamMembers = data.app.team_members.filter(member =>
                                 <div style="font-size: 12px; color: #6b7280;">Miembro del equipo</div>
                             </div>
                         </div>
-                        <button class="select-member-btn" style="
-                            padding: 8px 16px;
-                            background: #10b981;
-                            color: white;
-                            border: none;
+                        <button class="select-team-btn" style="
+                            padding: 6px 12px;
+                            background: #f3f4f6;
+                            color: #374151;
+                            border: 1px solid #d1d5db;
                             border-radius: 6px;
                             cursor: pointer;
-                            font-size: 14px;
+                            font-size: 12px;
                             font-weight: 500;
-                            transition: background 0.2s;
-                        " onmouseover="this.style.background='#0da271'"
-                           onmouseout="this.style.background='#10b981'">
-                            Añadir
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#e5e7eb'" 
+                           onmouseout="this.style.background='#f3f4f6'">
+                            Seleccionar
                         </button>
+                    </div>
+                    <div class="role-picker">
+                        <div style="font-size: 12px; color: #6b7280; margin-bottom: 8px;">Selecciona rol:</div>
+                        <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            <div class="role-option" data-role="admin">👑 Admin</div>
+                            <div class="role-option" data-role="moderator">⚖️ Moderador</div>
+                            <div class="role-option" data-role="collaborator">🤝 Colaborador</div>
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button class="confirm-role-btn" style="
+                                padding: 6px 12px;
+                                background: #10b981;
+                                color: white;
+                                border: none;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                cursor: pointer;
+                            ">Confirmar</button>
+                            <button class="cancel-role-btn" style="
+                                padding: 6px 12px;
+                                background: #f3f4f6;
+                                color: #6b7280;
+                                border: none;
+                                border-radius: 4px;
+                                font-size: 12px;
+                                cursor: pointer;
+                            ">Cancelar</button>
+                        </div>
                     </div>
                 `;
                 
-                // Evento para seleccionar miembro
-// Evento para seleccionar miembro (team member)
-const addBtn = card.querySelector('.select-member-btn');
-
-addBtn.addEventListener('click', function () {
-    openRolePicker(card, member);
-});
-
-
-
+                // Evento para seleccionar team member
+                const selectBtn = card.querySelector('.select-team-btn');
+                const rolePicker = card.querySelector('.role-picker');
+                const roleOptions = card.querySelectorAll('.role-option');
+                const confirmBtn = card.querySelector('.confirm-role-btn');
+                const cancelBtn = card.querySelector('.cancel-role-btn');
+                
+                let selectedRole = null;
+                
+                selectBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Ocultar otros role pickers
+                    document.querySelectorAll('.role-picker').forEach(rp => {
+                        if (rp !== rolePicker) rp.style.display = 'none';
+                    });
+                    
+                    // Mostrar/ocultar este role picker
+                    if (rolePicker.style.display === 'block') {
+                        rolePicker.style.display = 'none';
+                    } else {
+                        rolePicker.style.display = 'block';
+                        selectedRole = null;
+                        roleOptions.forEach(opt => opt.classList.remove('selected'));
+                    }
+                });
+                
+                roleOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        selectedRole = this.dataset.role;
+                        roleOptions.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                    });
+                });
+                
+                confirmBtn.addEventListener('click', function() {
+                    if (!selectedRole) {
+                        showNotification('Selecciona un rol primero', 'warning');
+                        return;
+                    }
+                    
+                    // Añadir miembro con rol seleccionado
+                    selectTeamMember(
+                        member.user_id,
+                        member.name,
+                        member.avatar_url || '',
+                        selectedRole
+                    );
+                    
+                    // Marcar como seleccionado
+                    card.classList.add('selected');
+                    selectBtn.textContent = 'Seleccionado';
+                    selectBtn.style.background = '#10b981';
+                    selectBtn.style.color = 'white';
+                    selectBtn.style.borderColor = '#10b981';
+                    rolePicker.style.display = 'none';
+                    
+                    updateTeamSelectedCount();
+                });
+                
+                cancelBtn.addEventListener('click', function() {
+                    rolePicker.style.display = 'none';
+                    selectedRole = null;
+                    roleOptions.forEach(opt => opt.classList.remove('selected'));
+                });
                 
                 teamList.appendChild(card);
             });
-        } else {
-            teamList.innerHTML = `
-                <div style="text-align: center; padding: 40px 20px; color: #666;">
-                    <div style="font-size: 36px; margin-bottom: 16px;">❓</div>
-                    <p style="margin: 0; font-size: 14px;">No se encontraron datos de miembros</p>
-                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">Respuesta: ${JSON.stringify(data).substring(0, 100)}...</p>
-                </div>
-            `;
         }
     } catch (error) {
         console.error('❌ Error cargando miembros del equipo:', error);
@@ -549,12 +773,12 @@ addBtn.addEventListener('click', function () {
                 <div style="text-align: center; padding: 40px 20px; color: #ef4444;">
                     <div style="font-size: 36px; margin-bottom: 16px;">❌</div>
                     <p style="margin: 0; font-size: 14px;">Error cargando miembros</p>
-                    <p style="margin: 4px 0 0 0; font-size: 12px;">${error.message}</p>
                 </div>
             `;
         }
     }
 }
+
 function openRolePicker(card, member) {
     if (card.querySelector('.inline-role-picker')) return;
 
@@ -641,7 +865,6 @@ async function searchExternalUsers(query) {
     }
     
     try {
-        // Buscar en TODOS los usuarios registrados
         const response = await fetch(`/search_users?q=${encodeURIComponent(query)}`);
         const users = await response.json();
         
@@ -670,6 +893,7 @@ async function searchExternalUsers(query) {
         const teamUserIds = teamUsers.map(m => m.user_id);
         
         resultsDiv.innerHTML = '';
+        
         users.forEach(user => {
             // Omitir usuarios que ya están en el equipo
             if (teamUserIds.includes(user.id)) {
@@ -683,66 +907,63 @@ async function searchExternalUsers(query) {
             
             const div = document.createElement('div');
             div.className = 'user-result';
-            div.style.cssText = 'padding: 16px; border-bottom: 1px solid #f3f4f6; cursor: pointer;';
+            div.style.cssText = 'padding: 12px; border-bottom: 1px solid #f3f4f6;';
             div.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-<img src="${getSafeAvatar(user.avatar_url, user.name)}" 
-     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
-     onerror="this.src='${DEFAULT_AVATAR_URL}'">
-                        <div>
-                            <div style="font-weight: 600; color: #1a1a1a;">${user.name || 'Usuario'}</div>
-                            <div style="font-size: 14px; color: #6b7280;">${user.email || 'Sin email'}</div>
-                        </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img src="${getSafeAvatar(user.avatar_url, user.name)}" 
+                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                         onerror="this.src='${DEFAULT_AVATAR_URL}'">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1a1a1a;">${user.name || 'Usuario'}</div>
+                        <div style="font-size: 13px; color: #6b7280;">${user.email || 'Sin email'}</div>
                     </div>
-                    <button class="add-external-user-btn" data-user-id="${user.id}" style="
-                        padding: 8px 16px;
-                        background: #3b82f6;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        font-weight: 500;
-                        transition: background 0.2s;
-                    " onmouseover="this.style.background='#2563eb'"
-                       onmouseout="this.style.background='#3b82f6'">
-                        Añadir
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <select class="external-role-select" style="
+                            padding: 6px 10px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            background: white;
+                        ">
+                            <option value="admin">👑 Admin</option>
+                            <option value="moderator">⚖️ Moderador</option>
+                            <option value="collaborator" selected>🤝 Colaborador</option>
+                        </select>
+                        <button class="add-external-btn" data-user-id="${user.id}" style="
+                            padding: 6px 12px;
+                            background: #3b82f6;
+                            color: white;
+                            border: none;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 500;
+                            transition: background 0.2s;
+                        " onmouseover="this.style.background='#2563eb'" 
+                           onmouseout="this.style.background='#3b82f6'">
+                            Añadir
+                        </button>
+                    </div>
                 </div>
             `;
             
             // Evento para añadir usuario externo
-            div.querySelector('.add-external-user-btn').addEventListener('click', function(e) {
-                e.stopPropagation();
+            div.querySelector('.add-external-btn').addEventListener('click', function() {
+                const roleSelect = div.querySelector('.external-role-select');
+                const role = roleSelect.value;
+                
                 addExternalUser(
                     user.id,
                     user.name,
                     user.email,
                     user.avatar_url || '',
-                    getSelectedRole()
+                    role
                 );
                 
-                // Ocultar resultados
-                resultsDiv.style.display = 'none';
-                document.getElementById('externalUserSearch').value = '';
-            });
-            
-            // Evento para hacer clic en toda la tarjeta
-            div.addEventListener('click', function(e) {
-                if (!e.target.classList.contains('add-external-user-btn')) {
-                    addExternalUser(
-                        user.id,
-                        user.name,
-                        user.email,
-                        user.avatar_url || '',
-                        getSelectedRole()
-                    );
-                    
-                    // Ocultar resultados
-                    resultsDiv.style.display = 'none';
-                    document.getElementById('externalUserSearch').value = '';
-                }
+                // Mostrar contador
+                updateExternalAddedCount();
+                
+                showNotification(`Usuario ${user.name} añadido como ${getRoleName(role)}`, 'success');
             });
             
             resultsDiv.appendChild(div);
@@ -761,6 +982,189 @@ async function searchExternalUsers(query) {
     }
 }
 
+async function sendEmailInvitation() {
+    const emailInput = document.getElementById('inviteEmail');
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        showNotification('Ingresa un email válido', 'warning');
+        emailInput.focus();
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showNotification('Formato de email inválido', 'warning');
+        return;
+    }
+    
+    // Verificar si ya está en la lista
+    if (currentMembers.some(m => m.email === email)) {
+        showNotification('Este email ya está en la lista', 'warning');
+        return;
+    }
+    
+    // Crear objeto de invitación
+    const invitation = {
+        id: 'invite_' + Date.now(),
+        email: email,
+        name: email.split('@')[0],
+        role: inviteEmailRole,
+        type: 'invitation',
+        status: 'pending',
+        avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&background=random`
+    };
+    
+    // Añadir a la lista de invitaciones
+    addInvitationToList(invitation);
+    
+    // Añadir también como miembro (pendiente de registro)
+    const member = {
+        id: null,
+        name: invitation.name,
+        email: email,
+        avatar_url: invitation.avatar_url,
+        role: inviteEmailRole,
+        is_external: true,
+        needs_invitation: true,
+        source: 'invitation'
+    };
+    
+    addToCommunityList(member);
+    
+    // Limpiar formulario
+    emailInput.value = '';
+    
+    showNotification(`Invitación enviada a ${email}`, 'success');
+}
+
+// Función para añadir invitación a la lista
+function addInvitationToList(invitation) {
+    const invitationsList = document.getElementById('invitationsList');
+    const noInvitations = document.getElementById('noInvitations');
+    
+    if (noInvitations) {
+        noInvitations.style.display = 'none';
+    }
+    
+    const div = document.createElement('div');
+    div.className = 'invitation-item';
+    div.dataset.email = invitation.email;
+    div.style.cssText = 'padding: 10px; border-bottom: 1px solid #eaeaea; font-size: 13px;';
+    div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-weight: 500;">${invitation.email}</div>
+                <div style="color: #6b7280; font-size: 12px;">Rol: ${getRoleName(invitation.role)}</div>
+            </div>
+            <span style="color: #f59e0b; font-size: 11px; padding: 2px 6px; background: #fef3c7; border-radius: 10px;">Pendiente</span>
+        </div>
+    `;
+    
+    invitationsList.appendChild(div);
+}
+
+function clearTeamSelections() {
+    // Limpiar selecciones visuales
+    document.querySelectorAll('.member-card.selected').forEach(card => {
+        card.classList.remove('selected');
+        const selectBtn = card.querySelector('.select-team-btn');
+        if (selectBtn) {
+            selectBtn.textContent = 'Seleccionar';
+            selectBtn.style.background = '#f3f4f6';
+            selectBtn.style.color = '#374151';
+            selectBtn.style.borderColor = '#d1d5db';
+        }
+        
+        // Ocultar role picker
+        const rolePicker = card.querySelector('.role-picker');
+        if (rolePicker) {
+            rolePicker.style.display = 'none';
+        }
+    });
+    
+    // Remover team members de la lista de comunidad
+    currentMembers = currentMembers.filter(member => 
+        member.source !== 'team' && !member.is_current_user
+    );
+    
+    // Actualizar UI
+    updateTeamSelectedCount();
+    updateCommunityUI();
+}
+
+function updateTeamSelectedCount() {
+    const selectedCount = document.querySelectorAll('.member-card.selected').length;
+    document.getElementById('teamSelectedCount').textContent = selectedCount;
+}
+
+function updateExternalAddedCount() {
+    const externalCount = currentMembers.filter(m => m.source === 'external').length;
+    const counterDiv = document.getElementById('externalAddedCount');
+    const numberSpan = document.getElementById('externalAddedNumber');
+    
+    if (externalCount > 0) {
+        numberSpan.textContent = externalCount;
+        counterDiv.style.display = 'block';
+    } else {
+        counterDiv.style.display = 'none';
+    }
+}
+
+function getRoleName(role) {
+    const roleNames = {
+        'owner': '👑 Owner',
+        'admin': '🛡️ Admin',
+        'moderator': '⚖️ Moderador',
+        'collaborator': '🤝 Colaborador'
+    };
+    return roleNames[role] || role;
+}
+
+function updateCommunityUI() {
+    updateCommunityMemberCount();
+    updateExternalAddedCount();
+    updateTeamSelectedCount();
+    updateCompleteButton();
+    updateSummary();
+}
+
+function updateSummary() {
+    const teamCount = currentMembers.filter(m => m.source === 'team').length;
+    const externalCount = currentMembers.filter(m => m.source === 'external').length;
+    const inviteCount = currentMembers.filter(m => m.source === 'invitation').length;
+    const total = currentMembers.length;
+    
+    // Actualizar breakdown
+    document.getElementById('totalMembersBreakdown').textContent = 
+        `${teamCount} team • ${externalCount} externos • ${inviteCount} invitados`;
+    
+    // Actualizar resumen final
+    let summary = '';
+    if (total <= 1) {
+        summary = 'No hay miembros añadidos';
+    } else {
+        const actualMembers = total - 1; // Restar al owner
+        summary = `${actualMembers} miembro${actualMembers !== 1 ? 's' : ''} añadido${actualMembers !== 1 ? 's' : ''}`;
+        
+        // Añadir detalles por rol
+        const roles = {};
+        currentMembers.forEach(m => {
+            if (!roles[m.role]) roles[m.role] = 0;
+            roles[m.role]++;
+        });
+        
+        const roleDetails = Object.entries(roles)
+            .filter(([role]) => role !== 'owner')
+            .map(([role, count]) => `${count} ${getRoleName(role)}`)
+            .join(', ');
+        
+        if (roleDetails) {
+            summary += ` (${roleDetails})`;
+        }
+    }
+    
+    document.getElementById('finalSummary').textContent = summary;
+}
 /* ============================================
    FUNCIONES AUXILIARES
 ============================================ */
