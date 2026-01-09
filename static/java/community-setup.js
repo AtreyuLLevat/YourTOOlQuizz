@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Iniciando configuración de equipo (MODO DEBUG FORZADO)');
-    
+    const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";   // FUNCIÓN PARA OBTENER AVATAR SEGURO
     function getSafeAvatar(url, name = '') {
         // Si no hay URL o es inválida, usar avatar por defecto
         if (!url || url.trim() === '' || url.includes('undefined') || url.includes('null')) {
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // URL DEL AVATAR POR DEFECTO DESDE SUPABASE (misma que backend)
 
     
-    const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";   // FUNCIÓN PARA OBTENER AVATAR SEGURO
+
 
 function initializeCurrentMembers() {
     currentMembers = [];
