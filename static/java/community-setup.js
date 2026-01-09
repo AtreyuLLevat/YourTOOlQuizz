@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
        FUNCIONES PRINCIPALES
     ============================================ */
         // URL DEL AVATAR POR DEFECTO DESDE SUPABASE (misma que backend)
-    const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";
+
     
-    // FUNCIÓN PARA OBTENER AVATAR SEGURO
+    const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";   // FUNCIÓN PARA OBTENER AVATAR SEGURO
 
 function initializeCurrentMembers() {
     currentMembers = [];
