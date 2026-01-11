@@ -1633,18 +1633,12 @@ async function loadTeamMembers() {
 
             // ➕ Acción añadir
 card.querySelector('.select-member-btn').addEventListener('click', function () {
-    if (!requireRoleOrWarn(this)) return;
-
-    selectTeamMember(
-        member.user_id,
-        member.name,
-        member.avatar_url || '',
-        selectedRole
-    );
-
-    selectedRole = null; // reset consciente
-    resetRoleUI();
+    // Mostrar selector de rol si aún no existe
+    if (!card.querySelector('.role-picker')) {
+        showRolePicker(card, member);
+    }
 });
+
 
 
             teamList.appendChild(card);
