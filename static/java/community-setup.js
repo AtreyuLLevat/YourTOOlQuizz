@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+
+    let skipSetup = false;
+
     console.log('🚀 Iniciando configuración de equipo (MODO DEBUG FORZADO)');
     const DEFAULT_AVATAR_URL = "https://ouoodvqsezartigpzwke.supabase.co/storage/v1/object/public/images/avatars/default.png";   // FUNCIÓN PARA OBTENER AVATAR SEGURO
     function getSafeAvatar(url, name = '') {
