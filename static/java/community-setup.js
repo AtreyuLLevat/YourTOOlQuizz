@@ -1478,32 +1478,42 @@ window.removeCommunityMember = function(identifier) {
             is_current_user: true
         });
     }
-    
- function setupEventListeners() {
+function setupEventListeners() {
     // Cargar miembros del equipo al inicio
     loadTeamMembers();
-    
-    // Botones del footer
+
+    // Botón "Configurar después"
     const skipBtn = document.getElementById('skipSetupBtn');
     if (skipBtn) {
-        skipBtn.addEventListener('click', skipSetup);
+        skipBtn.addEventListener('click', () => {
+            // Marcar que se omite la configuración
+            skipSetup = true;
+
+            // Cerrar el modal
+            closeModal();
+        });
     }
-    
+
+    // Botón "Completar configuración"
     const completeBtn = document.getElementById('completeSetupBtn');
     if (completeBtn) {
         completeBtn.addEventListener('click', completeSetup);
     }
-    
-    // Cerrar modal al hacer clic fuera
+
+    // Cerrar modal al hacer clic fuera del contenido
     const modal = document.getElementById('teamSetupModal');
     if (modal) {
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                showNotification('Completa la configuración o haz clic en "Configurar después"', 'warning');
+                showNotification(
+                    'Completa la configuración o haz clic en "Configurar después"',
+                    'warning'
+                );
             }
         });
     }
 }
+
 
 /* ============================================
    NUEVA FUNCIÓN: Cargar miembros del equipo
