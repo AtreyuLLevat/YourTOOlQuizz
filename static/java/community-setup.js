@@ -1516,6 +1516,80 @@ function setupEventListeners() {
     }
 }
 
+function showRolePicker(card, member) {
+    // Evitar duplicados
+    if (card.querySelector('.role-picker')) return;
+
+    let selectedRole = null;
+
+    const picker = document.createElement('div');
+    picker.className = 'role-picker';
+    picker.style.cssText = `
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #f9fafb;
+    `;
+
+    picker.innerHTML = `
+        <div style="font-size: 12px; margin-bottom: 6px; color: #374151;">
+            Selecciona un rol
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+            ${['admin','moderator','collaborator'].map(role => `
+                <button data-role="${role}" style="
+                    padding:6px 10px;
+                    border:1px solid #d1d5db;
+                    border-radius:6px;
+                    background:white;
+                    cursor:pointer;
+                    font-size:12px;
+                ">${role}</button>
+            `).join('')}
+        </div>
+        <button class="confirm-role-btn" disabled style="
+            padding:6px 12px;
+            background:#3b82f6;
+            color:white;
+            border:none;
+            border-radius:6px;
+            opacity:0.4;
+            cursor:not-allowed;
+        ">Confirmar</button>
+    `;
+
+    picker.querySelectorAll('button[data-role]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedRole = btn.dataset.role;
+
+            picker.querySelectorAll('button[data-role]').forEach(b => {
+                b.style.background = 'white';
+            });
+
+            btn.style.background = '#dbeafe';
+
+            const confirm = picker.querySelector('.confirm-role-btn');
+            confirm.disabled = false;
+            confirm.style.opacity = '1';
+            confirm.style.cursor = 'pointer';
+        });
+    });
+
+    picker.querySelector('.confirm-role-btn').addEventListener('click', () => {
+        selectTeamMember(
+            member.user_id,
+            member.name,
+            member.avatar_url || '',
+            selectedRole
+        );
+
+        card.classList.add('selected');
+        picker.remove();
+    });
+
+    card.appendChild(picker);
+}
 
 /* ============================================
    NUEVA FUNCIÓN: Cargar miembros del equipo
