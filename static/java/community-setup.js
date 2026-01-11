@@ -711,7 +711,9 @@ async function loadTeamMembers() {
                 const cancelBtn = card.querySelector('.cancel-role-btn');
                 
                 let selectedRole = null;
-                
+                // Mostrar siempre selector de rol
+showRolePicker(card, member);
+
                 selectBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     
@@ -1633,12 +1635,26 @@ async function loadTeamMembers() {
 
             // ➕ Acción añadir
 card.querySelector('.select-member-btn').addEventListener('click', function () {
-    // Mostrar selector de rol si aún no existe
-    if (!card.querySelector('.role-picker')) {
-        showRolePicker(card, member);
+    if (!selectedRole) {
+        showNotification('Selecciona un rol primero', 'warning');
+        return;
     }
+
+    selectTeamMember(
+        member.user_id,
+        member.name,
+        member.avatar_url || '',
+        selectedRole
+    );
+
+    card.classList.add('selected');
+    selectedRole = null;
+    resetRoleUI();
 });
 
+
+// Mostrar siempre selector de rol
+showRolePicker(card, member);
 
 
             teamList.appendChild(card);
