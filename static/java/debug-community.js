@@ -36,8 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`   - userName: ${currentUserName}`);
     
     // 4. Convertir a boolean correctamente
-    const isOwnerBool = isOwner === 'true';
-    const teamConfiguredBool = teamConfigured === 'true';
+const isOwnerBool =
+  chatContainer.dataset.isOwner?.trim().toLowerCase() === 'true';
+
+const teamConfiguredBool =
+  chatContainer.dataset.teamConfigured?.trim().toLowerCase() === 'true';
+
+
     
     console.log('\n🔍 CONVERSIONES BOOLEANAS:');
     console.log(`   - isOwnerBool: ${isOwnerBool} (${typeof isOwnerBool})`);
