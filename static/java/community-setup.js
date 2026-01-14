@@ -2006,7 +2006,8 @@ function updateCompleteButton() {
         }
     }
 }
-
+// Al final de la función, fuera de DOMContentLoaded
+window.completeSetup = completeSetup;
     
     async function completeSetup() {
     const completeBtn = document.getElementById('completeSetupBtn');
