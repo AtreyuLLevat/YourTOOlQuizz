@@ -458,7 +458,7 @@ function createModalHTML() {
         }
         
         .role-picker {
-            display: none;
+            display: block;
             margin-top: 8px;
             padding: 10px;
             background: #f9fafb;
@@ -710,9 +710,8 @@ async function loadTeamMembers() {
                 const confirmBtn = card.querySelector('.confirm-role-btn');
                 const cancelBtn = card.querySelector('.cancel-role-btn');
                 
-                let selectedRole = null;
+
                 // Mostrar siempre selector de rol
-showRolePicker(card, member);
 
                 selectBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -788,79 +787,7 @@ showRolePicker(card, member);
     }
 }
 
-function openRolePicker(card, member) {
-    if (card.querySelector('.inline-role-picker')) return;
 
-    const picker = document.createElement('div');
-    picker.className = 'inline-role-picker';
-    picker.style.cssText = `
-        margin-top: 10px;
-        padding: 12px;
-        border: 1px dashed #3b82f6;
-        border-radius: 8px;
-        background: #f9fafb;
-    `;
-
-    let selectedRole = null;
-
-    picker.innerHTML = `
-        <div style="font-size:13px;margin-bottom:8px;color:#374151;">
-            Selecciona un rol (obligatorio)
-        </div>
-        <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
-            ${["owner","admin","moderator","collaborator"].map(r => `
-                <button data-role="${r}" style="
-                    padding:6px 10px;
-                    border:1px solid #d1d5db;
-                    border-radius:6px;
-                    background:white;
-                    cursor:pointer;
-                    font-size:12px;
-                ">${r}</button>
-            `).join("")}
-        </div>
-        <button class="confirm-role-btn" disabled style="
-            padding:8px 14px;
-            background:#3b82f6;
-            color:white;
-            border:none;
-            border-radius:6px;
-            opacity:0.4;
-            cursor:not-allowed;
-        ">Confirmar</button>
-    `;
-
-    picker.querySelectorAll('button[data-role]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedRole = btn.dataset.role;
-
-            picker.querySelectorAll('button[data-role]').forEach(b => {
-                b.style.background = 'white';
-            });
-
-            btn.style.background = '#dbeafe';
-
-            const confirm = picker.querySelector('.confirm-role-btn');
-            confirm.disabled = false;
-            confirm.style.opacity = '1';
-            confirm.style.cursor = 'pointer';
-        });
-    });
-
-    picker.querySelector('.confirm-role-btn').addEventListener('click', () => {
-        selectTeamMember(
-            member.user_id,
-            member.name,
-            member.avatar_url || '',
-            selectedRole
-        );
-
-        card.classList.add('selected');
-        picker.remove();
-    });
-
-    card.appendChild(picker);
-}
 
 /* ============================================
    NUEVA FUNCIÓN: Buscar usuarios externos
@@ -1083,12 +1010,9 @@ function clearTeamSelections() {
             selectBtn.style.color = '#374151';
             selectBtn.style.borderColor = '#d1d5db';
         }
+    
+
         
-        // Ocultar role picker
-        const rolePicker = card.querySelector('.role-picker');
-        if (rolePicker) {
-            rolePicker.style.display = 'none';
-        }
     });
     
     // Remover team members de la lista de comunidad
@@ -1183,27 +1107,7 @@ document.querySelectorAll('.role-btn').forEach(b => {
     b.style.opacity = '0.5';
 });
 
-function resetRoleUI() {
-    document.querySelectorAll('.role-btn').forEach(b => {
-        b.classList.remove('active');
-        b.style.opacity = '0.5';
-    });
-}
 
-function requireRoleOrWarn(anchorElement) {
-    if (!selectedRole) {
-        anchorElement.style.outline = '2px solid #ef4444';
-        showNotification('Debes seleccionar un rol antes de añadir un miembro', 'error');
-        return false;
-    }
-    return true;
-}
-
-
-
-function getSelectedRole() {
-    return selectedRole;
-}
 
 function selectTeamMember(userId, userName, avatarUrl, role) {
     if (currentMembers.some(m => m.id === userId)) {
@@ -1436,10 +1340,7 @@ window.removeCommunityMember = function(identifier) {
         }
         
         // Ocultar role picker si está visible
-        const rolePicker = teamCard.querySelector('.role-picker');
-        if (rolePicker) {
-            rolePicker.style.display = 'none';
-        }
+
     }
     
     // Si era una invitación, remover de la lista de invitaciones
@@ -1516,80 +1417,7 @@ function setupEventListeners() {
     }
 }
 
-function showRolePicker(card, member) {
-    // Evitar duplicados
-    if (card.querySelector('.role-picker')) return;
 
-    let selectedRole = null;
-
-    const picker = document.createElement('div');
-    picker.className = 'role-picker';
-    picker.style.cssText = `
-        margin-top: 10px;
-        padding: 10px;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #f9fafb;
-    `;
-
-    picker.innerHTML = `
-        <div style="font-size: 12px; margin-bottom: 6px; color: #374151;">
-            Selecciona un rol
-        </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-            ${['admin','moderator','collaborator'].map(role => `
-                <button data-role="${role}" style="
-                    padding:6px 10px;
-                    border:1px solid #d1d5db;
-                    border-radius:6px;
-                    background:white;
-                    cursor:pointer;
-                    font-size:12px;
-                ">${role}</button>
-            `).join('')}
-        </div>
-        <button class="confirm-role-btn" disabled style="
-            padding:6px 12px;
-            background:#3b82f6;
-            color:white;
-            border:none;
-            border-radius:6px;
-            opacity:0.4;
-            cursor:not-allowed;
-        ">Confirmar</button>
-    `;
-
-    picker.querySelectorAll('button[data-role]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedRole = btn.dataset.role;
-
-            picker.querySelectorAll('button[data-role]').forEach(b => {
-                b.style.background = 'white';
-            });
-
-            btn.style.background = '#dbeafe';
-
-            const confirm = picker.querySelector('.confirm-role-btn');
-            confirm.disabled = false;
-            confirm.style.opacity = '1';
-            confirm.style.cursor = 'pointer';
-        });
-    });
-
-    picker.querySelector('.confirm-role-btn').addEventListener('click', () => {
-        selectTeamMember(
-            member.user_id,
-            member.name,
-            member.avatar_url || '',
-            selectedRole
-        );
-
-        card.classList.add('selected');
-        picker.remove();
-    });
-
-    card.appendChild(picker);
-}
 
 /* ============================================
    NUEVA FUNCIÓN: Cargar miembros del equipo
@@ -1728,7 +1556,7 @@ card.querySelector('.select-member-btn').addEventListener('click', function () {
 
 
 // Mostrar siempre selector de rol
-showRolePicker(card, member);
+
 
 
             teamList.appendChild(card);
