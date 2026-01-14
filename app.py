@@ -1112,10 +1112,11 @@ def create_app():
             new_member = TeamMember(
                 app_id=app.id,
                 user_id=user_to_add.id,
-                role=data.get("role", "Desarrollador"),
+                role=role,
                 name=data.get("name", user_to_add.name),
                 avatar_url=data.get("avatar_url", user_to_add.avatar_url)
             )
+
 
             
             db.session.add(new_member)
@@ -1173,10 +1174,15 @@ def create_app():
             return jsonify({"success": False, "error": "Nombre obligatorio"}), 400
         
         # Validar que solo haya un owner
-        owners = [m for m in members_data if m.get('role') == 'owner']
-        if len(owners) != 1:
-            return jsonify({"success": False, "error": "Debe haber exactamente un owner"}), 400
-        
+       # owners = [m for m in members_data if m.get('role') == 'owner']
+        #if len(owners) != 1:
+            #return jsonify({"success": False, "error": "Debe haber exactamente un owner"}), 400
+        allowed_roles = {'admin', 'moderator', 'collaborator'}
+
+        for m in members:
+            if m['role'] not in allowed_roles:
+                return jsonify({"error": "Rol no válido"}), 400
+                
         # Validar límites de roles
         admins = [m for m in members_data if m.get('role') == 'admin']
         if len(admins) > 3:
