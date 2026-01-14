@@ -2009,66 +2009,154 @@ function updateCompleteButton() {
 
     
     async function completeSetup() {
-        const completeBtn = document.getElementById('completeSetupBtn');
-        if (completeBtn.disabled) return;
+    const completeBtn = document.getElementById('completeSetupBtn');
+    
+    // Validar que hay al menos 1 miembro adicional (sin contar owner)
+    const additionalMembers = currentMembers.filter(m => !m.is_current_user);
+    
+    if (additionalMembers.length === 0) {
+        showNotification('Debes agregar al menos un miembro al equipo', 'warning');
+        return;
+    }
+    
+    // Mostrar loading
+    completeBtn.innerHTML = '⏳ Guardando...';
+    completeBtn.disabled = true;
+    
+    try {
+        // Preparar datos para enviar
+        const membersToSave = [];
+        const invitationsToSend = [];
         
-        // Mostrar loading
-        completeBtn.innerHTML = '⏳ Guardando...';
-        completeBtn.disabled = true;
-        
-        try {
-            // 1. Guardar cada miembro
-            const savePromises = currentMembers.map(async (member) => {
-                // No guardar al owner actual (ya está)
-                if (member.is_current_user) return Promise.resolve();
-                
-                const data = {
-                    user_id: member.id,
+        // Separar miembros existentes de invitaciones pendientes
+        currentMembers.forEach(member => {
+            // No guardar al owner actual
+            if (member.is_current_user) return;
+            
+            const memberData = {
+                user_id: member.id,
+                email: member.email,
+                role: member.role,
+                name: member.name,
+                avatar_url: member.avatar_url || '',
+                source: member.source || 'manual'
+            };
+            
+            if (member.needs_invitation && member.email) {
+                // Es una invitación pendiente
+                invitationsToSend.push({
                     email: member.email,
+                    name: member.name,
                     role: member.role,
-                    name: member.name
-                };
-                
+                    community_id: communityId
+                });
+            } else if (member.id) {
+                // Es un usuario registrado
+                membersToSave.push(memberData);
+            }
+        });
+        
+        console.log('📤 Enviando datos:', {
+            members: membersToSave,
+            invitations: invitationsToSend,
+            totalAdditional: additionalMembers.length
+        });
+        
+        // 1. Guardar miembros existentes
+        if (membersToSave.length > 0) {
+            const savePromises = membersToSave.map(async (memberData) => {
                 const response = await fetch(`/api/community/${communityId}/add_member_role`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(memberData)
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`Error al guardar miembro ${memberData.name}`);
+                }
                 
                 return response.json();
             });
             
             await Promise.all(savePromises);
-            
-            // 2. Marcar como configurado
-            const completeResponse = await fetch(`/api/community/${communityId}/complete_setup`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            
-            const result = await completeResponse.json();
-            
-            if (result.success) {
-                showNotification('✅ Equipo configurado exitosamente', 'success');
-                closeModal();
-                
-                // Recargar la página para actualizar el estado
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } else {
-                throw new Error(result.error || 'Error al completar configuración');
-            }
-            
-        } catch (error) {
-            console.error('Error completando configuración:', error);
-            showNotification('❌ Error: ' + error.message, 'error');
-            
-            // Restaurar botón
-            completeBtn.innerHTML = '✅ Completar Configuración';
-            completeBtn.disabled = false;
         }
+        
+        // 2. Enviar invitaciones por email (si hay)
+        if (invitationsToSend.length > 0) {
+            try {
+                const inviteResponse = await fetch(`/api/community/${communityId}/send_invitations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ invitations: invitationsToSend })
+                });
+                
+                if (!inviteResponse.ok) {
+                    console.warn('⚠️ No se pudieron enviar algunas invitaciones');
+                } else {
+                    const inviteResult = await inviteResponse.json();
+                    console.log('📧 Resultado invitaciones:', inviteResult);
+                }
+            } catch (inviteError) {
+                console.warn('⚠️ Error enviando invitaciones:', inviteError);
+                // Continuamos aunque falle el envío de invitaciones
+            }
+        }
+        
+        // 3. Marcar comunidad como configurada
+        const completeResponse = await fetch(`/api/community/${communityId}/complete_setup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!completeResponse.ok) {
+            throw new Error('Error al marcar comunidad como configurada');
+        }
+        
+        const result = await completeResponse.json();
+        
+        if (result.success) {
+            showNotification(`✅ Equipo configurado exitosamente. ${additionalMembers.length} miembro(s) añadido(s)`, 'success');
+            
+            // Cerrar modal
+            closeModal();
+            
+            // Recargar la página para actualizar el estado
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+            
+        } else {
+            throw new Error(result.error || 'Error al completar configuración');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error completando configuración:', error);
+        
+        // Mostrar mensaje de error más específico
+        let errorMessage = 'Error al guardar la configuración';
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage = 'Error de conexión. Verifica tu internet.';
+        } else if (error.message.includes('Error al marcar')) {
+            errorMessage = 'Error al actualizar el estado de la comunidad.';
+        }
+        
+        showNotification(`❌ ${errorMessage}`, 'error');
+        
+        // Restaurar botón
+        completeBtn.innerHTML = '✅ Completar Configuración';
+        completeBtn.style.background = '#10b981';
+        completeBtn.style.color = 'white';
+        completeBtn.disabled = false;
+        
+        // Mostrar botón para reintentar
+        setTimeout(() => {
+            showNotification(
+                '¿Problemas? <button onclick="completeSetup()" style="margin-left: 10px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer;">Reintentar</button>',
+                'info'
+            );
+        }, 1000);
     }
+}
     
     function closeModal() {
         const modal = document.getElementById('teamSetupModal');
