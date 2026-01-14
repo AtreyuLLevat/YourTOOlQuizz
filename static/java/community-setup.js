@@ -1987,9 +1987,7 @@ function updateCompleteButton() {
     const completeBtn = document.getElementById('completeSetupBtn');
     if (!completeBtn) return;
     
-    // Verificar que haya al menos un owner (siempre está)
-    const owners = currentMembers.filter(m => m.role === 'owner');
-    const hasOwner = owners.length >= 1;
+
     
     // Verificar que haya al menos un miembro adicional
     const additionalMembers = currentMembers.filter(m => !m.is_current_user);
