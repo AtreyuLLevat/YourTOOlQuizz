@@ -1985,25 +1985,15 @@ function addMemberToUI(member) {
     
 function updateCompleteButton() {
     const completeBtn = document.getElementById('completeSetupBtn');
-    if (!completeBtn) return;
-    
-
-    
-    // Verificar que haya al menos un miembro adicional
-    const additionalMembers = currentMembers.filter(m => !m.is_current_user);
-    
-    if (hasOwner && additionalMembers.length > 0) {
-        completeBtn.disabled = false;
-        completeBtn.style.background = '#10b981';
-        completeBtn.style.cursor = 'pointer';
-        completeBtn.innerHTML = 'Completar Configuración';
-    } else {
-        completeBtn.disabled = true;
-        completeBtn.style.background = '#eaeaea';
-        completeBtn.style.cursor = 'not-allowed';
-        completeBtn.innerHTML = additionalMembers.length === 0 ? 
-            'Añade al menos un miembro' : 
-            'Completar Configuración';
+    if (completeBtn) {
+        // Ya no verificamos si hay owner, siempre habilitado
+        // (o verifica solo si hay al menos un miembro seleccionado)
+        const hasMembers = window.selectedMembers && window.selectedMembers.length > 0;
+        
+        completeBtn.disabled = !hasMembers; // Deshabilitar solo si no hay miembros
+        completeBtn.title = hasMembers ? 
+            'Completar configuración del equipo' : 
+            'Debes agregar al menos un miembro al equipo';
     }
 }
 
