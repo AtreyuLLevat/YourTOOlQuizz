@@ -1986,14 +1986,24 @@ function addMemberToUI(member) {
 function updateCompleteButton() {
     const completeBtn = document.getElementById('completeSetupBtn');
     if (completeBtn) {
-        // Ya no verificamos si hay owner, siempre habilitado
-        // (o verifica solo si hay al menos un miembro seleccionado)
-        const hasMembers = window.selectedMembers && window.selectedMembers.length > 0;
+        // Verificar si hay al menos 1 miembro (sin contar al owner)
+        const hasAtLeastOneMember = currentMembers.length > 1; // >1 porque el owner ya está incluido
         
-        completeBtn.disabled = !hasMembers; // Deshabilitar solo si no hay miembros
-        completeBtn.title = hasMembers ? 
-            'Completar configuración del equipo' : 
-            'Debes agregar al menos un miembro al equipo';
+        completeBtn.disabled = !hasAtLeastOneMember;
+        
+        if (hasAtLeastOneMember) {
+            completeBtn.innerHTML = '✅ Completar Configuración';
+            completeBtn.style.background = '#10b981';
+            completeBtn.style.color = 'white';
+            completeBtn.style.cursor = 'pointer';
+            completeBtn.title = 'Completar configuración del equipo';
+        } else {
+            completeBtn.innerHTML = 'Completar Configuración';
+            completeBtn.style.background = '#e5e7eb';
+            completeBtn.style.color = '#9ca3af';
+            completeBtn.style.cursor = 'not-allowed';
+            completeBtn.title = 'Debes agregar al menos un miembro al equipo';
+        }
     }
 }
 
@@ -2070,7 +2080,11 @@ function updateCompleteButton() {
             }, 300);
         }
     }
-    
+    setTimeout(() => {
+    document.getElementById('teamSetupModal').style.display = 'flex';
+    document.getElementById('teamSearchInput')?.focus();
+    updateCompleteButton(); // ← Añade esta línea
+}, 500);
     /* ============================================
        FUNCIONES AUXILIARES
     ============================================ */
