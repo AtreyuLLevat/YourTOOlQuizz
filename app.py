@@ -1081,25 +1081,21 @@ def create_app():
     @login_required
     def add_team_member_two(app_id):
         try:
-            # Verificar que la app existe
             app = App.query.get_or_404(app_id)
             
-            # Verificar que el usuario es el dueño
             if app.owner_id != current_user.id:
                 return jsonify({"success": False, "message": "No tienes permiso para añadir miembros"}), 403
             
             data = request.get_json()
             
-            # Validar datos requeridos
             if not data.get("user_id"):
                 return jsonify({"success": False, "message": "Se requiere user_id"}), 400
             
-            # Buscar el usuario a añadir
             user_to_add = User.query.get(data["user_id"])
             if not user_to_add:
                 return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
             
-            # Verificar que el usuario no esté ya en el equipo
+            # Verificar que no esté ya en el equipo
             existing_member = TeamMember.query.filter_by(
                 app_id=app.id,
                 user_id=user_to_add.id
@@ -1108,40 +1104,33 @@ def create_app():
             if existing_member:
                 return jsonify({"success": False, "message": "Este usuario ya está en el equipo"}), 400
             
-                        # Crear nuevo miembro del equipo
+            # ✅ ASIGNAR user_id correctamente
             new_member = TeamMember(
                 app_id=app.id,
-                user_id=user_to_add.id,
-                role=role,
-                name=data.get("name", user_to_add.name),
-                avatar_url=data.get("avatar_url", user_to_add.avatar_url)
+                user_id=user_to_add.id,  # ✅ CLAVE: asignar el ID del usuario
+                role=data.get("role", "Colaborador"),
+                name=user_to_add.name,
+                avatar_url=user_to_add.avatar_url
             )
-
-
             
             db.session.add(new_member)
             db.session.commit()
             
-            # Preparar respuesta
-            member_data = {
-                "id": str(new_member.id),
-                "user_id": new_member.user_id,
-                "name": new_member.name,
-                "role": new_member.role,
-                "avatar_url": new_member.avatar_url,
-                "socials": new_member.socials or {}
-            }
-            
             return jsonify({
                 "success": True,
                 "message": "Miembro añadido correctamente",
-                "member": member_data
+                "member": {
+                    "id": str(new_member.id),
+                    "user_id": new_member.user_id,
+                    "name": new_member.name,
+                    "role": new_member.role,
+                    "avatar_url": new_member.avatar_url
+                }
             })
-            
         except Exception as e:
             db.session.rollback()
             print(f"Error añadiendo miembro: {e}")
-            return jsonify({"success": False, "message": "Error interno del servidor"}), 500
+            return jsonify({"success": False, "message": "Error interno"}), 500
 
 
     # Ruta para buscar usuarios (complementaria)
@@ -1457,6 +1446,7 @@ def create_app():
         if community.owner_id != current_user.id:
             return jsonify({"success": False, "error": "No autorizado"}), 403
         
+
         
         # Marcar como configurado
         community.team_configured = True
@@ -2191,16 +2181,43 @@ def create_app():
             flash("App creada correctamente", "success")
             return redirect(url_for("dashboard"))
 
-        # --- GET: traer apps del usuario ---
-        user_apps = App.query.filter_by(owner_id=current_user.id).order_by(App.created_at.desc()).all()
+        owned_apps = App.query.filter_by(owner_id=current_user.id).order_by(App.created_at.desc()).all()
+            
+            # Apps donde el usuario es team member (pero no owner)
+            team_memberships = (
+                db.session.query(App, TeamMember.role)
+                .join(TeamMember, TeamMember.app_id == App.id)
+                .filter(
+                    TeamMember.user_id == current_user.id,
+                    App.owner_id != current_user.id  # Excluir apps donde ya es owner
+                )
+                .order_by(App.created_at.desc())
+                .all()
+            )
+            
+            # Preparar datos para el template
+            owned_apps_data = [{
+                "id": app.id,
+                "name": app.name,
+                "image_url": app.image_url,
+                "role": "Owner"  # Rol especial
+            } for app in owned_apps]
+            
+            team_apps_data = [{
+                "id": app.id,
+                "name": app.name,
+                "image_url": app.image_url,
+                "role": role  # Rol como team member
+            } for app, role in team_memberships]
 
-        return render_template(
-            "account.html",
-            usuario=current_user,
-            apps=user_apps,
-            SUPABASE_URL=SUPABASE_URL,
-            SUPABASE_KEY=SUPABASE_ANON_KEY
-        )
+            return render_template(
+                "account.html",
+                usuario=current_user,
+                owned_apps=owned_apps_data,  # ✅ Nueva variable
+                team_apps=team_apps_data,    # ✅ Nueva variable
+                SUPABASE_URL=SUPABASE_URL,
+                SUPABASE_KEY=SUPABASE_ANON_KEY
+            )
 
 
     @app.route("/account/create_app", methods=["POST"])
