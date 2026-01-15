@@ -1457,14 +1457,6 @@ def create_app():
         if community.owner_id != current_user.id:
             return jsonify({"success": False, "error": "No autorizado"}), 403
         
-        # Verificar que haya al menos un owner
-        owner_count = CommunityMemberRole.query.filter_by(
-            community_id=community.id,
-            role='owner'
-        ).count()
-        
-        if owner_count != 1:
-            return jsonify({"success": False, "error": "Debe haber exactamente un owner"}), 400
         
         # Marcar como configurado
         community.team_configured = True
