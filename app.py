@@ -2181,43 +2181,43 @@ def create_app():
             flash("App creada correctamente", "success")
             return redirect(url_for("dashboard"))
 
-        owned_apps = App.query.filter_by(owner_id=current_user.id).order_by(App.created_at.desc()).all()
-            
-            # Apps donde el usuario es team member (pero no owner)
-            team_memberships = (
-                db.session.query(App, TeamMember.role)
-                .join(TeamMember, TeamMember.app_id == App.id)
-                .filter(
-                    TeamMember.user_id == current_user.id,
-                    App.owner_id != current_user.id  # Excluir apps donde ya es owner
-                )
-                .order_by(App.created_at.desc())
-                .all()
+    owned_apps = App.query.filter_by(owner_id=current_user.id).order_by(App.created_at.desc()).all()
+        
+        # Apps donde el usuario es team member (pero no owner)
+        team_memberships = (
+            db.session.query(App, TeamMember.role)
+            .join(TeamMember, TeamMember.app_id == App.id)
+            .filter(
+                TeamMember.user_id == current_user.id,
+                App.owner_id != current_user.id  # Excluir apps donde ya es owner
             )
-            
-            # Preparar datos para el template
-            owned_apps_data = [{
-                "id": app.id,
-                "name": app.name,
-                "image_url": app.image_url,
-                "role": "Owner"  # Rol especial
-            } for app in owned_apps]
-            
-            team_apps_data = [{
-                "id": app.id,
-                "name": app.name,
-                "image_url": app.image_url,
-                "role": role  # Rol como team member
-            } for app, role in team_memberships]
+            .order_by(App.created_at.desc())
+            .all()
+        )
+        
+        # Preparar datos para el template
+        owned_apps_data = [{
+            "id": app.id,
+            "name": app.name,
+            "image_url": app.image_url,
+            "role": "Owner"  # Rol especial
+        } for app in owned_apps]
+        
+        team_apps_data = [{
+            "id": app.id,
+            "name": app.name,
+            "image_url": app.image_url,
+            "role": role  # Rol como team member
+        } for app, role in team_memberships]
 
-            return render_template(
-                "account.html",
-                usuario=current_user,
-                owned_apps=owned_apps_data,  # ✅ Nueva variable
-                team_apps=team_apps_data,    # ✅ Nueva variable
-                SUPABASE_URL=SUPABASE_URL,
-                SUPABASE_KEY=SUPABASE_ANON_KEY
-            )
+        return render_template(
+            "account.html",
+            usuario=current_user,
+            owned_apps=owned_apps_data,  # ✅ Nueva variable
+            team_apps=team_apps_data,    # ✅ Nueva variable
+            SUPABASE_URL=SUPABASE_URL,
+            SUPABASE_KEY=SUPABASE_ANON_KEY
+        )
 
 
     @app.route("/account/create_app", methods=["POST"])
