@@ -2127,130 +2127,130 @@ def create_app():
 
 
 
-@app.route("/account", methods=["GET", "POST"])
-@login_required
-def dashboard():
-    SUPABASE_URL = os.getenv("SUPABASE_URL")
-    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+    @app.route("/account", methods=["GET", "POST"])
+    @login_required
+    def dashboard():
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-    # =========================================================
-    # POST → CREAR APP
-    # =========================================================
-    if request.method == "POST":
-        name = request.form.get("appName", "").strip()
-        description = request.form.get("appDescription", "").strip()
-        team = request.form.get("appTeam", "").strip()
-        theme = request.form.get("appTheme", "").strip()
-        creation_date_str = request.form.get("appCreationDate", "").strip()
-        status = request.form.get("appStatus", "").strip()
-        official_id = request.form.get("appOfficialId", "").strip()
-        image_file = request.files.get("appImage")
+        # =========================================================
+        # POST → CREAR APP
+        # =========================================================
+        if request.method == "POST":
+            name = request.form.get("appName", "").strip()
+            description = request.form.get("appDescription", "").strip()
+            team = request.form.get("appTeam", "").strip()
+            theme = request.form.get("appTheme", "").strip()
+            creation_date_str = request.form.get("appCreationDate", "").strip()
+            status = request.form.get("appStatus", "").strip()
+            official_id = request.form.get("appOfficialId", "").strip()
+            image_file = request.files.get("appImage")
 
-        if not name:
-            flash("El nombre de la app es obligatorio.", "error")
+            if not name:
+                flash("El nombre de la app es obligatorio.", "error")
+                return redirect(url_for("dashboard"))
+
+            # Fecha
+            creation_date = (
+                datetime.strptime(creation_date_str, "%Y-%m-%d")
+                if creation_date_str else None
+            )
+
+            # Imagen
+            image_url = None
+            if image_file and image_file.filename:
+                upload_path = os.path.join("static", "uploads", image_file.filename)
+                os.makedirs(os.path.dirname(upload_path), exist_ok=True)
+                image_file.save(upload_path)
+                image_url = f"/{upload_path}"
+
+            slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
+
+            new_app = App(
+                name=name,
+                description=description,
+                team=team,
+                theme=theme,
+                creation_date=creation_date,
+                status=status,
+                official_id=official_id,
+                image_url=image_url,
+                slug=slug,
+                owner_id=current_user.id,
+                created_at=datetime.utcnow()
+            )
+
+            db.session.add(new_app)
+            db.session.commit()
+
+            flash("App creada correctamente", "success")
             return redirect(url_for("dashboard"))
 
-        # Fecha
-        creation_date = (
-            datetime.strptime(creation_date_str, "%Y-%m-%d")
-            if creation_date_str else None
+        # =========================================================
+        # GET → DASHBOARD (SOLO LECTURA)
+        # =========================================================
+
+        # 1️⃣ Apps donde el usuario es OWNER
+        owned_apps = (
+            App.query
+            .filter(App.owner_id == current_user.id)
+            .order_by(App.created_at.desc())
+            .all()
         )
 
-        # Imagen
-        image_url = None
-        if image_file and image_file.filename:
-            upload_path = os.path.join("static", "uploads", image_file.filename)
-            os.makedirs(os.path.dirname(upload_path), exist_ok=True)
-            image_file.save(upload_path)
-            image_url = f"/{upload_path}"
-
-        slug = f"{slugify(name)}-{int(datetime.utcnow().timestamp())}"
-
-        new_app = App(
-            name=name,
-            description=description,
-            team=team,
-            theme=theme,
-            creation_date=creation_date,
-            status=status,
-            official_id=official_id,
-            image_url=image_url,
-            slug=slug,
-            owner_id=current_user.id,
-            created_at=datetime.utcnow()
+        # 2️⃣ Apps donde el usuario es TEAM MEMBER
+        team_apps = (
+            db.session.query(App, TeamMember.role)
+            .join(TeamMember, TeamMember.app_id == App.id)
+            .filter(TeamMember.user_id == current_user.id)
+            .order_by(App.created_at.desc())
+            .all()
         )
 
-        db.session.add(new_app)
-        db.session.commit()
+        # =========================================================
+        # FORMATEAR DATOS PARA EL FRONTEND
+        # =========================================================
 
-        flash("App creada correctamente", "success")
-        return redirect(url_for("dashboard"))
+        owned_apps_data = []
+        for app in owned_apps:
+            owned_apps_data.append({
+                "id": app.id,
+                "name": app.name,
+                "image_url": app.image_url or url_for("static", filename="Imagenes/logo.png"),
+                "description": app.description or "Sin descripción",
+                "theme": app.theme or "General",
+                "role": "Owner"
+            })
 
-    # =========================================================
-    # GET → DASHBOARD (SOLO LECTURA)
-    # =========================================================
+        team_apps_data = []
+        for app, role in team_apps:
+            team_apps_data.append({
+                "id": app.id,
+                "name": app.name,
+                "image_url": app.image_url or url_for("static", filename="Imagenes/logo.png"),
+                "description": app.description or "Sin descripción",
+                "theme": app.theme or "General",
+                "role": role or "Colaborador"
+            })
 
-    # 1️⃣ Apps donde el usuario es OWNER
-    owned_apps = (
-        App.query
-        .filter(App.owner_id == current_user.id)
-        .order_by(App.created_at.desc())
-        .all()
-    )
+        # =========================================================
+        # DEBUG LIMPIO (OPCIONAL)
+        # =========================================================
+        print(f"👤 Usuario: {current_user.email}")
+        print(f"📱 Apps como owner: {len(owned_apps_data)}")
+        print(f"👥 Apps como team member: {len(team_apps_data)}")
 
-    # 2️⃣ Apps donde el usuario es TEAM MEMBER
-    team_apps = (
-        db.session.query(App, TeamMember.role)
-        .join(TeamMember, TeamMember.app_id == App.id)
-        .filter(TeamMember.user_id == current_user.id)
-        .order_by(App.created_at.desc())
-        .all()
-    )
-
-    # =========================================================
-    # FORMATEAR DATOS PARA EL FRONTEND
-    # =========================================================
-
-    owned_apps_data = []
-    for app in owned_apps:
-        owned_apps_data.append({
-            "id": app.id,
-            "name": app.name,
-            "image_url": app.image_url or url_for("static", filename="Imagenes/logo.png"),
-            "description": app.description or "Sin descripción",
-            "theme": app.theme or "General",
-            "role": "Owner"
-        })
-
-    team_apps_data = []
-    for app, role in team_apps:
-        team_apps_data.append({
-            "id": app.id,
-            "name": app.name,
-            "image_url": app.image_url or url_for("static", filename="Imagenes/logo.png"),
-            "description": app.description or "Sin descripción",
-            "theme": app.theme or "General",
-            "role": role or "Colaborador"
-        })
-
-    # =========================================================
-    # DEBUG LIMPIO (OPCIONAL)
-    # =========================================================
-    print(f"👤 Usuario: {current_user.email}")
-    print(f"📱 Apps como owner: {len(owned_apps_data)}")
-    print(f"👥 Apps como team member: {len(team_apps_data)}")
-
-    # =========================================================
-    # RENDER
-    # =========================================================
-    return render_template(
-        "account.html",
-        usuario=current_user,
-        owned_apps=owned_apps_data,
-        team_apps=team_apps_data,
-        SUPABASE_URL=SUPABASE_URL,
-        SUPABASE_KEY=SUPABASE_ANON_KEY
-    )
+        # =========================================================
+        # RENDER
+        # =========================================================
+        return render_template(
+            "account.html",
+            usuario=current_user,
+            owned_apps=owned_apps_data,
+            team_apps=team_apps_data,
+            SUPABASE_URL=SUPABASE_URL,
+            SUPABASE_KEY=SUPABASE_ANON_KEY
+        )
 
 
     @app.route("/account/create_app", methods=["POST"])
