@@ -1307,6 +1307,49 @@ input[type="checkbox"] {
 .community-card:hover .community-card-arrow {
   transform: translateX(4px);
 }
+/* Badges de roles */
+.role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-left: 8px;
+}
+
+.role-badge.owner {
+    background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+    color: #7f1d1d;
+    border: 1px solid #f87171;
+}
+
+.role-badge.admin {
+    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%);
+    color: #1e40af;
+    border: 1px solid #60a5fa;
+}
+
+.role-badge.moderator {
+    background: linear-gradient(135deg, #d1fae5 0%, #6ee7b7 100%);
+    color: #065f46;
+    border: 1px solid #10b981;
+}
+
+.role-badge.collaborator {
+    background: linear-gradient(135deg, #f3e8ff 0%, #d8b4fe 100%);
+    color: #5b21b6;
+    border: 1px solid #8b5cf6;
+}
+
+/* Ajustar app-item para incluir badge */
+.app-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+}
 </style>
 {% endblock %}
 
@@ -1484,29 +1527,64 @@ input[type="checkbox"] {
       </div>
 
       <!-- APPS -->
-      <div id="apps" class="hidden">
-        <div class="apps-header">
-          <h1>Apps</h1>
-          <div class="actions" style="justify-content:flex-end;margin-bottom:20px;">
+<!-- APPS -->
+<div id="apps" class="hidden">
+    <div class="apps-header">
+        <h1>Apps</h1>
+        <div class="actions" style="justify-content:flex-end;margin-bottom:20px;">
             <button id="newAppBtn" class="btn primary">Nueva App</button>
-          </div>
         </div>
-        <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
+    </div>
+    <div class="sub">Gestiona tus aplicaciones y servicios integrados.</div>
 
-        <div id="appsList" class="apps-list">
-          {% if apps %}
-            {% for app in apps %}
-              <!-- Convierte app.id a string -->
-              <button class="app-item" data-app-id="{{ app.id|string }}">
-                <img src="{{ app.image_url }}" class="app-img">
-                <span class="app-name">{{ app.name }}</span>
-              </button>
+    <!-- Apps donde eres Owner -->
+    {% if owned_apps %}
+        <h3 style="margin: 20px 0 10px 0; color: var(--text); font-size: 1.1rem;">
+            🏆 Mis Apps (Owner)
+        </h3>
+        <div class="apps-list" id="ownedAppsList">
+            {% for app in owned_apps %}
+                <button class="app-item" data-app-id="{{ app.id|string }}">
+                    <img src="{{ app.image_url or url_for('static', filename='Imagenes/logo.png') }}" class="app-img">
+                    <span class="app-name">{{ app.name }}</span>
+                    <span class="role-badge owner" style="margin-left: auto; font-size: 0.8rem; background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 12px;">
+                        {{ app.role }}
+                    </span>
+                </button>
             {% endfor %}
-          {% else %}
-            <p>No tienes aplicaciones creadas.</p>
-          {% endif %}
         </div>
-      </div>
+    {% endif %}
+
+<!-- Apps donde eres Team Member -->
+{% if team_apps %}
+    <h3 style="margin: 20px 0 10px 0; color: var(--text); font-size: 1.1rem;">
+        🤝 Apps donde colaboro
+    </h3>
+
+    <div class="apps-list" id="teamAppsList">
+        {% for app in team_apps %}
+            <button
+                type="button"
+                class="app-item"
+                data-app-id="{{ app.id }}"
+            >
+                <img src="{{ app.image_url }}" class="app-img">
+
+                <span class="app-name">{{ app.name }}</span>
+
+                <span class="role-badge"
+                    style="margin-left: auto; font-size: 0.8rem;
+                    {% if app.role == 'Admin' %}background:#dbeafe;color:#2563eb;
+                    {% elif app.role == 'Moderator' %}background:#d1fae5;color:#059669;
+                    {% else %}background:#f3e8ff;color:#7c3aed;{% endif %}
+                    padding:2px 8px;border-radius:12px;">
+                    {{ app.role }}
+                </span>
+            </button>
+        {% endfor %}
+    </div>
+{% endif %}
+
     </div>
   </main>
 </div>
