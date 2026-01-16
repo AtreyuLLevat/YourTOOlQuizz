@@ -2187,22 +2187,88 @@ def create_app():
             return redirect(url_for("dashboard"))
 
         # --- GET: apps del usuario ---
-
-        # Apps donde el usuario es owner
-        owned_apps = (
+        
+        # SOLUCIÓN: Obtener apps de MÚLTIPLES formas para capturar todas las apps del usuario
+        
+        # 1. Apps donde el usuario es owner (usando owner_id)
+        owned_apps_v1 = (
             App.query
             .filter_by(owner_id=current_user.id)
             .order_by(App.created_at.desc())
             .all()
         )
+        
+        # 2. Apps donde el usuario es owner (usando created_by si existe ese campo)
+        # Nota: Si tu modelo App tiene un campo created_by, úsalo también
+        try:
+            owned_apps_v2 = (
+                App.query
+                .filter_by(created_by=current_user.id)
+                .order_by(App.created_at.desc())
+                .all()
+            )
+        except:
+            owned_apps_v2 = []
+        
+        # 3. Apps donde el usuario está en el campo 'team' (para apps antiguas)
+        # Buscar apps que tengan el nombre del usuario en el campo 'team'
+        owned_apps_v3 = (
+            App.query
+            .filter(
+                (App.team.contains(current_user.name)) | 
+                (App.team.contains(current_user.email))
+            )
+            .order_by(App.created_at.desc())
+            .all()
+        )
+        
+        # 4. Apps donde el owner_id es None o 0 (apps antiguas sin owner_id)
+        owned_apps_v4 = (
+            App.query
+            .filter((App.owner_id == None) | (App.owner_id == 0))
+            .order_by(App.created_at.desc())
+            .all()
+        )
+        
+        # 5. Apps donde el usuario es team member en TeamMember
+        owned_apps_v5 = (
+            db.session.query(App)
+            .join(TeamMember, TeamMember.app_id == App.id)
+            .filter(TeamMember.user_id == current_user.id)
+            .order_by(App.created_at.desc())
+            .all()
+        )
+        
+        # Combinar todas las apps evitando duplicados
+        all_owned_apps = {}
+        for app_list in [owned_apps_v1, owned_apps_v2, owned_apps_v3, owned_apps_v4, owned_apps_v5]:
+            for app in app_list:
+                if app.id not in all_owned_apps:
+                    all_owned_apps[app.id] = app
+        
+        owned_apps = list(all_owned_apps.values())
+        
+        # 6. Para apps antiguas sin owner_id, asignar el owner_id al usuario actual
+        for app in owned_apps_v4:
+            if app.owner_id is None or app.owner_id == 0:
+                app.owner_id = current_user.id
+                try:
+                    db.session.commit()
+                    print(f"✅ App antigua actualizada: {app.name} ahora pertenece a {current_user.email}")
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"❌ Error actualizando app antigua: {e}")
 
         # Apps donde el usuario es team member (pero no owner)
+        # Usar la lista combinada para evitar duplicados
+        owned_app_ids = [app.id for app in owned_apps]
+        
         team_memberships = (
             db.session.query(App, TeamMember.role)
             .join(TeamMember, TeamMember.app_id == App.id)
             .filter(
                 TeamMember.user_id == current_user.id,
-                App.owner_id != current_user.id
+                ~App.id.in_(owned_app_ids)  # Excluir apps que ya son del usuario
             )
             .order_by(App.created_at.desc())
             .all()
@@ -2212,16 +2278,27 @@ def create_app():
         owned_apps_data = [{
             "id": app.id,
             "name": app.name,
-            "image_url": app.image_url,
+            "image_url": app.image_url or url_for('static', filename='Imagenes/logo.png'),
+            "description": app.description or "Sin descripción",
+            "theme": app.theme or "General",
             "role": "Owner"
         } for app in owned_apps]
 
         team_apps_data = [{
             "id": app.id,
             "name": app.name,
-            "image_url": app.image_url,
+            "image_url": app.image_url or url_for('static', filename='Imagenes/logo.png'),
+            "description": app.description or "Sin descripción",
+            "theme": app.theme or "General",
             "role": role
         } for app, role in team_memberships]
+
+        # Para debug: mostrar en consola qué apps se encontraron
+        print(f"🔍 Usuario: {current_user.email}")
+        print(f"📱 Apps como owner: {len(owned_apps_data)}")
+        print(f"👥 Apps como team member: {len(team_apps_data)}")
+        for app in owned_apps_data:
+            print(f"  - {app['name']} (ID: {app['id']})")
 
         return render_template(
             "account.html",
@@ -2231,7 +2308,6 @@ def create_app():
             SUPABASE_URL=SUPABASE_URL,
             SUPABASE_KEY=SUPABASE_ANON_KEY
         )
-
 
     @app.route("/account/create_app", methods=["POST"])
     @login_required
