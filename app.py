@@ -2188,7 +2188,7 @@ def create_app():
 
         # --- GET: apps del usuario ---
         
-        # SOLUCIÓN: Obtener apps de MÚLTIPLES formas para capturar todas las apps del usuario
+        # SOLUCIÓN CORREGIDA: Obtener apps de MÚLTIPLES formas para capturar todas las apps del usuario
         
         # 1. Apps donde el usuario es owner (usando owner_id)
         owned_apps_v1 = (
@@ -2198,40 +2198,9 @@ def create_app():
             .all()
         )
         
-        # 2. Apps donde el usuario es owner (usando created_by si existe ese campo)
-        # Nota: Si tu modelo App tiene un campo created_by, úsalo también
-        try:
-            owned_apps_v2 = (
-                App.query
-                .filter_by(created_by=current_user.id)
-                .order_by(App.created_at.desc())
-                .all()
-            )
-        except:
-            owned_apps_v2 = []
-        
-        # 3. Apps donde el usuario está en el campo 'team' (para apps antiguas)
-        # Buscar apps que tengan el nombre del usuario en el campo 'team'
-        owned_apps_v3 = (
-            App.query
-            .filter(
-                (App.team.contains(current_user.name)) | 
-                (App.team.contains(current_user.email))
-            )
-            .order_by(App.created_at.desc())
-            .all()
-        )
-        
-        # 4. Apps donde el owner_id es None o 0 (apps antiguas sin owner_id)
-        owned_apps_v4 = (
-            App.query
-            .filter((App.owner_id == None) | (App.owner_id == 0))
-            .order_by(App.created_at.desc())
-            .all()
-        )
-        
-        # 5. Apps donde el usuario es team member en TeamMember
-        owned_apps_v5 = (
+        # 2. Apps donde el usuario es team member (incluso si también es owner)
+        # Usamos TeamMember para encontrar todas las apps asociadas al usuario
+        all_team_apps = (
             db.session.query(App)
             .join(TeamMember, TeamMember.app_id == App.id)
             .filter(TeamMember.user_id == current_user.id)
@@ -2239,18 +2208,30 @@ def create_app():
             .all()
         )
         
+        # 3. Apps donde el owner_id es None o 0 (apps antiguas sin owner_id)
+        # PRIMERO verificamos si la columna owner_id existe
+        try:
+            owned_apps_v3 = (
+                App.query
+                .filter((App.owner_id == None) | (App.owner_id == 0))
+                .order_by(App.created_at.desc())
+                .all()
+            )
+        except:
+            owned_apps_v3 = []
+        
         # Combinar todas las apps evitando duplicados
         all_owned_apps = {}
-        for app_list in [owned_apps_v1, owned_apps_v2, owned_apps_v3, owned_apps_v4, owned_apps_v5]:
+        for app_list in [owned_apps_v1, all_team_apps, owned_apps_v3]:
             for app in app_list:
                 if app.id not in all_owned_apps:
                     all_owned_apps[app.id] = app
         
         owned_apps = list(all_owned_apps.values())
         
-        # 6. Para apps antiguas sin owner_id, asignar el owner_id al usuario actual
-        for app in owned_apps_v4:
-            if app.owner_id is None or app.owner_id == 0:
+        # Para apps antiguas sin owner_id, asignar el owner_id al usuario actual
+        for app in owned_apps_v3:
+            if hasattr(app, 'owner_id') and (app.owner_id is None or app.owner_id == 0):
                 app.owner_id = current_user.id
                 try:
                     db.session.commit()
@@ -2259,46 +2240,53 @@ def create_app():
                     db.session.rollback()
                     print(f"❌ Error actualizando app antigua: {e}")
 
-        # Apps donde el usuario es team member (pero no owner)
-        # Usar la lista combinada para evitar duplicados
-        owned_app_ids = [app.id for app in owned_apps]
+        # Separar apps donde el usuario es owner vs team member
+        owned_apps_data = []
+        team_apps_data = []
         
-        team_memberships = (
-            db.session.query(App, TeamMember.role)
-            .join(TeamMember, TeamMember.app_id == App.id)
-            .filter(
-                TeamMember.user_id == current_user.id,
-                ~App.id.in_(owned_app_ids)  # Excluir apps que ya son del usuario
-            )
-            .order_by(App.created_at.desc())
-            .all()
-        )
-
-        # Preparar datos para el template
-        owned_apps_data = [{
-            "id": app.id,
-            "name": app.name,
-            "image_url": app.image_url or url_for('static', filename='Imagenes/logo.png'),
-            "description": app.description or "Sin descripción",
-            "theme": app.theme or "General",
-            "role": "Owner"
-        } for app in owned_apps]
-
-        team_apps_data = [{
-            "id": app.id,
-            "name": app.name,
-            "image_url": app.image_url or url_for('static', filename='Imagenes/logo.png'),
-            "description": app.description or "Sin descripción",
-            "theme": app.theme or "General",
-            "role": role
-        } for app, role in team_memberships]
+        for app in owned_apps:
+            # Determinar si es owner o team member
+            is_owner = False
+            is_team_member = False
+            team_role = "Miembro"
+            
+            # Verificar si es owner
+            if hasattr(app, 'owner_id') and app.owner_id == current_user.id:
+                is_owner = True
+                role = "Owner"
+            # Verificar si está en TeamMember
+            else:
+                team_member = TeamMember.query.filter_by(
+                    app_id=app.id, 
+                    user_id=current_user.id
+                ).first()
+                if team_member:
+                    is_team_member = True
+                    role = team_member.role or "Colaborador"
+            
+            app_data = {
+                "id": app.id,
+                "name": app.name,
+                "image_url": app.image_url or url_for('static', filename='Imagenes/logo.png'),
+                "description": app.description or "Sin descripción",
+                "theme": app.theme or "General",
+                "role": role
+            }
+            
+            if is_owner:
+                owned_apps_data.append(app_data)
+            elif is_team_member:
+                team_apps_data.append(app_data)
+            else:
+                # Si no es ni owner ni team member pero apareció en la lista, asumir owner
+                owned_apps_data.append(app_data)
 
         # Para debug: mostrar en consola qué apps se encontraron
         print(f"🔍 Usuario: {current_user.email}")
         print(f"📱 Apps como owner: {len(owned_apps_data)}")
         print(f"👥 Apps como team member: {len(team_apps_data)}")
         for app in owned_apps_data:
-            print(f"  - {app['name']} (ID: {app['id']})")
+            print(f"  - {app['name']} (ID: {app['id']}, Rol: {app['role']})")
 
         return render_template(
             "account.html",
