@@ -1080,42 +1080,55 @@ def create_app():
     @app.route("/account/apps/<uuid:app_id>/add_team_member_two", methods=["POST"])
     @login_required
     def add_team_member_two(app_id):
+        """
+        Añade un usuario como team member a la app.
+        - Asigna correctamente user_id.
+        - Evita duplicados.
+        - Devuelve info para que el frontend actualice la app en el perfil del usuario.
+        """
         try:
-            app = App.query.get_or_404(app_id)
-            
-            if app.owner_id != current_user.id:
+            # 1️⃣ Obtener la app
+            app_obj = App.query.get_or_404(app_id)
+
+            # Solo el owner puede añadir miembros
+            if app_obj.owner_id != current_user.id:
                 return jsonify({"success": False, "message": "No tienes permiso para añadir miembros"}), 403
-            
-            data = request.get_json()
-            
-            if not data.get("user_id"):
+
+            data = request.get_json() or {}
+
+            user_id = data.get("user_id")
+            role = data.get("role", "Colaborador")
+
+            if not user_id:
                 return jsonify({"success": False, "message": "Se requiere user_id"}), 400
-            
-            user_to_add = User.query.get(data["user_id"])
+
+            # 2️⃣ Obtener usuario
+            user_to_add = User.query.get(user_id)
             if not user_to_add:
                 return jsonify({"success": False, "message": "Usuario no encontrado"}), 404
-            
-            # Verificar que no esté ya en el equipo
+
+            # 3️⃣ Verificar que no esté ya en el equipo
             existing_member = TeamMember.query.filter_by(
-                app_id=app.id,
+                app_id=app_obj.id,
                 user_id=user_to_add.id
             ).first()
-            
             if existing_member:
-                return jsonify({"success": False, "message": "Este usuario ya está en el equipo"}), 400
-            
-            # ✅ ASIGNAR user_id correctamente
+                return jsonify({"success": False, "message": "Este usuario ya es miembro del equipo"}), 400
+
+            # 4️⃣ Crear TeamMember correctamente
             new_member = TeamMember(
-                app_id=app.id,
-                user_id=user_to_add.id,  # ✅ CLAVE: asignar el ID del usuario
-                role=data.get("role", "Colaborador"),
-                name=user_to_add.name,
-                avatar_url=user_to_add.avatar_url
+                app_id=app_obj.id,
+                user_id=user_to_add.id,       # 🔹 Esto es clave
+                role=role,
+                name=user_to_add.name,        # Nombre del usuario
+                avatar_url=user_to_add.avatar_url,
+                socials=user_to_add.socials or {}
             )
-            
+
             db.session.add(new_member)
             db.session.commit()
-            
+
+            # 5️⃣ Retornar info completa
             return jsonify({
                 "success": True,
                 "message": "Miembro añadido correctamente",
@@ -1124,13 +1137,16 @@ def create_app():
                     "user_id": new_member.user_id,
                     "name": new_member.name,
                     "role": new_member.role,
-                    "avatar_url": new_member.avatar_url
+                    "avatar_url": new_member.avatar_url,
+                    "socials": new_member.socials or {}
                 }
             })
+
         except Exception as e:
             db.session.rollback()
-            print(f"Error añadiendo miembro: {e}")
+            print(f"❌ Error añadiendo miembro: {e}")
             return jsonify({"success": False, "message": "Error interno"}), 500
+
 
 
     # Ruta para buscar usuarios (complementaria)
